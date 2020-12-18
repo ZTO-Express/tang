@@ -85,6 +85,7 @@ wiki是一个有用的开发工具。考虑创建一个包含不断发展的提�
 
 ##### Branch
 | 分支类型 | 分支描述 | 分支命名规范 |
+| :------ | :------ | :------ |
 | master | 稳定发布分支 | master |
 | develop | 开发分支 | develop |
 | hotfix | 热修复分支 | hotfix/[issue#number] |
