@@ -79,3 +79,17 @@ wiki是一个有用的开发工具。考虑创建一个包含不断发展的提�
 格式不如内容重要。
 
 每一节都分为一个评注/解释和例子。建议模板页面可以复制到孵化器Wiki上“建议”下的新页面，以加快创建速度。请删除多余的注释和示例部分。
+
+
+##### 开发规范
+
+##### Branch
+| 分支类型 | 分支描述 | 分支命名规范 |
+| master | 稳定发布分支 | master |
+| develop | 开发分支 | develop |
+| hotfix | 热修复分支 | hotfix/[issue#number] |
+| feature | 功能分支 | feature/[issue#number] |
+
+##### Commit
+
+// TODO
