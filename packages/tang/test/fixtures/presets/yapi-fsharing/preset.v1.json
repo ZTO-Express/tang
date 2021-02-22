@@ -1,0 +1,92 @@
+{
+  // 所有的插件基于事件驱动，但仍然遵循大的流程，事件有优先级以及同步或异步
+  "name": "@tang/yapi-sharing", // 预设名称
+  "version": "0.0.1", // 预设版本
+  "title": "yapi文档生成", // 标题
+  "description": "此预设用于通过api文档生成vue项目、调用接口及页面", // 描述
+  "contact": {
+    "name": "rayl", // 名称
+    "url": "https://github.com/ZTO-Express/tang", // url
+    "email": "rayl@pisaas.com" // 邮箱
+  },
+  "extends": {}, // 扩展其他配置
+  "plugins": {
+    // 插件的安装是并行的
+    "@tang/plugin-openapi-titan": {
+      // 插件
+      "install": [
+        "git clone git@github.com:pient/devspace.git",
+        "git checkout dev"
+      ] // 安装方式为git及地址
+    },
+    "@tang/plugin-yapi-openapi": {
+      // 插件
+      "install": "npm install", // 安装方式npm, 默认包名为key(@tang/plugin-yapi-openapi)
+      "version": "0.0.1"
+    }
+    // 所有插件安装完成，emit plugins:installed
+    // 所有插件安装完成后，开始执行插件初始化，插件的初始化目前是按优先级顺序进行的
+    // 默认按配置顺序 初始化完成后 emit plugins:initialized
+  },
+  "parsers": {
+    // 解析器会按自上而下的顺序执行
+    "plugin:yapi-openapi/parser": {
+      "trigger": "doc:loaded", // 默认触发时机
+      "emits": ["x:yapi:parsed"], // 自定义事件(完成后触发自定义事件)
+      "rules": {
+        "test": ".(json)$" // 解析json文件
+      }
+    },
+    "plugin:openapi-titan/parser": {
+      "trigger": "x:yapi:parsed", // 自定义触发时机
+      "emits": ["x:titan:parsed"], // 自定义事件(完成后触发自定义事件)
+      "rules": {
+        // 接收的文件或数据类型
+        "test": ".(yaml|json)$" // 只解析yaml或json文件
+      }
+    }
+    // 所有解析器执行完成，parsers针对某类型文件只执行一次，emit doc:parsed
+  },
+  "validators": {
+    "plugin:yapi-openapi/validator": {
+      "trigger": "x:yapi:parsed" // 默认触发时机(可设置为自定义事件)
+    }
+    // 所有解析器执行完成，emit doc:validated
+  },
+  "generators": {
+    "plugin:openapi-titan/generator": {
+      "trigger": "doc:parsed", // 默认触发时机
+      "include": [], // 包含的模版文件（以执行路径为基路径）
+      "exclude": [], // 排除的模版文件
+      "out": {
+        "dir": "", // 输出位置
+        "overwrite": true // 默认复写
+      }
+    },
+    "plugin:yapi-openapi/generator": {
+      "trigger": "doc:validated", // 触发时机（文档验证通过时）
+      "out": {
+        "git": "",
+        "branch": ""
+      }
+    }
+    // 所有生成器执行完成，emit doc:generated
+  },
+  "outputs": {
+    // 所有存储器执行完成，emit files:stored
+    "local": {
+      // 默认存储到本地文件系统
+      "outDir": ""
+    },
+    // 调用插件store方法
+    "plugin:openapi-titan/output": {
+      "trigger": "local:output"
+    }
+  },
+  "hooks": {
+    // 特定事件执行完成时触发
+    "titan:output": {
+      // 这里的事件是同步，并且有优先级，优先级高的先触发
+    }
+  }
+}

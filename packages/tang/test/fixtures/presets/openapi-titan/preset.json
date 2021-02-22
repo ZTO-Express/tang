@@ -1,0 +1,21 @@
+{
+  "doctype": "openapi",
+  "plugins": {
+    "@tang/plugin-openapi-titan": {
+      "version": "",
+      "git": ""
+    }
+  },
+  "validators": {
+    "plugin:openapi-titan/validator": {}
+  },
+  "generators": {
+    "plugin:openapi-titan/generator": {}
+  },
+  "config": {
+    "additinal": {},
+    "ignores": []
+  },
+  "extends": [],
+  "overrides": []
+}
