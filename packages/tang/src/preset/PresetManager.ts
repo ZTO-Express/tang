@@ -1,13 +1,15 @@
 import { fs, json5, validateSchema } from '../utils';
-
 import { Preset } from './Preset';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const presetSchema = require('../../schemas/preset.json');
 
 export class PresetManager {
   constructor(private readonly options: any) {}
 
   /** 预设所在文件夹 */
   get homedir() {
-    return `${this.options.homedir}/presets`;
+    return `${this.options.homedir}`;
   }
 
   /**
@@ -41,7 +43,14 @@ export class PresetManager {
       target = content;
     }
 
-    validateSchema({}, target);
+    try {
+      validateSchema(presetSchema, target);
+    } catch (err) {
+      // console.error(err);
+
+      debugger;
+      throw err;
+    }
 
     return true;
   }

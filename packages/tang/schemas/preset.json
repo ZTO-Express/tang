@@ -1,1 +1,176 @@
-{}
+{
+  "description": "预设schema",
+  "vesion": "0.0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "version"],
+  "properties": {
+    "name": {
+      "description": "预设名称（不能为空）",
+      "type": "string"
+    },
+    "version": {
+      "description": "预设版本（不能为空）",
+      "type": "string"
+    },
+    "title": {
+      "description": "预设标题",
+      "type": "string"
+    },
+    "description": {
+      "description": "预设描述",
+      "type": "string"
+    },
+    "contact": {
+      "$ref": "#/definitions/Contact"
+    },
+    "extends": {
+      "$ref": "#/definitions/Extends"
+    },
+    "plugins": {
+      "description": "插件列表",
+      "type": "array",
+      "items": {
+        "oneOf": [{ "$ref": "#/definitions/Plugin" }]
+      }
+    },
+    "parsers": {
+      "description": "解析器列表",
+      "type": "array",
+      "items": {
+        "oneOf": [{ "$ref": "#/definitions/Parser" }]
+      }
+    },
+    "generators": {
+      "description": "生成器列表",
+      "type": "array",
+      "items": {
+        "oneOf": [{ "$ref": "#/definitions/Generator" }]
+      }
+    },
+    "outputs": {
+      "description": "输出列表",
+      "type": "array",
+      "items": {
+        "oneOf": [{ "$ref": "#/definitions/Output" }]
+      }
+    },
+    "hooks": {
+      "description": "钩子列表",
+      "type": "array",
+      "items": {
+        "oneOf": [{ "$ref": "#/definitions/Hook" }]
+      }
+    }
+  },
+  "definitions": {
+    "Contact": {
+      "description": "预设作者以及联系方式等",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "联系人名称",
+          "type": "string"
+        },
+        "url": {
+          "description": "联系人网页",
+          "type": "string"
+        },
+        "email": {
+          "description": "联系人邮箱",
+          "type": "string"
+        }
+      }
+    },
+    "Extends": {
+      "description": "扩展配置",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "properties": {}
+        }
+      ]
+    },
+    "Plugin": {
+      "description": "插件配置",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "install"],
+      "properties": {
+        "name": {
+          "description": "插件名称（不能为空）",
+          "type": "string"
+        },
+        "install": {
+          "description": "安装命令",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    "Parser": {
+      "description": "解析器配置",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parser"],
+      "properties": {
+        "parser": {
+          "description": "解析器路径（不能为空）",
+          "type": "string"
+        },
+        "options": {}
+      }
+    },
+    "Generator": {
+      "description": "生成器配置",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generator"],
+      "properties": {
+        "generator": {
+          "description": "生成器路径（不能为空）",
+          "type": "string"
+        },
+        "options": {}
+      }
+    },
+    "Output": {
+      "description": "输出配置",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "description": "输出名称",
+          "type": "string"
+        },
+        "outDir": {
+          "description": "输出目录",
+          "type": "string"
+        },
+        "repository": {
+          "description": "git仓库",
+          "type": "string"
+        }
+      }
+    },
+    "Hook": {
+      "description": "钩子配置",
+      "type": "object",
+      "properties": {}
+    }
+  }
+}
