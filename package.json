@@ -1,0 +1,93 @@
+{
+  "name": "tang",
+  "private": true,
+  "scripts": {
+    "install": "lerna bootstrap",
+    "lint": "echo eslint",
+    "test": "npm run lint && lerna run test",
+    "build": "lerna run build --scope web",
+    "publish": "lerna publish && git commit -am \"Update version and changelog\" && git push origin master",
+    "clean": "lerna clean",
+    "commit": "git-cz",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
+    "release": "standard-version"
+  },
+  "dependencies": {
+    "ejs": "^3.1.5",
+    "execa": "^5.0.0",
+    "fs-extra": "^9.1.0",
+    "handlebars": "^4.7.6",
+    "json5": "^2.2.0",
+    "node-fetch": "^2.6.1",
+    "schema-utils": "^3.0.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@types/fs-extra": "^9.0.6",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.20",
+    "@types/node-fetch": "^2.5.8",
+    "@typescript-eslint/eslint-plugin": "^4.12.0",
+    "@typescript-eslint/parser": "^4.12.0",
+    "commitizen": "^4.2.2",
+    "conventional-changelog-cli": "^2.1.1",
+    "cz-customizable": "^6.3.0",
+    "eslint": "^7.17.0",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "husky": "^4.3.7",
+    "jest": "^26.6.3",
+    "lerna": "^3.13.1",
+    "lint-staged": "^10.5.3",
+    "nyc": "^15.1.0",
+    "prettier": "^2.2.1",
+    "standard-version": "^9.1.0",
+    "ts-jest": "^26.4.4",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3"
+  },
+  "engines": {
+    "node": ">= 10.13.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -e $GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "packages/**/*.{ts,json}": [
+      "prettier --ignore-path ./.prettierignore --write"
+    ]
+  },
+  "nyc": {
+    "include": [
+      "packages/**/*.ts"
+    ],
+    "exclude": [
+      "node_modules/",
+      "packages/**/test/**",
+      "packages/**/*.spec.ts",
+      "packages/**/test/**/*.ts",
+      "packages/tang/errors/**/*"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  }
+}

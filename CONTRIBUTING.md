@@ -47,7 +47,14 @@ _TBD: 提交合并时，使用 rebase 还是 merge。[git rebase vs merge](https
 
 ## Commit 约定
 
-此提交规范参考了由 **[Angluar 团队 Commit 规范](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines)** 衍生的 **[Conventional Commits Specification](https://www.conventionalcommits.org/en/v1.0.0/)**。
+提交时，我们建议采用如下命令进行提交，以保证提交符合 tang 的 commit 规范
+
+```
+# commit 命令
+npm run commit
+```
+
+tang 的 commit 规范参考了由 **[Angluar 团队 Commit 规范](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines)** 衍生的 **[Conventional Commits Specification](https://www.conventionalcommits.org/en/v1.0.0/)**。
 
 长话短说，提交消息必须满足如下正则：
 
