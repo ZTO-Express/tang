@@ -8,8 +8,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "schema-utils": "^3.0.0"
-  }
+  "license": "ISC"
 }
