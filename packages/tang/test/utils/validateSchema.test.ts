@@ -1,3 +1,4 @@
+import { ValidationError } from 'schema-utils';
 import { validateSchema } from '../../src/utils';
 
 describe('utils/validateSchema：validateSchema实用方法', () => {
@@ -29,13 +30,13 @@ describe('utils/validateSchema：validateSchema实用方法', () => {
       validateSchema(testSchema, {
         name: 'tang-test',
       });
-    }).toThrowError();
+    }).toThrowError(ValidationError);
 
     expect(() => {
       validateSchema(testSchema, {
         name: 'tang-test',
         exProp: 'xxxx',
       });
-    }).toThrowError();
+    }).toThrowError(ValidationError);
   });
 });
