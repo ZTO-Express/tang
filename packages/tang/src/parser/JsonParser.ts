@@ -1,15 +1,14 @@
-import { Document, DocumentParser, GenericConfigObject } from '../tang/types';
+import { DocumentModel } from '../tang/types';
+import { json5 } from '../utils';
 
 /**
  * Json解析器
  */
-export const JsonParser: DocumentParser = {
+export const jsonParser = {
   name: 'json',
 
-  async parse(
-    content: string | Buffer,
-    options?: GenericConfigObject,
-  ): Promise<Document> {
-    return {};
+  async parse(content: string): Promise<DocumentModel> {
+    const result = json5.parse(content);
+    return result;
   },
 };

@@ -1,13 +1,9 @@
 import { findBy, sortBy, clone } from '../utils';
-import {
-  DocumentLoader,
-  DocumentParser,
-  GeneratorOptions,
-} from '../tang/types';
-import { Generation } from './Generation';
+import { DocumentLoader, DocumentParser, CompilerOptions } from '../tang/types';
+import { Compilation } from './Compilation';
 
 /** 加载选项 */
-export interface GeneratorLoadOptions {
+export interface CompilerLoadOptions {
   entry?: string;
   loader?: string | DocumentLoader;
   parser?: string | DocumentParser;
@@ -16,23 +12,23 @@ export interface GeneratorLoadOptions {
 /**
  * 生成器
  */
-export class Generator {
+export class Compiler {
   private _loaders: DocumentLoader[];
   private _parsers: DocumentParser[];
 
-  constructor(options: GeneratorOptions) {
+  constructor(options: CompilerOptions) {
     this._loaders = this.sortByPriority(options.loaders);
     this._parsers = this.sortByPriority(options.parsers);
   }
 
   /**
-   * 生成器加载文档后生成Generation
+   * 生成器加载文档后生成Compilation
    * @param doc 文档
    */
   async load(
     entry: string,
-    options?: GeneratorLoadOptions,
-  ): Promise<Generation> {
+    options?: CompilerLoadOptions,
+  ): Promise<Compilation> {
     options = options || {};
     options.entry = entry;
 
@@ -49,17 +45,19 @@ export class Generator {
     const document = await parser.parse(docContent, parseOptions);
     // TODO: 新增解析完成事件
 
-    // 创建生成实例
-    const generation = new Generation(this, document);
+    // TODO 获取生成器实例
 
-    return generation;
+    // 创建生成实例
+    const compilation = new Compilation(this, document);
+
+    return compilation;
   }
 
   /**
    * 根据加载选项选择loader，默认选择第一个
    * @param options 加载选项
    */
-  getLoader(options: GeneratorLoadOptions) {
+  getLoader(options: CompilerLoadOptions) {
     const entry = options.entry;
 
     let loaderOptions: any = options.loader || {};
@@ -118,7 +116,7 @@ export class Generator {
    * 根据加载选项选择parser，默认选择第一个
    * @param options 加载选项
    */
-  getParser(options?: GeneratorLoadOptions) {
+  getParser(options?: CompilerLoadOptions) {
     if (!options || !options.parser) {
       return {
         parser: this._parsers[0],

@@ -77,14 +77,19 @@ export interface NormalizedTangOptions {
 }
 
 // 生成器配置选项
-export interface GeneratorOptions {
+export interface CompilerOptions {
   loaders: DocumentLoader[];
   parsers: DocumentParser[];
 }
 
 // 文档
 export interface Document {
-  models?: { [key: string]: any };
+  models?: { [key: string]: DocumentModel };
+}
+
+// 文档
+export interface DocumentModel {
+  [key: string]: any;
 }
 
 // 文档加载器
@@ -93,10 +98,7 @@ export interface DocumentLoader {
   priority?: number; // 加载器优先级
   test?: string | RegExp | ((entry: string) => boolean); // 验证是否可以加载指定文档（一般通过目标名称/路径即可判断）
   loadOptions?: GenericConfigObject;
-  load: (
-    entry: string,
-    options?: GenericConfigObject,
-  ) => Promise<string | Buffer>; // 加载方法
+  load: (entry: string, options?: GenericConfigObject) => Promise<string>; // 加载方法
 }
 
 // 文档解析器
@@ -105,7 +107,7 @@ export interface DocumentParser {
   priority?: number; // 加载器优先级
   parseOptions?: GenericConfigObject;
   parse: (
-    content: string | Buffer,
+    content: string,
     options?: GenericConfigObject,
-  ) => Promise<Document>;
+  ) => Promise<DocumentModel>;
 }

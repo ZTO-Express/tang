@@ -1,15 +1,17 @@
-import { Document, DocumentParser, GenericConfigObject } from '../tang/types';
+import { yaml } from '../utils';
+import { DocumentModel, GenericConfigObject } from '../tang/types';
 
 /**
  * Yaml解析器
  */
-export const YamlParser: DocumentParser = {
+export const yamlParser = {
   name: 'yaml',
 
   async parse(
-    content: string | Buffer,
+    content: string,
     options?: GenericConfigObject,
-  ): Promise<Document> {
-    return {};
+  ): Promise<DocumentModel> {
+    const result = yaml.load(content, options);
+    return result as DocumentModel;
   },
 };

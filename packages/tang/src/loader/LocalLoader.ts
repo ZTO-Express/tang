@@ -1,18 +1,15 @@
-import { DocumentLoader, GenericConfigObject } from '@/tang/types';
 import { check, fs } from '../utils';
+import { GenericConfigObject } from '../tang/types';
 
 /**
  * 本地文件加载器
  */
-export const LocalLoader: DocumentLoader = {
+export const localLoader = {
   name: 'local',
-  test: (entry: string) => {
-    return check.isAbsolutePath(entry) && fs.pathExistsSync(entry);
-  },
-  async load(
-    entry: string,
-    options?: GenericConfigObject,
-  ): Promise<string | Buffer> {
-    return '';
+  test: (entry: string) => check.isAbsolutePath(entry),
+  async load(entry: string, options?: GenericConfigObject): Promise<string> {
+    const buffer = await fs.readFile(entry, options);
+    const text = buffer.toString();
+    return text;
   },
 };
