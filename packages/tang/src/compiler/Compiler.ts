@@ -1,3 +1,4 @@
+import { error } from '../common';
 import { findBy, sortBy, deepClone, deepMerge } from '../utils';
 import {
   TangDocumentLoader,
@@ -58,10 +59,18 @@ export class Compiler {
     options.entry = entry;
 
     const loader = this.getLoader(options);
-    if (!loader) throw new Error('Not loader found');
+    if (!loader)
+      error.throwError({
+        code: error.Errors.BAD_LOADER,
+        message: '未找到加载器',
+      });
 
     const parser = this.getParser(options);
-    if (!parser) throw new Error('Not parser found');
+    if (!parser)
+      error.throwError({
+        code: error.Errors.BAD_PARSER,
+        message: '未找到解析器',
+      });
 
     // 加载器加载文档
     // TODO: 新增加载开始事件

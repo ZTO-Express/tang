@@ -1,3 +1,4 @@
+import { error } from '../common';
 import { fs, validateSchema } from '../utils';
 import { Preset } from './Preset';
 
@@ -70,6 +71,6 @@ export class PresetManager {
    */
   async save(preset: Preset) {
     console.debug(preset);
-    throw new Error('待实现');
+    error.throwError(error.errNotImplemented('待实现'));
   }
 }
