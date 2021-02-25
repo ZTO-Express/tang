@@ -1,8 +1,10 @@
 import * as testUtil from '../util';
 import { json5 } from '../../src/utils';
-import { urlLoader } from '../../src/loader';
+import * as loader from '../../src/loader';
 
 describe('loader/url：url加载器', () => {
+  const urlLoader = loader.urlLoader();
+
   it('urlLoader test方法', async () => {
     // 路径必须为绝对路径，并且存在
     expect(urlLoader.test('../fixture/presets/')).toBeFalsy();

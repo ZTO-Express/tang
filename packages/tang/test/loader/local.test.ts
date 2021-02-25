@@ -1,8 +1,10 @@
 import * as testUtil from '../util';
 import { json5 } from '../../src/utils';
-import { localLoader } from '../../src/loader';
+import * as loader from '../../src/loader';
 
 describe('loader/local：local加载器', () => {
+  const localLoader = loader.localLoader();
+
   it('localLoader test方法', async () => {
     // 路径必须为绝对路径，并且存在
     expect(localLoader.test('../fixture/presets/')).toBeFalsy();

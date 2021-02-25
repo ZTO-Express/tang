@@ -1,24 +1,49 @@
-import { findBy, sortBy, clone } from '../utils';
-import { DocumentLoader, DocumentParser, CompilerOptions } from '../tang/types';
+import { findBy, sortBy, deepClone, deepMerge } from '../utils';
+import {
+  TangDocumentLoader,
+  TangDocumentParser,
+  CompilerOptions,
+  GenericConfigObject,
+} from '../tang/types';
 import { Compilation } from './Compilation';
 
 /** 加载选项 */
 export interface CompilerLoadOptions {
   entry?: string;
-  loader?: string | DocumentLoader;
-  parser?: string | DocumentParser;
+  loader?: string | TangDocumentLoader;
+  loadOptions?: GenericConfigObject;
+  parser?: string | TangDocumentParser;
+  parseOptions?: GenericConfigObject;
 }
 
 /**
  * 生成器
  */
 export class Compiler {
-  private _loaders: DocumentLoader[];
-  private _parsers: DocumentParser[];
+  loaders: TangDocumentLoader[];
+  parsers: TangDocumentParser[];
+  defaultLoader: TangDocumentLoader;
+  defaultParser: TangDocumentParser;
 
   constructor(options: CompilerOptions) {
-    this._loaders = this.sortByPriority(options.loaders);
-    this._parsers = this.sortByPriority(options.parsers);
+    this.loaders = this.sortByPriority(options.loaders);
+    this.parsers = this.sortByPriority(options.parsers);
+
+    if (typeof options.defaultLoader === 'string') {
+      this.defaultLoader = this.loaders.find(
+        item => item.name === options.defaultLoader,
+      );
+    } else {
+      this.defaultLoader = options.defaultLoader || this.loaders[0];
+    }
+
+    if (typeof options.defaultParser === 'string') {
+      this.defaultParser = this.parsers.find(
+        item => item.name === options.defaultParser,
+      );
+    } else {
+      this.defaultParser = options.defaultParser || this.parsers[0];
+    }
   }
 
   /**
@@ -32,23 +57,35 @@ export class Compiler {
     options = options || {};
     options.entry = entry;
 
-    const { loader, loadOptions } = this.getLoader(options);
-    const { parser, parseOptions } = this.getParser(options);
+    const loader = this.getLoader(options);
+    if (!loader) throw new Error('Not loader found');
+
+    const parser = this.getParser(options);
+    if (!parser) throw new Error('Not parser found');
 
     // 加载器加载文档
     // TODO: 新增加载开始事件
-    const docContent = await loader.load(entry, loadOptions);
+    const docContent = await loader.load(entry, loader.loadOptions);
     // TODO: 新增加载结束事件
 
     // 解析器解析文档内容
     // TODO: 新增解析开始事件
-    const document = await parser.parse(docContent, parseOptions);
+    const docModel = await parser.parse(docContent, parser.parseOptions);
     // TODO: 新增解析完成事件
 
     // TODO 获取生成器实例
 
-    // 创建生成实例
-    const compilation = new Compilation(this, document);
+    const document = {
+      entry: options.entry,
+      content: docContent,
+      model: docModel,
+    };
+
+    const compilation = new Compilation(this, {
+      loader,
+      parser,
+      document,
+    });
 
     return compilation;
   }
@@ -57,49 +94,45 @@ export class Compiler {
    * 根据加载选项选择loader，默认选择第一个
    * @param options 加载选项
    */
-  getLoader(options: CompilerLoadOptions) {
+  getLoader(options: CompilerLoadOptions): TangDocumentLoader | undefined {
     const entry = options.entry;
+    const loaderOptions: any = options.loader || {};
 
-    let loaderOptions: any = options.loader || {};
-    let loadOptions: any = {}; // loader执行时配置
+    let loader: TangDocumentLoader;
 
     // 根据加载的文件的不同，创建加载器实例
     if (typeof loaderOptions === 'string') {
-      loaderOptions = { name: loaderOptions };
-    }
-
-    let loader: DocumentLoader;
-
-    if (typeof loaderOptions.load === 'function') {
-      // 如果选项中存在load方法，则此选项本身就是加载器
-      loader = loaderOptions as DocumentLoader;
-    } else if (loaderOptions.name) {
       // 如果有名字，则直接通过名字查找loader，并不进行test验证
-      loader = findBy<DocumentLoader>(
-        this._loaders,
-        'name',
-        loaderOptions.name,
-      );
+      loader = findBy<TangDocumentLoader>(this.loaders, 'name', loaderOptions);
+    } else if (typeof loaderOptions.load === 'function') {
+      // 如果选项中存在load方法，则此选项本身就是加载器
+      loader = loaderOptions as TangDocumentLoader;
+    } else if (this.testLoader(this.defaultLoader, entry)) {
+      // 如果未提供loader测尝试使用默认loader
+      loader = this.defaultLoader;
     } else {
-      loader = this._loaders.filter(l => {
-        return this.testLoader(l, entry);
-      })[0];
+      // 如果未提供loader及默认loader测尝试使用符合test条件的第一个loader
+      loader = this.loaders.filter(l => this.testLoader(l, entry))[0];
     }
 
-    loadOptions = Object.assign(
-      clone(loader && loader.loadOptions),
-      loaderOptions.loadOptions,
-    );
+    if (!loader) return undefined;
 
-    return { loader, loadOptions };
+    loader.loadOptions = deepMerge(
+      loader.loadOptions,
+      loaderOptions.loadOptions,
+      options.loadOptions,
+    ) as GenericConfigObject;
+
+    const result = deepClone(loader);
+    return result;
   }
 
   /**
    * 初步判断目标文件是否能被加载器加载
    * @param entry 验证目标
    */
-  async testLoader(loader: DocumentLoader, entry: string) {
-    if (!loader.test) return true;
+  testLoader(loader: TangDocumentLoader, entry: string): boolean {
+    if (!entry || !loader.test) return true;
 
     if (typeof loader.test === 'string') {
       return new RegExp(loader.test).test(entry);
@@ -116,40 +149,35 @@ export class Compiler {
    * 根据加载选项选择parser，默认选择第一个
    * @param options 加载选项
    */
-  getParser(options?: CompilerLoadOptions) {
-    if (!options || !options.parser) {
-      return {
-        parser: this._parsers[0],
-      };
-    }
+  getParser(options?: CompilerLoadOptions): TangDocumentParser | undefined {
+    const parserOptions: any = options.parser || {};
 
-    let parserOptions: any = options.parser;
-    let parseOptions: any = {}; // parser执行时配置
+    let parser: TangDocumentParser;
 
-    // 根据加载的文件的不同，创建加载器实例
-    if (typeof options.parser === 'string') {
-      parserOptions = { name: options.parser };
-    }
-
-    let parser: DocumentParser;
-
-    if (typeof parserOptions.parse === 'function') {
+    if (typeof parserOptions === 'string') {
+      // 如果有名字，则直接通过名字查找loader，并不进行test验证
+      parser = findBy<TangDocumentParser>(this.parsers, 'name', parserOptions);
+    } else if (typeof parserOptions.parse === 'function') {
       // 如果选项中存在parse方法，则此选项本身就是解析器
-      parser = parserOptions as DocumentParser;
-    } else if (parserOptions.name) {
-      // 如果选项中存在名称，则通过名称查找加载器
-      parser = findBy<DocumentParser>(
-        this._parsers,
-        'name',
-        parserOptions.name,
-      );
+      parser = parserOptions as TangDocumentParser;
+    } else if (this.defaultParser) {
+      // 如果未提供parser测尝试使用默认parser
+      parser = this.defaultParser;
+    } else {
+      // 如果未提供parser及默认parser测尝试使用第一个parser
+      parser = this.parsers[0];
     }
 
-    if (parserOptions.parseOptions) {
-      parseOptions = parserOptions.parseOptions;
-    }
+    if (!parser) return undefined;
 
-    return { parser, parseOptions };
+    parser.parseOptions = deepMerge(
+      parser.parseOptions,
+      parserOptions.parseOptions,
+      options.parseOptions,
+    ) as GenericConfigObject;
+
+    const result = deepClone(parser);
+    return result;
   }
 
   /**

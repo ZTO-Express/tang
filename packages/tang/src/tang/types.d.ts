@@ -78,22 +78,26 @@ export interface NormalizedTangOptions {
 
 // 生成器配置选项
 export interface CompilerOptions {
-  loaders: DocumentLoader[];
-  parsers: DocumentParser[];
+  defaultLoader?: string | TangDocumentLoader;
+  defaultParser?: string | TangDocumentParser;
+  loaders: TangDocumentLoader[];
+  parsers: TangDocumentParser[];
 }
 
 // 文档
-export interface Document {
-  models?: { [key: string]: DocumentModel };
+export interface TangDocument {
+  entry: string;
+  content: string;
+  model: TangDocumentModel;
 }
 
 // 文档
-export interface DocumentModel {
+export interface TangDocumentModel {
   [key: string]: any;
 }
 
 // 文档加载器
-export interface DocumentLoader {
+export interface TangDocumentLoader {
   name: string; // 加载器名称
   priority?: number; // 加载器优先级
   test?: string | RegExp | ((entry: string) => boolean); // 验证是否可以加载指定文档（一般通过目标名称/路径即可判断）
@@ -102,12 +106,12 @@ export interface DocumentLoader {
 }
 
 // 文档解析器
-export interface DocumentParser {
+export interface TangDocumentParser {
   name: string; // 加载器名称
   priority?: number; // 加载器优先级
   parseOptions?: GenericConfigObject;
   parse: (
     content: string,
     options?: GenericConfigObject,
-  ) => Promise<DocumentModel>;
+  ) => Promise<TangDocumentModel>;
 }

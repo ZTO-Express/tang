@@ -1,8 +1,11 @@
 import * as testUtil from '../util';
-import { localLoader } from '../../src/loader';
-import { jsonParser } from '../../src/parser';
+import * as loader from '../../src/loader';
+import * as parser from '../../src/parser';
 
 describe('parser/json：json解析器', () => {
+  const localLoader = loader.localLoader();
+  const jsonParser = parser.jsonParser();
+
   let presetText = '';
 
   beforeAll(async () => {

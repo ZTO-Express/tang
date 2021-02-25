@@ -20,9 +20,6 @@ export class PresetManager {
     try {
       validateSchema(presetSchema, content);
     } catch (err) {
-      // console.error(err);
-
-      // debugger;
       throw err;
     }
 

@@ -1,3 +1,6 @@
+import deepmerge from 'deepmerge';
+import { isNullOrUndefined, isPlainObject } from './check';
+
 /**
  * 返回数组
  * @param items 为数组返回原值，为空则空数组，否则返回目标为唯一项的数组
@@ -65,7 +68,7 @@ export function sortBy<T>(
 }
 
 /** 深度克隆，并支持循环应用 */
-export function clone(obj: any, cache: any[] = []) {
+export function deepClone(obj: any, cache: any[] = []) {
   if (null == obj || 'object' != typeof obj) return obj;
 
   // 处理日期
@@ -85,8 +88,19 @@ export function clone(obj: any, cache: any[] = []) {
   cache.push({ original: obj, copy });
 
   Object.keys(obj).forEach(key => {
-    copy[key] = clone((<any>obj)[key], cache);
+    copy[key] = deepClone((<any>obj)[key], cache);
   });
 
   return copy;
+}
+
+/**
+ * 深度合并，合并后会产生新的对象
+ * @param args 被和并的对象
+ */
+export function deepMerge(...args: any[]) {
+  const items = args.filter(it => !isNullOrUndefined(it));
+  return deepmerge.all(items, {
+    isMergeableObject: isPlainObject,
+  });
 }

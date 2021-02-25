@@ -1,8 +1,11 @@
 import * as testUtil from '../util';
-import { localLoader } from '../../src/loader';
-import { yamlParser } from '../../src/parser';
+import * as loader from '../../src/loader';
+import * as parser from '../../src/parser';
 
 describe('parser/json：json解析器', () => {
+  const localLoader = loader.localLoader();
+  const yamlParser = parser.yamlParser();
+
   const simpleText = 'simple text';
   let docText = '';
 

@@ -1,9 +1,30 @@
-import { Document } from '../tang/types';
+import {
+  TangDocument,
+  TangDocumentLoader,
+  TangDocumentParser,
+} from '../tang/types';
 import { Compiler } from './Compiler';
+
+/** 编译实例选项 */
+export interface CompilationOptions {
+  loader: TangDocumentLoader;
+  parser: TangDocumentParser;
+  document: TangDocument;
+}
 
 /**
  * 由Compiler加载文档后产生
  */
 export class Compilation {
-  constructor(readonly compiler: Compiler, readonly document: Document) {}
+  compiler: Compiler;
+  document: TangDocument;
+  loader: TangDocumentLoader;
+  parser: TangDocumentParser;
+
+  constructor(compiler: Compiler, options: CompilationOptions) {
+    this.compiler = compiler;
+    this.document = options.document;
+    this.loader = options.loader;
+    this.parser = options.parser;
+  }
 }
