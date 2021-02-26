@@ -29,3 +29,4 @@ yarn-error.log
 /packages/graphql
 /benchmarks/memory
 build/config\.gypi
+.test_output

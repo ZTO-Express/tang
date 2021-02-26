@@ -6,15 +6,16 @@ describe('loader/url：url加载器', () => {
   const urlLoader = loader.urlLoader();
 
   it('urlLoader test方法', async () => {
+    const loaderTest: any = urlLoader.test;
     // 路径必须为绝对路径，并且存在
-    expect(urlLoader.test('../fixture/presets/')).toBeFalsy();
-    expect(urlLoader.test('http://www.example.org')).toBeTruthy();
+    expect(loaderTest('../fixture/presets/')).toBeFalsy();
+    expect(loaderTest('http://www.example.org')).toBeTruthy();
 
     const yfPresetUrl = testUtil.resolveFixtureUrl(
       'presets/yapi-fsharing/preset.json',
     );
 
-    expect(urlLoader.test(yfPresetUrl)).toBeTruthy();
+    expect(loaderTest(yfPresetUrl)).toBeTruthy();
   });
 
   it('urlLoader load方法', async () => {

@@ -1,4 +1,4 @@
-import { GenericConfigObject, NormalizedTangOptions } from '../tang/types';
+import { GenericConfigObject, NormalizedTangOptions } from '../common/types';
 
 /**
  * 对传入的选项进行规范化

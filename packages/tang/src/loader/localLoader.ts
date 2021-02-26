@@ -1,11 +1,13 @@
 import { check, fs } from '../utils';
-import { GenericConfigObject } from '../tang/types';
+import { GenericConfigObject, TangDocumentLoader } from '../common/types';
 
 /**
  * 本地文件加载器
  */
-export const localLoader = () => {
+export const localLoader = (): TangDocumentLoader => {
   return {
+    type: 'loader',
+
     name: 'local',
 
     test: (entry: string) => check.isAbsolutePath(entry),

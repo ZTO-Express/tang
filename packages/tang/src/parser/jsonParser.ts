@@ -1,11 +1,13 @@
-import { TangDocumentModel } from '../tang/types';
+import { TangDocumentModel, TangDocumentParser } from '../common/types';
 import { json5 } from '../utils';
 
 /**
  * Json解析器
  */
-export const jsonParser = () => {
+export const jsonParser = (): TangDocumentParser => {
   return {
+    type: 'parser',
+
     name: 'json',
 
     async parse(content: string): Promise<TangDocumentModel> {

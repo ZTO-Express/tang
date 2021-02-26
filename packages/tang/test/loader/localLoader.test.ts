@@ -6,19 +6,21 @@ describe('loader/local：local加载器', () => {
   const localLoader = loader.localLoader();
 
   it('localLoader test方法', async () => {
+    const loaderTest: any = localLoader.test;
+
     // 路径必须为绝对路径，并且存在
-    expect(localLoader.test('../fixture/presets/')).toBeFalsy();
-    expect(localLoader.test('http://www.example.org')).toBeFalsy();
-    expect(localLoader.test('xxxx')).toBeFalsy();
+    expect(loaderTest('../fixture/presets/')).toBeFalsy();
+    expect(loaderTest('http://www.example.org')).toBeFalsy();
+    expect(loaderTest('xxxx')).toBeFalsy();
     expect(
-      localLoader.test('../fixture/presets/yapi-fsharing/preset.json'),
+      loaderTest('../fixture/presets/yapi-fsharing/preset.json'),
     ).toBeFalsy();
 
     const yfPresetPath = testUtil.resolveFixturePath(
       'presets/yapi-fsharing/preset.json',
     );
 
-    expect(localLoader.test(yfPresetPath)).toBeTruthy();
+    expect(loaderTest(yfPresetPath)).toBeTruthy();
   });
 
   it('localLoader load方法', async () => {

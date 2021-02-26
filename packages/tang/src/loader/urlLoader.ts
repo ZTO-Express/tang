@@ -1,11 +1,13 @@
 import { check, fetch } from '../utils';
-import { GenericConfigObject } from '../tang/types';
+import { GenericConfigObject, TangDocumentLoader } from '../common/types';
 
 /**
  * 通过url加载文件
  */
-export const urlLoader = () => {
+export const urlLoader = (): TangDocumentLoader => {
   return {
+    type: 'loader',
+
     name: 'url',
 
     test: (entry: string) => check.isUrl(entry),

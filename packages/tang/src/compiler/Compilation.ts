@@ -2,7 +2,7 @@ import {
   TangDocument,
   TangDocumentLoader,
   TangDocumentParser,
-} from '../tang/types';
+} from '../common/types';
 import { Compiler } from './Compiler';
 
 /** 编译实例选项 */

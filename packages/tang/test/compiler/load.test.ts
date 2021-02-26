@@ -20,12 +20,12 @@ describe('compiler/load：load 加载', () => {
   );
 
   beforeAll(() => {
-    compiler1 = new Compiler({
+    compiler1 = testUtil.createDefaultCompiler({
       loaders: [urlLoader, localLoader],
       parsers: [jsonParser, yamlParser],
     });
 
-    compiler2 = new Compiler({
+    compiler2 = testUtil.createDefaultCompiler({
       defaultParser: 'yaml',
       loaders: [urlLoader, localLoader],
       parsers: [jsonParser, yamlParser],

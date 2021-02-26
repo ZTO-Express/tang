@@ -1,11 +1,17 @@
 import { yaml } from '../utils';
-import { TangDocumentModel, GenericConfigObject } from '../tang/types';
+import {
+  TangDocumentModel,
+  GenericConfigObject,
+  TangDocumentParser,
+} from '../common/types';
 
 /**
  * Yaml解析器
  */
-export const yamlParser = () => {
+export const yamlParser = (): TangDocumentParser => {
   return {
+    type: 'parser',
+
     name: 'yaml',
 
     async parse(

@@ -1,10 +1,10 @@
-import { getNormalizedOptions } from '../options/normalizeOptions';
-import { Compiler } from '../compiler/Compiler';
+import { getNormalizedOptions } from './options/normalizeOptions';
+import { Compiler } from './compiler/Compiler';
 import {
   TangDocumentLoader,
   TangDocumentParser,
   GenericConfigObject,
-} from './types';
+} from './common/types';
 
 export default function tang(options: GenericConfigObject): Promise<Compiler> {
   const compiler = createCompiler(options);

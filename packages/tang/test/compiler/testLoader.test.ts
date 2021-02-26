@@ -39,5 +39,9 @@ describe('compiler/loader：测试loader testLoader', () => {
     expect(
       compiler.testLoader(localLoader, 'http://www.example.com'),
     ).toBeFalsy();
+
+    expect(
+      compiler.testLoader(localLoader, { entry: 'c://a/b.json' }),
+    ).toBeTruthy();
   });
 });

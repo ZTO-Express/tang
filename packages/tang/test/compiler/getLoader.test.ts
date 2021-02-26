@@ -1,28 +1,23 @@
+import * as testUtil from '../util';
 import { Compiler } from '../../src/compiler';
 
 import * as loader from '../../src/loader';
-import * as parser from '../../src/parser';
 
 describe('compiler/loader：获取加载器 getLoader', () => {
   const urlLoader = loader.urlLoader();
   const localLoader = loader.localLoader();
 
-  const jsonParser = parser.jsonParser();
-  const yamlParser = parser.yamlParser();
-
   let compiler1: Compiler;
   let compiler2: Compiler;
 
   beforeAll(() => {
-    compiler1 = new Compiler({
+    compiler1 = testUtil.createDefaultCompiler({
       loaders: [urlLoader, localLoader],
-      parsers: [jsonParser, yamlParser],
     });
 
-    compiler2 = new Compiler({
+    compiler2 = testUtil.createDefaultCompiler({
       defaultLoader: 'local',
       loaders: [urlLoader, localLoader],
-      parsers: [jsonParser, yamlParser],
     });
   });
 

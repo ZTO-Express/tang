@@ -1,4 +1,4 @@
-import { TangError, TangWarning } from '../tang/types';
+import { TangError, TangWarning } from '../common/types';
 
 // 错误代码
 export enum Errors {
@@ -7,6 +7,9 @@ export enum Errors {
   ALREADY_CLOSED = 'ALREADY_CLOSED',
   BAD_LOADER = 'BAD_LOADER',
   BAD_PARSER = 'BAD_PARSER',
+  BAD_GENERATOR = 'BAD_GENERATOR',
+  BAD_OUTPUTER = 'BAD_OUTPUTER',
+  INVALID_ARGUMENTS = 'INVALID_ARGUMENTS',
   CANNOT_EMIT_FROM_OPTIONS_HOOK = 'CANNOT_EMIT_FROM_OPTIONS_HOOK',
   EXTERNAL_SYNTHETIC_EXPORTS = 'EXTERNAL_SYNTHETIC_EXPORTS',
   FILE_NAME_CONFLICT = 'FILE_NAME_CONFLICT',
@@ -33,6 +36,14 @@ export function throwError(base: string | Error | TangError): never {
     base = Object.assign(new Error(baseErr.message), base);
 
   throw base;
+}
+
+// 无效参数
+export function errInvalidArguments(errorData: string | TangWarning) {
+  return {
+    code: Errors.INVALID_ARGUMENTS,
+    ...(typeof errorData === 'string' ? { message: errorData } : errorData),
+  };
 }
 
 // 功能未实现提示

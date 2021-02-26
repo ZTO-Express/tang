@@ -79,9 +79,16 @@ export interface NormalizedTangOptions {
 // 生成器配置选项
 export interface CompilerOptions {
   defaultLoader?: string | TangDocumentLoader;
-  defaultParser?: string | TangDocumentParser;
   loaders: TangDocumentLoader[];
+
+  defaultParser?: string | TangDocumentParser;
   parsers: TangDocumentParser[];
+
+  defaultGenerator?: string | TangDocumentGenerator;
+  generators: TangDocumentGenerator[];
+
+  defaultOutputer?: string | TangDocumentOutputer;
+  outputers: TangDocumentOutputer[];
 }
 
 // 文档
@@ -96,22 +103,73 @@ export interface TangDocumentModel {
   [key: string]: any;
 }
 
+// 文件块（用于生成文件）
+export interface TangChunk {
+  name: string;
+  content: string | Buffer;
+}
+
+// 文档生成结果
+export interface TangDocumentGeneration {
+  chunks: TangChunk[];
+}
+
+export type TangDocumentProcesserTypes =
+  | 'loader'
+  | 'parser'
+  | 'generator'
+  | 'outputer';
+
+// 当前文档处理器
+export interface TangDocumentProcesser {
+  type: TangDocumentProcesserTypes;
+  name: string; // 处理器名称
+  priority?: number; // 处理器优先级
+  [prop: string]: any; // 其他属性，如处理选项等
+}
+
+// 当前文档处理器
+export interface TangDocumentProcesser {
+  type: TangDocumentProcesserTypes; // 处理器类型
+  name: string; // 处理器名称
+  priority?: number; // 处理器优先级
+}
+
 // 文档加载器
-export interface TangDocumentLoader {
-  name: string; // 加载器名称
-  priority?: number; // 加载器优先级
+export interface TangDocumentLoader extends TangDocumentProcesser {
   test?: string | RegExp | ((entry: string) => boolean); // 验证是否可以加载指定文档（一般通过目标名称/路径即可判断）
   loadOptions?: GenericConfigObject;
   load: (entry: string, options?: GenericConfigObject) => Promise<string>; // 加载方法
 }
 
 // 文档解析器
-export interface TangDocumentParser {
-  name: string; // 加载器名称
-  priority?: number; // 加载器优先级
+export interface TangDocumentParser extends TangDocumentProcesser {
   parseOptions?: GenericConfigObject;
   parse: (
     content: string,
     options?: GenericConfigObject,
   ) => Promise<TangDocumentModel>;
+}
+
+// 文档生成器
+export interface TangDocumentGenerator extends TangDocumentProcesser {
+  generateOptions?: GenericConfigObject;
+  generate: (
+    document: TangDocument,
+    options?: GenericConfigObject,
+  ) => Promise<TangDocumentGeneration>;
+}
+
+export interface TangDocumentOutput {
+  result: boolean;
+  [prop: string]: any;
+}
+
+// 文件输出器
+export interface TangDocumentOutputer extends TangDocumentProcesser {
+  outputOptions?: GenericConfigObject;
+  output: (
+    generation: TangDocumentGeneration,
+    options?: GenericConfigObject,
+  ) => Promise<TangDocumentOutput>;
 }
