@@ -77,4 +77,23 @@ describe('utils/check：check实用方法', () => {
     expect(check.isPlainObject(new Error())).toBeFalsy();
     expect(check.isPlainObject(new Function())).toBeFalsy();
   });
+
+  it('验证isPlainObject2', () => {
+    class ExObj extends Object {}
+
+    const exObj2: any = new ExObj();
+    exObj2.constructor = { prototype: undefined };
+    expect(check.isPlainObject(exObj2)).toBeFalsy();
+
+    const exObj = new ExObj();
+    expect(check.isPlainObject(exObj)).toBeFalsy();
+    exObj.constructor = undefined;
+    expect(check.isPlainObject(exObj)).toBeTruthy();
+
+    class ExError extends Error {
+      exProp: '';
+    }
+    const exError = new ExError();
+    expect(check.isPlainObject(exError)).toBeFalsy();
+  });
 });

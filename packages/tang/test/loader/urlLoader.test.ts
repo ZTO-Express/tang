@@ -31,6 +31,10 @@ describe('loader/url：url加载器', () => {
   });
 
   it('urlLoader load方法 文件不存在', async () => {
+    await expect(
+      urlLoader.load('https://www.baidu.com/xxx'),
+    ).rejects.toThrowError(/not found/i);
+
     const yfPresetUrl = testUtil.resolveFixtureUrl(
       'presets/yapi-fsharing/preset.json1',
     );

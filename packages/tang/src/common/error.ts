@@ -54,7 +54,7 @@ export function errNotImplemented(errorData: string | TangWarning) {
   };
 }
 
-// 废弃代码异常
+// 废弃功能异常
 export function errDeprecation(errorData: string | TangWarning) {
   return {
     code: Errors.DEPRECATED_FEATURE,

@@ -7,6 +7,7 @@ import * as fs from 'fs-extra';
 import * as json5 from 'json5';
 import fetch from 'node-fetch';
 
+import { error } from '../common';
 import * as check from './check';
 
 export * from 'fs-extra';
@@ -40,6 +41,8 @@ export async function resolveFile(file: string, encoding = 'utf-8') {
         _data = await resp.text();
         break;
     }
+  } else {
+    error.throwError(error.errInvalidArguments('无效文件路径'));
   }
 
   if (!_data) return _data;

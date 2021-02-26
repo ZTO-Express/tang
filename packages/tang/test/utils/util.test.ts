@@ -4,9 +4,19 @@ import {
   sortBy,
   deepClone,
   deepMerge,
+  capitalizeFirst,
 } from '../../src/utils';
 
 describe('utils/util：通用实用方法', () => {
+  it('capitalizeFirst, 首字母打下', () => {
+    expect(capitalizeFirst('')).toBe('');
+    expect(capitalizeFirst(undefined)).toBe(undefined);
+    expect(capitalizeFirst(null)).toBe(null);
+
+    expect(capitalizeFirst('abc')).toBe('Abc');
+    expect(capitalizeFirst('_abc')).toBe('_abc');
+  });
+
   it('ensureArray：确保对象转换为数组', async () => {
     expect(ensureArray([1, 2])).toEqual([1, 2]);
     expect(ensureArray([{ a: 1, b: 2 }])).toEqual([{ a: 1, b: 2 }]);
@@ -21,6 +31,10 @@ describe('utils/util：通用实用方法', () => {
   });
 
   it('findBy：根据key查找对象', async () => {
+    expect(findBy(undefined, 'x', 'y')).toBeUndefined();
+    expect(findBy(null, 'x', 'y')).toBeUndefined();
+    expect(findBy([], 'x', 'y')).toBeUndefined();
+
     expect(findBy([0, 1, 2], 'a', 1)).toBeUndefined();
 
     expect(
@@ -38,7 +52,7 @@ describe('utils/util：通用实用方法', () => {
 
   it('sortBy：根据key排序对象', async () => {
     const items1 = [0, 1, 2];
-    const items2 = [{ a: 1 }, { a: 2, b: 3 }, { a: 2, b: 6, c: 6 }];
+    const items2 = [{ a: 2, b: 3 }, { a: 1 }, { a: 2, b: 6, c: 6 }];
 
     // 排序将产生新的数组
     expect(sortBy(items1, 'a') === items1).toBeFalsy();
@@ -68,6 +82,19 @@ describe('utils/util：通用实用方法', () => {
       { a: 2, b: 6, c: 6 },
       { a: 2, b: 3 },
       { a: 1 },
+    ]);
+
+    // 0也是默认顺序排列
+    expect(sortBy(items2, 'b', { sortOrder: 0 })).toStrictEqual([
+      { a: 1 },
+      { a: 2, b: 3 },
+      { a: 2, b: 6, c: 6 },
+    ]);
+
+    expect(sortBy(items2, 'b', { sortOrder: null })).toStrictEqual([
+      { a: 1 },
+      { a: 2, b: 3 },
+      { a: 2, b: 6, c: 6 },
     ]);
   });
 

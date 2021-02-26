@@ -4,6 +4,8 @@ import {
   TangDocumentLoader,
   TangDocumentParser,
   GenericConfigObject,
+  TangDocumentGenerator,
+  TangDocumentOutputer,
 } from './common/types';
 
 export default function tang(options: GenericConfigObject): Promise<Compiler> {
@@ -26,9 +28,17 @@ async function createCompiler(
   // 获取所有parsers
   const parsers: TangDocumentParser[] = [];
 
+  // 获取所有generators
+  const generators: TangDocumentGenerator[] = [];
+
+  // 获取所有outputers
+  const outputers: TangDocumentOutputer[] = [];
+
   const compiler = new Compiler({
     loaders,
     parsers,
+    generators,
+    outputers,
   });
 
   return compiler;

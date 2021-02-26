@@ -25,22 +25,32 @@ describe('outputer/local：local加载器', () => {
         name: 'preset.json',
         content: JSON.stringify(samplePresetData),
       },
+      {
+        name: 'blank.json',
+        content: '',
+      },
     ];
   });
 
-  it('localOutputer load方法', async () => {
+  it('localOutputer output方法', async () => {
+    await fs.emptyDir(testTmpDir);
+
+    await expect(
+      localOutputer.output({ chunks: sampleChunks }, {}),
+    ).rejects.toThrow('请提供输出目录');
+
     const output = await localOutputer.output(
       {
         chunks: sampleChunks,
       },
       {
         outputDir: testTmpDir,
-        clearDir: true,
         overwrite: true,
       },
     );
 
     expect(output.result).toBe(true);
+    expect(output.files.length).toBe(1);
 
     const files: any[] = output.files;
 
@@ -48,6 +58,18 @@ describe('outputer/local：local加载器', () => {
 
     expect(testData.name).toStrictEqual('@tang/yapi-sharing');
     expect(testData).toStrictEqual(samplePresetData);
+
+    const output2 = await localOutputer.output(
+      {
+        chunks: sampleChunks,
+      },
+      {
+        outputDir: testTmpDir,
+        clearDir: true,
+        overwrite: false,
+      },
+    );
+    expect(output2.files.length).toBe(0);
 
     await fs.emptyDir(testTmpDir);
   });

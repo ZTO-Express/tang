@@ -17,16 +17,7 @@ export interface TangError extends TangLogProps {
 export interface TangWarning extends TangLogProps {
   chunkName?: string;
   cycle?: string[];
-  exporter?: string;
-  exportName?: string;
   guess?: string;
-  importer?: string;
-  missing?: string;
-  modules?: string[];
-  names?: string[];
-  reexporter?: string;
-  source?: string;
-  sources?: string[];
 }
 
 // 日志属性

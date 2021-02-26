@@ -40,9 +40,7 @@ export const localOutputer = (): TangDocumentOutputer => {
       const files: any[] = [];
 
       const ops = generation.chunks.map(async chunk => {
-        if (!chunk.content) {
-          return;
-        }
+        if (!chunk.content) return;
 
         const filePath = path.join(outputDir, chunk.name);
 

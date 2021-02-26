@@ -15,7 +15,6 @@ export const urlLoader = (): TangDocumentLoader => {
     async load(entry: string, options?: GenericConfigObject): Promise<string> {
       const res = await fetch.request(entry, options);
       const text = await res.text();
-
       if (!res.ok) {
         let errorMsg = res.statusText;
 

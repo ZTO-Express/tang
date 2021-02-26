@@ -57,6 +57,7 @@ export function isNullOrUndefined(o: unknown) {
 
 // 目标是否普通对象
 export function isPlainObject(o: unknown) {
+  debugger;
   if (isObject(o) === false) return false;
 
   // If has modified constructor
