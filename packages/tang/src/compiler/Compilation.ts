@@ -1,27 +1,28 @@
 import {
   TangDocument,
-  TangDocumentLoader,
-  TangDocumentParser,
+  TangCompiler,
+  TangLoader,
+  TangParser,
+  TangCompilation,
 } from '../common/types';
-import { Compiler } from './Compiler';
 
 /** 编译实例选项 */
 export interface CompilationOptions {
-  loader: TangDocumentLoader;
-  parser: TangDocumentParser;
+  loader: TangLoader;
+  parser: TangParser;
   document: TangDocument;
 }
 
 /**
  * 由Compiler加载文档后产生
  */
-export class Compilation {
-  compiler: Compiler;
+export class Compilation implements TangCompilation {
+  compiler: TangCompiler;
   document: TangDocument;
-  loader: TangDocumentLoader;
-  parser: TangDocumentParser;
+  loader: TangLoader;
+  parser: TangParser;
 
-  constructor(compiler: Compiler, options: CompilationOptions) {
+  constructor(compiler: TangCompiler, options: CompilationOptions) {
     this.compiler = compiler;
     this.document = options.document;
     this.loader = options.loader;

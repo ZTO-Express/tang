@@ -3,9 +3,9 @@ import { memfs } from '../utils';
 
 import {
   GenericConfigObject,
-  TangDocumentGeneration,
-  TangDocumentOutput,
-  TangDocumentOutputer,
+  TangGeneration,
+  TangOutput,
+  TangOutputer,
 } from '../common/types';
 
 const Volume = memfs.Volume;
@@ -13,16 +13,16 @@ const Volume = memfs.Volume;
 /**
  * 内存文件输出器，一般用于测试或watch的场景
  */
-export const memoryOutputer = (): TangDocumentOutputer => {
+export const memoryOutputer = (): TangOutputer => {
   return {
     type: 'outputer',
 
     name: 'memory',
 
     async output(
-      generation: TangDocumentGeneration,
+      generation: TangGeneration,
       options?: GenericConfigObject,
-    ): Promise<TangDocumentOutput> {
+    ): Promise<TangOutput> {
       const vol = Volume.fromJSON({});
       const fs = vol.promises;
 

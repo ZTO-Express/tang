@@ -36,8 +36,12 @@
     // 所有插件安装完成后，开始执行插件初始化，插件的初始化目前是按优先级顺序进行的
     // 默认按配置顺序 初始化完成后 emit plugins:initialized
   ],
+  "loaders": [
+    // 默认包含local, url加载器
+  ],
   "parsers": [
-    // 解析器会按自上而下的顺序执行
+    // 默认包含yaml, json解析器
+    // 选择一个执行
     {
       "parser": "plugin:yapi-openapi/parser",
       "options": {}
@@ -49,6 +53,7 @@
     // 所有解析器执行完成，parsers针对某类型文件只执行一次，emit doc:parsed
   ],
   "generators": [
+    // 默认包含yaml, json生成器
     {
       "generator": "plugin:openapi-titan/generator",
       "options": {
@@ -71,10 +76,11 @@
     }
     // 所有生成器执行完成，emit doc:generated
   ],
-  "outputs": [
+  "outputers": [
+    // 默认包含local, memory生成器
     {
       "name": "local",
-      "outDir": "./out"
+      "outputDir": "./out"
     },
     {
       "name": "github",
@@ -87,11 +93,9 @@
       "snippet": "plugin:fsharing/snippets"
     }
   ],
-  "hooks": [
-    // 特定事件执行完成时触发
-    {
-      // 这里的事件是同步，并且有优先级，优先级高的先触发
-      "name": "titan:output"
+  "hooks": {
+    "beforeLoad": {
+      "name": ["titan:output"]
     }
-  ]
+  }
 }

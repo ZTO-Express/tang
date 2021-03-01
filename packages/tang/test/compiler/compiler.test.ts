@@ -1,7 +1,8 @@
 import { Compiler } from '../../src/compiler';
-
 import * as loader from '../../src/loader';
 import * as parser from '../../src/parser';
+import * as generator from '../../src/generator';
+import * as outputer from '../../src/outputer';
 
 describe('compiler/load：load 加载', () => {
   const urlLoader = loader.urlLoader();
@@ -10,9 +11,17 @@ describe('compiler/load：load 加载', () => {
   const jsonParser = parser.jsonParser();
   const yamlParser = parser.yamlParser();
 
+  const jsonGenerator = generator.jsonGenerator();
+  const yamlGenerator = generator.yamlGenerator();
+
+  const localOutputer = outputer.localOutputer();
+  const memoryOutputer = outputer.memoryOutputer();
+
   const defaultOptions = {
     loaders: [urlLoader, localLoader],
     parsers: [jsonParser, yamlParser],
+    generators: [jsonGenerator, yamlGenerator],
+    outputers: [localOutputer, memoryOutputer],
   };
 
   it('验证 constructor', () => {
@@ -28,31 +37,31 @@ describe('compiler/load：load 加载', () => {
     expect(compiler1.parsers[1]).toBe(yamlParser);
 
     expect(
-      new Compiler({
-        defaultLoader: 'local',
-        ...defaultOptions,
-      }).defaultLoader,
+      new Compiler({ defaultLoader: 'local', ...defaultOptions }).defaultLoader,
     ).toBe(localLoader);
 
     expect(
-      new Compiler({
-        defaultLoader: localLoader,
-        ...defaultOptions,
-      }).defaultLoader,
+      new Compiler({ defaultLoader: localLoader, ...defaultOptions })
+        .defaultLoader,
     ).toBe(localLoader);
 
     expect(
-      new Compiler({
-        defaultParser: 'yaml',
-        ...defaultOptions,
-      }).defaultParser,
+      new Compiler({ defaultParser: 'yaml', ...defaultOptions }).defaultParser,
     ).toBe(yamlParser);
 
     expect(
-      new Compiler({
-        defaultParser: yamlParser,
-        ...defaultOptions,
-      }).defaultParser,
+      new Compiler({ defaultParser: yamlParser, ...defaultOptions })
+        .defaultParser,
     ).toBe(yamlParser);
+
+    expect(
+      new Compiler({ defaultGenerator: 'yaml', ...defaultOptions })
+        .defaultGenerator,
+    ).toBe(yamlGenerator);
+
+    expect(
+      new Compiler({ defaultOutputer: memoryOutputer, ...defaultOptions })
+        .defaultOutputer,
+    ).toBe(memoryOutputer);
   });
 });

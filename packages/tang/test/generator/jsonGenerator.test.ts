@@ -1,11 +1,11 @@
 import * as testUtil from '../util';
 import * as generator from '../../src/generator';
 import { Compilation, Compiler } from '../../src/compiler';
-import { TangDocumentGenerator } from 'src/common/types';
+import { TangGenerator } from 'src/common/types';
 
 describe('generator/json：json生成器', () => {
   let compiler: Compiler;
-  let jsonGenerator: TangDocumentGenerator;
+  let jsonGenerator: TangGenerator;
 
   let docCompilation: Compilation;
 

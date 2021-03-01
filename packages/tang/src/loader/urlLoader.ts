@@ -1,16 +1,16 @@
-import { check, fetch } from '../utils';
-import { GenericConfigObject, TangDocumentLoader } from '../common/types';
+import { isUrl, fetch } from '../utils';
+import { GenericConfigObject, TangLoader } from '../common/types';
 
 /**
  * 通过url加载文件
  */
-export const urlLoader = (): TangDocumentLoader => {
+export const urlLoader = (): TangLoader => {
   return {
     type: 'loader',
 
     name: 'url',
 
-    test: (entry: string) => check.isUrl(entry),
+    test: (entry: string) => isUrl(entry),
 
     async load(entry: string, options?: GenericConfigObject): Promise<string> {
       const res = await fetch.request(entry, options);

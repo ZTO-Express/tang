@@ -69,28 +69,30 @@ export interface NormalizedTangOptions {
 
 // 生成器配置选项
 export interface CompilerOptions {
-  defaultLoader?: string | TangDocumentLoader;
-  loaders: TangDocumentLoader[];
+  defaultLoader?: string | TangLoader;
+  loaders: TangLoader[];
 
-  defaultParser?: string | TangDocumentParser;
-  parsers: TangDocumentParser[];
+  defaultParser?: string | TangParser;
+  parsers: TangParser[];
 
-  defaultGenerator?: string | TangDocumentGenerator;
-  generators: TangDocumentGenerator[];
+  defaultGenerator?: string | TangGenerator;
+  generators: TangGenerator[];
 
-  defaultOutputer?: string | TangDocumentOutputer;
-  outputers: TangDocumentOutputer[];
+  defaultOutputer?: string | TangOutputer;
+  outputers: TangOutputer[];
+
+  hooks?: TangHook[];
 }
 
 // 文档
 export interface TangDocument {
   entry: string;
   content: string;
-  model: TangDocumentModel;
+  model: TangModel;
 }
 
 // 文档
-export interface TangDocumentModel {
+export interface TangModel {
   [key: string]: any;
 }
 
@@ -101,66 +103,161 @@ export interface TangChunk {
 }
 
 // 文档生成结果
-export interface TangDocumentGeneration {
+export interface TangGeneration {
+  document: TangDocument;
   chunks: TangChunk[];
 }
 
-export type TangDocumentProcesserTypes =
-  | 'loader'
-  | 'parser'
-  | 'generator'
-  | 'outputer';
+export type TangProcesserTypes = 'loader' | 'parser' | 'generator' | 'outputer';
 
 // 当前文档处理器
-export interface TangDocumentProcesser {
-  type: TangDocumentProcesserTypes;
+export interface TangProcesser {
+  type: TangProcesserTypes; // 处理器类型
   name: string; // 处理器名称
-  priority?: number; // 处理器优先级
-  [prop: string]: any; // 其他属性，如处理选项等
-}
-
-// 当前文档处理器
-export interface TangDocumentProcesser {
-  type: TangDocumentProcesserTypes; // 处理器类型
-  name: string; // 处理器名称
+  pluginName?: string; // 处理器所属插件
   priority?: number; // 处理器优先级
 }
 
 // 文档加载器
-export interface TangDocumentLoader extends TangDocumentProcesser {
+export interface TangLoader extends TangProcesser {
   test?: string | RegExp | ((entry: string) => boolean); // 验证是否可以加载指定文档（一般通过目标名称/路径即可判断）
   loadOptions?: GenericConfigObject;
   load: (entry: string, options?: GenericConfigObject) => Promise<string>; // 加载方法
 }
 
 // 文档解析器
-export interface TangDocumentParser extends TangDocumentProcesser {
+export interface TangParser extends TangProcesser {
   parseOptions?: GenericConfigObject;
-  parse: (
-    content: string,
-    options?: GenericConfigObject,
-  ) => Promise<TangDocumentModel>;
+  parse: (content: string, options?: GenericConfigObject) => Promise<TangModel>;
 }
 
 // 文档生成器
-export interface TangDocumentGenerator extends TangDocumentProcesser {
+export interface TangGenerator extends TangProcesser {
   generateOptions?: GenericConfigObject;
   generate: (
     document: TangDocument,
     options?: GenericConfigObject,
-  ) => Promise<TangDocumentGeneration>;
+  ) => Promise<TangGeneration>;
 }
 
-export interface TangDocumentOutput {
+export interface TangOutput {
   result: boolean;
   [prop: string]: any;
 }
 
 // 文件输出器
-export interface TangDocumentOutputer extends TangDocumentProcesser {
+export interface TangOutputer extends TangProcesser {
   outputOptions?: GenericConfigObject;
   output: (
-    generation: TangDocumentGeneration,
+    generation: TangGeneration,
     options?: GenericConfigObject,
-  ) => Promise<TangDocumentOutput>;
+  ) => Promise<TangOutput>;
 }
+
+export interface TangCompilation {
+  compiler: TangCompiler;
+  document: TangDocument;
+  loader: TangLoader;
+  parser: TangParser;
+}
+
+/** 加载选项 */
+export interface TangCompilerLoadOptions {
+  entry?: string;
+  loader?: string | TangLoader;
+  loadOptions?: GenericConfigObject;
+  parser?: string | TangParser;
+  parseOptions?: GenericConfigObject;
+}
+
+/** 生成选项 */
+export interface TangCompilerGenerateOptions {
+  generator?: string | TangGenerator;
+  generateOptions?: GenericConfigObject;
+  outputer?: string | TangOutputer;
+  outputOptions?: GenericConfigObject;
+}
+
+export interface TangCompiler {
+  loaders: TangLoader[]; // 加载器
+  defaultLoader: TangLoader; // 默认加载器
+
+  parsers: TangParser[]; // 解析器
+  defaultParser: TangParser; // 默认解析器
+
+  generators: TangGenerator[]; // 生成器
+  defaultGenerator: TangGenerator; // 默认生成器
+
+  outputers: TangOutputer[]; // 输出器
+  defaultOutputer: TangOutputer; /// 默认输出器
+
+  load: (
+    entry: string,
+    options?: TangCompilerLoadOptions,
+  ) => Promise<TangCompilation>;
+
+  generate: (
+    document: TangDocument,
+    options?: TangCompilerGenerateOptions,
+  ) => Promise<TangOutput>;
+}
+
+export type TangHookFunction = (
+  context: TangHookContext,
+  ...args: any[]
+) => Promise<void>;
+
+// 钩子
+export interface TangHook {
+  name: string | string[];
+  pluginName?: string; // 钩子所属插件
+  priority?: number; // 处理器优先级
+  apply: TangHookFunction;
+}
+
+// 钩子执行上下文
+export interface TangHookContext {
+  compiler?: TangCompiler;
+
+  loader?: TangLoader;
+  parser?: TangParser;
+  generator?: TangGenerator;
+  outputer?: TangOutputer;
+
+  document?: TangDocument;
+  compilation?: TangCompilation;
+  generation?: TangGeneration;
+  output?: TangOutput;
+}
+
+// Tang内置钩子函数
+export interface TangHooks {
+  // 加载开始
+  load: TangHookFunction;
+
+  // 解析开始
+  parse: TangHookFunction;
+
+  // 加载结束
+  loaded: TangHookFunction;
+
+  // 生成开始
+  generate: TangHookFunction;
+
+  // 输出开始
+  output: TangHookFunction;
+
+  // 生成结束
+  generated: TangHookFunction;
+}
+
+export type TangHookNames = keyof TangHooks;
+
+// 并行执行的钩子
+export type TangParallelHookNames = 'generated';
+
+// 顺序执行的钩子
+export type TangSequentialHookNames = Exclude<
+  TangHookNames,
+  TangParallelHookNames
+>;

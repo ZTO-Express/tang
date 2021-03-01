@@ -2,9 +2,9 @@ import path from 'path';
 import { error } from '../common';
 import {
   GenericConfigObject,
-  TangDocumentGeneration,
-  TangDocumentOutput,
-  TangDocumentOutputer,
+  TangGeneration,
+  TangOutput,
+  TangOutputer,
 } from '../common/types';
 
 import { fs } from '../utils';
@@ -12,16 +12,16 @@ import { fs } from '../utils';
 /**
  * 本地文件输出器
  */
-export const localOutputer = (): TangDocumentOutputer => {
+export const localOutputer = (): TangOutputer => {
   return {
     type: 'outputer',
 
     name: 'local',
 
     async output(
-      generation: TangDocumentGeneration,
+      generation: TangGeneration,
       options?: GenericConfigObject,
-    ): Promise<TangDocumentOutput> {
+    ): Promise<TangOutput> {
       if (!options || !options.outputDir) {
         error.throwError(error.errInvalidArguments('请提供输出目录'));
       }

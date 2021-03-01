@@ -2,8 +2,8 @@ import {
   GenericConfigObject,
   TangChunk,
   TangDocument,
-  TangDocumentGeneration,
-  TangDocumentGenerator,
+  TangGeneration,
+  TangGenerator,
 } from '../common/types';
 
 import { yaml } from '../utils';
@@ -11,7 +11,7 @@ import { yaml } from '../utils';
 /**
  * yaml文件生成器
  */
-export const yamlGenerator = (): TangDocumentGenerator => {
+export const yamlGenerator = (): TangGenerator => {
   return {
     type: 'generator',
 
@@ -20,7 +20,7 @@ export const yamlGenerator = (): TangDocumentGenerator => {
     async generate(
       document: TangDocument,
       options: GenericConfigObject,
-    ): Promise<TangDocumentGeneration> {
+    ): Promise<TangGeneration> {
       const opts = Object.assign(
         { name: 'default.yaml', skipInvalid: true },
         options,

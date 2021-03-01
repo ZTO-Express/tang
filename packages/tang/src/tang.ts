@@ -1,11 +1,11 @@
 import { getNormalizedOptions } from './options/normalizeOptions';
 import { Compiler } from './compiler/Compiler';
 import {
-  TangDocumentLoader,
-  TangDocumentParser,
+  TangLoader,
+  TangParser,
   GenericConfigObject,
-  TangDocumentGenerator,
-  TangDocumentOutputer,
+  TangGenerator,
+  TangOutputer,
 } from './common/types';
 
 export default function tang(options: GenericConfigObject): Promise<Compiler> {
@@ -23,16 +23,16 @@ async function createCompiler(
   const options = getNormalizedOptions(rawOptions);
 
   // 获取所有loaders
-  const loaders: TangDocumentLoader[] = [];
+  const loaders: TangLoader[] = [];
 
   // 获取所有parsers
-  const parsers: TangDocumentParser[] = [];
+  const parsers: TangParser[] = [];
 
   // 获取所有generators
-  const generators: TangDocumentGenerator[] = [];
+  const generators: TangGenerator[] = [];
 
   // 获取所有outputers
-  const outputers: TangDocumentOutputer[] = [];
+  const outputers: TangOutputer[] = [];
 
   const compiler = new Compiler({
     loaders,

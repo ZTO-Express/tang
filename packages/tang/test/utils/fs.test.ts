@@ -1,4 +1,4 @@
-import { fs, check } from '../../src/utils';
+import { fs, isUrl } from '../../src/utils';
 import * as testUtil from '../util';
 
 describe('utils/fs：fs实用方法', () => {
@@ -24,7 +24,7 @@ describe('utils/fs：fs实用方法', () => {
     const yfPresetUrl = testUtil.resolveFixtureUrl(
       'presets/yapi-fsharing/preset.json',
     );
-    expect(check.isUrl(yfPresetUrl)).toBeTruthy();
+    expect(isUrl(yfPresetUrl)).toBeTruthy();
 
     const presetText = await fs.resolveFile(yfPresetUrl);
     expect(presetText).toMatch('@tang/yapi-sharing');

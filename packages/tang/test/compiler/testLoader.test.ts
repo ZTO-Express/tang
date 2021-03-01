@@ -1,5 +1,6 @@
-import { Compiler } from '../../src/compiler';
+import * as testUtil from '../util';
 
+import { Compiler } from '../../src/compiler';
 import * as loader from '../../src/loader';
 import * as parser from '../../src/parser';
 
@@ -12,7 +13,7 @@ describe('compiler/loader：测试loader testLoader', () => {
   const yamlParser = parser.yamlParser();
 
   beforeAll(() => {
-    compiler = new Compiler({
+    compiler = testUtil.createDefaultCompiler({
       loaders: [urlLoader, localLoader],
       parsers: [jsonParser, yamlParser],
     });
@@ -43,5 +44,37 @@ describe('compiler/loader：测试loader testLoader', () => {
     expect(
       compiler.testLoader(localLoader, { entry: 'c://a/b.json' }),
     ).toBeTruthy();
+  });
+
+  it('验证 testLoader2', async () => {
+    const urlLoader1 = loader.urlLoader();
+    expect(
+      compiler.testLoader(urlLoader1, 'ftp://www.example.com'),
+    ).toBeFalsy();
+
+    urlLoader1.test = '';
+    expect(
+      compiler.testLoader(urlLoader1, 'ftp://www.example.com'),
+    ).toBeTruthy();
+
+    urlLoader1.test = `^https://www.*.com`;
+    expect(
+      compiler.testLoader(urlLoader1, 'ftp://www.example.com'),
+    ).toBeFalsy();
+
+    expect(
+      compiler.testLoader(urlLoader1, 'https://www.example.com'),
+    ).toBeTruthy();
+
+    urlLoader1.test = new RegExp(`^ftp://www.*.com`);
+    expect(
+      compiler.testLoader(urlLoader1, 'ftp://www.example.com'),
+    ).toBeTruthy();
+
+    const urlLoader2: any = loader.urlLoader();
+    urlLoader2.test = {};
+    expect(
+      compiler.testLoader(urlLoader2, 'ftp://www.example.com'),
+    ).toBeFalsy();
   });
 });

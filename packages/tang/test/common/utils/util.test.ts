@@ -5,7 +5,7 @@ import {
   deepClone,
   deepMerge,
   capitalizeFirst,
-} from '../../src/utils';
+} from '../../../src/common/utils';
 
 describe('utils/util：通用实用方法', () => {
   it('capitalizeFirst, 首字母打下', () => {
@@ -53,6 +53,9 @@ describe('utils/util：通用实用方法', () => {
   it('sortBy：根据key排序对象', async () => {
     const items1 = [0, 1, 2];
     const items2 = [{ a: 2, b: 3 }, { a: 1 }, { a: 2, b: 6, c: 6 }];
+
+    expect(sortBy(undefined, 'a')).toEqual([]);
+    expect(sortBy([], 'a')).toEqual([]);
 
     // 排序将产生新的数组
     expect(sortBy(items1, 'a') === items1).toBeFalsy();

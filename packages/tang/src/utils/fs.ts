@@ -8,7 +8,7 @@ import * as json5 from 'json5';
 import fetch from 'node-fetch';
 
 import { error } from '../common';
-import * as check from './check';
+import * as util from './util';
 
 export * from 'fs-extra';
 
@@ -24,13 +24,13 @@ export async function resolveFile(file: string, encoding = 'utf-8') {
   let _encoding = encoding;
   if (!encoding || encoding === 'json') _encoding = 'utf-8';
 
-  if (check.isRelativePath(file)) {
+  if (util.isRelativePath(file)) {
     _file = path.join(process.cwd(), file);
   }
 
-  if (check.isAbsolutePath(_file)) {
+  if (util.isAbsolutePath(_file)) {
     _data = await fs.readFile(_file, _encoding);
-  } else if (check.isUrl(file)) {
+  } else if (util.isUrl(file)) {
     const resp = await fetch(file);
 
     switch (encoding) {

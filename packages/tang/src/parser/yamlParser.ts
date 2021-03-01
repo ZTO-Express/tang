@@ -1,14 +1,10 @@
 import { yaml } from '../utils';
-import {
-  TangDocumentModel,
-  GenericConfigObject,
-  TangDocumentParser,
-} from '../common/types';
+import { TangModel, GenericConfigObject, TangParser } from '../common/types';
 
 /**
  * Yaml解析器
  */
-export const yamlParser = (): TangDocumentParser => {
+export const yamlParser = (): TangParser => {
   return {
     type: 'parser',
 
@@ -17,9 +13,9 @@ export const yamlParser = (): TangDocumentParser => {
     async parse(
       content: string,
       options?: GenericConfigObject,
-    ): Promise<TangDocumentModel> {
+    ): Promise<TangModel> {
       const result = yaml.load(content, options);
-      return result as TangDocumentModel;
+      return result as TangModel;
     },
   };
 };

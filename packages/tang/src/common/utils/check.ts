@@ -2,8 +2,6 @@
  * 验证相关实用方法
  */
 
-import { types } from 'util';
-
 // 正则表达式
 const regexs = Object.freeze({
   absolutePath: /^(?:\/|(?:[A-Za-z]:)?[\\|/])/,
@@ -57,7 +55,6 @@ export function isNullOrUndefined(o: unknown) {
 
 // 目标是否普通对象
 export function isPlainObject(o: unknown) {
-  debugger;
   if (isObject(o) === false) return false;
 
   // If has modified constructor
