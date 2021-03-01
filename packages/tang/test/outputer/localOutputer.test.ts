@@ -3,7 +3,7 @@ import { fs } from '../../src/utils';
 import { TangChunk } from '../../src/common/types';
 import * as outputer from '../../src/outputer';
 
-describe('outputer/local：local加载器', () => {
+describe('outputer/local：local输出器', () => {
   const localOutputer = outputer.localOutputer();
   const compiler = testUtil.createDefaultCompiler();
   const testTmpDir = testUtil.resolveTmpDir('localOutputer');

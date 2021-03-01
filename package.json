@@ -20,6 +20,7 @@
     "handlebars": "^4.7.6",
     "js-yaml": "^4.0.0",
     "json5": "^2.2.0",
+    "memfs": "^3.2.0",
     "node-fetch": "^2.6.1",
     "schema-utils": "^3.0.0"
   },
