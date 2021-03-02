@@ -2,7 +2,6 @@ import * as testUtil from '../util';
 import { yaml } from '../../src/utils';
 import * as generator from '../../src/generator';
 import { Compilation, Compiler } from '../../src/compiler';
-import { TangGenerator } from 'src/common/types';
 
 describe('generator/yaml：yaml生成器', () => {
   let compiler: Compiler;

@@ -2,9 +2,10 @@ import {
   ensureArray,
   findBy,
   sortBy,
+  capitalizeFirst,
   deepClone,
   deepMerge,
-  capitalizeFirst,
+  deepMerge2,
 } from '../../../src/common/utils';
 
 describe('utils/util：通用实用方法', () => {
@@ -209,5 +210,20 @@ describe('utils/util：通用实用方法', () => {
         },
       },
     });
+  });
+
+  it('deepMerge2：深度Merge方法2', async () => {
+    const data1 = { items: [{ name: 1 }, { name: 2 }] };
+    const data2 = { items: [{ name: 1 }, { name: 3 }] };
+
+    const options = {
+      arrayMerge: (target: any, source: any, options: any) => [
+        ...source,
+        ...target,
+      ],
+    };
+
+    const result: any = deepMerge2([data1.items, data2.items]);
+    expect(result.length).toBe(4);
   });
 });

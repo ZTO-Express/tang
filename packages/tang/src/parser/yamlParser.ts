@@ -1,5 +1,4 @@
 import { yaml } from '../utils';
-import { TangModel, GenericConfigObject, TangParser } from '../common/types';
 
 /**
  * Yaml解析器

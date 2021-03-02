@@ -1,13 +1,4 @@
-import { sortBy } from '../utils';
-
-import {
-  TangHookContext,
-  TangHook,
-  TangHookNames,
-  TangHooks,
-  TangParallelHookNames,
-  TangSequentialHookNames,
-} from '../types';
+import { sortBy, ensureArray } from '../utils';
 
 import { throwInvalidHookError, throwHookError } from './hookUtil';
 
@@ -24,7 +15,7 @@ type ResolveValue<T> = T extends Promise<infer K> ? K : T;
 type EnsurePromise<T> = Promise<ResolveValue<T>>;
 
 export class HookDriver {
-  private hooks: TangHook[];
+  hooks: TangHook[];
 
   constructor(hooks: TangHook[]) {
     this.hooks = sortBy<TangHook>(hooks || [], 'priority', {
@@ -37,10 +28,10 @@ export class HookDriver {
     hookName: H,
     context: TangHookContext,
     args?: Parameters<TangHooks[H]>,
-  ): Promise<void> {
-    const promises: Promise<void>[] = [];
+  ): Promise<unknown | void> {
+    const promises: Promise<unknown | void>[] = [];
     for (let i = 0; i < this.hooks.length; i++) {
-      const hookPromise = this.runHook(hookName, context, args, i, false);
+      const hookPromise = this.runHook(hookName, context, args, i);
       if (!hookPromise) continue;
       promises.push(hookPromise);
     }
@@ -58,7 +49,7 @@ export class HookDriver {
     let promise = Promise.resolve();
     for (let i = 0; i < this.hooks.length; i++) {
       promise = promise.then(
-        () => this.runHook(hookName, context, args, i, false) as Promise<void>,
+        () => this.runHook(hookName, context, args, i) as Promise<void>,
       );
     }
     return promise;
@@ -76,20 +67,33 @@ export class HookDriver {
     context: TangHookContext,
     args: Parameters<TangHooks[H]>,
     hookIndex: number,
-    permitValues: boolean,
   ): EnsurePromise<ReturnType<TangHooks[H]>> {
     const hook = this.hooks[hookIndex];
-    if (!hook || hook.name !== hookName) return undefined as any;
+
+    if (!this.testHook(hookName, hook)) return undefined as any;
+
+    const hookFn: any = hook.apply;
 
     return Promise.resolve()
       .then(() => {
-        // 是否允许钩子函数部位函数
-        if (typeof hook !== 'function') {
-          if (permitValues) return hook;
-          return throwInvalidHookError(hookName);
-        }
-        return (hook as Function).apply(context, args);
+        return hookFn.call(this, context, ...(args || []).slice(1));
       })
-      .catch(err => throwHookError(err, { hook: hookName }));
+      .catch(err => throwHookError(err, hookName));
+  }
+
+  /** 判断钩子是否满足执行条件 */
+  private testHook(hookName: TangHookNames, hook: TangHook) {
+    if (!hookName || !hook) return false;
+
+    if (typeof hook.apply !== 'function') throwInvalidHookError(hookName, hook);
+
+    if (hook.name && hook.name.endsWith(`:hook:${hookName}`)) return true;
+
+    if (hook.trigger === '*') return true;
+
+    const hookTrigger = ensureArray(hook.trigger) as string[];
+    if (hookTrigger.includes(hookName)) return true;
+
+    return false;
   }
 }

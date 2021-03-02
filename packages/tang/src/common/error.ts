@@ -1,5 +1,3 @@
-import { TangError, TangWarning } from '../common/types';
-
 // 错误代码
 export enum Errors {
   DEPRECATED_FEATURE = 'DEPRECATED_FEATURE',

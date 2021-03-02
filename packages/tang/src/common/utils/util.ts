@@ -1,4 +1,4 @@
-import deepmerge from 'deepmerge';
+import * as deepmerge from 'deepmerge';
 import { isNullOrUndefined, isPlainObject } from './check';
 
 /**
@@ -112,4 +112,20 @@ export function deepMerge(...args: any[]) {
   return deepmerge.all(items, {
     isMergeableObject: isPlainObject,
   });
+}
+
+/**
+ * 深度合并，合并后会产生新的对象
+ * @param args 被和并的对象
+ */
+export function deepMerge2(args: any[], options?: deepmerge.Options) {
+  const items = args.filter(it => !isNullOrUndefined(it));
+
+  const opts = Object.assign(
+    {
+      isMergeableObject: isPlainObject,
+    },
+    options,
+  );
+  return deepmerge.all(items, opts);
 }

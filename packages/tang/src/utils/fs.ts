@@ -2,7 +2,7 @@
  * 文件系统相关实用方法
  */
 
-import path from 'path';
+import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as json5 from 'json5';
 import fetch from 'node-fetch';

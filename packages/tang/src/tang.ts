@@ -1,14 +1,7 @@
 import { getNormalizedOptions } from './options/normalizeOptions';
 import { Compiler } from './compiler/Compiler';
-import {
-  TangLoader,
-  TangParser,
-  GenericConfigObject,
-  TangGenerator,
-  TangOutputer,
-} from './common/types';
 
-export default function tang(options: GenericConfigObject): Promise<Compiler> {
+export function tang(options: GenericConfigObject): Promise<Compiler> {
   const compiler = createCompiler(options);
   return compiler;
 }
@@ -22,24 +15,7 @@ async function createCompiler(
 ): Promise<Compiler> {
   const options = getNormalizedOptions(rawOptions);
 
-  // 获取所有loaders
-  const loaders: TangLoader[] = [];
-
-  // 获取所有parsers
-  const parsers: TangParser[] = [];
-
-  // 获取所有generators
-  const generators: TangGenerator[] = [];
-
-  // 获取所有outputers
-  const outputers: TangOutputer[] = [];
-
-  const compiler = new Compiler({
-    loaders,
-    parsers,
-    generators,
-    outputers,
-  });
+  const compiler = new Compiler(options);
 
   return compiler;
 }

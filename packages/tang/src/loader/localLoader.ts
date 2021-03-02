@@ -1,5 +1,4 @@
 import { isAbsolutePath, fs } from '../utils';
-import { GenericConfigObject, TangLoader } from '../common/types';
 
 /**
  * 本地文件加载器

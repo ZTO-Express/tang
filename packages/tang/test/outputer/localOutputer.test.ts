@@ -1,6 +1,5 @@
 import * as testUtil from '../util';
 import { fs } from '../../src/utils';
-import { TangChunk } from '../../src/common/types';
 import * as outputer from '../../src/outputer';
 
 describe('outputer/local：local输出器', () => {
@@ -35,19 +34,16 @@ describe('outputer/local：local输出器', () => {
   it('localOutputer output方法', async () => {
     await fs.emptyDir(testTmpDir);
 
-    await expect(
-      localOutputer.output({ chunks: sampleChunks }, {}),
-    ).rejects.toThrow('请提供输出目录');
+    const sampleGeneration = { document: {}, chunks: sampleChunks } as any;
 
-    const output = await localOutputer.output(
-      {
-        chunks: sampleChunks,
-      },
-      {
-        outputDir: testTmpDir,
-        overwrite: true,
-      },
+    await expect(localOutputer.output(sampleGeneration, {})).rejects.toThrow(
+      '请提供输出目录',
     );
+
+    const output = await localOutputer.output(sampleGeneration, {
+      outputDir: testTmpDir,
+      overwrite: true,
+    });
 
     expect(output.result).toBe(true);
     expect(output.files.length).toBe(1);
@@ -59,17 +55,26 @@ describe('outputer/local：local输出器', () => {
     expect(testData.name).toStrictEqual('@tang/yapi-sharing');
     expect(testData).toStrictEqual(samplePresetData);
 
-    const output2 = await localOutputer.output(
-      {
-        chunks: sampleChunks,
-      },
-      {
-        outputDir: testTmpDir,
-        clearDir: true,
-        overwrite: false,
-      },
-    );
+    const output2 = await localOutputer.output(sampleGeneration, {
+      outputDir: testTmpDir,
+      clearDir: false,
+      overwrite: false,
+    });
     expect(output2.files.length).toBe(0);
+
+    const output3 = await localOutputer.output(sampleGeneration, {
+      outputDir: testTmpDir,
+      clearDir: false,
+      overwrite: true,
+    });
+    expect(output3.files.length).toBe(1);
+
+    const output4 = await localOutputer.output(sampleGeneration, {
+      outputDir: testTmpDir,
+      clearDir: true,
+      overwrite: false,
+    });
+    expect(output3.files.length).toBe(1);
 
     await fs.emptyDir(testTmpDir);
   });

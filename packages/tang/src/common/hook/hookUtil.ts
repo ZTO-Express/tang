@@ -1,27 +1,24 @@
-import { TangError } from '../types';
 import { throwError, Errors } from '../error';
 
-export function throwInvalidHookError(hookName: string) {
+export function throwInvalidHookError(
+  hookName: TangHookNames,
+  hook?: TangHook,
+) {
   return throwError({
-    code: 'INVALID_HOOK',
-    message: `运行钩子函数错误 ${hookName}。`,
+    code: Errors.INVALID_HOOK,
+    message: `hook ${hookName}: 无效钩子函数`,
+    hook: hook ? hook.name : undefined,
+    plugin: hook ? hook.pluginName : undefined,
   });
 }
 
 export function throwHookError(
   err: string | TangError,
-  { hook, id }: { hook?: string; id?: string } = {},
+  hookName?: TangHookNames,
 ): never {
   if (typeof err === 'string') err = { message: err };
-  if (err.code && err.code !== Errors.HOOK_ERROR) {
-    err.pluginCode = err.code;
-  }
   err.code = Errors.HOOK_ERROR;
-  if (hook) {
-    err.hook = hook;
-  }
-  if (id) {
-    err.id = id;
-  }
+  if (hookName) err.hook = hookName;
+  err.message = `钩子执行错误：${err.message}`;
   return throwError(err);
 }

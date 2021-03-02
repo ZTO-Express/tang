@@ -1,13 +1,6 @@
 import * as path from 'path';
 import { memfs } from '../utils';
 
-import {
-  GenericConfigObject,
-  TangGeneration,
-  TangOutput,
-  TangOutputer,
-} from '../common/types';
-
 const Volume = memfs.Volume;
 
 /**
@@ -19,10 +12,7 @@ export const memoryOutputer = (): TangOutputer => {
 
     name: 'memory',
 
-    async output(
-      generation: TangGeneration,
-      options?: GenericConfigObject,
-    ): Promise<TangOutput> {
+    async output(generation: TangGeneration): Promise<TangOutput> {
       const vol = Volume.fromJSON({});
       const fs = vol.promises;
 

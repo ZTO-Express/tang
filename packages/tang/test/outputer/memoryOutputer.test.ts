@@ -1,6 +1,5 @@
 import * as testUtil from '../util';
 import { memfs, json5 } from '../../src/utils';
-import { TangChunk } from '../../src/common/types';
 import * as outputer from '../../src/outputer';
 
 describe('outputer/memory：memory输出器', () => {
@@ -34,7 +33,7 @@ describe('outputer/memory：memory输出器', () => {
   it('memoryOutputer output方法', async () => {
     const output = await memoryOutputer.output({
       chunks: sampleChunks,
-    });
+    } as any);
 
     expect(output.result).toBe(true);
     expect(output.files.length).toBe(1);

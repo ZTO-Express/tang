@@ -1,11 +1,3 @@
-import {
-  GenericConfigObject,
-  TangChunk,
-  TangDocument,
-  TangGeneration,
-  TangGenerator,
-} from '../common/types';
-
 /**
  * json文件生成器
  */
@@ -18,7 +10,7 @@ export const jsonGenerator = (): TangGenerator => {
     async generate(
       document: TangDocument,
       options: GenericConfigObject,
-    ): Promise<TangGeneration> {
+    ): Promise<TangGenerateResult> {
       const opts = Object.assign(
         { name: 'default.json', space: 2, replacer: null },
         options,

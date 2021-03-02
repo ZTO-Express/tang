@@ -1,11 +1,3 @@
-import {
-  TangDocument,
-  TangCompiler,
-  TangLoader,
-  TangParser,
-  TangCompilation,
-} from '../common/types';
-
 /** 编译实例选项 */
 export interface CompilationOptions {
   loader: TangLoader;

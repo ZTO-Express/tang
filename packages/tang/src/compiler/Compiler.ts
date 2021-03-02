@@ -7,34 +7,17 @@ import {
   capitalizeFirst,
 } from '../utils';
 
-import {
-  TangLoader,
-  TangParser,
-  CompilerOptions,
-  GenericConfigObject,
-  TangDocument,
-  TangGenerator,
-  TangOutputer,
-  TangProcesser,
-  TangProcesserTypes,
-  TangCompilation,
-  TangCompiler,
-  TangCompilerLoadOptions,
-  TangCompilerGenerateOptions,
-  TangOutput,
-  TangHookContext,
-} from '../common/types';
 import { HookDriver } from '../common';
 import { Compilation } from './Compilation';
 
 /** 处理器获取选项 */
-export interface ProcesserGetOptions {
-  processers: TangProcesser[]; // 带选择处理器
-  processer?: string | TangProcesser;
+export interface ProcessorGetOptions {
+  processors: TangProcessor[]; // 带选择处理器
+  processor?: string | TangProcessor;
   processMethodName: string;
   processOptionsName: string;
-  defaultProcesser?: TangProcesser;
-  testProcesser?: (processer: TangProcesser, ...args: any[]) => boolean;
+  defaultProcessor?: TangProcessor;
+  testProcessor?: (processor: TangProcessor, ...args: any[]) => boolean;
   testOptions?: any;
   [prop: string]: any;
 }
@@ -57,17 +40,17 @@ export class Compiler implements TangCompiler {
 
   hookDriver: HookDriver;
 
-  constructor(options: CompilerOptions) {
+  constructor(options: TangCompilerOptions) {
     this.initialize(options);
 
     this.hookDriver = new HookDriver(options.hooks);
   }
 
-  initialize(options: CompilerOptions) {
-    this.initializeProcessers('loader', options); // 初始化加载器
-    this.initializeProcessers('parser', options); // 初始化解析器
-    this.initializeProcessers('generator', options); // 初始化生成器
-    this.initializeProcessers('outputer', options); // 初始化输出器
+  private initialize(options: TangCompilerOptions) {
+    this.initializeProcessors('loader', options); // 初始化加载器
+    this.initializeProcessors('parser', options); // 初始化解析器
+    this.initializeProcessors('generator', options); // 初始化生成器
+    this.initializeProcessors('outputer', options); // 初始化输出器
   }
 
   /**
@@ -75,26 +58,29 @@ export class Compiler implements TangCompiler {
    * @param type 处理器类型
    * @param options 编译器初始化参数
    */
-  initializeProcessers(type: TangProcesserTypes, options: CompilerOptions) {
-    const processersName = `${type}s`;
-    const defaultProcesserName = `default${capitalizeFirst(type)}`;
+  private initializeProcessors(
+    type: TangProcessorTypes,
+    options: TangCompilerOptions,
+  ) {
+    const processorsName = `${type}s`;
+    const defaultProcessorName = `default${capitalizeFirst(type)}`;
 
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const thiz: any = this;
     const opts: any = options;
 
-    const processers: any[] = this.sortByPriority(opts[processersName]);
+    const processors: any[] = this.sortByPriority(opts[processorsName]);
 
-    // 设置processers
-    thiz[processersName] = processers;
+    // 设置processors
+    thiz[processorsName] = processors;
 
-    // 设置默认processer，如defaultLoader,defaultParser,defaultGenerator,def
-    if (typeof opts[defaultProcesserName] === 'string') {
-      thiz[defaultProcesserName] = processers.find(
-        item => item.name === opts[defaultProcesserName],
+    // 设置默认processor，如defaultLoader,defaultParser,defaultGenerator,def
+    if (typeof opts[defaultProcessorName] === 'string') {
+      thiz[defaultProcessorName] = processors.find(
+        item => item.name === opts[defaultProcessorName],
       );
     } else {
-      thiz[defaultProcesserName] = opts[defaultProcesserName] || processers[0];
+      thiz[defaultProcessorName] = opts[defaultProcessorName] || processors[0];
     }
   }
 
@@ -197,11 +183,12 @@ export class Compiler implements TangCompiler {
     // 调用生成钩子
     await this.hookDriver.hookSeq('generate', hookContext);
 
-    const generation = await generator.generate(
+    const generateResult = await generator.generate(
       document,
       generator.generateOptions,
     );
-    generation.document = document;
+
+    const generation = { document: document, ...generateResult };
 
     // 调用输出钩子
     hookContext.generation = generation;
@@ -222,13 +209,13 @@ export class Compiler implements TangCompiler {
    * @param options 加载选项
    */
   getLoader(options: TangCompilerLoadOptions): TangLoader | undefined {
-    const loader = this.getProcesser<TangLoader>({
-      processers: this.loaders,
+    const loader = this.getProcessor<TangLoader>({
+      processors: this.loaders,
       processMethodName: 'load',
       processOptionsName: 'loadOptions',
-      defaultProcesser: this.defaultLoader,
-      processer: options.loader,
-      testProcesser: this.testLoader as any,
+      defaultProcessor: this.defaultLoader,
+      processor: options.loader,
+      testProcessor: this.testLoader as any,
       testOptions: options,
       loadOptions: options.loadOptions,
     });
@@ -270,12 +257,12 @@ export class Compiler implements TangCompiler {
    * @param options 加载选项
    */
   getParser(options?: TangCompilerLoadOptions): TangParser | undefined {
-    const parser = this.getProcesser<TangParser>({
-      processers: this.parsers,
+    const parser = this.getProcessor<TangParser>({
+      processors: this.parsers,
       processMethodName: 'parse',
       processOptionsName: 'parseOptions',
-      defaultProcesser: this.defaultParser,
-      processer: options.parser,
+      defaultProcessor: this.defaultParser,
+      processor: options.parser,
       parseOptions: options.parseOptions,
     });
 
@@ -289,12 +276,12 @@ export class Compiler implements TangCompiler {
   getGenerator(
     options?: TangCompilerGenerateOptions,
   ): TangGenerator | undefined {
-    const generator = this.getProcesser<TangGenerator>({
-      processers: this.generators,
+    const generator = this.getProcessor<TangGenerator>({
+      processors: this.generators,
       processMethodName: 'generate',
       processOptionsName: 'generateOptions',
-      defaultProcesser: this.defaultGenerator,
-      processer: options.generator,
+      defaultProcessor: this.defaultGenerator,
+      processor: options.generator,
       generateOptions: options.generateOptions,
     });
 
@@ -306,12 +293,12 @@ export class Compiler implements TangCompiler {
    * @param options
    */
   getOutputer(options?: TangCompilerGenerateOptions): TangOutputer | undefined {
-    const outputer = this.getProcesser<TangOutputer>({
-      processers: this.outputers,
+    const outputer = this.getProcessor<TangOutputer>({
+      processors: this.outputers,
       processMethodName: 'output',
       processOptionsName: 'outputOptions',
-      defaultProcesser: this.defaultOutputer,
-      processer: options.outputer,
+      defaultProcessor: this.defaultOutputer,
+      processor: options.outputer,
       outputOptions: options.outputOptions,
     });
 
@@ -319,50 +306,46 @@ export class Compiler implements TangCompiler {
   }
 
   /** 选择处理器 */
-  getProcesser<T extends TangProcesser>(
-    options: ProcesserGetOptions,
+  getProcessor<T extends TangProcessor>(
+    options: ProcessorGetOptions,
   ): T | undefined {
-    const processerOptions: any = options.processer || {};
+    const processorOptions: any = options.processor || {};
     const processMethodName = options.processMethodName;
     const processOptionsName = options.processOptionsName;
-    const defaultProcesser = options.defaultProcesser as T;
-    const processers = options.processers as T[];
-    const testProcesser = options.testProcesser;
+    const defaultProcessor = options.defaultProcessor as T;
+    const processors = options.processors as T[];
+    const testProcessor = options.testProcessor;
     const testOptions = options.testOptions;
 
-    let processer: any;
+    let processor: any;
 
-    if (typeof processerOptions === 'string') {
-      // 如果有名字，则直接通过名字查找loader，并不进行test验证
-      processer = findBy<T>(processers, 'name', processerOptions);
-    } else if (typeof processerOptions[processMethodName] === 'function') {
+    if (typeof processorOptions === 'string') {
+      // 如果有名字，则直接通过名字查找processor，并不进行test验证
+      processor = findBy<T>(processors, 'name', processorOptions);
+    } else if (typeof processorOptions[processMethodName] === 'function') {
       // 如果选项中存在process方法，则此选项本身就是处理器
-      processer = processerOptions as T;
+      processor = processorOptions as T;
     } else if (
-      defaultProcesser &&
-      (!testProcesser || testProcesser(defaultProcesser, testOptions))
+      defaultProcessor &&
+      (!testProcessor || testProcessor(defaultProcessor, testOptions))
     ) {
       // 如果未提供processr测尝试使用默认processr
-      processer = defaultProcesser;
+      processor = defaultProcessor;
     } else {
       // 如果未提供parser及默认parser测尝试使用第一个parser
-      if (!testProcesser) {
-        processer = processers[0]; // 一般情况，代码不会走到这里
-      } else {
-        processer = processers.filter(p => testProcesser(p, testOptions))[0];
-      }
+      processor = processors.filter(p => testProcessor(p, testOptions))[0];
     }
 
-    if (!processer) return undefined;
+    if (!processor) return undefined;
 
     // 合并参数
-    processer[processOptionsName] = deepMerge(
-      processer[processOptionsName],
-      processerOptions[processOptionsName],
+    processor[processOptionsName] = deepMerge(
+      processor[processOptionsName],
+      processorOptions[processOptionsName],
       options[processOptionsName],
     ) as GenericConfigObject;
 
-    const result = deepClone(processer) as T;
+    const result = deepClone(processor) as T;
     return result;
   }
 
@@ -370,7 +353,7 @@ export class Compiler implements TangCompiler {
    * 根据优先级排序，排序将产生新的数组，默认优先级10
    * @param items 排序对象
    */
-  private sortByPriority<T>(items: TangProcesser[]) {
+  private sortByPriority<T>(items: TangProcessor[]) {
     return sortBy<T>(items, 'priority', {
       defaultValue: 10,
     });

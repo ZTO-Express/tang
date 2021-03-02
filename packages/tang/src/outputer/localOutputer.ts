@@ -1,11 +1,5 @@
-import path from 'path';
+import * as path from 'path';
 import { error } from '../common';
-import {
-  GenericConfigObject,
-  TangGeneration,
-  TangOutput,
-  TangOutputer,
-} from '../common/types';
 
 import { fs } from '../utils';
 
@@ -45,7 +39,7 @@ export const localOutputer = (): TangOutputer => {
 
         if (!overwrite) {
           const existsFile = await fs.pathExists(filePath);
-          if (!existsFile) return;
+          if (existsFile) return;
         }
 
         await fs.writeFile(filePath, chunk.content);

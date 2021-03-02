@@ -1,5 +1,4 @@
 import { isUrl, fetch } from '../utils';
-import { GenericConfigObject, TangLoader } from '../common/types';
 
 /**
  * 通过url加载文件
@@ -22,7 +21,7 @@ export const urlLoader = (): TangLoader => {
           errorMsg = text;
         }
 
-        throw new Error(text || res.statusText);
+        throw new Error(errorMsg);
       }
 
       return text;

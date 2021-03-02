@@ -1,4 +1,3 @@
-import { TangModel, TangParser } from '../common/types';
 import { json5 } from '../utils';
 
 /**
