@@ -1,5 +1,5 @@
-import { getNormalizedOptions } from './options/normalizeOptions';
-import { Compiler } from './compiler/Compiler';
+import { getNormalizedOptions } from './options/normalize-options';
+import { Compiler } from './compiler/compiler';
 
 export function tang(options: GenericConfigObject): Promise<Compiler> {
   const compiler = createCompiler(options);

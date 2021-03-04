@@ -2,7 +2,7 @@ import * as testUtil from '../util';
 
 import { error } from '../../src/common';
 import { tang, loader } from '../../src';
-import { getNormalizedOptions } from '../../src/options/normalizeOptions';
+import { getNormalizedOptions } from '../../src/options/normalize-options';
 
 describe('tang：tang工具配置', () => {
   const tfDocPath = testUtil.resolveFixturePath(

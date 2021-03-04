@@ -4,7 +4,7 @@ node_modules/
 # IDE
 /.idea
 /.awcache
-/.vscode
+.vscode
 *.code-workspace
 
 # misc
@@ -30,3 +30,8 @@ yarn-error.log
 /benchmarks/memory
 build/config\.gypi
 .test_coverage
+.test_output
+
+# dists
+dist/
+/packages/tang/lib

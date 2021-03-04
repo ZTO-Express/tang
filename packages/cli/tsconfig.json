@@ -6,7 +6,8 @@
     "target": "es6",
     "skipLibCheck": true,
     "sourceMap": false,
-    "strict": true
+    "strict": true,
+    "esModuleInterop": false
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", ".test_coverage"]

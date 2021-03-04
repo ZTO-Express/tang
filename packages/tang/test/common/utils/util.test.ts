@@ -2,22 +2,12 @@ import {
   ensureArray,
   findBy,
   sortBy,
-  capitalizeFirst,
   deepClone,
   deepMerge,
   deepMerge2,
 } from '../../../src/common/utils';
 
 describe('utils/util：通用实用方法', () => {
-  it('capitalizeFirst, 首字母打下', () => {
-    expect(capitalizeFirst('')).toBe('');
-    expect(capitalizeFirst(undefined)).toBe(undefined);
-    expect(capitalizeFirst(null)).toBe(null);
-
-    expect(capitalizeFirst('abc')).toBe('Abc');
-    expect(capitalizeFirst('_abc')).toBe('_abc');
-  });
-
   it('ensureArray：确保对象转换为数组', async () => {
     expect(ensureArray([1, 2])).toEqual([1, 2]);
     expect(ensureArray([{ a: 1, b: 2 }])).toEqual([{ a: 1, b: 2 }]);

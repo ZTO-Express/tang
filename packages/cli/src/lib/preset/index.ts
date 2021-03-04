@@ -1,2 +1,1 @@
-export * from './Preset';
-export * from './PresetManager';
+export * from './preset-manager';

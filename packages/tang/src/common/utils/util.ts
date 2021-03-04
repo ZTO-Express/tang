@@ -2,15 +2,6 @@ import * as deepmerge from 'deepmerge';
 import { isNullOrUndefined, isPlainObject } from './check';
 
 /**
- * 首字母大写
- * @param str 目标字符串
- */
-export function capitalizeFirst(str: string) {
-  if (!str) return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/**
  * 返回数组
  * @param items 为数组返回原值，为空则空数组，否则返回目标为唯一项的数组
  */

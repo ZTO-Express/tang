@@ -1,11 +1,11 @@
-import { existsSync } from 'fs';
+import { util as tangUtil } from '@tang/tang';
 import { join, posix } from 'path';
 import { CommandLoader } from '../../commands';
 
 const localBinPathSegments = [process.cwd(), 'node_modules', '@tang', 'cli'];
 
 export function localBinExists() {
-  return existsSync(join(...localBinPathSegments));
+  return tangUtil.fs.existsSync(join(...localBinPathSegments));
 }
 
 export function loadLocalBinCommandLoader(): typeof CommandLoader {
