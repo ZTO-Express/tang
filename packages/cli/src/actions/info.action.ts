@@ -2,11 +2,11 @@ import * as chalk from 'chalk';
 import { platform, release } from 'os';
 import osName = require('os-name');
 import { AbstractPackageManager, PackageManagerFactory } from '../lib/package';
-import { BANNER, MESSAGES } from '../lib/ui';
-import { AbstractAction } from './abstract.action';
+import { BANNER } from '../lib/ui';
+import { CliAction } from '../common';
 
-export class InfoAction extends AbstractAction {
-  async handle() {
+export class InfoAction implements CliAction {
+  async main() {
     displayBanner();
     await displaySystemInformation();
     await displayTangInformation();

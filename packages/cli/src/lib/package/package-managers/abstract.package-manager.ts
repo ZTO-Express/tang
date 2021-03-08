@@ -4,7 +4,7 @@ import * as ora from 'ora';
 import { join } from 'path';
 import { MESSAGES } from '../../ui';
 import { AbstractRunner } from '../../runners/abstract.runner';
-import { PackageManagerCommands } from '../../interfaces/package-managers';
+import { PackageManagerCommands } from '../../../common';
 
 export enum PackageManagers {
   NPM = 'npm',

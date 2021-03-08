@@ -1,8 +1,8 @@
 import { TangDependencyManager, PackageManagerFactory } from '../lib/package';
-import { AbstractAction, ActionOptions } from './abstract.action';
+import { CliAction, CliActionOptions } from '../common';
 
-export class UpdateAction extends AbstractAction {
-  async handle(options: ActionOptions) {
+export class UpdateAction extends CliAction {
+  async main(options: CliActionOptions) {
     const commandOptions = options.options || {};
 
     const force = commandOptions.force as boolean;

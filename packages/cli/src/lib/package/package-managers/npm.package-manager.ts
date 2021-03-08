@@ -1,4 +1,4 @@
-import { PackageManagerCommands } from '../../interfaces';
+import { PackageManagerCommands } from '../../../common';
 import { Runner, RunnerFactory } from '../../runners';
 import { NpmRunner } from '../../runners/npm.runner';
 import {

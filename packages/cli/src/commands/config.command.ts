@@ -1,26 +1,40 @@
-import { Command, CommanderStatic } from 'commander';
-import { AbstractCommand } from './abstract.command';
-import { CommandInput, CommandOptions } from './command.input';
+import { CliCommand } from '../common';
 
-export class ConfigCommand extends AbstractCommand {
-  load(program: CommanderStatic) {
-    program
-      .command('config [name] [value]')
-      .alias('cfg')
-      .description('操作Tang配置信息')
-      .option('--unset', '列出当前所有配置项')
-      .option('-l, --list', '列出当前所有配置项')
-      .action(async (name: string, value: string, command: Command) => {
-        const inputs: CommandInput[] = [];
-        inputs.push({ name: 'unset', value: command.unset });
-        inputs.push({ name: 'list', value: command.list });
-
-        const options: CommandOptions = {
-          name,
-          value,
-        };
-
-        await this.action.handle({ inputs, options });
-      });
+export class ConfigCommand implements CliCommand {
+  config() {
+    return {
+      name: 'config',
+      args: '<key> <value>',
+      aliases: ['cfg'],
+      description: '操作Tang配置',
+      argsDescription: {
+        key: '配置key',
+        value: '配置值',
+      },
+      commands: [
+        {
+          name: 'list',
+          aliases: ['l', 'ls'],
+          description: '列出所有配置',
+        },
+        {
+          name: 'add', // 默认action为config.set
+          flags: '<key> <value>',
+          aliases: ['a'],
+          description: '新增配置，已存在则忽略',
+        },
+        {
+          name: 'set', // 默认action为config.set
+          flags: '<key> <value>',
+          aliases: ['s'],
+          description: '设置配置',
+        },
+        {
+          name: 'unset', // 默认action为config.set
+          flags: '<key>',
+          description: '移除配置',
+        },
+      ],
+    };
   }
 }

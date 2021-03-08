@@ -1,5 +1,5 @@
 import * as tang from '@tang/tang';
-import { Preset } from '../interfaces/preset';
+import { Preset } from '../../common';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const presetSchema = require('../../../schemas/preset.json');

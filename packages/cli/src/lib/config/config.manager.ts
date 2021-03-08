@@ -1,7 +1,7 @@
 import { util as tangUtil } from '@tang/tang';
 import * as path from 'path';
 import { TANG_HOME, TANG_CONFIG_FILENAME } from '../../consts';
-import { Configuration, Loader, GenericConfigObject } from '../interfaces';
+import { Configuration, Loader, GenericConfigObject } from '../../common';
 import { LocalLoader } from '../loaders';
 import { defaultConfiguration } from './defaults';
 

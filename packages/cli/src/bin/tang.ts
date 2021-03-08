@@ -2,6 +2,7 @@
 import * as commander from 'commander';
 import { CommanderStatic } from 'commander';
 import { CommandLoader } from '../commands';
+
 import {
   loadLocalBinCommandLoader,
   localBinExists,
@@ -25,7 +26,12 @@ const bootstrap = () => {
   } else {
     CommandLoader.load(program);
   }
+
+  // TODO 添加钩子回调
+
   commander.parse(process.argv);
+
+  // TODO 添加钩子回调
 
   if (!process.argv.slice(2).length) {
     program.outputHelp();

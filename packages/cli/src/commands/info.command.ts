@@ -1,14 +1,14 @@
-import { CommanderStatic } from 'commander';
-import { AbstractCommand } from './abstract.command';
+import * as commander from 'commander';
+import { CliActionFn, CliCommand } from '../common';
 
-export class InfoCommand extends AbstractCommand {
-  load(program: CommanderStatic) {
-    program
+export class InfoCommand implements CliCommand {
+  constructor(private readonly actionFn: CliActionFn) {}
+
+  load(program: commander.Command) {
+    return program
       .command('info')
       .alias('i')
       .description('Display Tang details.')
-      .action(async () => {
-        await this.action.handle();
-      });
+      .action(this.actionFn);
   }
 }

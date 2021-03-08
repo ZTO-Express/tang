@@ -1,10 +1,11 @@
-import { Command, CommanderStatic } from 'commander';
-import { AbstractCommand } from './abstract.command';
-import { CommandOptions } from './command.input';
+import * as commander from 'commander';
+import { CliActionFn, CliCommand, CliCommandOptions } from '../common';
 
-export class UpdateCommand extends AbstractCommand {
-  load(program: CommanderStatic) {
-    program
+export class UpdateCommand implements CliCommand {
+  constructor(private readonly actionFn: CliActionFn) {}
+
+  load(program: commander.Command) {
+    return program
       .command('update')
       .alias('u')
       .description('Update Tang dependencies.')
@@ -16,13 +17,13 @@ export class UpdateCommand extends AbstractCommand {
         '-t, --tag <tag>',
         'Upgrade to tagged packages (latest | beta | rc | next tag).',
       )
-      .action(async (command: Command) => {
-        const options: CommandOptions = {
-          force: !!command.force,
-          tag: command.tag,
+      .action(async (opts: any, command: commander.Command) => {
+        const options: CliCommandOptions = {
+          force: !!opts.force,
+          tag: opts.tag,
         };
 
-        await this.action.handle({ options });
+        await this.actionFn({ options });
       });
   }
 }

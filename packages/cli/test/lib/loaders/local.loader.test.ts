@@ -1,6 +1,5 @@
 import * as testUtil from '../../util';
 import { TANG_CONFIG_FILENAME } from '../../../src/consts';
-import { ConfigManager } from '../../../src/lib/config';
 import { LocalLoader } from '../../../src/lib/loaders';
 
 const tangUtil = testUtil.tangUtil;
@@ -66,6 +65,12 @@ describe('tang/cli/local.loader：本地加载器', () => {
     expect(localLoader.loadDirectory).toBe(tmpDir);
     expect(localLoader.loadFile).toBe(TANG_CONFIG_FILENAME);
 
+    await tangUtil.fs.emptyDir(tmpDir);
+  });
+
+  it('read 加载器读写操作 readAnyOf', async () => {
+    await localLoader.write('test_file', TANG_CONFIG_FILENAME);
+
     const text2 = await localLoader.readAnyOf([
       'no-exists.json',
       TANG_CONFIG_FILENAME,
@@ -82,7 +87,5 @@ describe('tang/cli/local.loader：本地加载器', () => {
     expect(text3).toBeUndefined();
     expect(localLoader.loadDirectory).toBe(tmpDir);
     expect(localLoader.loadFile).toBe(TANG_CONFIG_FILENAME);
-
-    await tangUtil.fs.emptyDir(tmpDir);
   });
 });

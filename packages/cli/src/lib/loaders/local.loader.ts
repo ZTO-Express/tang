@@ -1,7 +1,6 @@
 import * as path from 'path';
 import { util as tangUtil } from '@tang/tang';
-import { Loader } from '../interfaces/loader';
-import { GenericConfigObject } from '../interfaces';
+import { GenericConfigObject, Loader } from '../../common/';
 
 export interface LocalWriteOptions extends GenericConfigObject {
   file?: string;

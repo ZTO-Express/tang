@@ -1,4 +1,4 @@
-import { PackageManagerCommands } from '../../interfaces';
+import { PackageManagerCommands } from '../../../common/interfaces';
 import { Runner, RunnerFactory } from '../../runners';
 import { YarnRunner } from '../../runners/yarn.runner';
 import {
