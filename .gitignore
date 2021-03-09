@@ -34,4 +34,4 @@ build/config\.gypi
 
 # dists
 dist/
-/packages/tang/lib
+lib/

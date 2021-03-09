@@ -1,3 +1,4 @@
+import { GenericConfigObject, TangLoader } from '../@types';
 import { isAbsolutePath, fs } from '../utils';
 
 /**

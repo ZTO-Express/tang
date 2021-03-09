@@ -5,6 +5,8 @@ import {
   deepClone,
   deepMerge,
   deepMerge2,
+  get,
+  set,
 } from '../../../src/common/utils';
 
 describe('utils/util：通用实用方法', () => {
@@ -215,5 +217,37 @@ describe('utils/util：通用实用方法', () => {
 
     const result: any = deepMerge2([data1.items, data2.items]);
     expect(result.length).toBe(4);
+  });
+
+  it('get 获取路径', async () => {
+    const data1 = { items: [{ name: 1 }, { name: 2 }] };
+    const data2 = { items: [{ name: 1 }, { name: 3 }] };
+
+    expect(get(null, 'items[0].name.x', 'x')).toBe('x');
+    expect(get(undefined, 'items[0].name.x', 'x')).toBe('x');
+
+    expect(get(data1, 'items')).toBe(data1.items);
+    expect(get(data1, 'items[0]')).toBe(data1.items[0]);
+    expect(get(data1, 'items[0].name')).toBe(data1.items[0].name);
+    expect(get(data1, 'items[0].name.x')).toBeUndefined();
+    expect(get(data1, 'items[0].name.x', 'x')).toBe('x');
+  });
+
+  it('set 设置路径值', async () => {
+    const data1 = { items: [{ name: 1 }, { name: 2 }] };
+    const data2 = { items: [{ name: 1 }, { name: 3 }] };
+
+    expect(set(null, 'a.b', 'x')).toBeNull();
+    expect(set(undefined, 'a.b', 'x')).toBeUndefined();
+    expect(set(1, 'a.b', 'x')).toBe(1);
+    expect(set('1', 'a.b', 'x')).toBe('1');
+
+    expect(get(set(data1, 'a.b', 'x'), 'a.b')).toBe('x');
+    expect(get(set(data1, 'items[0].name', 'x'), 'items[0].name')).toBe('x');
+    expect(get(set(data1, 'items[0].name.x', 'x'), 'items[0].name.x')).toBe(
+      'x',
+    );
+
+    expect(get(set(data1, 'a.b', undefined), 'a.b')).toBeUndefined();
   });
 });

@@ -1,3 +1,11 @@
+import {
+  TangHook,
+  TangHookContext,
+  TangHookNames,
+  TangHooks,
+  TangParallelHookNames,
+  TangSequentialHookNames,
+} from '../../@types';
 import { sortBy, ensureArray } from '../utils';
 
 import { throwInvalidHookError, throwHookError } from './hook-util';

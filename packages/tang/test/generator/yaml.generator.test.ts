@@ -1,6 +1,7 @@
 import * as testUtil from '../util';
 import { yaml } from '../../src/utils';
 import * as generator from '../../src/generator';
+import { TangGenerator } from '../../src/@types';
 import { Compilation, Compiler } from '../../src/compiler';
 
 describe('generator/yaml：yaml生成器', () => {

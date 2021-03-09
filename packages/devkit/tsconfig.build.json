@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
-    "outDir": "lib"
+    "outDir": "lib",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "esModuleInterop": false
   },
   "include": ["src"],
   "exclude": ["lib"]

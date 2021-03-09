@@ -1,3 +1,5 @@
+import { GenericConfigObject } from './@types';
+
 import { getNormalizedOptions } from './options/normalize-options';
 import { Compiler } from './compiler/compiler';
 

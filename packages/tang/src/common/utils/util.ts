@@ -1,4 +1,5 @@
 import * as deepmerge from 'deepmerge';
+import { baseGet, baseSet } from './internal';
 import { isNullOrUndefined, isPlainObject } from './check';
 
 /**
@@ -119,4 +120,15 @@ export function deepMerge2(args: any[], options?: deepmerge.Options) {
     options,
   );
   return deepmerge.all(items, opts);
+}
+
+/** 获取指定路径对象值 */
+export function get(object: unknown, path: string, defaultValue?: unknown) {
+  const result = object == null ? undefined : baseGet(object, path);
+  return result === undefined ? defaultValue : result;
+}
+
+/** 设置指定对象路径值 */
+export function set(object: unknown, path: string, value: unknown) {
+  return object == null ? object : baseSet(object, path, value);
 }

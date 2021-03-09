@@ -1,3 +1,5 @@
+import { TangGeneration, TangOutput, TangOutputer } from '../@types';
+
 import * as path from 'path';
 import { memfs } from '../utils';
 

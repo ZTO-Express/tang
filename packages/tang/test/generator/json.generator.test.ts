@@ -1,5 +1,6 @@
 import * as testUtil from '../util';
 import * as generator from '../../src/generator';
+import { TangGenerator } from '../../src/@types';
 import { Compilation, Compiler } from '../../src/compiler';
 
 describe('generator/json：json生成器', () => {

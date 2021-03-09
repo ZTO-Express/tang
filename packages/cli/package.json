@@ -9,14 +9,15 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "../../node_modules/.bin/rimraf -rf lib/ && ../../node_modules/.bin/tsc --project tsconfig.build.json",
-    "start": "node dist/bin/tang.js",
+    "start": "node dist/bin/tang",
+    "start-ts": "../../node_modules/.bin/ts-node src/bin/tang",
     "test": "jest --coverage --runInBand"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@tang/tang": "^0.0.1",
+    "@tang/devkit": "^0.0.1",
     "chalk": "^4.1.0",
     "cli-table3": "^0.6.0",
     "commander": "^7.1.0",

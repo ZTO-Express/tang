@@ -1,3 +1,4 @@
+import { TangHookContext } from '../../../src/@types';
 import { HookDriver, util } from '../../../src/common';
 
 describe('common/HookDriver：钩子驱动顺序执行 hookSeq', () => {

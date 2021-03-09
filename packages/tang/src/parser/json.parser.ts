@@ -1,3 +1,5 @@
+import { TangModel, TangParser } from '../@types';
+
 import { json5 } from '../utils';
 
 /**

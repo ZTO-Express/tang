@@ -1,3 +1,10 @@
+import {
+  GenericConfigObject,
+  NormalizedTangOptions,
+  TangProcessor,
+  TangProcessorTypes,
+} from '../@types';
+
 import { deepMerge } from '../utils';
 import * as loader from '../loader';
 import * as parser from '../parser';

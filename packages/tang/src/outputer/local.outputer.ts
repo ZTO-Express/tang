@@ -1,3 +1,10 @@
+import {
+  GenericConfigObject,
+  TangGeneration,
+  TangOutput,
+  TangOutputer,
+} from '../@types';
+
 import * as path from 'path';
 import { error } from '../common';
 

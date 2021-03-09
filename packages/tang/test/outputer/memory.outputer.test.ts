@@ -1,5 +1,6 @@
 import * as testUtil from '../util';
 import { memfs, json5 } from '../../src/utils';
+import { TangChunk } from '../../src/@types';
 import * as outputer from '../../src/outputer';
 
 describe('outputer/memory：memory输出器', () => {

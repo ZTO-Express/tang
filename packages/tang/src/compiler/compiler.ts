@@ -1,3 +1,21 @@
+import {
+  GenericConfigObject,
+  TangCompilation,
+  TangCompiler,
+  TangCompilerGenerateOptions,
+  TangCompilerLoadOptions,
+  TangCompilerOptions,
+  TangDocument,
+  TangGenerator,
+  TangHookContext,
+  TangLoader,
+  TangOutput,
+  TangOutputer,
+  TangParser,
+  TangProcessor,
+  TangProcessorTypes,
+} from '../@types';
+
 import { error } from '../common';
 import { findBy, sortBy, deepClone, deepMerge, strings } from '../utils';
 

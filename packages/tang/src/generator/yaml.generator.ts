@@ -1,3 +1,11 @@
+import {
+  GenericConfigObject,
+  TangChunk,
+  TangDocument,
+  TangGenerateResult,
+  TangGenerator,
+} from '../@types';
+
 import { yaml } from '../utils';
 
 /**

@@ -1,3 +1,5 @@
+import { TangError } from '../@types';
+
 // 输出标准错误
 export const stderr = console.error.bind(console);
 

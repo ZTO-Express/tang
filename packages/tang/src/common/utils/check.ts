@@ -1,6 +1,7 @@
 /**
  * 验证相关实用方法
  */
+import { getTag } from './internal';
 
 // 正则表达式
 const regexs = Object.freeze({
@@ -35,17 +36,17 @@ export function isRelativePath(path: string) {
 
 // 目标是否对象
 export function isObject(o: unknown) {
-  return Object.prototype.toString.call(o) === '[object Object]';
+  return getTag(o) === '[object Object]';
 }
 
 // 目标是否为null
 export function isNull(o: unknown) {
-  return !o && Object.prototype.toString.call(o) === '[object Null]';
+  return getTag(o) === '[object Null]';
 }
 
 // 目标是否为undefined
 export function isUndefined(o: unknown) {
-  return typeof o === 'undefined';
+  return getTag(o) === '[object Undefined]';
 }
 
 // 目标为null or undefined

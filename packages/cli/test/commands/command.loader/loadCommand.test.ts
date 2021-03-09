@@ -1,6 +1,5 @@
 import * as commander from 'commander';
 import { CommandLoader } from '../../../src/commands';
-import { CliActionFn } from '../../../src/common';
 
 describe('@tang/cli/commands：command.loader命令加载器 loadCommand', () => {
   let program: commander.Command;

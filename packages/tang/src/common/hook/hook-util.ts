@@ -1,3 +1,4 @@
+import { TangError, TangHook, TangHookNames } from '../../@types';
 import { throwError, Errors } from '../error';
 
 export function throwInvalidHookError(

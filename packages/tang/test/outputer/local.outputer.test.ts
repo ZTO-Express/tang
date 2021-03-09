@@ -1,5 +1,6 @@
 import * as testUtil from '../util';
 import { fs } from '../../src/utils';
+import { TangChunk } from '../../src/@types';
 import * as outputer from '../../src/outputer';
 
 describe('outputer/local：local输出器', () => {

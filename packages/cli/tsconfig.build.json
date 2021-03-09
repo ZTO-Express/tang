@@ -7,6 +7,10 @@
     "noUnusedParameters": false,
     "esModuleInterop": false
   },
-  "include": ["src", "node_modules/@tang/tang/typings"],
+  "include": [
+    "src",
+    "node_modules/@tang/tang/typings",
+    "node_modules/@tang/devkit/node_modules/@tang/tang/typings"
+  ],
   "exclude": ["dist"]
 }

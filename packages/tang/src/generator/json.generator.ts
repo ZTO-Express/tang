@@ -1,3 +1,11 @@
+import {
+  GenericConfigObject,
+  TangChunk,
+  TangDocument,
+  TangGenerateResult,
+  TangGenerator,
+} from '../@types';
+
 /**
  * json文件生成器
  */

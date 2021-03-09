@@ -6,22 +6,22 @@ import { ERROR_PREFIX } from '../lib/ui';
 
 import * as actions from '../actions';
 
+// import { UpdateCommand } from './update.command';
 import { InfoCommand } from './info.command';
-import { UpdateCommand } from './update.command';
 import { ConfigCommand } from './config.command';
 
 export class CommandLoader {
   // 所有action字典
   private static actionsMap = {
+    // update: new actions.UpdateAction(),
     info: new actions.InfoAction(),
-    update: new actions.UpdateAction(),
     config: new actions.ConfigAction(),
   };
 
   // 所有命令字典
   private static commandsArr = [
+    // new UpdateCommand(CommandLoader.actionsMap.update.main),
     new InfoCommand(CommandLoader.actionsMap.info.main),
-    new UpdateCommand(CommandLoader.actionsMap.update.main),
     new ConfigCommand(),
   ];
 

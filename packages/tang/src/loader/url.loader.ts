@@ -1,3 +1,5 @@
+import { GenericConfigObject, TangLoader } from '../@types';
+
 import { isUrl, fetch } from '../utils';
 
 /**

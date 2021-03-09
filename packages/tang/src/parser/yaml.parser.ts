@@ -1,3 +1,5 @@
+import { GenericConfigObject, TangModel, TangParser } from '../@types';
+
 import { yaml } from '../utils';
 
 /**
