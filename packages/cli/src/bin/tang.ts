@@ -6,7 +6,7 @@ import { CommandLoader } from '../commands';
 import {
   loadLocalBinCommandLoader,
   localBinExists,
-} from '../lib/utils/local-binaries';
+} from '../utils/local-binaries';
 
 const bootstrap = () => {
   const program: CommanderStatic = commander;

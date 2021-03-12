@@ -1,0 +1,39 @@
+{
+  "name": "@tang/core",
+  "version": "0.0.1",
+  "description": "Tang核心库",
+  "main": "lib/",
+  "types": "lib/",
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "lib/**"
+  ],
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "../../node_modules/.bin/rimraf -rf lib/ && ../../node_modules/.bin/tsc --project tsconfig.build.json",
+    "test": "jest --coverage --runInBand"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tang/common": "^0.0.1",
+    "isomorphic-unfetch": "^3.1.0",
+    "js-yaml": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.8",
+    "@types/js-yaml": "^4.0.0",
+    "@types/node-fetch": "^2.5.8",
+    "fs-extra": "^9.1.0",
+    "node-fetch": "^2.6.1"
+  },
+  "engines": {
+    "node": ">= 10"
+  }
+}

@@ -1,4 +1,4 @@
-import { TangDependencyManager, PackageManagerFactory } from '../lib/package';
+import { TangDependencyManager, PackageManagerFactory } from '../package';
 import { CliAction, CliActionOptions } from '../common';
 
 export class UpdateAction extends CliAction {

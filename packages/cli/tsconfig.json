@@ -9,6 +9,6 @@
     "strict": true,
     "esModuleInterop": false
   },
-  "include": ["src"],
+  "include": ["src", "../devkit/src/utils/local-binaries.ts", "src/package"],
   "exclude": ["node_modules", "dist", ".test_coverage"]
 }

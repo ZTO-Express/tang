@@ -2,7 +2,7 @@ import * as chalk from 'chalk';
 import * as commander from 'commander';
 import { CliActionFn, CliCommand, CliCommandConfig } from '../common';
 
-import { ERROR_PREFIX } from '../lib/ui';
+import { ERROR_PREFIX } from '../ui';
 
 import * as actions from '../actions';
 

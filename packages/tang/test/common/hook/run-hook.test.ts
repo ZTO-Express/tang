@@ -1,3 +1,4 @@
+import { TangHookContext } from '../../../src/@types';
 import { HookDriver } from '../../../src/common';
 
 describe('common/HookDriver：钩子驱动 testHook & runHook', () => {

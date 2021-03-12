@@ -1,4 +1,4 @@
-import { PresetManager } from '../../../src/lib/preset';
+import { PresetManager } from '../../../src/preset';
 
 describe('preset/PresetManager：preset格式验证 index', () => {
   let presetManager: PresetManager;

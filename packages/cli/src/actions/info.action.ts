@@ -1,8 +1,8 @@
 import * as chalk from 'chalk';
 import { platform, release } from 'os';
 import osName = require('os-name');
-import { AbstractPackageManager, PackageManagerFactory } from '../lib/package';
-import { BANNER } from '../lib/ui';
+import { AbstractPackageManager, PackageManagerFactory } from '../package';
+import { BANNER } from '../ui';
 import { CliAction } from '../common';
 
 export class InfoAction implements CliAction {

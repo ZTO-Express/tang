@@ -36,10 +36,10 @@ describe('utils/fs：fs实用方法', () => {
     expect(presetBuffer).toBeInstanceOf(Buffer);
     expect(presetBuffer.toString()).toMatch('@tang/yapi-sharing');
 
-    const preset2Json = await fs.resolveFile(
-      './test/fixtures/presets/yapi-fsharing/preset.json',
-      'json',
-    );
-    expect(preset2Json.name).toEqual('@tang/yapi-sharing');
+    // const preset2Json = await fs.resolveFile(
+    //   './test/fixtures/presets/yapi-fsharing/preset.json',
+    //   'json',
+    // );
+    // expect(preset2Json.name).toEqual('@tang/yapi-sharing');
   });
 });

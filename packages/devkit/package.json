@@ -1,7 +1,7 @@
 {
   "name": "@tang/devkit",
   "version": "0.0.1",
-  "description": "Tang",
+  "description": "Tang开发库",
   "main": "lib/",
   "types": "lib/",
   "files": [
@@ -22,19 +22,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@tang/tang": "^0.0.1",
-    "deepmerge": "^4.2.2",
+    "@tang/common": "^0.0.1",
+    "@tang/core": "^0.0.1",
+    "chalk": "^4.1.0",
     "fs-extra": "^9.1.0",
-    "js-yaml": "^4.0.0",
     "json5": "^2.2.0",
     "memfs": "^3.2.0",
     "node-fetch": "^2.6.1",
     "schema-utils": "^3.0.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "^9.0.6",
-    "@types/js-yaml": "^4.0.0",
-    "@types/node-fetch": "^2.5.8"
+    "@types/fs-extra": "^9.0.6"
   },
   "engines": {
     "node": ">= 10"
