@@ -3,11 +3,11 @@ import { memoize } from './memoize';
 
 const charCodeOfDot = '.'.charCodeAt(0);
 
-const MAX_MEMOIZE_SIZE = 500;
-const MAX_SAFE_INTEGER = 9007199254740991;
+export const MAX_MEMOIZE_SIZE = 500;
+export const MAX_SAFE_INTEGER = 9007199254740991;
 
 /** Used as references for various `Number` constants. */
-const INFINITY = 1 / 0;
+export const INFINITY = 1 / 0;
 
 const regexs = Object.freeze({
   reIsUint: /^(?:0|[1-9]\d*)$/,
@@ -49,8 +49,14 @@ export function isSymbol(value: any) {
     (type === 'object' && value != null && getTag(value) == '[object Symbol]')
   );
 }
-
-/** 判断目标是否数组下标 */
+/**
+ * Checks if `value` is a valid array-like index.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+ * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+ */
 export function isIndex(value: any, length?: number) {
   const type = typeof value;
   length = length == null ? MAX_SAFE_INTEGER : length;
@@ -174,8 +180,9 @@ export function baseAssignValue(object: any, key: string, value: any) {
     object[key] = value;
   }
 }
-
-/** 当value不等于object的key属性时赋值给对应属性 */
+/**
+ * Assigns `value` to `key` of `object` if the existing value is not equivalent.
+ */
 export function assignValue(object: any, key: string, value: any) {
   const objValue = object[key];
 
@@ -183,9 +190,11 @@ export function assignValue(object: any, key: string, value: any) {
     if (value !== 0 || 1 / value === 1 / objValue) {
       baseAssignValue(object, key, value);
     }
-  } else if (value === undefined && !(key in object)) {
-    baseAssignValue(object, key, value);
   }
+  // 这段代码肯定不会走
+  //  else if (value === undefined && !(key in object)) {
+  //   baseAssignValue(object, key, value);
+  // }
 }
 
 /** 获取指定路径对象值， 不支持默认值 */
@@ -243,4 +252,47 @@ export function baseSet(
     nested = nested[key];
   }
   return object;
+}
+
+/**
+ * Gets the parent value at `path` of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Array} path The path to get the parent value of.
+ * @returns {*} Returns the parent value.
+ */
+export function parent(object: any, path: string[]) {
+  return path.length < 2 ? object : baseGet(object, path.slice(0, -1));
+}
+
+/**
+ * Gets the last element of `array`.
+ *
+ * @since 0.1.0
+ * @category Array
+ * @param {Array} array The array to query.
+ * @returns {*} Returns the last element of `array`.
+ * @example
+ *
+ * last([1, 2, 3])
+ * // => 3
+ */
+export function last(array: any[]) {
+  const length = array == null ? 0 : array.length;
+  return length ? array[length - 1] : undefined;
+}
+
+/**
+ * The base implementation of `unset`.
+ *
+ * @private
+ * @param {Object} object The object to modify.
+ * @param {Array|string} path The property path to unset.
+ * @returns {boolean} Returns `true` if the property is deleted, else `false`.
+ */
+export function baseUnset(object: any, path: string | string[]) {
+  const paths: string[] = castPath(path, object);
+  object = parent(object, paths);
+  return object == null || delete object[toKey(last(paths))];
 }

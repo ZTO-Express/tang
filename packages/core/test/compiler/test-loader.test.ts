@@ -1,6 +1,6 @@
 import * as testUtil from '../util';
 
-import { Compiler } from '../../src/compiler';
+import { Compiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/loader：测试loader testLoader', () => {
@@ -9,7 +9,7 @@ describe('compiler/loader：测试loader testLoader', () => {
   const localLoader = testUtil.localLoader();
 
   const jsonParser = processors.jsonParser();
-  const yamlParser = processors.yamlParser();
+  const yamlParser = testUtil.yamlParser();
 
   beforeAll(() => {
     compiler = testUtil.createDefaultCompiler({

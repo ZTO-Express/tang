@@ -11,6 +11,10 @@ import { Compiler } from '../src/compiler';
 export const appRescBaseUrl = 'http://resc.pisaas.com/apps/tang';
 export const appHomeDir = `${os.homedir}/.tang`;
 
+export const falsey = [, null, undefined, false, 0, NaN, ''];
+
+export const empties = [[], {}].concat(falsey.slice(1));
+
 /** 获取fixture位置 */
 export function resolveFixturePath(...args: string[]) {
   return path.join(__dirname, 'fixtures', ...args);

@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { Compiler } from '../../src/compiler';
+import { Compiler } from '../../src';
 
 import * as processors from '../../src/processors';
 

@@ -136,7 +136,6 @@ export const stringToPath = memoizeCapped((string: string) => {
         key = expression.trim();
       }
       result.push(key);
-
       return '';
     },
   );

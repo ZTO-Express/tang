@@ -1,6 +1,14 @@
 import { deepmergeAll, DeepmergeOptions } from './internal/deepmerge';
-import { baseGet, baseSet } from './internal';
+import { baseGet, baseSet, baseUnset, last } from './internal';
 import { isNil, isPlainObject } from './check';
+
+/** 返回数组最后一个元素 */
+export const arryLast = last;
+
+/** 无操作 */
+export const noop = () => {
+  /** noop */
+};
 
 /**
  * 返回数组
@@ -123,12 +131,26 @@ export function deepMerge2(args: any[], options?: DeepmergeOptions) {
 }
 
 /** 获取指定路径对象值 */
-export function get(object: unknown, path: string, defaultValue?: unknown) {
+export function get(
+  object: unknown,
+  path: string | string[],
+  defaultValue?: unknown,
+) {
   const result = object == null ? undefined : baseGet(object, path);
   return result === undefined ? defaultValue : result;
 }
 
 /** 设置指定对象路径值 */
-export function set(object: unknown, path: string, value: unknown) {
-  return object == null ? object : baseSet(object, path, value);
+export function set(
+  object: unknown,
+  path: string | string[],
+  value: unknown,
+  customizer?: Function,
+) {
+  customizer = typeof customizer === 'function' ? customizer : undefined;
+  return object == null ? object : baseSet(object, path, value, customizer);
+}
+
+export function unset(object: undefined, path: string | string[]) {
+  return object == null ? true : baseUnset(object, path);
 }

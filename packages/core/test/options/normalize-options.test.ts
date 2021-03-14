@@ -1,7 +1,4 @@
-import {
-  getNormalizedOptions,
-  mergeProcessors,
-} from '../../src/options/normalize-options';
+import { getNormalizedOptions, mergeProcessors } from '../../src';
 
 describe('options/normalizeOptions：规范化配置', () => {
   const testLoader = { type: 'loader', name: 'local', isTest: true };
@@ -14,8 +11,8 @@ describe('options/normalizeOptions：规范化配置', () => {
     const options1 = getNormalizedOptions({});
 
     expect(options1.loaders.length).toBe(1);
-    expect(options1.parsers.length).toBe(2);
-    expect(options1.generators.length).toBe(2);
+    expect(options1.parsers.length).toBe(1);
+    expect(options1.generators.length).toBe(1);
     expect(options1.outputers.length).toBe(0);
 
     const options2 = getNormalizedOptions({});

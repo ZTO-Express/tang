@@ -123,12 +123,16 @@ export function deepMerge2(args: any[], options?: deepmerge.Options) {
 }
 
 /** 获取指定路径对象值 */
-export function get(object: unknown, path: string, defaultValue?: unknown) {
+export function get(
+  object: unknown,
+  path: string | string[],
+  defaultValue?: unknown,
+) {
   const result = object == null ? undefined : baseGet(object, path);
   return result === undefined ? defaultValue : result;
 }
 
 /** 设置指定对象路径值 */
-export function set(object: unknown, path: string, value: unknown) {
+export function set(object: unknown, path: string | string[], value: unknown) {
   return object == null ? object : baseSet(object, path, value);
 }

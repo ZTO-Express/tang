@@ -23,8 +23,8 @@ export function getNormalizedOptions(config: GenericConfigObject) {
 
   const defaultProcessors = {
     loaders: [processors.urlLoader()],
-    parsers: [processors.jsonParser(), processors.yamlParser()],
-    generators: [processors.jsonGenerator(), processors.yamlGenerator()],
+    parsers: [processors.jsonParser()],
+    generators: [processors.jsonGenerator()],
     outputers: [] as TangOutputer[],
   };
 

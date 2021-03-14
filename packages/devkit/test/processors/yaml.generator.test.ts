@@ -1,7 +1,7 @@
 import * as testUtil from '../util';
+import { Compilation, Compiler } from '@tang/core';
 import { yaml } from '../../src/utils';
 import * as processors from '../../src/processors';
-import { Compilation, Compiler } from '../../src/compiler';
 
 describe('generator/yaml：yaml生成器', () => {
   const compiler: Compiler = testUtil.createDefaultCompiler();
@@ -10,7 +10,7 @@ describe('generator/yaml：yaml生成器', () => {
   let docCompilation: Compilation;
 
   beforeAll(async () => {
-    const tfDocPath = testUtil.resolveFixturePath('openapi.yaml');
+    const tfDocPath = testUtil.resolveFixturePath('documents/openapi.yaml');
 
     docCompilation = await compiler.load(tfDocPath, {
       parser: 'yaml',

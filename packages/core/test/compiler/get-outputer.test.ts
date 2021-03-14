@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { Compiler } from '../../src/compiler';
+import { Compiler } from '../../src';
 
 describe('compiler/outputer：获取输出器 getOutputer', () => {
   const localOutputer = testUtil.localOutputer();

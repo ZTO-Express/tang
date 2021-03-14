@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { Compiler } from '../../src/compiler';
+import { Compiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/load：load 加载', () => {
@@ -7,10 +7,10 @@ describe('compiler/load：load 加载', () => {
   const localLoader = testUtil.localLoader();
 
   const jsonParser = processors.jsonParser();
-  const yamlParser = processors.yamlParser();
+  const yamlParser = testUtil.yamlParser();
 
   const jsonGenerator = processors.jsonGenerator();
-  const yamlGenerator = processors.yamlGenerator();
+  const yamlGenerator = testUtil.yamlGenerator();
 
   const localOutputer = testUtil.localOutputer();
   const memoryOutputer = testUtil.memoryOutputer();

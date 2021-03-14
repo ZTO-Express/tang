@@ -1,7 +1,7 @@
 import * as testUtil from '../util';
 import { TangGenerator } from '@tang/common';
+import { Compilation, Compiler } from '../../src';
 import * as processors from '../../src/processors';
-import { Compilation, Compiler } from '../../src/compiler';
 
 describe('generator/json：json生成器', () => {
   let compiler: Compiler;

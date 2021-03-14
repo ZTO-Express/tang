@@ -1,7 +1,7 @@
 import * as testUtil from '../util';
 import { ErrorCodes } from '@tang/common';
 
-import { Compiler } from '../../src/compiler';
+import { Compiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/load：load 加载', () => {
@@ -11,7 +11,7 @@ describe('compiler/load：load 加载', () => {
   const localLoader = testUtil.localLoader();
 
   const jsonParser = processors.jsonParser();
-  const yamlParser = processors.yamlParser();
+  const yamlParser = testUtil.yamlParser();
 
   let compiler1: Compiler;
   let compiler2: Compiler;

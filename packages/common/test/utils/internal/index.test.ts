@@ -7,6 +7,9 @@ import {
   memoizeCapped,
   assignValue,
   stringToPath,
+  last,
+  isIndex,
+  MAX_MEMOIZE_SIZE,
 } from '../../../src/utils/internal';
 
 describe('utils/internal：内部实用方法', () => {
@@ -64,13 +67,30 @@ describe('utils/internal：内部实用方法', () => {
   });
 
   it('stringToPath 测试', () => {
-    debugger;
     stringToPath('a.b.c');
   });
 
   it('memoize 缓存', () => {
     expect(() => memoizeCapped('a' as any)).toThrow('Expected a function');
     expect(memoizeCapped((str: string) => str)('a')).toBe('a');
+
+    const memoizeCappedFn = memoizeCapped((str: string) => str);
+
+    for (let i = 0; i < MAX_MEMOIZE_SIZE + 1; i++) {
+      memoizeCappedFn(i);
+    }
+
+    expect(memoizeCappedFn(MAX_MEMOIZE_SIZE + 1)).toBe(MAX_MEMOIZE_SIZE + 1);
+  });
+
+  it('last', () => {
+    expect(last(undefined)).toBe(undefined);
+  });
+
+  it('isIndex', () => {
+    expect(isIndex(10, 1)).toBe(false);
+    expect(isIndex(10, 10)).toBe(false);
+    expect(isIndex(10, 11)).toBe(true);
   });
 
   it('assignValue', () => {
@@ -88,9 +108,13 @@ describe('utils/internal：内部实用方法', () => {
       name: any = undefined;
     }
 
+    class SubTestObj extends TestObj {
+      subName: any = undefined;
+    }
+
     (TestObj as any).prototype.gender = undefined;
 
-    const o = new TestObj();
+    const o = new SubTestObj();
 
     assignValue(o, 'gender', undefined);
     expect(obj.gender).toBeUndefined();
@@ -98,7 +122,22 @@ describe('utils/internal：内部实用方法', () => {
     assignValue(o, 'name', undefined);
     expect(obj.name).toBeUndefined();
 
+    assignValue(o, 'subName', undefined);
+    expect(obj.subName).toBeUndefined();
+
+    assignValue(o, 'subName', undefined);
+    expect(obj.subName).toBeUndefined();
+
+    assignValue(o, 'name', 0);
+    expect(obj.name).toBe(undefined);
+
     assignValue(o, '__proto__', 'test');
     expect((o as any).__proto__).toBe('test');
+  });
+
+  it('baseSet', () => {
+    expect(isIndex(10, 1)).toBe(false);
+    expect(isIndex(10, 10)).toBe(false);
+    expect(isIndex(10, 11)).toBe(true);
   });
 });

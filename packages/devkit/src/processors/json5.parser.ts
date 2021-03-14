@@ -5,7 +5,7 @@ import { json5 } from '../utils';
 /**
  * Json解析器
  */
-export const jsonParser = (): TangParser => {
+export const json5Parser = (): TangParser => {
   return {
     type: 'parser',
 

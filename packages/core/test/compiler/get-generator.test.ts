@@ -1,11 +1,11 @@
 import * as testUtil from '../util';
-import { Compiler } from '../../src/compiler';
+import { Compiler } from '../../src';
 
 import * as processors from '../../src/processors';
 
 describe('compiler/generator：获取生成器 getGenerator', () => {
   const jsonGenerator = processors.jsonGenerator();
-  const yamlGenerator = processors.yamlGenerator();
+  const yamlGenerator = testUtil.yamlGenerator();
 
   let compiler1: Compiler;
   let compiler2: Compiler;

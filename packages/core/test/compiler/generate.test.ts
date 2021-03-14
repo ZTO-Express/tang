@@ -1,7 +1,7 @@
 import * as testUtil from '../util';
 import { ErrorCodes } from '@tang/common';
 
-import { Compilation, Compiler } from '../../src/compiler';
+import { Compilation, Compiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/load：load 加载', () => {
@@ -11,7 +11,7 @@ describe('compiler/load：load 加载', () => {
   const localLoader = testUtil.localLoader();
 
   const jsonParser = processors.jsonParser();
-  const yamlParser = processors.yamlParser();
+  const yamlParser = testUtil.yamlParser();
 
   let compiler1: Compiler;
   let compiler2: Compiler;
@@ -63,6 +63,13 @@ describe('compiler/load：load 加载', () => {
       outputer: 'memory',
     });
 
-    expect(output.files).toEqual(['default.yaml']);
+    expect(output.files.length).toBe(1);
+
+    const genFileBuffer = await output.vol.promises.readFile(
+      output.files[0].path,
+    );
+
+    expect(genFileBuffer).toBeInstanceOf(Buffer);
+    expect(genFileBuffer.toString()).toMatch('openapi: 3.0.0');
   });
 });

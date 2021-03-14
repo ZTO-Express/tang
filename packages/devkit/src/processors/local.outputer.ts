@@ -4,6 +4,7 @@ import {
   TangGeneration,
   TangOutput,
   TangOutputer,
+  Chunk,
 } from '@tang/common';
 
 import * as path from 'path';
@@ -38,7 +39,7 @@ export const localOutputer = (): TangOutputer => {
 
       const files: any[] = [];
 
-      const ops = generation.chunks.map(async chunk => {
+      const ops = generation.chunks.map(async (chunk: Chunk) => {
         if (!chunk.content) return;
 
         const filePath = path.join(outputDir, chunk.name);
