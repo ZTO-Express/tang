@@ -43,4 +43,22 @@ describe('tang/cli/config.manager load：配置加载', () => {
 
     await testUtil.fs.emptyDir(tmpDir);
   });
+
+  it('修改配置', async () => {
+    const cfgManager = new ConfigManager({ configDir: tmpDir });
+
+    const config = await cfgManager.load();
+    expect(config).toEqual(defaultConfig);
+
+    cfgManager.set('test.name', 'devKit');
+    expect(cfgManager.get('test.name')).toBe('devKit');
+    expect(cfgManager.get('test')).toEqual({ name: 'devKit' });
+    expect(config.test).toEqual({ name: 'devKit' });
+
+    cfgManager.set('test', 'devKit');
+    expect(config.test).toBe('devKit');
+
+    cfgManager.unset('test');
+    expect(config.test).toBeUndefined();
+  });
 });

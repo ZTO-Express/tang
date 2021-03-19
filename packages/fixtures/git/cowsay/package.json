@@ -1,0 +1,24 @@
+{
+  "name": "cowsay",
+  "version": "1.4.0",
+  "description": "cowsay is a configurable talking cow",
+  "homepage": "https://github.com/piuccio/cowsay",
+  "author": {
+    "name": "Fabio Crisci",
+    "email": "piuccio@gmail.com",
+    "url": "https://github.com/piuccio/"
+  },
+  "license": "MIT",
+  "main": "./index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/piuccio/cowsay.git"
+  },
+  "dependencies": {
+    "string-width": "~2.1.1"
+  },
+  "preferGlobal": true,
+  "engines": {
+    "node": ">= 4"
+  }
+}

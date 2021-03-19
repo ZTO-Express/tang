@@ -1,7 +1,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testTimeout: 5000,
+  testTimeout: 30000,
   coverageDirectory: '.test_coverage',
   collectCoverageFrom: [
     "src/**/*.{js,ts}"

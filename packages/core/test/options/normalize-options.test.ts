@@ -10,7 +10,7 @@ describe('options/normalizeOptions：规范化配置', () => {
   it('获取规范化选项 多次为不同对象，但值相同', () => {
     const options1 = getNormalizedOptions({});
 
-    expect(options1.loaders.length).toBe(1);
+    expect(options1.loaders.length).toBe(2);
     expect(options1.parsers.length).toBe(1);
     expect(options1.generators.length).toBe(1);
     expect(options1.outputers.length).toBe(0);
@@ -33,7 +33,7 @@ describe('options/normalizeOptions：规范化配置', () => {
       exProp: { isTestExProp: true },
     });
 
-    expect(options1.loaders.length).toBe(2);
+    expect(options1.loaders.length).toBe(3);
     expect(options1.parsers.length).toBe(2);
 
     expect(JSON.stringify(options1.defaultLoader)).toBe(

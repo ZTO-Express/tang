@@ -66,4 +66,28 @@ describe('common/error：应用错误', () => {
       },
     });
   });
+
+  it('目标已存在错误 Already Exists Error', () => {
+    expect(new errors.AlreadyExistsError()).toMatchObject({
+      name: 'TangError',
+      code: ErrorCodes.ALREADY_EXISTS,
+      message: 'Already Exists',
+      body: {
+        code: ErrorCodes.ALREADY_EXISTS,
+        message: 'Already Exists',
+      },
+    });
+  });
+
+  it('目标未找到错误 Not Found Error', () => {
+    expect(new errors.NotFoundError()).toMatchObject({
+      name: 'TangError',
+      code: ErrorCodes.NOT_FOUND,
+      message: 'Not Found',
+      body: {
+        code: ErrorCodes.NOT_FOUND,
+        message: 'Not Found',
+      },
+    });
+  });
 });

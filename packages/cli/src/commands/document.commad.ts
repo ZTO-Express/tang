@@ -1,11 +1,11 @@
 import { CliCommand } from '../common';
 
-export class ConfigCommand implements CliCommand {
+export class DocumentCommand implements CliCommand {
   config() {
     return {
-      name: 'plugin',
+      name: 'document',
       args: '<key> <value>',
-      description: '操作Tang配置',
+      description: '操作文档',
       argsDescription: {
         key: '配置key',
         value: '配置值',

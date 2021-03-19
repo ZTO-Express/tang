@@ -1,11 +1,13 @@
 import * as path from 'path';
 import * as os from 'os';
 
+import { GenericConfigObject } from '@tang/common';
+import { Compiler, getNormalizedOptions } from '@tang/core';
+
 import * as processors from '../src/processors';
 
 import { fs } from '../src/utils';
-import { GenericConfigObject } from '@tang/common';
-import { Compiler, getNormalizedOptions } from '@tang/core';
+import { TangLauncher } from '../src';
 
 export { fs };
 
@@ -14,7 +16,7 @@ export const appHomeDir = `${os.homedir}/.tang`;
 
 /** 获取fixture位置 */
 export function resolveFixturePath(...args: string[]) {
-  return path.join(__dirname, 'fixtures', ...args);
+  return path.join(__dirname, '../../fixtures', ...args);
 }
 
 /** 获取fixture url位置 */
@@ -29,6 +31,19 @@ export function resolveTmpDir(...args: string[]) {
   const tmpDir = path.join(appHomeDir, 'test_output/cli', ...args);
   fs.ensureDirSync(tmpDir);
   return tmpDir;
+}
+
+/** 清理测试换行 */
+export async function cleanTangLauncherTestEnv() {
+  const launcher = TangLauncher.getInstance();
+  const { pluginManager } = launcher;
+
+  // 删除所有cowsay插件
+  await pluginManager.deleteAll('cowsay');
+  await pluginManager.deleteAll('test-tang');
+
+  // 清理缓存及无效插件、预设
+  launcher.prune();
 }
 
 /** 创建默认编译器 */

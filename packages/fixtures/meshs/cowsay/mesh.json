@@ -1,0 +1,17 @@
+{
+  "name": "@tang/cowsay", // 预设名称
+  "version": "0.0.1", // 预设版本
+  "title": "测试预设", // 标题
+  "description": "此预设用于测试", // 描述
+  "contact": {
+    "name": "rayl", // 名称
+    "url": "https://github.com/ZTO-Express/tang", // url
+    "email": "rayl@pisaas.com" // 邮箱
+  },
+  "plugins": [
+    {
+      "name": "cowsay",
+      "version": "1.4.0"
+    }
+  ]
+}

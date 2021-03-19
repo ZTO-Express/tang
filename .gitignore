@@ -23,6 +23,7 @@ yarn-error.log
 
 # tests
 /test
+/fixtures/git/**/package-lock.json
 /benchmarks/memory
 /coverage
 /.nyc_output

@@ -13,7 +13,7 @@ describe('outputer/local：local输出器', () => {
 
   beforeAll(async () => {
     const yfPresetPath = testUtil.resolveFixturePath(
-      'presets/yapi-fsharing/preset.json',
+      'meshs/yapi-fsharing/mesh.json',
     );
 
     const presetGeneration = await compiler.load(yfPresetPath);
@@ -22,7 +22,7 @@ describe('outputer/local：local输出器', () => {
 
     sampleChunks = [
       {
-        name: 'preset.json',
+        name: 'mesh.json',
         content: JSON.stringify(samplePresetData),
       },
       {

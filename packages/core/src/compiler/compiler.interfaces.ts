@@ -6,21 +6,24 @@ import {
   TangProcessor,
   TangHook,
   TangProcessorTypeNames,
+  Preset,
 } from '@tang/common';
 
 // 生成器配置选项
 export interface CompilerOptions {
+  preset?: Preset;
+
   defaultLoader?: string | TangLoader;
-  loaders: TangLoader[];
+  loaders?: TangLoader[];
 
   defaultParser?: string | TangParser;
-  parsers: TangParser[];
+  parsers?: TangParser[];
 
   defaultGenerator?: string | TangGenerator;
-  generators: TangGenerator[];
+  generators?: TangGenerator[];
 
   defaultOutputer?: string | TangOutputer;
-  outputers: TangOutputer[];
+  outputers?: TangOutputer[];
 
   hooks?: TangHook[];
 }

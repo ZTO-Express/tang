@@ -32,6 +32,16 @@ describe('utils/check：check实用方法', () => {
     expect(util.isRelativePath('../xxx/y.json')).toBe(true);
   });
 
+  it('验证 isPath', () => {
+    expect(util.isPath('/xxx/y.json')).toBe(true);
+    expect(util.isPath('c://xxxx/y.json')).toBe(true);
+    expect(util.isPath('c:/xxxx/y.json')).toBe(true);
+    expect(util.isPath('http://www.github.com')).toBe(false);
+    expect(util.isPath('xxx/y.json')).toBe(false);
+    expect(util.isPath('./xxx/y.json')).toBe(true);
+    expect(util.isPath('../xxx/y.json')).toBe(true);
+  });
+
   it('验证isObject', () => {
     expect(util.isObject({})).toBe(true);
 

@@ -21,13 +21,16 @@ export class AbstractRunner {
         options,
       );
       if (collect) {
-        child.stdout!.on('data', data =>
-          resolve(data.toString().replace(/\r\n|\n/, '')),
-        );
+        child.stdout?.on('data', data => () => {
+          setTimeout(
+            () => resolve(data.toString().replace(/\r\n|\n/, '')),
+            100,
+          );
+        });
       }
       child.on('close', code => {
         if (code === 0) {
-          resolve(null);
+          setTimeout(() => resolve(null), 100);
         } else {
           reject(`\nFailed to execute command: ${this.binary} ${command}`);
         }

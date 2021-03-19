@@ -55,3 +55,33 @@ export class NotImplementedError extends TangError {
     );
   }
 }
+
+// 目标已存在
+export class AlreadyExistsError extends TangError {
+  constructor(
+    objectOrError?: string | object | any,
+    description = 'Already Exists',
+  ) {
+    super(
+      TangError.createBody(
+        objectOrError,
+        description,
+        ErrorCodes.ALREADY_EXISTS,
+      ),
+      ErrorCodes.ALREADY_EXISTS,
+    );
+  }
+}
+
+// 目标未找到
+export class NotFoundError extends TangError {
+  constructor(
+    objectOrError?: string | object | any,
+    description = 'Not Found',
+  ) {
+    super(
+      TangError.createBody(objectOrError, description, ErrorCodes.NOT_FOUND),
+      ErrorCodes.NOT_FOUND,
+    );
+  }
+}

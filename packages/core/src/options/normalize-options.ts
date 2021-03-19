@@ -22,7 +22,7 @@ export function getNormalizedOptions(config: GenericConfigObject) {
   const defaultOptions = {};
 
   const defaultProcessors = {
-    loaders: [processors.urlLoader()],
+    loaders: [processors.urlLoader(), processors.moduleLoader()],
     parsers: [processors.jsonParser()],
     generators: [processors.jsonGenerator()],
     outputers: [] as TangOutputer[],

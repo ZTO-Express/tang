@@ -11,17 +11,17 @@ describe('outputer/memory：memory输出器', () => {
   let sampleChunks: Chunk[];
 
   beforeAll(async () => {
-    const yfPresetPath = testUtil.resolveFixturePath(
-      'presets/yapi-fsharing/preset.json',
+    const yfDocPath = testUtil.resolveFixturePath(
+      'meshs/yapi-fsharing/mesh.json',
     );
 
-    const presetGeneration = await compiler.load(yfPresetPath);
+    const presetGeneration = await compiler.load(yfDocPath);
 
     samplePresetData = presetGeneration.document.model;
 
     sampleChunks = [
       {
-        name: '/preset.json',
+        name: '/mesh.json',
         content: JSON.stringify(samplePresetData),
       },
       {

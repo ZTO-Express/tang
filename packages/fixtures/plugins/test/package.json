@@ -1,0 +1,13 @@
+{
+  "name": "test-tang",
+  "version": "0.0.1",
+  "description": "tang测试插件",
+  "author": {
+    "name": "rayl",
+    "email": "rayl@pisaas.com"
+  },
+  "main": "./index",
+  "dependencies": {
+    "cowsay": "1.4.0"
+  }
+}

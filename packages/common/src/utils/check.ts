@@ -18,6 +18,11 @@ export function isUrl(str: string) {
   return regexs.url.test(str);
 }
 
+/** 判断是否为路径 */
+export function isPath(path: string) {
+  return isAbsolutePath(path) || isRelativePath(path);
+}
+
 /**
  * 是否绝对路径
  * @param path 路径字符串

@@ -9,7 +9,8 @@ export const jsonParser = (): TangParser => {
 
     name: 'json',
 
-    async parse(content: string): Promise<DocumentModel> {
+    async parse(content: string | object): Promise<DocumentModel> {
+      if (typeof content === 'object') return content;
       const result = JSON.parse(content);
       return result;
     },

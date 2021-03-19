@@ -5,6 +5,7 @@ import { IO } from './io.interfaces';
 
 export interface LocalWriteOptions extends GenericConfigObject {
   file?: string;
+  fullPath?: string;
 }
 
 export class LocalIO implements IO {

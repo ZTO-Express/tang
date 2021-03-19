@@ -4,13 +4,13 @@ import * as testUtil from '../util';
 
 describe('utils/fs：fs实用方法', () => {
   it('从本地目录获取文件', async () => {
-    const yfPresetPath = testUtil.resolveFixturePath(
-      'presets/yapi-fsharing/preset.json',
+    const yfDocPath = testUtil.resolveFixturePath(
+      'meshs/yapi-fsharing/mesh.json',
     );
 
-    const presetContent = await fs.resolveFile(yfPresetPath, 'json');
+    const meshContent = await fs.resolveFile(yfDocPath, 'json');
 
-    expect(presetContent.name).toEqual('@tang/yapi-sharing');
+    expect(meshContent.name).toEqual('@tang/yapi-sharing');
   });
 
   it('从url获取文件', async () => {
@@ -22,25 +22,19 @@ describe('utils/fs：fs实用方法', () => {
     const blankText = await fs.resolveFile(blankUrl);
     expect(blankText).toBe('');
 
-    const yfPresetUrl = testUtil.resolveFixtureUrl(
-      'presets/yapi-fsharing/preset.json',
+    const yfDocUrl = testUtil.resolveFixtureUrl(
+      'meshs/yapi-fsharing/mesh.json',
     );
-    expect(utils.isUrl(yfPresetUrl)).toBeTruthy();
+    expect(utils.isUrl(yfDocUrl)).toBeTruthy();
 
-    const presetText = await fs.resolveFile(yfPresetUrl);
-    expect(presetText).toMatch('@tang/yapi-sharing');
+    const meshText = await fs.resolveFile(yfDocUrl);
+    expect(meshText).toMatch('@tang/yapi-sharing');
 
-    const presetJson = await fs.resolveFile(yfPresetUrl, 'json');
-    expect(presetJson.name).toEqual('@tang/yapi-sharing');
+    const meshJson = await fs.resolveFile(yfDocUrl, 'json');
+    expect(meshJson.name).toEqual('@tang/yapi-sharing');
 
-    const presetBuffer = await fs.resolveFile(yfPresetUrl, 'buffer');
-    expect(presetBuffer).toBeInstanceOf(ArrayBuffer);
-    expect(presetBuffer.byteLength).toBeGreaterThan(10);
-
-    const preset2Json = await fs.resolveFile(
-      './test/fixtures/presets/yapi-fsharing/preset.json',
-      'json',
-    );
-    expect(preset2Json.name).toEqual('@tang/yapi-sharing');
+    const meshBuffer = await fs.resolveFile(yfDocUrl, 'buffer');
+    expect(meshBuffer).toBeInstanceOf(ArrayBuffer);
+    expect(meshBuffer.byteLength).toBeGreaterThan(10);
   });
 });

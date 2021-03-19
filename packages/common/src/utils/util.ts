@@ -1,6 +1,6 @@
 import { deepmergeAll, DeepmergeOptions } from './internal/deepmerge';
 import { baseGet, baseSet, baseUnset, last } from './internal';
-import { isNil, isPlainObject } from './check';
+import { isNil, isObject, isPlainObject } from './check';
 
 /** 返回数组最后一个元素 */
 export const arryLast = last;
@@ -151,6 +151,47 @@ export function set(
   return object == null ? object : baseSet(object, path, value, customizer);
 }
 
-export function unset(object: undefined, path: string | string[]) {
+/** 移除对象指定路径值 */
+export function unset(object: unknown, path: string | string[]) {
   return object == null ? true : baseUnset(object, path);
+}
+
+export type OmitFilterFn = (val: any, key: string, object: unknown) => boolean;
+
+/**
+ *
+ * @param object 需要移除属性的对象
+ * @param props 需要移除的属性
+ * @param filter 过滤方法，返回true则保留，否则排除
+ */
+export function omit(
+  object: unknown,
+  props?: string | string[] | OmitFilterFn,
+  filter?: OmitFilterFn,
+): any {
+  if (typeof props === 'string') {
+    props = [props];
+  } else if (typeof props === 'function') {
+    filter = props;
+    props = [];
+  }
+
+  if (!isObject(object)) return {};
+
+  const isFunction = typeof filter === 'function';
+  const keys = Object.keys(object);
+  const res: any = {};
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const val = (object as any)[key];
+
+    if (
+      !props ||
+      (props.indexOf(key) === -1 && (!isFunction || filter(val, key, object)))
+    ) {
+      res[key] = val;
+    }
+  }
+  return res;
 }

@@ -2,7 +2,7 @@ import * as testUtil from '../util';
 import { TANG_CONFIG_FILENAME } from '../../src/consts';
 import { LocalIO } from '../../src/io';
 
-describe('tang/cli/local.loader：本地加载器', () => {
+describe('tang/core/local.loader：本地加载器', () => {
   const tmpDir = testUtil.resolveTmpDir();
   const localIO = new LocalIO(tmpDir);
 

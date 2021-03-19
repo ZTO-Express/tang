@@ -93,7 +93,6 @@ export class Compiler implements TangCompiler {
     entry: string,
     options?: TangCompilerLoadOptions,
   ): Promise<TangCompilation> {
-    debugger;
     options = options || {};
     options.entry = entry;
 

@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { GenericConfigObject } from '@tang/common';
+import { GenericConfigObject, utils } from '@tang/common';
 import { json5 } from '../utils';
 import { TANG_HOME, TANG_CONFIG_FILENAME } from '../consts';
 import { Config } from './interfaces';
@@ -16,8 +16,6 @@ export interface ConfigManagerOptions extends GenericConfigObject {
  * 配置管理器
  */
 export class ConfigManager {
-  options: ConfigManagerOptions = {};
-
   readonly configDir: string;
   readonly configFileName: string;
 
@@ -64,9 +62,20 @@ export class ConfigManager {
     return this.config;
   }
 
+  // 获取配置信息
+  get<T>(path: string): T {
+    const result = utils.get(this.config, path);
+    return result;
+  }
+
   // 设置配置
-  async set() {
-    debugger;
+  unset(path: string) {
+    utils.unset(this.config, path);
+  }
+
+  // 设置配置
+  set(path: string, value?: any) {
+    utils.set(this.config, path, value);
   }
 
   /** 保存配置 */
