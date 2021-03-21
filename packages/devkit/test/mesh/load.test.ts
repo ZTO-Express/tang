@@ -1,5 +1,6 @@
 import * as testUtil from '../util';
-import { MeshManager, TangLauncher } from '../../src';
+import { TangLauncher } from '../../src';
+import { MeshManager } from '../../src/mesh';
 
 // 预设文件格式：
 // plugin:@tang/test@0.0.1:test-cowsay@0.0.1
@@ -10,10 +11,13 @@ import { MeshManager, TangLauncher } from '../../src';
 // test-cowsay
 
 describe('tang/mesh/load：加载预设', () => {
-  const launcher = TangLauncher.getInstance();
-  const meshManager = new MeshManager(launcher);
+  let meshManager: MeshManager;
+  let launcher: TangLauncher;
 
   beforeAll(async () => {
+    launcher = await TangLauncher.getInstance();
+    meshManager = new MeshManager(launcher);
+
     await testUtil.cleanTangLauncherTestEnv();
 
     // 删除所有test-tang预设

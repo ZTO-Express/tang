@@ -1,8 +1,13 @@
 import * as testUtil from '../util';
-import { TangLauncher } from '../../src';
+import { PluginManager, TangLauncher } from '../../src';
 
 describe('tang/plugin/install：安装插件', () => {
-  const pluginManager = TangLauncher.getInstance().pluginManager;
+  let pluginManager: PluginManager;
+
+  beforeAll(async () => {
+    const launcher = await TangLauncher.getInstance();
+    pluginManager = launcher.pluginManager;
+  });
 
   beforeEach(async () => {
     await testUtil.cleanTangLauncherTestEnv();
@@ -57,7 +62,6 @@ describe('tang/plugin/install：安装插件', () => {
   it('从npm link安装插件', async () => {
     const packagePath = testUtil.resolveFixturePath('git/cowsay');
     const installOptions = {
-      type: 'npm_link',
       version: '1.4.0',
       package: packagePath,
       force: true,
@@ -67,7 +71,7 @@ describe('tang/plugin/install：安装插件', () => {
 
     const pluginName = `cowsay@${installOptions.version}`;
 
-    let list = await pluginManager.list('cowsay');
+    const list = await pluginManager.list('cowsay');
     expect(list).toEqual([pluginName]);
 
     const result = await pluginManager.run(pluginName, 'say', {
@@ -82,8 +86,8 @@ describe('tang/plugin/install：安装插件', () => {
 
     await pluginManager.delete('cowsay', installOptions.version);
 
-    list = await pluginManager.list('cowsay');
-    expect(list).toEqual([]);
+    const list1 = await pluginManager.list('cowsay');
+    expect(list1).toEqual([]);
   });
 
   it('安装插件（包含preset）', async () => {

@@ -9,6 +9,7 @@ import * as actions from '../actions';
 // import { UpdateCommand } from './update.command';
 import { InfoCommand } from './info.command';
 import { ConfigCommand } from './config.command';
+import { PluginCommand } from './plugin.command';
 
 export class CommandLoader {
   // 所有action字典
@@ -16,6 +17,7 @@ export class CommandLoader {
     // update: new actions.UpdateAction(),
     info: new actions.InfoAction(),
     config: new actions.ConfigAction(),
+    plugin: new actions.PluginAction(),
   };
 
   // 所有命令字典
@@ -23,6 +25,7 @@ export class CommandLoader {
     // new UpdateCommand(CommandLoader.actionsMap.update.main),
     new InfoCommand(CommandLoader.actionsMap.info.main),
     new ConfigCommand(),
+    new PluginCommand(),
   ];
 
   static load(program: commander.Command, existWhenError = true): void {
@@ -82,8 +85,6 @@ export class CommandLoader {
   ) {
     const actionsMap = CommandLoader.actionsMap;
 
-    const { name } = cfg;
-
     let actionFn: CliActionFn | undefined = undefined;
     let actionNames: string[] = [];
 
@@ -100,10 +101,9 @@ export class CommandLoader {
       actionNames = [cfg.name];
     }
 
-    if (!actionFn && actionNames.length) {
-      const baseAction = (actionsMap as any)[actionNames[0]];
-      if (!baseAction) return;
+    const baseAction = (actionsMap as any)[actionNames[0]];
 
+    if (!actionFn && actionNames.length) {
       if (actionNames.length === 1) {
         actionFn = baseAction['main'];
       } else {
@@ -135,7 +135,13 @@ export class CommandLoader {
       cmd.addOption(opt);
     });
 
-    cmd.action(actionFn);
+    if (!baseAction) {
+      cmd.action(actionFn);
+    } else {
+      cmd.action((...args: any[]) => {
+        return actionFn?.call(baseAction, ...args, cmd);
+      });
+    }
 
     // 如果此配置有父命令则直接返回（不支持2级以上命令）
     if (cfg.parent) return;

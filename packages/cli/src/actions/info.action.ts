@@ -5,7 +5,7 @@ import { AbstractPackageManager, PackageManagerFactory } from '../package';
 import { BANNER } from '../ui';
 import { CliAction } from '../common';
 
-export class InfoAction implements CliAction {
+export class InfoAction extends CliAction {
   async main() {
     displayBanner();
     await displaySystemInformation();

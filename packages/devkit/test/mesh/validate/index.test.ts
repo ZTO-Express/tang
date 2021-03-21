@@ -1,7 +1,14 @@
-import { MeshManager, TangLauncher } from '../../../src';
+import { TangLauncher } from '../../../src';
+import { MeshManager } from '../../../src/mesh';
 
 describe('preset/PresetManager：preset格式验证 index', () => {
-  const meshManager = new MeshManager(TangLauncher.getInstance());
+  let meshManager: MeshManager;
+  let launcher: TangLauncher;
+
+  beforeAll(async () => {
+    launcher = await TangLauncher.getInstance();
+    meshManager = new MeshManager(launcher);
+  });
 
   it('验证 preset格式，通过', async () => {
     await expect(

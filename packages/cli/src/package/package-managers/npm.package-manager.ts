@@ -1,6 +1,5 @@
 import { PackageManagerCommands } from '../../common';
-import { Runner, RunnerFactory } from '@tang/devkit/src/runners';
-import { NpmRunner } from '@tang/devkit/src/runners/npm.runner';
+import { Runner, RunnerFactory } from '@tang/devkit';
 import {
   PackageManagers,
   AbstractPackageManager,
@@ -8,7 +7,7 @@ import {
 
 export class NpmPackageManager extends AbstractPackageManager {
   constructor() {
-    super(RunnerFactory.create(Runner.NPM) as NpmRunner);
+    super(RunnerFactory.create(Runner.NPM));
   }
 
   public get name() {

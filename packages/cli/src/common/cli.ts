@@ -1,3 +1,4 @@
+import * as devkit from '@tang/devkit';
 import * as commander from 'commander';
 
 /** 命令选项 */
@@ -46,7 +47,13 @@ export type CliActionOptions = {
 
 export type CliActionFn = (...args: any[]) => void | Promise<void>;
 
-export abstract class CliAction {}
+export abstract class CliAction {
+  /** 返回加载器 */
+  protected async getLauncher() {
+    const launcher = await devkit.launcher();
+    return launcher;
+  }
+}
 
 /** cli命令，支持采用config方式和load方式进行配置（推荐config，load主要用于现阶段调试配置时用） */
 export interface CliCommand {

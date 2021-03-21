@@ -347,7 +347,7 @@ export class MeshManager {
     }
 
     if (_name.lastIndexOf('@') > 0) return _name;
-    const fullName = version ? `${_name}@${version}` : _name;
+    const fullName = _version ? `${_name}@${_version}` : _name;
     return fullName;
   }
 

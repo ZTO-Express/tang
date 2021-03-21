@@ -1,6 +1,5 @@
 import { PackageManagerCommands } from '../../common/interfaces';
-import { Runner, RunnerFactory } from '@tang/devkit/src/runners';
-import { YarnRunner } from '@tang/devkit/src/runners/yarn.runner';
+import { Runner, RunnerFactory } from '@tang/devkit';
 import {
   PackageManagers,
   AbstractPackageManager,
@@ -8,7 +7,7 @@ import {
 
 export class YarnPackageManager extends AbstractPackageManager {
   constructor() {
-    super(RunnerFactory.create(Runner.YARN) as YarnRunner);
+    super(RunnerFactory.create(Runner.YARN));
   }
 
   public get name() {

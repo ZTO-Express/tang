@@ -35,7 +35,7 @@ export function resolveTmpDir(...args: string[]) {
 
 /** 清理测试换行 */
 export async function cleanTangLauncherTestEnv() {
-  const launcher = TangLauncher.getInstance();
+  const launcher = await TangLauncher.getInstance();
   const { pluginManager } = launcher;
 
   // 删除所有cowsay插件

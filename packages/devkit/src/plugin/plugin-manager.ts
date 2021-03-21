@@ -1,17 +1,16 @@
 import * as path from 'path';
 import {
   GenericConfigObject,
-  Plugin,
+  TangPlugin,
   NotImplementedError,
   NotFoundError,
   InvalidPluginError,
-  utils,
   InvalidArguments,
+  TangPreset,
 } from '@tang/common';
 import { fs, uuid } from '../utils';
 import { TANG_PLUGIN_DIR } from '../consts';
 import { Runner, RunnerFactory } from '../runners';
-import { TangLauncher } from '../launch';
 
 // 配置选项
 export interface PluginManagerOptions extends GenericConfigObject {
@@ -56,10 +55,7 @@ export class PluginManager {
 
   private pluginNames: string[] = []; // 已存在插件名称
 
-  constructor(
-    private readonly launcher: TangLauncher,
-    options?: PluginManagerOptions,
-  ) {
+  constructor(options?: PluginManagerOptions) {
     options = Object.assign({}, options);
     this.pluginDir = options.pluginDir || TANG_PLUGIN_DIR;
   }
@@ -104,7 +100,7 @@ export class PluginManager {
   }
 
   /**
-   * 清理安装缓存
+   * 清理安装缓存，以及无效插件
    */
   async prune() {
     const tmpDir = this.pluginTmpDir;
@@ -127,7 +123,7 @@ export class PluginManager {
    * @param version 为空模版返回最大版本
    * @returns
    */
-  async get(name?: string, version?: string): Promise<Plugin> {
+  async get(name?: string, version?: string): Promise<TangPlugin> {
     if (!name) return undefined;
 
     const fullPluginName = await this.findExistsPluginName(name, version);
@@ -141,8 +137,8 @@ export class PluginManager {
    * 添加插件到本地环境
    * @param name 插件名称，npm, npm_link, shell
    */
-  async add(name: string, options?: GenericConfigObject): Promise<boolean> {
-    const nameVersion = this.parsePluginName(name, 'latest');
+  async add(name: string, options?: GenericConfigObject): Promise<TangPlugin> {
+    const nameVersion = this.parsePluginName(name);
 
     const opts = Object.assign(
       {
@@ -152,21 +148,31 @@ export class PluginManager {
       options,
     ) as PluginInstallOptions;
 
-    await this.install([opts]);
+    const plugins = await this.install([opts]);
 
-    return true;
+    return plugins[0];
   }
 
   /**
    * 删除指定插件
    * @param name 插件名称
    */
-  async delete(name: string, version?: string) {
-    const pluginPath = this.getPluginPath(name, version);
+  async delete(
+    name: string,
+    version?: string,
+  ): Promise<TangPlugin | undefined> {
+    const plugin = await this.get(name, version);
+
+    if (!plugin) return undefined;
+
+    const pluginPath = this.getPluginPath(plugin);
+
     await fs.emptyDir(pluginPath);
     await fs.rmdir(pluginPath);
 
     await this.getPluginNames(true);
+
+    return plugin;
   }
 
   /**
@@ -188,19 +194,19 @@ export class PluginManager {
   /**
    * 调用插件命令
    * @param name
-   * @param command
+   * @param action
    */
-  async run(name: string, method: string, ...args: any[]) {
+  async run(name: string, action: string, ...args: any[]) {
     const plugin: any = await this.get(name);
 
     if (!plugin) throw new NotFoundError(`未找到插件${name}`);
 
     // 优先执行methods下面的方法
-    const fn = (plugin.methods && plugin.methods[method]) || plugin[method];
+    const fn = (plugin.actions && plugin.actions[action]) || plugin[action];
 
-    if (!fn) throw new NotFoundError(`未找到插件方法${name}.${method}`);
+    if (!fn) throw new NotFoundError(`未找到插件方法${name}.${action}`);
     if (typeof fn !== 'function')
-      throw new InvalidPluginError(`无效插件方法${name}.${method}`);
+      throw new InvalidPluginError(`无效插件方法${name}.${action}`);
 
     return fn.apply(this, args);
   }
@@ -211,7 +217,7 @@ export class PluginManager {
    */
   async install(
     optionsItems: PluginInstallOptions[],
-  ): Promise<(Plugin | undefined)[]> {
+  ): Promise<(TangPlugin | undefined)[]> {
     await fs.ensureDir(this.pluginDir);
     await fs.ensureDir(this.pluginTmpDir);
 
@@ -232,15 +238,8 @@ export class PluginManager {
    */
   async installSingle(
     options: PluginInstallOptions,
-  ): Promise<Plugin | undefined> {
-    if (!options.type) {
-      const packageName = (options as any).package;
-      if (packageName && utils.isAbsolutePath(packageName)) {
-        options.type = 'npm_link';
-      } else {
-        options.type = 'npm';
-      }
-    }
+  ): Promise<TangPlugin | undefined> {
+    options.type = options.type || 'npm';
 
     const folderId = uuid.v4();
     const tmpFolder = this.getPluginTmpPath(folderId);
@@ -357,7 +356,7 @@ module.exports = require('${moduleName}');
   }
 
   /** 通过路径加载预设 */
-  async getByFullName(name: string): Promise<Plugin> {
+  async getByFullName(name: string): Promise<TangPlugin> {
     const pluginPath = this.getPluginPath(name);
 
     let pluginData: any;
@@ -402,10 +401,10 @@ module.exports = require('${moduleName}');
     return fullPluginName;
   }
 
-  /** 解析预设名称 */
+  /** 解析插件名称 */
   parsePluginName(
     name: string,
-    defaultVersion?: string,
+    defaultVersion = 'latest',
   ): { name: string; fullName: string; version?: string } {
     let shortName = name;
     let version = defaultVersion;
@@ -428,14 +427,25 @@ module.exports = require('${moduleName}');
   }
 
   /** 根据预设名称及版本获取预设全路径 */
-  getPluginFullName(name: string, version = 'latest') {
-    if (name.lastIndexOf('@') > 0) return name;
+  getPluginFullName(name: string | TangPlugin, version = 'latest') {
+    let _name: string;
+    let _version = version;
 
-    return `${name}@${version}`;
+    if (typeof name === 'object') {
+      const _plugin = name as TangPlugin;
+      _name = _plugin.name;
+      _version = _plugin.version;
+    } else {
+      _name = name;
+    }
+
+    if (_name.lastIndexOf('@') > 0) return _name;
+    const fullName = _version ? `${_name}@${_version}` : _name;
+    return fullName;
   }
 
   /** 根据预设名称获取预设路径 */
-  getPluginPath(name: string, version = 'latest') {
+  getPluginPath(name: string | TangPlugin, version = 'latest') {
     const fullName = this.getPluginFullName(name, version);
     return path.join(this.pluginDir, fullName);
   }

@@ -1,7 +1,14 @@
-import { MeshManager, TangLauncher } from '../../../src';
+import { TangLauncher } from '../../../src';
+import { MeshManager } from '../../../src/mesh';
 
 describe('preset/PresetManager：preset格式验证 plugins', () => {
-  const meshManager = new MeshManager(TangLauncher.getInstance());
+  let meshManager: MeshManager;
+  let launcher: TangLauncher;
+
+  beforeAll(async () => {
+    launcher = await TangLauncher.getInstance();
+    meshManager = new MeshManager(launcher);
+  });
 
   it('plugins 应当为数组', async () => {
     await expect(

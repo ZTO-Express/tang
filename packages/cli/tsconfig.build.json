@@ -2,15 +2,16 @@
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
     "outDir": "dist",
+    "module": "commonjs",
+    "target": "es6",
     "declaration": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "strict": true,
     "esModuleInterop": false
   },
-  "include": [
-    "src",
-    "node_modules/@tang/tang/typings",
-    "node_modules/@tang/devkit/node_modules/@tang/tang/typings"
-  ],
+  "include": ["src"],
   "exclude": ["dist"]
 }

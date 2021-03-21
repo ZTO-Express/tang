@@ -1,5 +1,6 @@
 const presets = require('./presets')
 const actions = require('./actions')
+const { preset } = require('../../../../jest.config')
 
 module.exports = async () => {
   return {
@@ -9,7 +10,8 @@ module.exports = async () => {
       url: 'https://github.com/ZTO-Express/tang',
       email: 'rayl@pisaas.com'
     },
-    presets, // 包含默认预设
+    preset: presets[0], // 可以不设置
+    presets, // 包含多个预设
     actions
   }
 }

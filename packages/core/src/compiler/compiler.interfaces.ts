@@ -6,12 +6,12 @@ import {
   TangProcessor,
   TangHook,
   TangProcessorTypeNames,
-  Preset,
+  TangPreset,
 } from '@tang/common';
 
 // 生成器配置选项
 export interface CompilerOptions {
-  preset?: Preset;
+  preset?: TangPreset;
 
   defaultLoader?: string | TangLoader;
   loaders?: TangLoader[];

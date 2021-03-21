@@ -15,6 +15,7 @@ export class ConfigAction extends CliAction {
   }
 
   async list(key: string) {
+    debugger;
     return this.listOrGet(key);
   }
 
@@ -38,7 +39,7 @@ export class ConfigAction extends CliAction {
   listOrGet(key: string) {
     let targetData = configData;
 
-    if (key) targetData = devkit.util.get(configData, key);
+    if (key) targetData = devkit.utils.get(configData, key);
 
     const targetText = devkit.json5.stringify(targetData, undefined, 2);
 

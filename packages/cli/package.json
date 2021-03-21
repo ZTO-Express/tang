@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "bin": {
-    "tang": "dist/bin/tang.js"
+    "tang": "dist/bin/cli.js"
   },
   "scripts": {
     "prepublish": "npm run build",
     "build": "../../node_modules/.bin/rimraf -rf lib/ && ../../node_modules/.bin/tsc --project tsconfig.build.json",
-    "start": "node dist/bin/tang",
+    "start": "node dist/bin/cli",
     "start-ts": "../../node_modules/.bin/ts-node src/bin/tang",
-    "test": "jest --coverage --runInBand"
+    "test": "jest --coverage --runInBand",
+    "postinstall": "echo 'install openapi-plugin'"
   },
   "keywords": [],
   "author": "",

@@ -36,6 +36,22 @@ export class ConfigManager {
     return path.join(this.configDir, this.configFileName);
   }
 
+  // 获取配置信息
+  get<T>(path: string): T {
+    const result = utils.get(this.config, path);
+    return result;
+  }
+
+  // 设置配置
+  unset(path: string) {
+    utils.unset(this.config, path);
+  }
+
+  // 设置配置
+  set(path: string, value: any) {
+    utils.set(this.config, path, value);
+  }
+
   // 加载配置
   async load(name?: string): Promise<Config> {
     name = name || this.configFileName;
@@ -60,22 +76,6 @@ export class ConfigManager {
     };
 
     return this.config;
-  }
-
-  // 获取配置信息
-  get<T>(path: string): T {
-    const result = utils.get(this.config, path);
-    return result;
-  }
-
-  // 设置配置
-  unset(path: string) {
-    utils.unset(this.config, path);
-  }
-
-  // 设置配置
-  set(path: string, value?: any) {
-    utils.set(this.config, path, value);
   }
 
   /** 保存配置 */
