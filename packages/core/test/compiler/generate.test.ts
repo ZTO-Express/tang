@@ -8,7 +8,7 @@ describe('compiler/load：load 加载', () => {
   const testTmpDir = testUtil.resolveTmpDir('localOutputer');
 
   const urlLoader = processors.urlLoader();
-  const localLoader = testUtil.localLoader();
+  const docLoader = testUtil.docLoader();
 
   const jsonParser = processors.jsonParser();
   const yamlParser = testUtil.yamlParser();
@@ -21,14 +21,14 @@ describe('compiler/load：load 加载', () => {
 
   beforeAll(async () => {
     compiler1 = testUtil.createDefaultCompiler({
-      loaders: [urlLoader, localLoader],
+      loaders: [urlLoader, docLoader],
       parsers: [jsonParser, yamlParser],
     });
 
     compiler2 = testUtil.createDefaultCompiler({
       defaultParser: 'yaml',
       defaultGenerator: 'yaml',
-      loaders: [urlLoader, localLoader],
+      loaders: [urlLoader, docLoader],
       parsers: [jsonParser, yamlParser],
     });
 

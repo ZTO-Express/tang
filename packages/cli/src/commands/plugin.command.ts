@@ -12,14 +12,21 @@ export class PluginCommand implements CliCommand {
       commands: [
         {
           name: 'list',
+          args: '[prefix]',
           aliases: ['l', 'ls'],
           description: '列出所有插件',
+          argsDescription: {
+            prefix: '列出的插件前缀',
+          },
         },
         {
           name: 'info',
           args: '<name>',
           aliases: ['i'],
           description: '查看插件名称',
+          argsDescription: {
+            prefix: '插件名称',
+          },
         },
         {
           name: 'install',
@@ -55,6 +62,12 @@ export class PluginCommand implements CliCommand {
           name: 'run',
           args: '<name> <action>',
           description: '运行插件方法',
+          options: [
+            {
+              flags: '--args [args...]',
+              description: '执行参数',
+            },
+          ],
         },
       ],
     };

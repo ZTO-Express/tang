@@ -51,7 +51,7 @@ export function createDefaultCompiler(options?: GenericConfigObject) {
   options = Object.assign({}, options);
   options.loaders = [
     ...((options.loaders as any) || []),
-    processors.localLoader(),
+    processors.docLoader(),
   ];
   options.parsers = [
     ...((options.parsers as any) || []),

@@ -5,12 +5,10 @@ describe('tang/plugin/install：安装插件', () => {
   let pluginManager: PluginManager;
 
   beforeAll(async () => {
+    await testUtil.cleanTangLauncherTestEnv();
+
     const launcher = await TangLauncher.getInstance();
     pluginManager = launcher.pluginManager;
-  });
-
-  beforeEach(async () => {
-    await testUtil.cleanTangLauncherTestEnv();
   });
 
   it('列出所有插件', async () => {
@@ -67,7 +65,11 @@ describe('tang/plugin/install：安装插件', () => {
       force: true,
     };
 
-    await pluginManager.add('cowsay', installOptions);
+    const plugin = await pluginManager.add('cowsay', installOptions);
+    expect(plugin).toMatchObject({
+      name: 'cowsay',
+      version: installOptions.version,
+    });
 
     const pluginName = `cowsay@${installOptions.version}`;
 
@@ -84,7 +86,7 @@ describe('tang/plugin/install：安装插件', () => {
     });
     expect(result1).toContain('hello1');
 
-    await pluginManager.delete('cowsay', installOptions.version);
+    await pluginManager.delete(pluginName, installOptions.version);
 
     const list1 = await pluginManager.list('cowsay');
     expect(list1).toEqual([]);
@@ -97,5 +99,9 @@ describe('tang/plugin/install：安装插件', () => {
       force: true,
       package: packagePath,
     });
+
+    await pluginManager.delete('test-tang@0.0.1');
+    const list1 = await pluginManager.list('test-tang');
+    expect(list1).toEqual([]);
   });
 });

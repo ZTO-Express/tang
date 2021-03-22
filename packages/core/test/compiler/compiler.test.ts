@@ -4,7 +4,7 @@ import * as processors from '../../src/processors';
 
 describe('compiler/load：load 加载', () => {
   const urlLoader = processors.urlLoader();
-  const localLoader = testUtil.localLoader();
+  const docLoader = testUtil.docLoader();
 
   const jsonParser = processors.jsonParser();
   const yamlParser = testUtil.yamlParser();
@@ -16,7 +16,7 @@ describe('compiler/load：load 加载', () => {
   const memoryOutputer = testUtil.memoryOutputer();
 
   const defaultOptions = {
-    loaders: [urlLoader, localLoader],
+    loaders: [urlLoader, docLoader],
     parsers: [jsonParser, yamlParser],
     generators: [jsonGenerator, yamlGenerator],
     outputers: [localOutputer, memoryOutputer],
@@ -29,19 +29,19 @@ describe('compiler/load：load 加载', () => {
     expect(compiler1.defaultParser).toBe(jsonParser);
     expect(compiler1.loaders.length).toBe(2);
     expect(compiler1.loaders[0]).toBe(urlLoader);
-    expect(compiler1.loaders[1]).toBe(localLoader);
+    expect(compiler1.loaders[1]).toBe(docLoader);
     expect(compiler1.parsers.length).toBe(2);
     expect(compiler1.parsers[0]).toBe(jsonParser);
     expect(compiler1.parsers[1]).toBe(yamlParser);
 
     expect(
-      new Compiler({ defaultLoader: 'local', ...defaultOptions }).defaultLoader,
-    ).toBe(localLoader);
+      new Compiler({ defaultLoader: 'doc', ...defaultOptions }).defaultLoader,
+    ).toBe(docLoader);
 
     expect(
-      new Compiler({ defaultLoader: localLoader, ...defaultOptions })
+      new Compiler({ defaultLoader: docLoader, ...defaultOptions })
         .defaultLoader,
-    ).toBe(localLoader);
+    ).toBe(docLoader);
 
     expect(
       new Compiler({ defaultParser: 'yaml', ...defaultOptions }).defaultParser,

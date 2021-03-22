@@ -218,7 +218,6 @@ export class PluginManager {
   async install(
     optionsItems: PluginInstallOptions[],
   ): Promise<(TangPlugin | undefined)[]> {
-    await fs.ensureDir(this.pluginDir);
     await fs.ensureDir(this.pluginTmpDir);
 
     const ops = optionsItems.map(it => {

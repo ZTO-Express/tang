@@ -1,3 +1,4 @@
+import { TangLoader } from '@tang/common/lib';
 import { getNormalizedOptions, mergeProcessors } from '../../src';
 
 describe('options/normalizeOptions：规范化配置', () => {
@@ -8,7 +9,7 @@ describe('options/normalizeOptions：规范化配置', () => {
   const testOutputer = { type: 'outputer', name: 'memory', isTest: true };
 
   it('获取规范化选项 多次为不同对象，但值相同', () => {
-    const options1 = getNormalizedOptions({});
+    const options1 = getNormalizedOptions(undefined);
 
     expect(options1.loaders.length).toBe(2);
     expect(options1.parsers.length).toBe(1);
@@ -67,5 +68,22 @@ describe('options/normalizeOptions：规范化配置', () => {
 
     mergeProcessors('outputer' as any, options1, { outputers: [testOutputer] });
     expect(options1.outputers[0]).toBe(testOutputer);
+  });
+
+  it('合并处理器 mergeProcessors 2', () => {
+    const results1 = mergeProcessors('loader' as any, undefined, {
+      loaders: [testLoader],
+    });
+    expect(results1.loaders[0]).toBe(testLoader);
+
+    const results2 = mergeProcessors(
+      'loader' as any,
+      {
+        loaders: [testLoader] as any,
+      },
+      undefined,
+    );
+
+    expect(results2.loaders[0]).toBe(testLoader);
   });
 });

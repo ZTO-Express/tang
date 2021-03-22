@@ -22,12 +22,9 @@ export const localOutputer = (): TangOutputer => {
 
     async output(
       generation: TangGeneration,
-      options?: GenericConfigObject,
+      options: GenericConfigObject = {},
     ): Promise<TangOutput> {
-      if (!options || !options.outputDir)
-        throw new InvalidArguments('请提供输出目录');
-
-      const outputDir = options.outputDir as string;
+      const outputDir = options.outputDir || process.cwd();
       const clearDir = options.clearDir === true; // 是否晴空目录(默认false)
       const overwrite = options.overwrite !== false; // 是否覆盖已存在目录(默认true)
 

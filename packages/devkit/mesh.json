@@ -1,0 +1,60 @@
+{
+  "name": "@tang/yapi-sharing",
+  "version": "0.0.1",
+  "title": "yapi文档生成",
+  "description": "此预设用于通过api文档生成vue项目、调用接口及页面",
+  "contact": {
+    "name": "rayl",
+    "url": "https://github.com/ZTO-Express/tang",
+    "email": "rayl@pisaas.com"
+  },
+  "extends": "",
+  "plugins": [
+    { "name": "fsharing", "version": "0.0.1", "type": "npm" },
+    {
+      "name": "yapi-openapi",
+      "version": "0.0.1",
+      "type": "npm",
+      "package": "@tang/yapi-openapi@0.0.1"
+    },
+    {
+      "name": "fsharing_url2",
+      "version": "0.0.1",
+      "type": "npm_link",
+      "dir": "/dir/to/path/name"
+    },
+    {
+      "name": "openapi-titan",
+      "type": "shell",
+      "install": [
+        "git clone git@github.com:pient/devspace.git",
+        "git checkout dev"
+      ]
+    }
+  ],
+  "loaders": [],
+  "parsers": [
+    { "parser": "plugin:yapi-openapi/parser", "options": {} },
+    { "parser": "plugin:openapi-titan/parser", "options": {} }
+  ],
+  "generators": [
+    {
+      "generator": "plugin:openapi-titan/generator",
+      "options": {
+        "include": [],
+        "exclude": [],
+        "output": { "name": "local", "overwrite": true }
+      }
+    },
+    {
+      "generator": "plugin:yapi-openapi/generator",
+      "options": { "output": { "name": "github", "overwrite": true } }
+    }
+  ],
+  "outputers": [
+    { "name": "local", "outputDir": "./out" },
+    { "name": "github", "repository": "" }
+  ],
+  "snippets": [{ "snippet": "plugin:fsharing/snippets" }],
+  "hooks": { "beforeLoad": { "name": ["titan:output"] } }
+}

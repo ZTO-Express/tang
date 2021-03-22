@@ -8,6 +8,10 @@ export enum TangProcessorTypes {
   outputer = 'outputer', // 输出器;
 }
 
+export const TangProcessorsTypeKeys = Object.keys(TangProcessorTypes).map(
+  it => `${it}s`,
+);
+
 export type TangProcessorTypeNames = keyof typeof TangProcessorTypes;
 
 // 当前文档处理器

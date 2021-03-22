@@ -26,6 +26,8 @@ import {
 import { ConfigManager } from '../config';
 import { PluginManager } from '../plugin';
 
+import { mergePresetOptions } from './options';
+
 export interface PresetConfigData {
   plugin?: string;
   preset?: string;
@@ -103,7 +105,7 @@ export class TangLauncher {
       throw new InvalidArguments(`预设名称格式错误`);
     }
 
-    const preset = this.getPreset(presetData);
+    const preset = await this.getPreset(presetData);
 
     if (!preset) {
       throw new NotFoundError(`未找到预设${name}`);
@@ -125,6 +127,15 @@ export class TangLauncher {
     return this.pluginManager.add(name, options);
   }
 
+  /** 获取生成完整选项 */
+  async options(presetName?: string, options?: GenericConfigObject) {
+    const preset = await this.getPreset(presetName);
+
+    const opts = mergePresetOptions(preset, options);
+
+    return opts;
+  }
+
   /**
    * 加载文档
    * @param entry 文档入口
@@ -136,13 +147,9 @@ export class TangLauncher {
     presetName?: string,
     options?: TangCompilerLoadOptions,
   ) {
-    const preset = await this.getPreset(presetName);
+    const opts = await this.options(presetName, options);
 
-    if (!preset) {
-      throw new NotFoundError('无法加载文档，未找到可用的预设');
-    }
-
-    const compiler = await tang(preset);
+    const compiler = await tang(opts);
     const compilation = await compiler.load(entry, options);
     return compilation;
   }
@@ -156,17 +163,15 @@ export class TangLauncher {
   async generate(
     entry: string,
     presetName?: string,
-    options?: TangCompilerGenerateOptions,
+    options?: TangCompilerLoadOptions & TangCompilerGenerateOptions,
   ) {
     const preset = await this.getPreset(presetName);
 
-    if (!preset) {
-      throw new NotFoundError('无法加载文档，未找到可用的预设');
-    }
+    const opts = mergePresetOptions(preset, options);
 
-    const compiler = await tang(preset);
+    const compiler = await tang(opts);
     const compilation = await compiler.load(entry);
-    const output = await compiler.generate(compilation.document, options);
+    const output = await compiler.generate(compilation.document, opts as any);
     return output;
   }
 

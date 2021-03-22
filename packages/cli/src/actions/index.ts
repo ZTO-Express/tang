@@ -4,3 +4,4 @@
 export * from './info.action';
 export * from './config.action';
 export * from './plugin.action';
+export * from './generate.action';

@@ -29,7 +29,7 @@ export function resolveFixtureUrl(...args: string[]) {
   return urlStr;
 }
 
-export const localLoader = devkit.localLoader;
+export const docLoader = devkit.docLoader;
 
 export const yamlParser = devkit.yamlParser;
 
@@ -42,7 +42,7 @@ export const memoryOutputer = devkit.memoryOutputer;
 /** 创建默认编译器 */
 export function createDefaultCompiler(options?: GenericConfigObject) {
   options = Object.assign({}, options);
-  options.loaders = [...((options.loaders as any) || []), localLoader()];
+  options.loaders = [...((options.loaders as any) || []), docLoader()];
   options.parsers = [...((options.parsers as any) || []), yamlParser()];
   options.generators = [
     ...((options.generators as any) || []),

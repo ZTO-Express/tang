@@ -1,4 +1,4 @@
-export * from './local.loader';
+export * from './doc.loader';
 export * from './json5.parser';
 export * from './yaml.parser';
 export * from './yaml.generator';

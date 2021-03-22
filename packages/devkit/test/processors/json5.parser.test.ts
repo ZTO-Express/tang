@@ -11,7 +11,7 @@ describe('parser/json5：json5解析器', () => {
     expect(presetData.name).toBe('test-name');
   });
 
-  it('localLoader parse方法', async () => {
+  it('docLoader parse方法', async () => {
     await expect(json5Parser.parse('xxxxx')).rejects.toThrowError(
       'JSON5: invalid character',
     );

@@ -1,4 +1,4 @@
-import { ChildProcess, spawn, SpawnOptions } from 'child_process';
+import * as execa from 'execa';
 
 export class AbstractRunner {
   constructor(protected binary: string, protected args: string[] = []) {}
@@ -9,32 +9,19 @@ export class AbstractRunner {
     cwd: string = process.cwd(),
   ): Promise<null | string> {
     const args: string[] = [command];
-    const options: SpawnOptions = {
+
+    const options: execa.Options = {
       cwd,
       stdio: collect ? 'pipe' : 'inherit',
       shell: true,
     };
-    return new Promise<null | string>((resolve, reject) => {
-      const child: ChildProcess = spawn(
-        `${this.binary}`,
-        [...this.args, ...args],
-        options,
-      );
-      if (collect) {
-        child.stdout?.on('data', data => () => {
-          setTimeout(
-            () => resolve(data.toString().replace(/\r\n|\n/, '')),
-            100,
-          );
-        });
-      }
-      child.on('close', code => {
-        if (code === 0) {
-          setTimeout(() => resolve(null), 100);
-        } else {
-          reject(`\nFailed to execute command: ${this.binary} ${command}`);
-        }
-      });
-    });
+
+    const results = await execa(this.binary, [...this.args, ...args], options);
+
+    if (results.exitCode !== 0) {
+      throw new Error(`\nFailed to execute command: ${this.binary} ${command}`);
+    } else {
+      return results.stdout;
+    }
   }
 }

@@ -6,14 +6,14 @@ import * as processors from '../../src/processors';
 describe('compiler/loader：测试loader testLoader', () => {
   let compiler: Compiler;
   const urlLoader = processors.urlLoader();
-  const localLoader = testUtil.localLoader();
+  const docLoader = testUtil.docLoader();
 
   const jsonParser = processors.jsonParser();
   const yamlParser = testUtil.yamlParser();
 
   beforeAll(() => {
     compiler = testUtil.createDefaultCompiler({
-      loaders: [urlLoader, localLoader],
+      loaders: [urlLoader, docLoader],
       parsers: [jsonParser, yamlParser],
     });
   });
@@ -28,20 +28,20 @@ describe('compiler/loader：测试loader testLoader', () => {
       compiler.testLoader(urlLoader, 'http://www.example.com'),
     ).toBeTruthy();
 
-    expect(compiler.testLoader(localLoader, '')).toBeTruthy();
-    expect(compiler.testLoader(localLoader, null)).toBeTruthy();
-    expect(compiler.testLoader(localLoader, undefined)).toBeTruthy();
+    expect(compiler.testLoader(docLoader, '')).toBeTruthy();
+    expect(compiler.testLoader(docLoader, null)).toBeTruthy();
+    expect(compiler.testLoader(docLoader, undefined)).toBeTruthy();
 
-    expect(compiler.testLoader(localLoader, './')).toBeFalsy();
-    expect(compiler.testLoader(localLoader, '/a/b.json')).toBeTruthy();
-    expect(compiler.testLoader(localLoader, 'c:/a/b.json')).toBeTruthy();
-    expect(compiler.testLoader(localLoader, 'c://a/b.json')).toBeTruthy();
+    expect(compiler.testLoader(docLoader, './')).toBeFalsy();
+    expect(compiler.testLoader(docLoader, '/a/b.json')).toBeTruthy();
+    expect(compiler.testLoader(docLoader, 'c:/a/b.json')).toBeTruthy();
+    expect(compiler.testLoader(docLoader, 'c://a/b.json')).toBeTruthy();
     expect(
-      compiler.testLoader(localLoader, 'http://www.example.com'),
-    ).toBeFalsy();
+      compiler.testLoader(docLoader, 'http://www.example.com'),
+    ).toBeTruthy();
 
     expect(
-      compiler.testLoader(localLoader, { entry: 'c://a/b.json' }),
+      compiler.testLoader(docLoader, { entry: 'c://a/b.json' }),
     ).toBeTruthy();
   });
 

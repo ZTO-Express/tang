@@ -2,8 +2,9 @@ import {
   GenericConfigObject,
   TangOutputer,
   TangProcessor,
-  TangProcessorTypeNames,
   TangProcessorTypes,
+  TangProcessorTypeNames,
+  TangProcessorsTypeKeys,
   utils,
 } from '@tang/common';
 
@@ -19,8 +20,6 @@ export interface NormalizedTangOptions extends CompilerOptions {
  * @param config
  */
 export function getNormalizedOptions(config: GenericConfigObject) {
-  const defaultOptions = {};
-
   const defaultProcessors = {
     loaders: [processors.urlLoader(), processors.moduleLoader()],
     parsers: [processors.jsonParser()],
@@ -28,17 +27,38 @@ export function getNormalizedOptions(config: GenericConfigObject) {
     outputers: [] as TangOutputer[],
   };
 
+  const options = mergeOptions(defaultProcessors, config);
+
+  return options;
+}
+
+export function mergeOptions(
+  targetOptions: NormalizedTangOptions,
+  sourceOptions: GenericConfigObject,
+) {
+  sourceOptions = sourceOptions || {};
+
+  const sourcePlainOptions: any = {};
+  const sourceProcessors: Record<string, TangProcessor> = {};
+
+  // 拆分普通选项和处理器选项
+  for (const key in sourceOptions) {
+    if (TangProcessorsTypeKeys.includes(key)) {
+      sourceProcessors[key] = sourceOptions[key];
+    } else {
+      sourcePlainOptions[key] = sourceOptions[key];
+    }
+  }
+
+  // 合并普通选项
   const options = utils.deepMerge(
-    defaultOptions,
-    config,
+    targetOptions,
+    sourcePlainOptions,
   ) as NormalizedTangOptions;
 
-  // 先用默认处理器替换原处理器
-  Object.assign(options, defaultProcessors);
-
-  // 调用方法合并源处理器
+  // 合并处理器选项
   for (const type in TangProcessorTypes) {
-    mergeProcessors(type as TangProcessorTypeNames, options, config);
+    mergeProcessors(type as TangProcessorTypeNames, options, sourceProcessors);
   }
 
   return options;
@@ -59,6 +79,9 @@ export function mergeProcessors(
   sourceOptions: GenericConfigObject,
 ) {
   const typeKey = `${type}s`;
+
+  targetOptions = targetOptions || {};
+  sourceOptions = sourceOptions || {};
 
   let target = (targetOptions[typeKey] || []) as TangProcessor[];
   let source = (sourceOptions[typeKey] || []) as TangProcessor[];

@@ -40,12 +40,6 @@ describe('outputer/local：local输出器', () => {
       chunks: sampleChunks,
     } as any;
 
-    await expect(localOutputer.output(sampleGeneration, {})).rejects.toThrow(
-      '请提供输出目录',
-    );
-
-    debugger;
-
     const output = await localOutputer.output(sampleGeneration, {
       outputDir: testTmpDir,
       overwrite: true,

@@ -2,7 +2,7 @@ import * as testUtil from '../util';
 import * as processors from '../../src';
 
 describe('parser/yaml：yaml解析器', () => {
-  const localLoader = processors.localLoader();
+  const docLoader = processors.docLoader();
   const yamlParser = processors.yamlParser();
 
   const simpleText = 'simple text';
@@ -11,7 +11,7 @@ describe('parser/yaml：yaml解析器', () => {
   beforeAll(async () => {
     const docPath = testUtil.resolveFixturePath('documents/openapi.yaml');
 
-    docText = await localLoader.load<string>(docPath);
+    docText = await docLoader.load<string>(docPath);
   });
 
   it('yamlParser parse方法', async () => {

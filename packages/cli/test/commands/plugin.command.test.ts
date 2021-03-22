@@ -18,21 +18,21 @@ describe('@tang/cli/commands：plugin', () => {
     await program.parseAsync(rawInfoArgs);
   });
 
+  it('plugin run', async () => {
+    const rawInfoArgs = [
+      'node',
+      'tang',
+      'plugin',
+      'run',
+      'cowsay',
+      'say',
+      '--args={text:"hello"}',
+    ];
+    await program.parseAsync(rawInfoArgs);
+  });
+
   it('plugin delete', async () => {
     const rawInfoArgs = ['node', 'tang', 'plugin', 'delete', 'cowsay'];
     await program.parseAsync(rawInfoArgs);
   });
-
-  // it('plugin run', async () => {
-  //   const rawInfoArgs = [
-  //     'node',
-  //     'tang',
-  //     'plugin',
-  //     'run',
-  //     'cowsay',
-  //     'say',
-  //     '--text=hello',
-  //   ];
-  //   await program.parseAsync(rawInfoArgs);
-  // });
 });

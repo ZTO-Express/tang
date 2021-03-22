@@ -5,10 +5,8 @@ import { Compiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/load：load 加载', () => {
-  const testTmpDir = testUtil.resolveTmpDir('localOutputer');
-
   const urlLoader = processors.urlLoader();
-  const localLoader = testUtil.localLoader();
+  const docLoader = testUtil.docLoader();
 
   const jsonParser = processors.jsonParser();
   const yamlParser = testUtil.yamlParser();
@@ -20,14 +18,14 @@ describe('compiler/load：load 加载', () => {
 
   beforeAll(() => {
     compiler1 = testUtil.createDefaultCompiler({
-      loaders: [urlLoader, localLoader],
+      loaders: [urlLoader, docLoader],
       parsers: [jsonParser, yamlParser],
     });
 
     compiler2 = testUtil.createDefaultCompiler({
       defaultParser: 'yaml',
       defaultGenerator: 'yaml',
-      loaders: [urlLoader, localLoader],
+      loaders: [urlLoader, docLoader],
       parsers: [jsonParser, yamlParser],
     });
   });
@@ -37,8 +35,8 @@ describe('compiler/load：load 加载', () => {
       parser: 'yaml',
     });
     expect(compilation.compiler).toBe(compiler1);
-    expect(compilation.loader).not.toBe(localLoader);
-    expect(compilation.loader).toStrictEqual(localLoader);
+    expect(compilation.loader).not.toBe(docLoader);
+    expect(compilation.loader).toStrictEqual(docLoader);
 
     await expect(
       compiler1.load(tfDocPath, { loader: 'NonExists' }),

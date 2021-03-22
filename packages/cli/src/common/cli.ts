@@ -32,7 +32,7 @@ export interface CliCommandConfig {
   aliases?: string[]; // 命令别名
   options?: CliCommandOptionConfig[]; // 命令选项
   description?: string; // 描述
-  argsDescription?: { [key: string]: string }; // 参数描述
+  argsDescription?: { [key: string]: any }; // 参数描述
   action?: string | ((...args: any[]) => void | Promise<void>); // 默认根据命令名称生成
   parent?: CliCommandConfig; // 父命令，在生成子命令的时候用到
   commands?: CliCommandConfig[]; // 子命令

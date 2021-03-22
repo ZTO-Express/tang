@@ -9,9 +9,7 @@ describe('parser/json：json解析器', () => {
   it('jsonParser parse方法', async () => {
     const presetData = await jsonParser.parse(presetText);
     expect(presetData.name).toBe('test-name');
-  });
 
-  it('localLoader parse方法', async () => {
     await expect(jsonParser.parse('xxxxx')).rejects.toThrowError(
       'Unexpected token',
     );

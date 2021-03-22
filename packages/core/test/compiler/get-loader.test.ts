@@ -5,28 +5,28 @@ import * as processors from '../../src/processors';
 
 describe('compiler/loader：获取加载器 getLoader', () => {
   const urlLoader = processors.urlLoader();
-  const localLoader = testUtil.localLoader();
+  const docLoader = testUtil.docLoader();
 
   let compiler1: Compiler;
   let compiler2: Compiler;
 
   beforeAll(() => {
     compiler1 = testUtil.createDefaultCompiler({
-      loaders: [urlLoader, localLoader],
+      loaders: [urlLoader, docLoader],
     });
 
     compiler2 = testUtil.createDefaultCompiler({
-      defaultLoader: 'local',
-      loaders: [urlLoader, localLoader],
+      defaultLoader: 'doc',
+      loaders: [urlLoader, docLoader],
     });
   });
 
   it('验证 getLoader by name', async () => {
-    const loader = compiler1.getLoader({ loader: 'local' });
-    expect(loader).not.toBe(localLoader);
-    expect(loader.name).toBe(localLoader.name);
-    expect(loader.load).toBe(localLoader.load);
-    expect(loader.test).toBe(localLoader.test);
+    const loader = compiler1.getLoader({ loader: 'doc' });
+    expect(loader).not.toBe(docLoader);
+    expect(loader.name).toBe(docLoader.name);
+    expect(loader.load).toBe(docLoader.load);
+    expect(loader.test).toBe(docLoader.test);
 
     expect(compiler1.getLoader({ loader: 'xxx' })).toBeUndefined();
   });
@@ -42,12 +42,12 @@ describe('compiler/loader：获取加载器 getLoader', () => {
 
   it('验证 getLoader by default', async () => {
     expect(compiler1.getLoader({}).name).toBe(urlLoader.name);
-    expect(compiler2.getLoader({}).name).toBe(localLoader.name);
+    expect(compiler2.getLoader({}).name).toBe(docLoader.name);
   });
 
   it('验证 getLoader by entry', async () => {
     expect(compiler1.getLoader({ entry: '/tmp/preset.json' }).name).toBe(
-      localLoader.name,
+      docLoader.name,
     );
 
     expect(compiler1.getLoader({ entry: 'http://www.baidu.com' }).name).toBe(
@@ -57,7 +57,7 @@ describe('compiler/loader：获取加载器 getLoader', () => {
     expect(compiler1.getLoader({ entry: 'aaa' })).toBeUndefined();
 
     expect(compiler2.getLoader({ entry: '/tmp/preset.json' }).name).toBe(
-      localLoader.name,
+      docLoader.name,
     );
   });
 

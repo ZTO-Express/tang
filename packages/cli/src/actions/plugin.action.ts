@@ -1,6 +1,5 @@
 import { GenericConfigObject } from '@tang/common';
 import * as devkit from '@tang/devkit';
-import { option } from 'commander';
 import { CliAction } from '../common';
 
 export class PluginAction extends CliAction {
@@ -15,7 +14,7 @@ export class PluginAction extends CliAction {
 
     const plugin = launcher.pluginManager.get(name);
 
-    console.log('查看插件信息');
+    console.log('插件信息');
 
     // 输出插件信息
     console.log(JSON.stringify(plugin, undefined, 2));
@@ -33,10 +32,10 @@ export class PluginAction extends CliAction {
           (prefix ? `前缀为"${prefix}"的插件` : '插件') +
           '，请使用 tang install <plugin> 命令安装插件',
       );
+    } else {
+      console.log('当前已安装插件：');
+      console.log(pluginNames.join());
     }
-
-    console.log('当前已安装插件：');
-    console.log(pluginNames.join());
   }
 
   /** 安装插件 */
@@ -89,9 +88,16 @@ export class PluginAction extends CliAction {
       return;
     }
 
+    let args: any[] = [];
+    if (Array.isArray(options.args)) {
+      args = options.args.map(arg => {
+        return devkit.json5.parse(arg);
+      });
+    }
+
     const launcher = await this.getLauncher();
 
-    const result = await launcher.pluginManager.run(name, action, options);
+    const result = await launcher.pluginManager.run(name, action, ...args);
 
     console.log(`已成功执行插件 ${name}的方法${action}`);
     console.log(JSON.stringify(result, null, 2));

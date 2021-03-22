@@ -10,6 +10,7 @@ import * as actions from '../actions';
 import { InfoCommand } from './info.command';
 import { ConfigCommand } from './config.command';
 import { PluginCommand } from './plugin.command';
+import { GenerateCommand } from './generate.command';
 
 export class CommandLoader {
   // 所有action字典
@@ -18,6 +19,7 @@ export class CommandLoader {
     info: new actions.InfoAction(),
     config: new actions.ConfigAction(),
     plugin: new actions.PluginAction(),
+    generate: new actions.GenerateAction(),
   };
 
   // 所有命令字典
@@ -26,6 +28,7 @@ export class CommandLoader {
     new InfoCommand(CommandLoader.actionsMap.info.main),
     new ConfigCommand(),
     new PluginCommand(),
+    new GenerateCommand(),
   ];
 
   static load(program: commander.Command, existWhenError = true): void {

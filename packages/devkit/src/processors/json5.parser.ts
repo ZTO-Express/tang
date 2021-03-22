@@ -12,6 +12,8 @@ export const json5Parser = (): TangParser => {
     name: 'json5',
 
     async parse(content: string): Promise<DocumentModel> {
+      if (typeof content !== 'string') return content;
+
       const result = json5.parse(content);
       return result;
     },
