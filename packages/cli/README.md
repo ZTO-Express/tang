@@ -1,4 +1,4 @@
-# @tang/cli
+# tang-cli
 
 ## 描述
 
@@ -7,7 +7,7 @@
 ## 安装
 
 ```
-$ npm install -g @tang/cli
+$ npm install -g tang-cli
 ```
 
 ## 使用

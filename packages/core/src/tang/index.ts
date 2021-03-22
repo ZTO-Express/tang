@@ -1,4 +1,4 @@
-import { GenericConfigObject, TangPreset } from '@tang/common';
+import { GenericConfigObject, TangPreset } from '@devs-tang/common';
 
 import { getNormalizedOptions } from '../options/normalize-options';
 import { Compiler } from '../compiler/compiler';

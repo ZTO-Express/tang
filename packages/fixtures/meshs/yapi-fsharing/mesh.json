@@ -1,6 +1,6 @@
 {
   // 所有的插件基于事件驱动，但仍然遵循大的流程，事件有优先级以及同步或异步
-  "name": "@tang/yapi-sharing", // 预设名称
+  "name": "tang-yapi-sharing", // 预设名称
   "version": "0.0.1", // 预设版本
   "title": "yapi文档生成", // 标题
   "description": "此预设用于通过api文档生成vue项目、调用接口及页面", // 描述
@@ -20,8 +20,8 @@
     {
       "name": "yapi-openapi",
       "version": "0.0.1",
-      "type": "npm", // 安装方式npm, 默认包名为key(@tang/plugin-yapi-openapi)
-      "package": "@tang/yapi-openapi@0.0.1"
+      "type": "npm", // 安装方式npm, 默认包名为key(tang-plugin-yapi-openapi)
+      "package": "tang-yapi-openapi@0.0.1"
     },
     {
       "name": "fsharing_url2",

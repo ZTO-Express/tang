@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { TangGenerator } from '@tang/common';
+import { TangGenerator } from '@devs-tang/common';
 import { Compilation, Compiler } from '../../src';
 import * as processors from '../../src/processors';
 

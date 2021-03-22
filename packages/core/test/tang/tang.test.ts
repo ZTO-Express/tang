@@ -1,6 +1,6 @@
 import * as testUtil from '../util';
 
-import { ErrorCodes } from '@tang/common';
+import { ErrorCodes } from '@devs-tang/common';
 import { tang } from '../../src';
 import { getNormalizedOptions } from '../../src/options/normalize-options';
 
@@ -33,7 +33,7 @@ describe('tang：tang工具配置', () => {
 
     const compilation = await compiler.load(tfDocPath, { parser: 'json' });
 
-    expect(compilation.document.model.name).toBe('@tang/test-mesh');
+    expect(compilation.document.model.name).toBe('tang-test-mesh');
 
     await expect(
       compiler.generate(compilation.document, { generator: 'NonExists' }),

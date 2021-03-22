@@ -1,7 +1,7 @@
 {
   "doctype": "openapi",
   "plugins": {
-    "@tang/plugin-openapi-titan": {
+    "tang-plugin-openapi-titan": {
       "version": "",
       "git": ""
     }

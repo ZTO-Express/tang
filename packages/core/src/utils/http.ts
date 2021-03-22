@@ -1,7 +1,7 @@
 /**
  * 网络请求相关实用方法
  */
-import { GenericConfigObject } from '@tang/common';
+import { GenericConfigObject } from '@devs-tang/common';
 
 import 'isomorphic-unfetch';
 

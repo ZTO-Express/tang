@@ -1,4 +1,4 @@
-import { DocumentModel, TangParser } from '@tang/common';
+import { DocumentModel, TangParser } from '@devs-tang/common';
 
 import { json5 } from '../utils';
 

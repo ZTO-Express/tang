@@ -1,4 +1,4 @@
-# @tang/tang
+# tang-tang
 
 tang 核心库
 
@@ -15,7 +15,7 @@ tang 核心库包含 tang 体系的主要核心概念以及内置实现
 编译器是 tang 的核心概念，支持对各类资源进行加载，以及生成各类文件。如下为示例代码：
 
 ```typescript
-import tang from '@tang/tang';
+import tang from 'tang-tang';
 
 const compile = async () => {
   // 创建编译器

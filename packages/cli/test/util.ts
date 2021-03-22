@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as os from 'os';
-import * as devkit from '@tang/devkit';
+import * as devkit from '@devs-tang/devkit';
 
-export * as devkit from '@tang/devkit';
+export * as devkit from '@devs-tang/devkit';
 
 export const appRescBaseUrl = 'http://resc.pisaas.com/apps/tang';
 export const appHomeDir = `${os.homedir}/.tang`;

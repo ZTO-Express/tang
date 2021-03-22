@@ -5,7 +5,7 @@ import {
   TangOutput,
   TangOutputer,
   Chunk,
-} from '@tang/common';
+} from '@devs-tang/common';
 
 import * as path from 'path';
 

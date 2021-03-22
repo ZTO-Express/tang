@@ -20,7 +20,7 @@ import {
   utils,
   TangProcessorTypes,
   ParserError,
-} from '@tang/common';
+} from '@devs-tang/common';
 
 import { CompilerOptions, ProcessorGetOptions } from './compiler.interfaces';
 import { Compilation } from './compilation';

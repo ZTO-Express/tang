@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { Compilation, Compiler } from '@tang/core';
+import { Compilation, Compiler } from '@devs-tang/core';
 import { yaml } from '../../src/utils';
 import * as processors from '../../src/processors';
 

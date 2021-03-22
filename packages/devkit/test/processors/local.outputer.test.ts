@@ -1,6 +1,6 @@
 import * as testUtil from '../util';
 import { fs } from '../../src/utils';
-import { Chunk } from '@tang/common';
+import { Chunk } from '@devs-tang/common';
 import * as processors from '../../src/processors';
 
 describe('outputer/local：local输出器', () => {
@@ -52,7 +52,7 @@ describe('outputer/local：local输出器', () => {
 
     const testData = await fs.readJSON(files[0].path);
 
-    expect(testData.name).toStrictEqual('@tang/yapi-sharing');
+    expect(testData.name).toStrictEqual('tang-yapi-sharing');
     expect(testData).toStrictEqual(samplePresetData);
 
     const output2 = await localOutputer.output(sampleGeneration, {

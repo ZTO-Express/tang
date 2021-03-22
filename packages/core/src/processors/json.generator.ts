@@ -4,7 +4,7 @@ import {
   Document,
   TangGenerateResult,
   TangGenerator,
-} from '@tang/common';
+} from '@devs-tang/common';
 
 /**
  * json文件生成器

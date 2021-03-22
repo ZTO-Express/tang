@@ -1,5 +1,5 @@
-import { GenericConfigObject, TangPreset } from '@tang/common';
-import { mergeOptions } from '@tang/core';
+import { GenericConfigObject, TangPreset } from '@devs-tang/common';
+import { mergeOptions } from '@devs-tang/core';
 import * as processors from '../processors';
 
 /**

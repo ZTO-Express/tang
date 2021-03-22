@@ -1,7 +1,7 @@
 import * as commander from 'commander';
 import { CommandLoader } from '../../../src/commands';
 
-describe('@tang/cli/commands：command.loader命令加载器 loadCommand', () => {
+describe('tang-cli/commands：command.loader命令加载器 loadCommand', () => {
   let program: commander.Command;
 
   const commandLoader = CommandLoader as any;

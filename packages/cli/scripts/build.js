@@ -17,12 +17,6 @@ async function build() {
   compile('tsconfig.build.json')
   spinner.succeed('编译完成')
 
-  const typesDir =path.join(__dirname,'../src/@types')
-
-  spinner.start(`复制类型文件: ${typesDir}`);
-  fs.copySync(typesDir, path.join(libDir, '/@types'))
-  spinner.succeed('构建完成')
-
   process.exit();
 }
 

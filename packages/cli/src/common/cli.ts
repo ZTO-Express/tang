@@ -1,4 +1,4 @@
-import * as devkit from '@tang/devkit';
+import * as devkit from '@devs-tang/devkit';
 import * as commander from 'commander';
 
 /** 命令选项 */

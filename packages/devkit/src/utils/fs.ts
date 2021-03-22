@@ -6,8 +6,8 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as json5 from 'json5';
 
-import { utils, InvalidArguments } from '@tang/common';
-import { http } from '@tang/core';
+import { utils, InvalidArguments } from '@devs-tang/common';
+import { http } from '@devs-tang/core';
 
 export * from 'fs-extra';
 

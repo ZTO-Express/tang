@@ -3,10 +3,10 @@ import { TangLauncher } from '../../src';
 import { MeshManager } from '../../src/mesh';
 
 // 预设文件格式：
-// plugin:@tang/test@0.0.1:test-cowsay@0.0.1
-// @tang/test@0.0.1:test-cowsay@0.0.1
-// plugin:@tang/test@0.0.1
-// plugin:@tang/test
+// plugin:tang-test@0.0.1:test-cowsay@0.0.1
+// tang-test@0.0.1:test-cowsay@0.0.1
+// plugin:tang-test@0.0.1
+// plugin:tang-test
 // test-cowsay@0.0.1
 // test-cowsay
 
@@ -33,5 +33,7 @@ describe('tang/mesh/load：加载预设', () => {
     });
 
     expect(result).toContain('hello');
+
+    await launcher.pluginManager.deleteAll('cowsay');
   });
 });

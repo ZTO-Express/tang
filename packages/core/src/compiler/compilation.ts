@@ -4,7 +4,7 @@ import {
   TangCompiler,
   TangLoader,
   TangParser,
-} from '@tang/common';
+} from '@devs-tang/common';
 
 /** 编译实例选项 */
 export interface CompilationOptions {

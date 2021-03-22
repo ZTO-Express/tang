@@ -1,4 +1,4 @@
-import { utils } from '@tang/common';
+import { utils } from '@devs-tang/common';
 import { json5 } from '../../src/utils';
 import * as testUtil from '../util';
 

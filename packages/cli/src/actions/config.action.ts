@@ -1,4 +1,4 @@
-import * as devkit from '@tang/devkit';
+import * as devkit from '@devs-tang/devkit';
 import { CliAction } from '../common';
 
 const configData = Object.freeze({

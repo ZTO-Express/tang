@@ -7,7 +7,7 @@ import {
   TangHook,
   TangProcessorTypeNames,
   TangPreset,
-} from '@tang/common';
+} from '@devs-tang/common';
 
 // 生成器配置选项
 export interface CompilerOptions {

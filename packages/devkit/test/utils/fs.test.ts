@@ -1,4 +1,4 @@
-import { utils } from '@tang/common';
+import { utils } from '@devs-tang/common';
 import { fs } from '../../src/utils';
 import * as testUtil from '../util';
 
@@ -10,7 +10,7 @@ describe('utils/fs：fs实用方法', () => {
 
     const meshContent = await fs.resolveFile(yfDocPath, 'json');
 
-    expect(meshContent.name).toEqual('@tang/yapi-sharing');
+    expect(meshContent.name).toEqual('tang-yapi-sharing');
   });
 
   it('从url获取文件', async () => {
@@ -23,15 +23,17 @@ describe('utils/fs：fs实用方法', () => {
     expect(blankText).toBe('');
 
     const yfDocUrl = testUtil.resolveFixtureUrl(
-      'meshs/yapi-fsharing/mesh.json',
+      'presets/yapi-fsharing/preset.v0.1.json',
     );
+    const yfDocTitle = 'yapi文档生成';
+
     expect(utils.isUrl(yfDocUrl)).toBeTruthy();
 
     const meshText = await fs.resolveFile(yfDocUrl);
-    expect(meshText).toMatch('@tang/yapi-sharing');
+    expect(meshText).toMatch(yfDocTitle);
 
     const meshJson = await fs.resolveFile(yfDocUrl, 'json');
-    expect(meshJson.name).toEqual('@tang/yapi-sharing');
+    expect(meshJson.title).toEqual(yfDocTitle);
 
     const meshBuffer = await fs.resolveFile(yfDocUrl, 'buffer');
     expect(meshBuffer).toBeInstanceOf(ArrayBuffer);

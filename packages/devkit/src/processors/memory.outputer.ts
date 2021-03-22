@@ -1,4 +1,4 @@
-import { TangGeneration, TangOutput, TangOutputer } from '@tang/common';
+import { TangGeneration, TangOutput, TangOutputer } from '@devs-tang/common';
 
 import * as path from 'path';
 import { memfs } from '../utils';

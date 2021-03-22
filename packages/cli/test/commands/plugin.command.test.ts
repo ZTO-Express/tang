@@ -1,7 +1,7 @@
 import * as commander from 'commander';
 import { CommandLoader } from '../../src/commands';
 
-describe('@tang/cli/commands：plugin', () => {
+describe('tang-cli/commands：plugin', () => {
   const program = commander.createCommand();
 
   beforeAll(async () => {

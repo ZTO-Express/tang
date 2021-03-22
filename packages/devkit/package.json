@@ -1,5 +1,5 @@
 {
-  "name": "@tang/devkit",
+  "name": "@devs-tang/devkit",
   "version": "0.0.1",
   "description": "Tang开发库",
   "main": "lib/",
@@ -22,8 +22,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@tang/common": "^0.0.1",
-    "@tang/core": "^0.0.1",
+    "@devs-tang/common": "^0.0.1",
+    "@devs-tang/core": "^0.0.1",
     "chalk": "^4.1.0",
     "execa": "^5.0.0",
     "fs-extra": "^9.1.0",
@@ -41,5 +41,8 @@
   },
   "engines": {
     "node": ">= 10"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

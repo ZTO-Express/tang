@@ -1,4 +1,4 @@
-import { TangLoader, utils } from '@tang/common';
+import { TangLoader, utils } from '@devs-tang/common';
 
 import { http } from '../utils';
 

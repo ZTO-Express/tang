@@ -6,7 +6,7 @@ import {
   TangProcessorTypeNames,
   TangProcessorsTypeKeys,
   utils,
-} from '@tang/common';
+} from '@devs-tang/common';
 
 import { CompilerOptions } from '../compiler/compiler.interfaces';
 import * as processors from '../processors';

@@ -1,4 +1,4 @@
-import { TangLoader } from '@tang/common/lib';
+import { TangLoader } from '@devs-tang/common/lib';
 import { getNormalizedOptions, mergeProcessors } from '../../src';
 
 describe('options/normalizeOptions：规范化配置', () => {

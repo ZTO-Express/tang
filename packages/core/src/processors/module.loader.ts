@@ -1,4 +1,4 @@
-import { TangLoader, utils } from '@tang/common';
+import { TangLoader, utils } from '@devs-tang/common';
 
 /**
  * 通过加载js模块

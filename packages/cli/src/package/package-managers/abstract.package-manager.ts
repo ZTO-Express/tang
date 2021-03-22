@@ -1,8 +1,8 @@
 import * as chalk from 'chalk';
 import * as ora from 'ora';
 import { join } from 'path';
-import { utils } from '@tang/common';
-import { fs, AbstractRunner } from '@tang/devkit';
+import { utils } from '@devs-tang/common';
+import { fs, AbstractRunner } from '@devs-tang/devkit';
 import { PackageManagerCommands } from '../../common';
 import { MESSAGES } from '../../ui';
 

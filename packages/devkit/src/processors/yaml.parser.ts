@@ -1,4 +1,8 @@
-import { GenericConfigObject, DocumentModel, TangParser } from '@tang/common';
+import {
+  GenericConfigObject,
+  DocumentModel,
+  TangParser,
+} from '@devs-tang/common';
 
 import { yaml } from '../utils';
 

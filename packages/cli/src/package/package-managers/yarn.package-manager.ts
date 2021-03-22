@@ -1,5 +1,5 @@
 import { PackageManagerCommands } from '../../common/interfaces';
-import { Runner, RunnerFactory } from '@tang/devkit';
+import { Runner, RunnerFactory } from '@devs-tang/devkit';
 import {
   PackageManagers,
   AbstractPackageManager,

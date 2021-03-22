@@ -19,7 +19,7 @@ describe('loader/module：module加载器', () => {
     const yfMeshUrl = testUtil.resolveFixturePath('mesh.js');
 
     const data: any = await moduleLoader.load(yfMeshUrl);
-    expect(data.name).toBe('@tang/test-mesh');
+    expect(data.name).toBe('tang-test-mesh');
   });
 
   it('urlLoader load方法 文件不存在', async () => {

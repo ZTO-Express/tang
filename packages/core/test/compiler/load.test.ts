@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { ErrorCodes } from '@tang/common';
+import { ErrorCodes } from '@devs-tang/common';
 
 import { Compiler } from '../../src';
 import * as processors from '../../src/processors';

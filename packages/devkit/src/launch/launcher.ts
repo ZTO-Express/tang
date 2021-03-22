@@ -14,9 +14,9 @@ import {
   TangCompilerLoadOptions,
   TangPreset,
   utils,
-} from '@tang/common';
+} from '@devs-tang/common';
 
-import { tang } from '@tang/core';
+import { tang } from '@devs-tang/core';
 
 import { fs } from '../utils';
 import {

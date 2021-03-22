@@ -1,5 +1,5 @@
-import { GenericConfigObject } from '@tang/common';
-import * as devkit from '@tang/devkit';
+import { GenericConfigObject } from '@devs-tang/common';
+import * as devkit from '@devs-tang/devkit';
 import { CliAction } from '../common';
 
 export class PluginAction extends CliAction {

@@ -1,4 +1,4 @@
-import { GenericConfigObject, TangLoader, utils } from '@tang/common';
+import { GenericConfigObject, TangLoader, utils } from '@devs-tang/common';
 import { fs } from '../utils';
 
 /**

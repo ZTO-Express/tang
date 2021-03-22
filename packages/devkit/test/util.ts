@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as os from 'os';
 
-import { GenericConfigObject } from '@tang/common';
-import { Compiler, getNormalizedOptions } from '@tang/core';
+import { GenericConfigObject } from '@devs-tang/common';
+import { Compiler, getNormalizedOptions } from '@devs-tang/core';
 
 import * as processors from '../src/processors';
 

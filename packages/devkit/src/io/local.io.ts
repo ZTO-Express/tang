@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { GenericConfigObject } from '@tang/common';
+import { GenericConfigObject } from '@devs-tang/common';
 import { fs, json5 } from '../utils';
 import { IO } from './io.interfaces';
 

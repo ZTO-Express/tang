@@ -7,7 +7,7 @@ import {
   InvalidPluginError,
   InvalidArguments,
   TangPreset,
-} from '@tang/common';
+} from '@devs-tang/common';
 import { fs, uuid } from '../utils';
 import { TANG_PLUGIN_DIR } from '../consts';
 import { Runner, RunnerFactory } from '../runners';

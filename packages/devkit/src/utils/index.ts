@@ -1,4 +1,4 @@
-import * as core from '@tang/core';
+import * as core from '@devs-tang/core';
 import * as _execa from 'execa';
 
 export * as yaml from 'js-yaml';

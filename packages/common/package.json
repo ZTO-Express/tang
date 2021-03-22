@@ -1,7 +1,7 @@
 {
-  "name": "@tang/common",
+  "name": "@devs-tang/common",
   "version": "0.0.1",
-  "description": "Tang",
+  "description": "Tang通用库",
   "main": "lib/",
   "types": "lib/",
   "files": [
@@ -23,5 +23,8 @@
   "license": "ISC",
   "engines": {
     "node": ">= 10"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

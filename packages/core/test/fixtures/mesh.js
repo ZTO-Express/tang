@@ -1,6 +1,6 @@
 module.exports = {
   // 所有的插件基于事件驱动，但仍然遵循大的流程，事件有优先级以及同步或异步
-  "name": "@tang/test-mesh", // mesh名称
+  "name": "tang-test-mesh", // mesh名称
   "version": "0.0.1", // 预设版本
   "title": "yapi文档生成", // 标题
   "description": "此预设用于通过api文档生成vue项目、调用接口及页面", // 描述

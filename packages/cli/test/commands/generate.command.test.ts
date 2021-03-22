@@ -3,7 +3,7 @@ import * as testUtil from '../util';
 import * as commander from 'commander';
 import { CommandLoader } from '../../src/commands';
 
-describe('@tang/cli/commands：generate', () => {
+describe('tang-cli/commands：generate', () => {
   const testTmpDir = testUtil.resolveTmpDir();
   const program = commander.createCommand();
 

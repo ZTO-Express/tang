@@ -6,7 +6,7 @@ import {
   InvalidArguments,
   InvalidPresetError,
   NotFoundError,
-} from '@tang/common';
+} from '@devs-tang/common';
 import { validateSchema, fs } from '../utils';
 import { TANG_MESH_DIR, TANG_MESH_FILENAME } from '../consts';
 import { TangLauncher } from '../launch';

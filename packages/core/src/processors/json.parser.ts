@@ -1,4 +1,4 @@
-import { DocumentModel, TangParser } from '@tang/common';
+import { DocumentModel, TangParser } from '@devs-tang/common';
 
 /**
  * Json解析器
