@@ -1,6 +1,6 @@
 {
   "name": "@devs-tang/core",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Tang核心库",
   "main": "lib/",
   "types": "lib/",
@@ -22,11 +22,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@devs-tang/common": "^0.0.1",
+    "@devs-tang/common": "^1.0.0",
     "isomorphic-unfetch": "^3.1.0"
   },
   "devDependencies": {
-    "@devs-tang/devkit": "^0.0.1",
+    "@devs-tang/devkit": "^1.0.0",
     "@types/fs-extra": "^9.0.8",
     "@types/node-fetch": "^2.5.8",
     "fs-extra": "^9.1.0",
@@ -38,5 +38,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "c53eb3352ed20746d904bca2040a9c3cddadfb21"
+  "gitHead": "86bf7ddcc4deee68eb569f2976e4d4603f18a97f"
 }

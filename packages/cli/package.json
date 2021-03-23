@@ -1,6 +1,6 @@
 {
-  "name": "tang-cli",
-  "version": "0.0.1",
+  "name": "@devs-tang/cli",
+  "version": "1.0.0",
   "description": "Tang命令行",
   "main": "index.js",
   "bin": {
@@ -18,9 +18,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@devs-tang/common": "^0.0.1",
-    "@devs-tang/core": "^0.0.1",
-    "@devs-tang/devkit": "^0.0.1",
+    "@devs-tang/common": "^1.0.0",
+    "@devs-tang/core": "^1.0.0",
+    "@devs-tang/devkit": "^1.0.0",
     "chalk": "^4.1.0",
     "cli-table3": "^0.6.0",
     "commander": "^7.1.0",
@@ -35,5 +35,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "gitHead": "86bf7ddcc4deee68eb569f2976e4d4603f18a97f"
 }

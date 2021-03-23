@@ -1,6 +1,6 @@
 {
   "name": "@devs-tang/common",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Tang通用库",
   "main": "lib/",
   "types": "lib/",
@@ -26,5 +26,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "gitHead": "86bf7ddcc4deee68eb569f2976e4d4603f18a97f"
 }
