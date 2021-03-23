@@ -38,6 +38,10 @@ export class ConfigManager {
 
   // 获取配置信息
   get<T>(path: string): T {
+    if (path === '.') {
+      return this.config as T;
+    }
+
     const result = utils.get(this.config, path);
     return result;
   }

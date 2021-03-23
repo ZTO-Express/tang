@@ -1,42 +1,25 @@
 import * as chalk from 'chalk';
 import * as commander from 'commander';
-import { CliActionFn, CliCommand, CliCommandConfig } from '../common';
+import {
+  CliAction,
+  CliActionFn,
+  CliCommand,
+  CliCommandConfig,
+} from '../common';
 
 import { ERROR_PREFIX } from '../ui';
 
-import * as actions from '../actions';
-
-// import { UpdateCommand } from './update.command';
-import { InfoCommand } from './info.command';
-import { ConfigCommand } from './config.command';
-import { PluginCommand } from './plugin.command';
-import { GenerateCommand } from './generate.command';
+import { getCliCommandActions } from './command.actions';
 
 export class CommandLoader {
-  // 所有action字典
-  private static actionsMap = {
-    // update: new actions.UpdateAction(),
-    info: new actions.InfoAction(),
-    config: new actions.ConfigAction(),
-    plugin: new actions.PluginAction(),
-    generate: new actions.GenerateAction(),
-  };
-
-  // 所有命令字典
-  private static commandsArr = [
-    // new UpdateCommand(CommandLoader.actionsMap.update.main),
-    new InfoCommand(CommandLoader.actionsMap.info.main),
-    new ConfigCommand(),
-    new PluginCommand(),
-    new GenerateCommand(),
-  ];
-
   static load(program: commander.Command, existWhenError = true): void {
+    const { commandActions, commandsArr } = getCliCommandActions();
+
     // TODO 添加钩子回调
 
-    this.commandsArr.forEach(cmd => {
+    commandsArr.forEach(cmd => {
       // TODO 添加钩子回调
-      this.loadCommand(program, cmd);
+      this.loadCommand(program, cmd, commandActions);
       // TODO 添加钩子回调
     });
 
@@ -64,11 +47,12 @@ export class CommandLoader {
   private static loadCommand(
     program: commander.Command,
     cliCommand: CliCommand,
+    actionsMap: Record<string, CliAction> = {},
   ) {
     // 先执行config中的内容
     if (cliCommand.config) {
       const cmdConfig = cliCommand.config();
-      this.loadCommandByConfig(program, cmdConfig);
+      this.loadCommandByConfig(program, cmdConfig, actionsMap);
     }
 
     // 执行load
@@ -85,9 +69,8 @@ export class CommandLoader {
   private static loadCommandByConfig(
     program: commander.Command,
     cfg: CliCommandConfig,
+    actionsMap: Record<string, CliAction> = {},
   ) {
-    const actionsMap = CommandLoader.actionsMap;
-
     let actionFn: CliActionFn | undefined = undefined;
     let actionNames: string[] = [];
 
@@ -106,16 +89,13 @@ export class CommandLoader {
 
     const baseAction = (actionsMap as any)[actionNames[0]];
 
-    if (!actionFn && actionNames.length) {
+    if (!actionFn && baseAction && actionNames.length) {
       if (actionNames.length === 1) {
         actionFn = baseAction['main'];
       } else {
         actionFn = baseAction[actionNames[1]];
       }
     }
-
-    // 如果此命令没有action则直接忽略
-    if (!actionFn) return;
 
     const cmd: commander.Command = program.command(cfg.name);
 
@@ -138,12 +118,15 @@ export class CommandLoader {
       cmd.addOption(opt);
     });
 
-    if (!baseAction) {
-      cmd.action(actionFn);
-    } else {
-      cmd.action((...args: any[]) => {
-        return actionFn?.call(baseAction, ...args, cmd);
-      });
+    // 如果此命令没有action则直接忽略
+    if (actionFn) {
+      if (!baseAction) {
+        cmd.action(actionFn);
+      } else {
+        cmd.action((...args: any[]) => {
+          return actionFn?.call(baseAction, ...args, cmd);
+        });
+      }
     }
 
     // 如果此配置有父命令则直接返回（不支持2级以上命令）
@@ -151,7 +134,7 @@ export class CommandLoader {
 
     cfg.commands?.forEach(it => {
       it.parent = cfg;
-      CommandLoader.loadCommandByConfig(cmd, it);
+      CommandLoader.loadCommandByConfig(cmd, it, actionsMap);
     });
   }
 }

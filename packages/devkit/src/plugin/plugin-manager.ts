@@ -11,6 +11,7 @@ import {
 import { fs, uuid } from '../utils';
 import { TANG_PLUGIN_DIR } from '../consts';
 import { Runner, RunnerFactory } from '../runners';
+import { utils } from '..';
 
 // 配置选项
 export interface PluginManagerOptions extends GenericConfigObject {
@@ -138,12 +139,28 @@ export class PluginManager {
    * @param name 插件名称，npm, npm_link, shell
    */
   async add(name: string, options?: GenericConfigObject): Promise<TangPlugin> {
-    const nameVersion = this.parsePluginName(name);
+    let nameVersion: any;
+
+    let packageName: string;
+
+    if (utils.isPath(name)) {
+      packageName = name;
+      const packageInfo = await fs.readPackageInfo(packageName);
+
+      if (!packageInfo) return undefined;
+
+      nameVersion = {
+        name: packageInfo.name,
+      };
+    } else {
+      nameVersion = this.parsePluginName(name);
+    }
 
     const opts = Object.assign(
       {
         name: nameVersion.name,
         version: nameVersion.version,
+        package: packageName,
       },
       options,
     ) as PluginInstallOptions;

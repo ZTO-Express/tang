@@ -1,6 +1,6 @@
 import * as devkit from '@devs-tang/devkit';
 import { join, posix } from 'path';
-import { CommandLoader } from '../commands';
+import { CommandLoader } from '../entry';
 
 const localBinPathSegments = [process.cwd(), 'node_modules', '@tang', 'cli'];
 

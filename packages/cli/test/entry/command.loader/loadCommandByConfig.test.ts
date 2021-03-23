@@ -1,5 +1,5 @@
 import * as commander from 'commander';
-import { CommandLoader } from '../../../src/commands';
+import { CommandLoader } from '../../../src/entry';
 
 describe('tang-cli/commands：command.loader命令加载器 loadCommandByConfig', () => {
   let program: commander.Command;

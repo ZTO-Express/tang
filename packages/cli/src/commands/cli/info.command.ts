@@ -1,5 +1,5 @@
 import * as commander from 'commander';
-import { CliActionFn, CliCommand } from '../common';
+import { CliActionFn, CliCommand } from '../../common';
 
 export class InfoCommand implements CliCommand {
   constructor(private readonly actionFn: CliActionFn) {}

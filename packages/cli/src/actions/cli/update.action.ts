@@ -1,5 +1,5 @@
-import { TangDependencyManager, PackageManagerFactory } from '../package';
-import { CliAction, CliActionOptions } from '../common';
+import { TangDependencyManager, PackageManagerFactory } from '../../utils';
+import { CliAction, CliActionOptions } from '../../common';
 
 export class UpdateAction extends CliAction {
   async main(options: CliActionOptions) {

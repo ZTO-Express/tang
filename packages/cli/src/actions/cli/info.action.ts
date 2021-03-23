@@ -1,9 +1,13 @@
-import * as chalk from 'chalk';
 import { platform, release } from 'os';
 import osName = require('os-name');
-import { AbstractPackageManager, PackageManagerFactory } from '../package';
-import { BANNER } from '../ui';
-import { CliAction } from '../common';
+import {
+  chalk,
+  AbstractPackageManager,
+  PackageManagerFactory,
+} from '../../utils';
+import { BANNER } from '../../ui';
+import { CliAction } from '../../common';
+import { PluginAction } from '../plugin';
 
 export class InfoAction extends CliAction {
   async main() {
@@ -34,19 +38,22 @@ const displayPackageManagerVersion = async () => {
   }
 };
 
-const displayTangInformation = async () => {
-  displayCliVersion();
-  console.info(chalk.green('[Tang Platform Information]'));
-
-  // 读取插件以及预设信息
-};
-
 const displayCliVersion = () => {
   console.info(chalk.green('[Tang CLI]'));
   console.info(
     'Tang CLI Version :',
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    chalk.blue(require('../../package.json').version),
+    chalk.blue(require('../../../package.json').version),
     '\n',
   );
+};
+
+const displayTangInformation = async () => {
+  displayCliVersion();
+  // console.info(chalk.green('[Tang Platform Information]'));
+
+  // 读取插件信息
+  console.info(chalk.green('[Tang Plugins]'));
+  const pluginAction = new PluginAction();
+  await pluginAction.list();
 };

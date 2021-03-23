@@ -8,20 +8,19 @@ import * as path from 'path';
 import {
   GenericConfigObject,
   InvalidArguments,
-  NotFoundError,
   SpecialObject,
   TangCompilerGenerateOptions,
   TangCompilerLoadOptions,
-  TangPreset,
   utils,
 } from '@devs-tang/common';
 
 import { tang } from '@devs-tang/core';
 
-import { fs } from '../utils';
+import { fs, json5 } from '../utils';
 import {
   TANG_LAUNCH_CONFIG_FILENAME,
-  TANG_LAUNCH_CONFIG_PRESET,
+  TANG_LAUNCH_CONFIG_PRESETS,
+  TANG_LAUNCH_CONFIG_PRESET_DEFAULT,
 } from '../consts';
 import { ConfigManager } from '../config';
 import { PluginManager } from '../plugin';
@@ -29,8 +28,10 @@ import { PluginManager } from '../plugin';
 import { mergePresetOptions } from './options';
 
 export interface PresetConfigData {
+  name: string;
+  use?: boolean;
   plugin?: string;
-  preset?: string;
+  options?: GenericConfigObject;
 }
 
 export interface LaunchPresetConfig extends SpecialObject {
@@ -98,42 +99,34 @@ export class TangLauncher {
    * @param name
    * @returns
    */
-  async use(name?: string) {
-    const presetData = this.parsePresetName(name);
+  async use(name?: string, options?: GenericConfigObject): Promise<any> {
+    name = name || TANG_LAUNCH_CONFIG_PRESET_DEFAULT;
 
-    if (!presetData) {
-      throw new InvalidArguments(`预设名称格式错误`);
+    if (name === TANG_LAUNCH_CONFIG_PRESET_DEFAULT) {
+      this.setPresetConfig(name, { use: true, options });
+      return this.save();
     }
 
-    const preset = await this.getPreset(presetData);
+    const presetInfo = this.parsePresetName(name);
 
-    if (!preset) {
-      throw new NotFoundError(`未找到预设${name}`);
+    if (!presetInfo) return undefined;
+
+    const presetFullName = this.getPresetFullName(presetInfo);
+
+    if (presetInfo.plugin) {
+      const existsPlugin = await this.pluginManager.exists(presetInfo.plugin);
+
+      if (!existsPlugin) {
+        const plugin = await this.pluginManager.add(presetInfo.plugin);
+
+        if (!plugin) {
+          throw new Error('插件安装失败。');
+        }
+      }
     }
 
-    this.set(TANG_LAUNCH_CONFIG_PRESET, presetData);
-
-    await this.save();
-
-    return preset;
-  }
-
-  /**
-   * 安装插件
-   * @param name 插件名称
-   * @param version 插件版本
-   */
-  async install(name?: string, options?: GenericConfigObject) {
-    return this.pluginManager.add(name, options);
-  }
-
-  /** 获取生成完整选项 */
-  async options(presetName?: string, options?: GenericConfigObject) {
-    const preset = await this.getPreset(presetName);
-
-    const opts = mergePresetOptions(preset, options);
-
-    return opts;
+    this.setPresetConfig(presetFullName, { use: true, options });
+    return this.save();
   }
 
   /**
@@ -154,6 +147,15 @@ export class TangLauncher {
     return compilation;
   }
 
+  /** 获取生成完整选项 */
+  async options(presetName?: string, options?: GenericConfigObject) {
+    const preset = await this.getPresetConfig(presetName);
+
+    const opts = mergePresetOptions(preset, options);
+
+    return opts;
+  }
+
   /**
    * 生成文档
    * @param entry 文档入口
@@ -165,7 +167,7 @@ export class TangLauncher {
     presetName?: string,
     options?: TangCompilerLoadOptions & TangCompilerGenerateOptions,
   ) {
-    const preset = await this.getPreset(presetName);
+    const preset = await this.getPresetConfig(presetName);
 
     const opts = mergePresetOptions(preset, options);
 
@@ -173,6 +175,15 @@ export class TangLauncher {
     const compilation = await compiler.load(entry);
     const output = await compiler.generate(compilation.document, opts as any);
     return output;
+  }
+
+  /** 获取编译器完整选项 */
+  async inspect(presetName?: string, options?: GenericConfigObject) {
+    const preset = await this.getPresetConfig(presetName);
+
+    const opts = mergePresetOptions(preset, options);
+
+    return opts;
   }
 
   /**
@@ -203,7 +214,24 @@ export class TangLauncher {
 
   /** 保存配置 */
   async save() {
-    await fs.writeJSON(this.launchConfigFilePath, this.launchConfig);
+    const text = json5.stringify(this.launchConfig, { space: 2 });
+    await fs.writeFile(this.launchConfigFilePath, text);
+    return true;
+  }
+
+  /** 设置指定预设 */
+  setPresetConfig(name: string, options: GenericConfigObject) {
+    if (!name) return undefined;
+
+    const presetPath = `${TANG_LAUNCH_CONFIG_PRESETS}.${name}`;
+
+    let presetData = this.get(presetPath);
+
+    presetData = utils.deepMerge(presetData, options);
+
+    this.set(presetPath, presetData);
+
+    return presetData;
   }
 
   /**
@@ -211,37 +239,17 @@ export class TangLauncher {
    * @param name 预设名称
    * @returns 当name为空时，获取当前预设（配置文件中）
    */
-  async getPreset(name?: string | PresetConfigData) {
-    let presetData: PresetConfigData;
+  async getPresetConfig(name?: string) {
+    name = name || TANG_LAUNCH_CONFIG_PRESET_DEFAULT;
 
-    if (utils.isObject(name)) {
-      presetData = name;
-    } else if (name) {
-      presetData = this.parsePresetName(name);
-    } else {
-      presetData = this.get(TANG_LAUNCH_CONFIG_PRESET);
-    }
+    const presetInfo = this.parsePresetName(name);
+    const presetFullName = this.getPresetFullName(presetInfo);
 
-    if (!presetData) return undefined;
+    const presetPath = `${TANG_LAUNCH_CONFIG_PRESETS}.${presetFullName}`;
 
-    let preset: TangPreset;
+    const presetData = this.get(presetPath);
 
-    if (presetData.plugin) {
-      const plugin = await this.pluginManager.get(presetData.plugin);
-
-      if (!plugin) {
-        throw new NotFoundError(`插件${presetData.plugin}不存在`);
-      }
-
-      const presetName = presetData.preset;
-      if (!presetName) {
-        preset = plugin.preset || (plugin.presets && plugin.presets[0]);
-      } else if (Array.isArray(plugin.presets)) {
-        preset = plugin.presets.find(it => it.name === presetName);
-      }
-    }
-
-    return preset;
+    return presetData;
   }
 
   /**
@@ -254,7 +262,7 @@ export class TangLauncher {
     if (!options.plugin) return undefined;
 
     const _pluginName = options.plugin;
-    const _presetName = options.preset || 'default';
+    const _presetName = options.name || 'default';
 
     return `plugin:${_pluginName}:${_presetName}`;
   }
@@ -271,17 +279,17 @@ export class TangLauncher {
     if (parts[0] === 'plugin') {
       return {
         plugin: parts[1],
-        preset: parts[2],
+        name: parts[2],
       };
     } else if (parts.length === 2) {
       return {
         plugin: parts[0],
-        preset: parts[1],
+        name: parts[1],
       };
     } else if (parts.length === 1) {
       return {
         plugin: parts[0],
-        preset: undefined,
+        name: 'default',
       };
     }
 

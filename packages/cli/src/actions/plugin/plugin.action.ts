@@ -1,11 +1,11 @@
 import { GenericConfigObject } from '@devs-tang/common';
 import * as devkit from '@devs-tang/devkit';
-import { CliAction } from '../common';
+import { CliAction } from '../../common';
 
 export class PluginAction extends CliAction {
   // 主命令 (获取当前)
   async main(name: string) {
-    await this.info(name);
+    return this.info(name);
   }
 
   // 查看指定插件帮助信息
@@ -42,7 +42,7 @@ export class PluginAction extends CliAction {
   async install(packageName: string, options?: GenericConfigObject) {
     if (!packageName) {
       console.error('请输入需要安装的插件包');
-      return;
+      return undefined;
     }
 
     const launcher = await this.getLauncher();
@@ -51,17 +51,19 @@ export class PluginAction extends CliAction {
 
     if (!plugin) {
       console.error('插件安装失败，请重试。');
-      return;
+      return undefined;
     }
 
     console.log(`已成功安装插件 ${plugin.name}@${plugin.version}`);
+
+    return plugin;
   }
 
   /** 安装插件 */
   async delete(name: string) {
     if (!name) {
       console.error('请输入要删除的插件名称');
-      return;
+      return undefined;
     }
 
     const launcher = await this.getLauncher();
@@ -70,22 +72,24 @@ export class PluginAction extends CliAction {
 
     if (!plugin) {
       console.warn(`插件 ${name} 不存在`);
-      return;
+      return undefined;
     }
 
     console.log(`已成功删除插件 ${name}`);
+
+    return plugin;
   }
 
   /** 执行插件方法 */
   async run(name: string, action: string, options: GenericConfigObject) {
     if (!name) {
       console.error('请输入要执行的插件名称');
-      return;
+      return undefined;
     }
 
     if (!action) {
       console.error('请输入要执行的插件方法');
-      return;
+      return undefined;
     }
 
     let args: any[] = [];
@@ -101,5 +105,7 @@ export class PluginAction extends CliAction {
 
     console.log(`已成功执行插件 ${name}的方法${action}`);
     console.log(JSON.stringify(result, null, 2));
+
+    return result;
   }
 }

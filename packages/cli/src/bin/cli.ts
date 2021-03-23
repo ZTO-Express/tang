@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import * as commander from 'commander';
 import { CommanderStatic } from 'commander';
-import { CommandLoader } from '../commands';
+import { CommandLoader } from '../entry';
 
 import {
   loadLocalBinCommandLoader,

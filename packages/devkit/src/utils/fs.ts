@@ -40,6 +40,19 @@ export function readJSON5Sync(file: string) {
   return _data;
 }
 
+/** 读取node package信息 */
+export async function readPackageInfo(packagePath: string) {
+  const exists = await fs.pathExists(packagePath);
+  if (!exists) return undefined;
+
+  const jsonFile = path.join(packagePath, 'package.json');
+  const existsJson = await fs.pathExists(jsonFile);
+  if (!existsJson) return undefined;
+
+  const jsonData = await fs.readJson(jsonFile);
+  return jsonData;
+}
+
 /**
  * 根据name格式获取文件内容
  * @param file 文件url, 相对/绝对路径, type根据类型不同获取文件路径或url

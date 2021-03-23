@@ -95,12 +95,13 @@ describe('tang/plugin/install：安装插件', () => {
   it('安装插件（包含preset）', async () => {
     const packagePath = testUtil.resolveFixturePath('plugins/test');
 
-    await pluginManager.add('test-tang@0.0.1', {
+    const plugin = await pluginManager.add(packagePath, {
       force: true,
-      package: packagePath,
     });
 
-    await pluginManager.delete('test-tang@0.0.1');
+    expect(plugin).not.toBeUndefined();
+
+    await pluginManager.delete('test-tang');
     const list1 = await pluginManager.list('test-tang');
     expect(list1).toEqual([]);
   });

@@ -1,13 +1,13 @@
-import { CliCommand } from '../common';
+import { CliCommand } from '../../common';
 
-export class PluginCommand implements CliCommand {
+export class PresetCommand implements CliCommand {
   config() {
     return {
-      name: 'plugin',
+      name: 'preset',
       args: '<name>',
-      description: '插件相关操作',
+      description: '插件预设相关操作',
       argsDescription: {
-        name: '插件名称 <name>[@version]',
+        name: '插件预设名称 <pluginName>[@version]:presetName',
       },
       commands: [
         {

@@ -1,9 +1,7 @@
 import * as commander from 'commander';
-import { CommandLoader } from '../../../src/commands';
+import { CommandLoader } from '../../../src/entry';
 
 describe('tang-cli/commands：command.loader命令加载器 load', () => {
-  const CommandLoaderAny = CommandLoader as any;
-
   let program: commander.Command;
 
   beforeEach(() => {
@@ -12,8 +10,6 @@ describe('tang-cli/commands：command.loader命令加载器 load', () => {
 
   it('加载action方法', async () => {
     CommandLoader.load(program, false);
-
-    expect(program.commands.length).toBe(CommandLoaderAny.commandsArr.length);
 
     const rawInfoArgs = ['node', 'tang', 'info'];
 

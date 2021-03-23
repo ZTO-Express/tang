@@ -1,5 +1,5 @@
 import * as commander from 'commander';
-import { CommandLoader } from '../../src/commands';
+import { CommandLoader } from '../../src/entry';
 
 describe('tang-cli/commands：info', () => {
   const program = commander.createCommand();

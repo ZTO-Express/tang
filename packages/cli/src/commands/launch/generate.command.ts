@@ -1,4 +1,4 @@
-import { CliCommand } from '../common';
+import { CliCommand } from '../../common';
 
 export class GenerateCommand implements CliCommand {
   config() {
@@ -55,6 +55,10 @@ export class GenerateCommand implements CliCommand {
           flags: '--overwrite',
           description: '是否覆盖源文档',
           defaultValue: false,
+        },
+        {
+          flags: '--inspect',
+          description: '获取当前生成器所有配置信息',
         },
       ],
     };

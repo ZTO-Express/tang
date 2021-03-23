@@ -1,6 +1,6 @@
 import { GenericConfigObject } from '@devs-tang/common';
 import * as devkit from '@devs-tang/devkit';
-import { CliAction } from '../common';
+import { CliAction } from '../../common';
 
 export class GenerateAction extends CliAction {
   async main(entry: string, options: GenericConfigObject) {

@@ -1,10 +1,10 @@
-import { CliCommand } from '../common';
+import { CliCommand } from '../../common';
 
 export class ConfigCommand implements CliCommand {
   config() {
     return {
       name: 'config',
-      args: '<key> <value>',
+      args: '[key] [value]',
       aliases: ['cfg'],
       description: '操作Tang配置',
       argsDescription: {
@@ -13,13 +13,8 @@ export class ConfigCommand implements CliCommand {
       },
       commands: [
         {
-          name: 'list',
-          aliases: ['ls'],
-          args: '[key]',
-          description: '列出所有或指定节点下生效配置',
-        },
-        {
           name: 'get', // 默认action为config.set
+          aliases: ['list', 'ls'],
           args: '[key]',
           description: '获取指定节点下生效配置',
         },
