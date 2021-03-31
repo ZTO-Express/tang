@@ -1,6 +1,6 @@
 import { ConfigAction } from '../../src/actions';
 
-describe('tang-cli/commands：config', () => {
+describe('tang-cli/actions：config', () => {
   const configAction = new ConfigAction();
 
   it('config get', async () => {

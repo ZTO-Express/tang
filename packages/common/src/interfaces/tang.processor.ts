@@ -18,6 +18,7 @@ export type TangProcessorTypeNames = keyof typeof TangProcessorTypes;
 export interface TangProcessor {
   type: TangProcessorTypeNames; // 处理器类型
   name: string; // 处理器名称
+  code?: string; // 处理器编号
   pluginName?: string; // 处理器所属插件
   priority?: number; // 处理器优先级
 }

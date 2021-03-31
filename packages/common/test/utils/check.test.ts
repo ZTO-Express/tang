@@ -120,6 +120,12 @@ describe('utils/check：check实用方法', () => {
     expect(util.isSymbol(new Function())).toBe(false);
   });
 
+  it('isPromise', () => {
+    expect(util.isPromise(Promise.resolve())).toBe(true);
+    expect(util.isPromise({ then: util.noop })).toBe(true);
+    expect(util.isPromise(null)).toBe(false);
+  });
+
   it('验证isPlainObject2', () => {
     class ExObj extends Object {}
 

@@ -22,7 +22,7 @@ const displayBanner = () => {
 };
 
 const displaySystemInformation = async () => {
-  console.info(chalk.green('[System Information]'));
+  console.info(chalk.green('[系统信息]'));
   console.info('OS Version     :', chalk.blue(osName(platform(), release())));
   console.info('NodeJS Version :', chalk.blue(process.version));
   await displayPackageManagerVersion();
@@ -53,7 +53,7 @@ const displayTangInformation = async () => {
   // console.info(chalk.green('[Tang Platform Information]'));
 
   // 读取插件信息
-  console.info(chalk.green('[Tang Plugins]'));
+  console.info(chalk.green('[Tang 插件信息]'));
   const pluginAction = new PluginAction();
   await pluginAction.list();
 };

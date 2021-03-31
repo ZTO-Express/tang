@@ -6,17 +6,29 @@ export class ConfigCommand implements CliCommand {
       name: 'config',
       args: '[key] [value]',
       aliases: ['cfg'],
-      description: '操作Tang配置',
+      description: '配置相关操作',
       argsDescription: {
         key: '配置key',
         value: '配置值',
       },
+      options: [
+        {
+          flags: '-f --format <format>',
+          description: '输出格式',
+        },
+      ],
       commands: [
         {
           name: 'get', // 默认action为config.set
           aliases: ['list', 'ls'],
           args: '[key]',
           description: '获取指定节点下生效配置',
+          options: [
+            {
+              flags: '-f --format <format>',
+              description: '输出格式',
+            },
+          ],
         },
         {
           name: 'set', // 默认action为config.set

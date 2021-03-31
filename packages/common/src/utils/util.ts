@@ -159,7 +159,6 @@ export function unset(object: unknown, path: string | string[]) {
 export type OmitFilterFn = (val: any, key: string, object: unknown) => boolean;
 
 /**
- *
  * @param object 需要移除属性的对象
  * @param props 需要移除的属性
  * @param filter 过滤方法，返回true则保留，否则排除
@@ -194,4 +193,20 @@ export function omit(
     }
   }
   return res;
+}
+
+/**
+ * 简单的从目标中选取指定选项生成新的对象
+ * @param source
+ * @param keys
+ * @returns
+ */
+export function pick(source: any, ...keys: string[]) {
+  return keys.reduce((result: { [key: string]: any }, key) => {
+    if (source[key] !== undefined) {
+      result[key] = source[key];
+    }
+
+    return result;
+  }, {});
 }

@@ -6,7 +6,7 @@ export class ListCommand implements CliCommand {
       name: 'list',
       args: '[type]',
       aliases: ['ls'],
-      description: '列出相关信息',
+      description: '列出所有已安装插件',
       argsDescription: {
         name: '类型',
       },

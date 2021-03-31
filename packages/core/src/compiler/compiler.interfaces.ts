@@ -1,31 +1,12 @@
 import {
-  TangGenerator,
-  TangLoader,
-  TangOutputer,
-  TangParser,
   TangProcessor,
-  TangHook,
   TangProcessorTypeNames,
-  TangPreset,
+  TangPresetOptions,
 } from '@devs-tang/common';
 
 // 生成器配置选项
-export interface CompilerOptions {
-  preset?: TangPreset;
-
-  defaultLoader?: string | TangLoader;
-  loaders?: TangLoader[];
-
-  defaultParser?: string | TangParser;
-  parsers?: TangParser[];
-
-  defaultGenerator?: string | TangGenerator;
-  generators?: TangGenerator[];
-
-  defaultOutputer?: string | TangOutputer;
-  outputers?: TangOutputer[];
-
-  hooks?: TangHook[];
+export interface CompilerOptions extends TangPresetOptions {
+  [key: string]: any;
 }
 
 /** 处理器获取选项 */

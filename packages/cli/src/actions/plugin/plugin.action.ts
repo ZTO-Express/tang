@@ -1,23 +1,36 @@
-import { GenericConfigObject } from '@devs-tang/common';
+import { GenericConfigObject, TangPlugin } from '@devs-tang/common';
 import * as devkit from '@devs-tang/devkit';
 import { CliAction } from '../../common';
 
 export class PluginAction extends CliAction {
   // 主命令 (获取当前)
-  async main(name: string) {
+  async main(name?: string) {
     return this.info(name);
   }
 
   // 查看指定插件帮助信息
-  async info(name: string) {
+  async info(name?: string) {
     const launcher = await this.getLauncher();
 
-    const plugin = launcher.pluginManager.get(name);
+    let plugin: TangPlugin;
 
-    console.log('插件信息');
+    if (name) {
+      plugin = await launcher.pluginManager.get(name);
+    } else {
+      plugin = await launcher.presetManager.getUsedPlugin();
+    }
+
+    if (!plugin) {
+      console.log(name ? `未安装插件“${name}”` : '当前未使用任何插件');
+      return undefined;
+    }
 
     // 输出插件信息
-    console.log(JSON.stringify(plugin, undefined, 2));
+    console.log('插件信息');
+    console.log(`${plugin.name}@${plugin.version}`);
+    console.log(`${plugin.description}`);
+
+    return plugin;
   }
 
   /** 列出所有插件 */
@@ -33,7 +46,6 @@ export class PluginAction extends CliAction {
           '，请使用 tang install <plugin> 命令安装插件',
       );
     } else {
-      console.log('当前已安装插件：');
       console.log(pluginNames.join());
     }
   }
@@ -59,7 +71,7 @@ export class PluginAction extends CliAction {
     return plugin;
   }
 
-  /** 安装插件 */
+  /** 删除插件 */
   async delete(name: string) {
     if (!name) {
       console.error('请输入要删除的插件名称');
@@ -68,7 +80,7 @@ export class PluginAction extends CliAction {
 
     const launcher = await this.getLauncher();
 
-    const plugin = await launcher.pluginManager.delete(name);
+    const plugin = await launcher.deletePlugin(name);
 
     if (!plugin) {
       console.warn(`插件 ${name} 不存在`);

@@ -190,6 +190,31 @@ export class Compiler implements TangCompiler {
   }
 
   /**
+   * 测试编译器生成时完整配置
+   * @param entry
+   * @param options
+   * @returns
+   */
+  async inspect(
+    entry: string,
+    options: TangCompilerLoadOptions & TangCompilerGenerateOptions = {},
+  ) {
+    options.entry = entry;
+
+    const loader = this.getLoader(options);
+    const parser = this.getParser(options);
+    const generator = this.getGenerator(options);
+    const outputer = this.getOutputer(options);
+
+    return {
+      loader,
+      parser,
+      generator,
+      outputer,
+    };
+  }
+
+  /**
    * 根据加载选项选择loader，默认选择第一个
    * @param options 加载选项
    */
@@ -301,10 +326,10 @@ export class Compiler implements TangCompiler {
     const processorOptions: any = options.processorOptions || {};
     const processMethodName = options.processMethodName;
     const processOptionsName = options.processOptionsName;
-    const defaultProcessor = options.defaultProcessor as T;
+    const defaultProcessor = (options.defaultProcessor as any) as T;
     const testProcessor = options.testProcessor;
     const testOptions = options.testOptions;
-    const processors = options.processors as T[];
+    const processors = (options.processors as any) as T[];
 
     let processor: any;
 
@@ -316,13 +341,15 @@ export class Compiler implements TangCompiler {
       processor = processorOptions as T;
     } else if (
       defaultProcessor &&
-      (!testProcessor || testProcessor(defaultProcessor, testOptions))
+      (!testProcessor || testProcessor(defaultProcessor as any, testOptions))
     ) {
       // 如果未提供processr测尝试使用默认processr
       processor = defaultProcessor;
     } else {
       // 如果未提供parser及默认parser测尝试使用第一个parser
-      processor = processors.filter(p => testProcessor(p, testOptions))[0];
+      processor = processors.filter(p =>
+        testProcessor(p as any, testOptions),
+      )[0];
     }
 
     if (!processor) return undefined;

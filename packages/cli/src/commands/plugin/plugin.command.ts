@@ -4,10 +4,10 @@ export class PluginCommand implements CliCommand {
   config() {
     return {
       name: 'plugin',
-      args: '<name>',
+      args: '[name]',
       description: '插件相关操作',
       argsDescription: {
-        name: '插件名称 <name>[@version]',
+        name: '插件名称 [name][@version]',
       },
       commands: [
         {
@@ -25,7 +25,7 @@ export class PluginCommand implements CliCommand {
           aliases: ['i'],
           description: '查看插件名称',
           argsDescription: {
-            prefix: '插件名称',
+            name: '插件名称',
           },
         },
         {

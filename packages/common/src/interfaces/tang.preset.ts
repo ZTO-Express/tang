@@ -2,17 +2,29 @@ import { TangHook } from './tang.hook';
 import {
   TangGenerator,
   TangLoader,
-  TangOutput,
+  TangOutputer,
   TangParser,
 } from './tang.processor';
 
-export interface TangPreset {
+export interface TangPresetOptions {
+  defaultLoader?: string | TangLoader;
+  loaders?: TangLoader[];
+
+  defaultParser?: string | TangParser;
+  parsers?: TangParser[];
+
+  defaultGenerator?: string | TangGenerator;
+  generators?: TangGenerator[];
+
+  defaultOutputer?: string | TangOutputer;
+  outputers?: TangOutputer[];
+
+  hooks?: TangHook[];
+}
+
+export interface TangPreset extends TangPresetOptions {
   name: string;
   version?: string;
-  loaders?: TangLoader[];
-  parsers?: TangParser[];
-  generators?: TangGenerator[];
-  outputers?: TangOutput[];
-  hooks?: TangHook[];
+  description?: string;
   [prop: string]: any;
 }

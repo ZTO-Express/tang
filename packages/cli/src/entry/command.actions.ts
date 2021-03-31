@@ -14,9 +14,9 @@ export function getCliCommandActions() {
     config: new actions.ConfigAction(),
 
     plugin: new actions.PluginAction(),
-    preset: new actions.PresetAction(),
 
     launch: new actions.LaunchAction(),
+    preset: new actions.PresetAction(),
     generate: new actions.GenerateAction(),
   };
 
@@ -26,15 +26,15 @@ export function getCliCommandActions() {
     new commands.ConfigCommand(),
 
     new commands.PluginCommand(),
-    new commands.PresetCommand(),
-
-    new commands.ListCommand(),
     new commands.InstallCommand(),
-    new commands.PruneCommand(),
-    new commands.UseCommand(),
-    new commands.GenerateCommand(),
     new commands.RunCommand(),
+    new commands.UseCommand(),
     new commands.DeleteCommand(),
+    new commands.ListCommand(),
+    new commands.PruneCommand(),
+
+    new commands.PresetCommand(),
+    new commands.GenerateCommand(),
   ];
 
   return {

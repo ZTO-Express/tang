@@ -1,7 +1,7 @@
 import * as testUtil from '../util';
 import { TangLauncher } from '../../src';
 
-describe('tang/plugin/install：安装插件', () => {
+describe('tang/launch/generate：代码生成', () => {
   const tmpOutputDir = testUtil.resolveTmpDir();
 
   let launcher: TangLauncher;

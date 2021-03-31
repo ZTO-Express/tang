@@ -44,23 +44,28 @@ export const isObject = (fn: any): fn is object =>
   !isNil(fn) && typeof fn === 'object';
 
 // 目标是否为null
-export const isNull = (o: unknown) => getTag(o) === '[object Null]';
+export const isNull = (o: any) => getTag(o) === '[object Null]';
 
 // 目标是否为undefined
-export const isUndefined = (o: unknown) => getTag(o) === '[object Undefined]';
+export const isUndefined = (o: any) => getTag(o) === '[object Undefined]';
 
 // 目标为null or undefined
-export const isNil = (o: unknown) => isNull(o) || isUndefined(o);
+export const isNil = (o: any) => isNull(o) || isUndefined(o);
 
 // 是否为function
-export const isFunction = (fn: any): boolean => typeof fn === 'function';
+export const isFunction = (o: any) => typeof o === 'function';
 
-export const isString = (fn: any): fn is string => typeof fn === 'string';
+// 是否为Promise对象
+export const isPromise = (o: any) => isObject(o) && isFunction((o as any).then);
 
-export const isSymbol = (fn: any): fn is symbol => typeof fn === 'symbol';
+// 是否String
+export const isString = (o: any): o is string => typeof o === 'string';
+
+// 是否Symbol
+export const isSymbol = (o: any): o is symbol => typeof o === 'symbol';
 
 // 目标是否普通对象
-export const isPlainObject = (o: unknown) => {
+export const isPlainObject = (o: any) => {
   if (isObject(o) === false) return false;
 
   // If has modified constructor

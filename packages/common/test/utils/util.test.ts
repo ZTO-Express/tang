@@ -7,6 +7,7 @@ import {
   deepMerge2,
   get,
   set,
+  pick,
 } from '../../src/utils';
 
 describe('utils/util：通用实用方法', () => {
@@ -249,5 +250,35 @@ describe('utils/util：通用实用方法', () => {
     );
 
     expect(get(set(data1, 'a.b', undefined), 'a.b')).toBeUndefined();
+  });
+
+  it('pick', () => {
+    expect(
+      pick(
+        {
+          name: 'David',
+          first: 1,
+          second: 2,
+        },
+        'first',
+        'second',
+      ),
+    ).toEqual({
+      first: 1,
+      second: 2,
+    });
+
+    expect(
+      pick(
+        {
+          name: 'David',
+          first: 1,
+        },
+        'first',
+        'second',
+      ),
+    ).toEqual({
+      first: 1,
+    });
   });
 });

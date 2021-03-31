@@ -8,7 +8,7 @@ export class InfoCommand implements CliCommand {
     return program
       .command('info')
       .alias('i')
-      .description('Display Tang details.')
+      .description('显示Tang详情')
       .action(this.actionFn);
   }
 }

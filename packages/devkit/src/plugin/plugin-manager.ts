@@ -7,11 +7,11 @@ import {
   InvalidPluginError,
   InvalidArguments,
   TangPreset,
+  utils,
 } from '@devs-tang/common';
 import { fs, uuid } from '../utils';
 import { TANG_PLUGIN_DIR } from '../consts';
 import { Runner, RunnerFactory } from '../runners';
-import { utils } from '..';
 
 // 配置选项
 export interface PluginManagerOptions extends GenericConfigObject {
@@ -120,7 +120,7 @@ export class PluginManager {
 
   /**
    * 获取已存在预设
-   * @param name 为空返回当前已加载预设
+   * @param name 为空返回当前使用插件
    * @param version 为空模版返回最大版本
    * @returns
    */
@@ -226,6 +226,46 @@ export class PluginManager {
       throw new InvalidPluginError(`无效插件方法${name}.${action}`);
 
     return fn.apply(this, args);
+  }
+
+  /**
+   * 获取插件预设
+   * @param pluginName 插件名称
+   * @param presetName 预设名称
+   * @returns
+   */
+  async getPreset(
+    pluginName: string,
+    presetName?: string,
+  ): Promise<TangPreset> {
+    const plugin = await this.get(pluginName);
+
+    if (!plugin) throw new NotFoundError(`未找到插件${pluginName}`);
+
+    let rawPreset: any;
+
+    if (presetName) {
+      rawPreset =
+        plugin.presets &&
+        plugin.presets.find((it: any) => it.name === presetName);
+    } else {
+      rawPreset = plugin.preset
+        ? plugin.preset
+        : plugin.presets && plugin.presets[0];
+    }
+
+    if (!rawPreset) return undefined;
+
+    let presetOptions = {};
+    if (utils.isFunction(rawPreset.options)) {
+      presetOptions = rawPreset.options.call();
+    } else {
+      presetOptions = rawPreset.options || {};
+    }
+
+    const preset = { name: rawPreset.name, ...presetOptions };
+
+    return preset;
   }
 
   /**
@@ -468,7 +508,7 @@ module.exports = require('${moduleName}');
 
   /** 插件临时文件 */
   getPluginTmpPath(...args: string[]) {
-    return path.join(this.pluginDir, '.tmp', ...args);
+    return path.join(this.pluginDir, '_tmp', ...args);
   }
 
   /**

@@ -37,7 +37,7 @@ export class ConfigManager {
   }
 
   // 获取配置信息
-  get<T>(path: string): T {
+  get<T = any>(path: string): T {
     if (path === '.') {
       return this.config as T;
     }

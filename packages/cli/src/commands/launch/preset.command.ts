@@ -4,7 +4,7 @@ export class PresetCommand implements CliCommand {
   config() {
     return {
       name: 'preset',
-      args: '<name>',
+      args: '[name]',
       description: '插件预设相关操作',
       argsDescription: {
         name: '插件预设名称 <pluginName>[@version]:presetName',
@@ -14,18 +14,18 @@ export class PresetCommand implements CliCommand {
           name: 'list',
           args: '[prefix]',
           aliases: ['l', 'ls'],
-          description: '列出所有插件',
+          description: '列出所有插件预设',
           argsDescription: {
             prefix: '列出的插件前缀',
           },
         },
         {
           name: 'info',
-          args: '<name>',
+          args: '[name]',
           aliases: ['i'],
-          description: '查看插件名称',
+          description: '查看插件预设名称',
           argsDescription: {
-            prefix: '插件名称',
+            name: '插件预设名称 <pluginName>[@version]:presetName',
           },
         },
         {

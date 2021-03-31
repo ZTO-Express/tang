@@ -1,12 +1,13 @@
+import { GenericConfigObject } from '@devs-tang/common';
 import * as devkit from '@devs-tang/devkit';
 import { CliAction } from '../../common';
 
 export class ConfigAction extends CliAction {
   // 主命令
-  async main(key: string, value: string) {
+  async main(key: string, value: string, options: GenericConfigObject) {
     if (!value) {
       // key, value未设置，则列出所有配置或特定配置
-      return this.get(key);
+      return this.get(key, options);
     } else if (key) {
       // key, value都设置，设置指定配置
       return this.set(key, value);
@@ -14,11 +15,13 @@ export class ConfigAction extends CliAction {
   }
 
   // 列出所有或特定配置，以json格式展示
-  async get(key: string, format = 'yaml') {
+  async get(key: string, options: GenericConfigObject = {}) {
     const result = await this.getConfig(key);
-    if (!result) return;
+    if (!result) return result;
 
     let text = '';
+
+    const format = options.format;
 
     if (format === 'json') {
       text = JSON.stringify(result, undefined, 2);

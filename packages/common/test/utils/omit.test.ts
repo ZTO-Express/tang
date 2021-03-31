@@ -1,6 +1,4 @@
-import { toKey } from '../../src/utils/internal';
 import { omit } from '../../src/utils';
-import { symbol, numberProto, stringProto } from '../util';
 
 describe('utils/util：omit方法', () => {
   it('should omit a key from the object', () => {

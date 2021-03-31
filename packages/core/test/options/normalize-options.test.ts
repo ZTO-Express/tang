@@ -1,20 +1,36 @@
-import { TangLoader } from '@devs-tang/common/lib';
-import { getNormalizedOptions, mergeProcessors } from '../../src';
+import {
+  getNormalizedOptions,
+  mergeProcessors,
+  normalizePresetOptions,
+  normalizeProcessor,
+  getPresetConfig,
+} from '../../src';
+import { TANG_CORE_PLUGIN_NAME } from '../../src/consts';
 
 describe('options/normalizeOptions：规范化配置', () => {
-  const testLoader = { type: 'loader', name: 'local', isTest: true };
-  const testParser = { type: 'parser', name: 'yaml', isTest: true };
-  const testParser2 = { type: 'parser', name: 'json', isTest: true };
-  const testGenerator = { type: 'generator', name: 'json', isTest: true };
-  const testOutputer = { type: 'outputer', name: 'memory', isTest: true };
+  const testLoader: any = {
+    type: 'loader',
+    name: 'local',
+    isTest: true,
+    loadOptions: { testStr: 'test' },
+  };
+  const testParser: any = {
+    type: 'parser',
+    name: 'yaml',
+    pluginName: 'test',
+    isTest: true,
+  };
+  const testParser2: any = { type: 'parser', name: 'json', isTest: true };
+  const testGenerator: any = { type: 'generator', name: 'json', isTest: true };
+  const testOutputer: any = { type: 'outputer', name: 'memory', isTest: true };
 
   it('获取规范化选项 多次为不同对象，但值相同', () => {
     const options1 = getNormalizedOptions(undefined);
 
-    expect(options1.loaders.length).toBe(2);
+    expect(options1.loaders.length).toBe(1);
     expect(options1.parsers.length).toBe(1);
     expect(options1.generators.length).toBe(1);
-    expect(options1.outputers.length).toBe(0);
+    expect(options1.outputers.length).toBe(1);
 
     const options2 = getNormalizedOptions({});
     expect(options1).not.toBe(options2);
@@ -25,7 +41,6 @@ describe('options/normalizeOptions：规范化配置', () => {
   });
 
   it('获取规范化选项 默认值验证', () => {
-    debugger;
     const options1 = getNormalizedOptions({
       defaultLoader: testLoader,
       loaders: [testLoader],
@@ -34,7 +49,9 @@ describe('options/normalizeOptions：规范化配置', () => {
       exProp: { isTestExProp: true },
     });
 
-    expect(options1.loaders.length).toBe(3);
+    expect(options1.loaders.length).toBe(2);
+    expect(options1.loaders[0].pluginName).toBeUndefined();
+    expect(options1.loaders[1].pluginName).toBe(TANG_CORE_PLUGIN_NAME);
     expect(options1.parsers.length).toBe(2);
 
     expect(JSON.stringify(options1.defaultLoader)).toBe(
@@ -43,6 +60,53 @@ describe('options/normalizeOptions：规范化配置', () => {
 
     expect(options1.loadOptions).toEqual({ isTest: true });
     expect(options1.exProp).toEqual({ isTestExProp: true });
+  });
+
+  it('获取规范化预设选项 normalizePresetOptions', () => {
+    const options1 = normalizePresetOptions(
+      {
+        defaultLoader: testLoader,
+        loaders: [testLoader],
+        parsers: [testParser, testParser2],
+      },
+      {
+        pluginName: 'test',
+      },
+    );
+
+    const loader0 = options1.loaders[0];
+    const parser0 = options1.parsers[0];
+
+    expect((options1.defaultLoader as any).pluginName).toBe('test');
+
+    expect(loader0.pluginName).toBe('test');
+    expect(loader0.code).toBe(
+      `${loader0.pluginName}:${loader0.type}:${loader0.name}`,
+    );
+
+    expect(parser0.pluginName).toBe('test');
+    expect(parser0.code).toBe(
+      `${parser0.pluginName}:${parser0.type}:${parser0.name}`,
+    );
+
+    expect(normalizePresetOptions(undefined)).toBe(undefined);
+  });
+
+  it('获取规范化预设选项 normalizePresetOptions', () => {
+    expect(normalizeProcessor(undefined)).toBe(undefined);
+    expect(normalizeProcessor({} as any)).toEqual({});
+
+    expect(
+      normalizeProcessor(
+        { type: 'loader', name: 'test', pluginName: 'test', code: 'xxx' },
+        { pluginName: 'dev' },
+      ),
+    ).toEqual({
+      type: 'loader',
+      name: 'test',
+      pluginName: 'test',
+      code: `xxx`,
+    });
   });
 
   it('合并处理器 mergeProcessors', () => {
@@ -85,5 +149,35 @@ describe('options/normalizeOptions：规范化配置', () => {
     );
 
     expect(results2.loaders[0]).toBe(testLoader);
+  });
+
+  it('getPresetConfig', () => {
+    expect(getPresetConfig(undefined)).toBe(undefined);
+    expect(
+      getPresetConfig({
+        name: 'test',
+        defaultLoader: 'test',
+        loaders: [testLoader],
+        parsers: [testParser],
+      }),
+    ).toMatchObject({
+      name: 'test',
+      defaultLoader: { name: 'test' },
+      loaders: [
+        {
+          loadOptions: { testStr: 'test' },
+          name: testLoader.name,
+          type: testLoader.type,
+        },
+      ],
+      parsers: [
+        {
+          code: `${testParser.pluginName}:${testParser.type}:${testParser.name}`,
+          name: testParser.name,
+          pluginName: testParser.pluginName,
+          type: testParser.type,
+        },
+      ],
+    });
   });
 });
