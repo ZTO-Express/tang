@@ -1,6 +1,7 @@
 import { GenericConfigObject } from '@devs-tang/common';
 import * as devkit from '@devs-tang/devkit';
 import { CliAction } from '../../common';
+import { printData } from '../../utils';
 
 export class ConfigAction extends CliAction {
   // 主命令
@@ -19,17 +20,7 @@ export class ConfigAction extends CliAction {
     const result = await this.getConfig(key);
     if (!result) return result;
 
-    let text = '';
-
-    const format = options.format;
-
-    if (format === 'json') {
-      text = JSON.stringify(result, undefined, 2);
-    } else {
-      text = devkit.yaml.dump(result);
-    }
-
-    console.info(text);
+    printData(result, options);
 
     return result;
   }

@@ -1,4 +1,4 @@
-import { GenericConfigObject, TangPlugin } from '@devs-tang/common';
+import { GenericConfigObject } from '@devs-tang/common';
 import * as devkit from '@devs-tang/devkit';
 import { CliAction } from '../../common';
 
@@ -12,13 +12,7 @@ export class PluginAction extends CliAction {
   async info(name?: string) {
     const launcher = await this.getLauncher();
 
-    let plugin: TangPlugin;
-
-    if (name) {
-      plugin = await launcher.pluginManager.get(name);
-    } else {
-      plugin = await launcher.presetManager.getUsedPlugin();
-    }
+    const plugin = await launcher.getPlugin(name);
 
     if (!plugin) {
       console.log(name ? `未安装插件“${name}”` : '当前未使用任何插件');
@@ -26,9 +20,9 @@ export class PluginAction extends CliAction {
     }
 
     // 输出插件信息
-    console.log('插件信息');
+    console.log('插件信息：');
     console.log(`${plugin.name}@${plugin.version}`);
-    console.log(`${plugin.description}`);
+    console.log(`${plugin.description || ''}`);
 
     return plugin;
   }

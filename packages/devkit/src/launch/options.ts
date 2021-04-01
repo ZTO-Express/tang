@@ -10,22 +10,6 @@ import { TANG_DEVKIT_PLUGIN_NAME } from '../consts';
 import * as processors from '../processors';
 
 /**
- * 获取默认预设选项
- * @param config
- * @returns
- */
-export function getDefaultPreset(options?: NormalizedTangOptions) {
-  const opts = mergePresetAndOptions(
-    {
-      name: 'tang',
-    },
-    options,
-  );
-
-  return opts;
-}
-
-/**
  * 对传入的选项进行规范化
  * @param config
  */

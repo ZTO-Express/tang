@@ -22,7 +22,11 @@ import {
   ParserError,
 } from '@devs-tang/common';
 
-import { CompilerOptions, ProcessorGetOptions } from './compiler.interfaces';
+import {
+  CompilerInspectOptions,
+  CompilerOptions,
+  ProcessorGetOptions,
+} from './compiler.interfaces';
 import { Compilation } from './compilation';
 
 /**
@@ -195,12 +199,7 @@ export class Compiler implements TangCompiler {
    * @param options
    * @returns
    */
-  async inspect(
-    entry: string,
-    options: TangCompilerLoadOptions & TangCompilerGenerateOptions = {},
-  ) {
-    options.entry = entry;
-
+  async inspect(options: CompilerInspectOptions) {
     const loader = this.getLoader(options);
     const parser = this.getParser(options);
     const generator = this.getGenerator(options);
@@ -334,8 +333,12 @@ export class Compiler implements TangCompiler {
     let processor: any;
 
     if (typeof processorOptions === 'string') {
-      // 如果有名字，则直接通过名字查找processor，并不进行test验证
-      processor = utils.findBy<T>(processors, 'name', processorOptions);
+      // 如果有名字，则直接通过code或名字查找processor，并不进行test验证
+      processor = utils.findBy<T>(processors, 'code', processorOptions);
+
+      if (!processor) {
+        processor = utils.findBy<T>(processors, 'name', processorOptions);
+      }
     } else if (typeof processorOptions[processMethodName] === 'function') {
       // 如果选项中存在process方法，则此选项本身就是处理器
       processor = processorOptions as T;

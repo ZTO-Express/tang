@@ -29,43 +29,36 @@ export class PresetCommand implements CliCommand {
           },
         },
         {
-          name: 'install',
-          args: '<package>',
-          description: '安装插件',
+          name: 'use',
+          args: '[name]',
+          description: '应用指定的插件或预设',
           argsDescription: {
-            package: '插件包名或路径(类似npm install)',
+            name: '插件或预设名称，如(openapi, openapi:default)',
           },
           options: [
             {
-              flags: '-f --force',
-              description: '强制安装',
-              defaultValue: false,
+              flags: '-opts --options <options>',
+              description: '插件预设配置信息',
             },
             {
-              flags: '-r --repository <repository>',
-              description: '插件仓库',
-            },
-            {
-              flags: '-t --type <type>',
-              description: '安装方式',
-              choices: ['npm', 'npm_link'],
-              defaultValue: 'npm',
+              flags: '-od --outputDir <outputDir>',
+              description: '输出文件夹',
             },
           ],
         },
         {
-          name: 'delete',
-          args: '<name>',
-          description: '删除指定插件',
-        },
-        {
-          name: 'run',
-          args: '<name> <action>',
-          description: '运行插件方法',
+          name: 'options',
+          args: '[key] [value]',
+          aliases: ['opt'],
+          description: '配置预设处理器选项',
+          argsDescription: {
+            key: '选项路径',
+            value: '选项值',
+          },
           options: [
             {
-              flags: '--args [args...]',
-              description: '执行参数',
+              flags: '--unset',
+              description: '取消指定的设置',
             },
           ],
         },

@@ -3,41 +3,20 @@
  * 每次命令执行用于构建运行环境
  */
 
-import * as path from 'path';
+import { TangCompilerLoadOptions, utils } from '@devs-tang/common';
 
 import {
-  GenericConfigObject,
-  NotImplementedError,
-  SpecialObject,
-  TangCompilerGenerateOptions,
-  TangCompilerLoadOptions,
-} from '@devs-tang/common';
-
-import { createCompiler, NormalizedTangOptions } from '@devs-tang/core';
+  createCompiler,
+  CompilerInspectOptions,
+  CompilerProcessOptions,
+  getPresetProcessorConfigData,
+} from '@devs-tang/core';
 
 import { fs } from '../utils';
 import { ConfigManager } from '../config';
 import { PluginManager } from '../plugin';
 
-import { getNormalizedOptions, mergePresetOptions } from './options';
-import { PresetManager } from './preset-manager';
-
-export interface PresetConfigData {
-  name: string;
-  use?: boolean;
-  plugin?: string;
-  options?: GenericConfigObject;
-}
-
-export interface LaunchPresetConfig extends SpecialObject {
-  plugin?: string;
-  preset?: string;
-}
-
-/** 加载session */
-export interface LaunchConfig {
-  preset?: LaunchPresetConfig;
-}
+import { PresetManager, PresetWithConfigData } from './preset-manager';
 
 export class TangLauncher {
   readonly configManager: ConfigManager;
@@ -88,11 +67,59 @@ export class TangLauncher {
     presetName?: string,
     options?: TangCompilerLoadOptions,
   ) {
-    const opts = await this.getPresetOptions(presetName, options);
+    const opts = await this.getPresetWithConfigOptions(presetName, options);
 
-    const compiler = await createCompiler(opts);
-    const compilation = await compiler.load(entry, options);
+    if (!opts) return undefined;
+
+    const compiler = await createCompiler(opts.preset);
+    const compilation = await compiler.load(entry, opts.options);
     return compilation;
+  }
+
+  /**
+   * 生成文档
+   * @param entry 文档入口
+   * @param presetName 预设名称
+   * @returns
+   */
+  async generate(
+    entry: string,
+    presetName?: string,
+    options?: CompilerProcessOptions,
+  ) {
+    const opts = await this.getPresetWithConfigOptions(presetName, options);
+
+    if (!opts) return undefined;
+
+    const compiler = await createCompiler(opts.preset);
+
+    const compilation = await compiler.load(entry, opts.options);
+
+    const output = await compiler.generate(compilation.document, opts.options);
+    return output;
+  }
+
+  /**
+   * 获取编译器完整选项
+   */
+  async inspect(presetName: string, options: CompilerInspectOptions) {
+    const opts = await this.getPresetWithConfigOptions(presetName);
+
+    const compiler = await createCompiler(opts.preset);
+
+    const processors: any = await compiler.inspect(options);
+
+    const inspectData: any = {
+      name: opts.name,
+      use: opts.use,
+      processOptions: opts.options,
+    };
+
+    Object.keys(processors).forEach(key => {
+      inspectData[key] = getPresetProcessorConfigData(processors[key]);
+    });
+
+    return inspectData;
   }
 
   /** 删除插件 */
@@ -110,72 +137,46 @@ export class TangLauncher {
     return plugin;
   }
 
-  /**
-   * 获取当前预设
-   * @param name
-   */
-  async getPreset(presetName?: string) {
-    const nameInfo = this.presetManager.parseName(presetName);
-    if (!nameInfo) return undefined;
+  /** 获取正在使用的插件 */
+  async getPlugin(name?: string) {
+    let pluginName = name;
 
-    const preset = await this.pluginManager.getPreset(
-      nameInfo.plugin,
-      nameInfo.name,
-    );
-    return preset;
-  }
+    if (!pluginName) {
+      pluginName = this.presetManager.getUsedPluginName();
+    }
 
-  /**
-   * 获取预设所属插件
-   * @param name
-   */
-  async getPresetPlugin(presetName?: string) {
-    const nameInfo = this.presetManager.parseName(presetName);
-    if (!nameInfo || !nameInfo.plugin) return undefined;
-
-    const plugin = await this.pluginManager.get(nameInfo.plugin);
+    const plugin = await this.pluginManager.get(pluginName);
     return plugin;
   }
 
   /**
-   * 生成文档
-   * @param entry 文档入口
+   * 获取生成完整选项
    * @param presetName 预设名称
+   * @param options 编译处理选项
    * @returns
    */
-  async generate(
-    entry: string,
-    presetName?: string,
-    options?: TangCompilerLoadOptions & TangCompilerGenerateOptions,
+  async getPresetWithConfigOptions(
+    presetName: string,
+    options?: CompilerProcessOptions,
   ) {
-    const opts = await this.getPresetOptions(presetName, options);
-
-    const compiler = await createCompiler(opts);
-    const compilation = await compiler.load(entry);
-    const output = await compiler.generate(compilation.document, opts as any);
-    return output;
-  }
-
-  /** 获取生成完整选项 */
-  async getPresetOptions(presetName?: string, options?: NormalizedTangOptions) {
-    let presetConfig: any;
+    let presetWithConfig: PresetWithConfigData;
 
     if (!presetName) {
-      presetConfig = this.presetManager.getUsedConfig();
+      presetWithConfig = await this.presetManager.getUsedPresetWithConfig();
     } else {
-      presetConfig = this.presetManager.getConfigByName(presetName);
+      presetWithConfig = await this.presetManager.getPresetWithConfigByName(
+        presetName,
+      );
     }
 
-    let opts = mergePresetOptions(presetConfig, options);
+    if (!presetWithConfig) return undefined;
 
-    opts = getNormalizedOptions(opts);
+    presetWithConfig.options = utils.deepMerge(
+      presetWithConfig.options,
+      options,
+    ) as CompilerProcessOptions;
 
-    return opts;
-  }
-
-  /** 获取编译器完整选项 */
-  async inspect(presetName?: string, options?: GenericConfigObject) {
-    throw new NotImplementedError();
+    return presetWithConfig;
   }
 
   /**

@@ -3,7 +3,7 @@ import {
   mergeProcessors,
   normalizePresetOptions,
   normalizeProcessor,
-  getPresetConfig,
+  getPresetConfigData,
 } from '../../src';
 import { TANG_CORE_PLUGIN_NAME } from '../../src/consts';
 
@@ -151,10 +151,20 @@ describe('options/normalizeOptions：规范化配置', () => {
     expect(results2.loaders[0]).toBe(testLoader);
   });
 
-  it('getPresetConfig', () => {
-    expect(getPresetConfig(undefined)).toBe(undefined);
+  it('getPresetConfigData', () => {
+    expect(getPresetConfigData(undefined)).toBe(undefined);
+
     expect(
-      getPresetConfig({
+      getPresetConfigData({
+        name: 'test',
+        defaultLoader: undefined,
+      }),
+    ).toEqual({
+      name: 'test',
+    });
+
+    expect(
+      getPresetConfigData({
         name: 'test',
         defaultLoader: 'test',
         loaders: [testLoader],

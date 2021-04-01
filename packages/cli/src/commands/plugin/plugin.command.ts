@@ -21,7 +21,7 @@ export class PluginCommand implements CliCommand {
         },
         {
           name: 'info',
-          args: '<name>',
+          args: '[name]',
           aliases: ['i'],
           description: '查看插件名称',
           argsDescription: {

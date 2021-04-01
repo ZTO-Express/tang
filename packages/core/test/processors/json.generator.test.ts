@@ -18,8 +18,6 @@ describe('generator/json：json生成器', () => {
     docCompilation = await compiler.load(tfDocPath, {
       parser: 'yaml',
     });
-
-    debugger;
   });
 
   it('jsonGenerator generate方法', async () => {

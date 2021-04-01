@@ -1,19 +1,19 @@
-const hooks = require('../hooks')
-const processors = require('../processors')
+import * as hooks from '../hooks';
+import * as processors from '../processors';
 
-module.exports = {
+export const orderPreset = {
   name: 'order', // 预设名称
   title: '顺序预设', // 标题
   description: '此预设用于tang-test测试，处理器有顺序要求', // 描述
 
-  get () {
+  get() {
     return {
       loaders: [],
       parsers: [],
       generators: [],
       outputers: [],
       processors,
-      hooks
-    }
-  }
+      hooks,
+    } as any;
+  },
 };

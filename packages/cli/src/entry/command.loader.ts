@@ -1,3 +1,4 @@
+import { utils } from '@devs-tang/common';
 import * as chalk from 'chalk';
 import * as commander from 'commander';
 import {
@@ -120,13 +121,20 @@ export class CommandLoader {
 
     // 如果此命令没有action则直接忽略
     if (actionFn) {
-      if (!baseAction) {
-        cmd.action(actionFn);
-      } else {
-        cmd.action((...args: any[]) => {
-          return actionFn?.call(baseAction, ...args, cmd);
-        });
-      }
+      cmd.action(async (...args: any[]) => {
+        const actionFnAny = actionFn as any;
+
+        try {
+          const result = await Promise.resolve().then(() => {
+            return actionFnAny.call(baseAction || undefined, ...args, cmd);
+          });
+          return result;
+        } catch (err) {
+          console.log(chalk.red(err.message));
+
+          throw err;
+        }
+      });
     }
 
     // 如果此配置有父命令则直接返回（不支持2级以上命令）

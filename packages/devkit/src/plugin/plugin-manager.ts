@@ -9,6 +9,8 @@ import {
   TangPreset,
   utils,
 } from '@devs-tang/common';
+import { normalizePresetOptions } from '@devs-tang/core';
+
 import { fs, uuid } from '../utils';
 import { TANG_PLUGIN_DIR } from '../consts';
 import { Runner, RunnerFactory } from '../runners';
@@ -124,7 +126,7 @@ export class PluginManager {
    * @param version 为空模版返回最大版本
    * @returns
    */
-  async get(name?: string, version?: string): Promise<TangPlugin> {
+  async get(name: string, version?: string): Promise<TangPlugin> {
     if (!name) return undefined;
 
     const fullPluginName = await this.findExistsPluginName(name, version);
@@ -240,7 +242,7 @@ export class PluginManager {
   ): Promise<TangPreset> {
     const plugin = await this.get(pluginName);
 
-    if (!plugin) throw new NotFoundError(`未找到插件${pluginName}`);
+    if (!plugin) return undefined;
 
     let rawPreset: any;
 
@@ -263,7 +265,17 @@ export class PluginManager {
       presetOptions = rawPreset.options || {};
     }
 
-    const preset = { name: rawPreset.name, ...presetOptions };
+    const pluginFullName = this.getPluginFullName(plugin);
+
+    const preset = normalizePresetOptions(
+      {
+        name: rawPreset.name,
+        ...presetOptions,
+      },
+      {
+        pluginName: pluginFullName,
+      },
+    ) as TangPreset;
 
     return preset;
   }
@@ -422,8 +434,15 @@ module.exports = require('${moduleName}');
       const plugin = require(pluginPath);
 
       pluginData = plugin;
-      if (typeof plugin === 'function') {
+
+      if (utils.isFunction(plugin)) {
         pluginData = await Promise.resolve().then(() => plugin.call(this));
+      } else if (utils.isFunction(plugin.metadata)) {
+        pluginData = await Promise.resolve().then(() =>
+          plugin.metadata.call(this),
+        );
+      } else if (utils.isObject(plugin.metadata)) {
+        pluginData = plugin.metadata;
       }
     } catch (ex) {
       if (ex.code === 'MODULE_NOT_FOUND') {

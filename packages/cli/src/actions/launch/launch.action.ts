@@ -1,5 +1,6 @@
 import { GenericConfigObject, utils } from '@devs-tang/common';
 import { CliAction } from '../../common';
+import { printData } from '../../utils';
 import { PluginAction } from '../plugin';
 import { PresetAction } from './preset.action';
 
@@ -22,7 +23,7 @@ export class LaunchAction extends CliAction {
   }
 
   /** 安装插件 */
-  async install(name: string, options?: GenericConfigObject) {
+  async install(name: string, options: GenericConfigObject) {
     const pluginAction = new PluginAction();
 
     return pluginAction.install(name, options);

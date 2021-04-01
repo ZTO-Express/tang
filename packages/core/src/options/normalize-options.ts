@@ -4,16 +4,17 @@ import {
   TangProcessorTypeNames,
   TangProcessorsTypeKeys,
   TangPresetOptions,
-  utils,
-  GenericConfigObject,
   TangPreset,
+  utils,
 } from '@devs-tang/common';
 
 import { TANG_CORE_PLUGIN_NAME } from '../consts';
 import { CompilerOptions } from '../compiler';
 import * as processors from '../processors';
 
-export type NormalizedTangOptions = CompilerOptions;
+export interface NormalizedTangOptions extends CompilerOptions {
+  [prop: string]: any;
+}
 
 export interface NormalizeOptions {
   pluginName?: string;
@@ -49,7 +50,7 @@ export function getNormalizedOptions(options?: NormalizedTangOptions) {
  * @returns
  */
 export function normalizePresetOptions(
-  presetOptions: TangPresetOptions,
+  presetOptions: NormalizedTangOptions,
   options: NormalizeOptions = {},
 ) {
   if (!presetOptions) return presetOptions;
@@ -153,8 +154,8 @@ export function mergeProcessors(
  * @param preset
  * @returns
  */
-export function getPresetConfig(preset: TangPreset) {
-  const _config = getPresetOptionsConfig(preset);
+export function getPresetConfigData(preset: TangPreset) {
+  const _config = getPresetOptionsConfigData(preset);
 
   if (!_config) return undefined;
 
@@ -176,24 +177,26 @@ export function getPresetConfig(preset: TangPreset) {
  * @param presetOptions
  * @returns
  */
-export function getPresetOptionsConfig(presetOptions: TangPresetOptions) {
+export function getPresetOptionsConfigData(presetOptions: TangPresetOptions) {
   if (!presetOptions) return undefined;
 
   const config = utils.omit(
     {
-      defaultLoader: getPresetProcessorConfig(presetOptions.defaultLoader),
-      loaders: getPresetProcessorsConfigs(presetOptions.loaders),
+      defaultLoader: getPresetProcessorConfigData(presetOptions.defaultLoader),
+      loaders: getPresetProcessorsConfigsData(presetOptions.loaders),
 
-      defaultParser: getPresetProcessorConfig(presetOptions.defaultParser),
-      parsers: getPresetProcessorsConfigs(presetOptions.parsers),
+      defaultParser: getPresetProcessorConfigData(presetOptions.defaultParser),
+      parsers: getPresetProcessorsConfigsData(presetOptions.parsers),
 
-      defaultGenerator: getPresetProcessorConfig(
+      defaultGenerator: getPresetProcessorConfigData(
         presetOptions.defaultGenerator,
       ),
-      generators: getPresetProcessorsConfigs(presetOptions.generators),
+      generators: getPresetProcessorsConfigsData(presetOptions.generators),
 
-      defaultOutputer: getPresetProcessorConfig(presetOptions.defaultOutputer),
-      outputers: getPresetProcessorsConfigs(presetOptions.outputers),
+      defaultOutputer: getPresetProcessorConfigData(
+        presetOptions.defaultOutputer,
+      ),
+      outputers: getPresetProcessorsConfigsData(presetOptions.outputers),
     },
     it => !utils.isNil(it),
   );
@@ -206,8 +209,10 @@ export function getPresetOptionsConfig(presetOptions: TangPresetOptions) {
  * @param processors 获取多个处理器配置
  * @returns
  */
-export function getPresetProcessorsConfigs(processors: TangProcessor[]) {
-  const configs = (processors || []).map(it => getPresetProcessorConfig(it));
+export function getPresetProcessorsConfigsData(processors: TangProcessor[]) {
+  if (!processors || !processors.length) return undefined;
+
+  const configs = processors.map(it => getPresetProcessorConfigData(it));
   return configs;
 }
 
@@ -216,7 +221,9 @@ export function getPresetProcessorsConfigs(processors: TangProcessor[]) {
  * @param processor
  * @returns
  */
-export function getPresetProcessorConfig(processor: TangProcessor | string) {
+export function getPresetProcessorConfigData(
+  processor: TangProcessor | string,
+) {
   let config: any = undefined;
 
   if (typeof processor === 'string') {

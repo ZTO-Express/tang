@@ -1,5 +1,4 @@
 import * as testUtil from '../util';
-import { ErrorCodes } from '@devs-tang/common';
 
 import { Compiler } from '../../src';
 import * as processors from '../../src/processors';
@@ -31,7 +30,8 @@ describe('compiler/insepct：测试服务器生成时完整配置', () => {
   });
 
   it('inspect 1', async () => {
-    const config = await compiler1.inspect(tfDocPath, {
+    const config = await compiler1.inspect({
+      entry: tfDocPath,
       parser: 'yaml',
       outputOptions: {
         outputDir: 'test',
@@ -47,9 +47,14 @@ describe('compiler/insepct：测试服务器生成时完整配置', () => {
     });
   });
 
-  it('inspect 2', async () => {
-    const config = await compiler2.inspect(tfDocPath);
+  it('inspect 3', async () => {
+    const inspectData = await compiler2.inspect({
+      entry: tfDocPath,
+      loader: 'nonExists',
+      generator: 'core:generator:json',
+    });
 
-    expect(config.parser).toStrictEqual(yamlParser);
+    expect(inspectData.loader).toBeUndefined();
+    expect(inspectData.generator.code).toBe('core:generator:json');
   });
 });

@@ -1,11 +1,7 @@
 {
   "name": "@devs-tang/openapi",
   "version": "1.0.1-alpha.0",
-  "description": "tang openapi内置插件",
-  "author": {
-    "name": "rayl",
-    "email": "rayl@pisaas.com"
-  },
+  "description": "tang openapi相关插件",
   "main": "lib/",
   "types": "lib/",
   "files": [
