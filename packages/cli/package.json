@@ -1,6 +1,6 @@
 {
   "name": "@devs-tang/cli",
-  "version": "1.0.1-alpha.0",
+  "version": "1.0.1",
   "description": "Tang命令行",
   "main": "index.js",
   "bin": {
@@ -18,9 +18,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@devs-tang/common": "^1.0.1-alpha.0",
-    "@devs-tang/core": "^1.0.1-alpha.0",
-    "@devs-tang/devkit": "^1.0.1-alpha.0",
+    "@devs-tang/common": "^1.0.1",
+    "@devs-tang/core": "^1.0.1",
+    "@devs-tang/devkit": "^1.0.1",
     "chalk": "^4.1.0",
     "cli-table3": "^0.6.0",
     "commander": "^7.1.0",

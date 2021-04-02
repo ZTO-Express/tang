@@ -1,6 +1,6 @@
 {
   "name": "@devs-tang/openapi",
-  "version": "1.0.1-alpha.0",
+  "version": "1.0.1",
   "description": "tang openapi相关插件",
   "main": "lib/",
   "types": "lib/",
@@ -19,7 +19,6 @@
     "build": "../../node_modules/.bin/rimraf -rf lib/ && ../../node_modules/.bin/tsc --project tsconfig.build.json",
     "test": "jest --coverage --runInBand"
   },
-  "dependencies": {},
   "engines": {
     "node": ">= 10"
   },
