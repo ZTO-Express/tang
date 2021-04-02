@@ -24,24 +24,14 @@ export class PresetAction extends CliAction {
 
       console.log(noExistsMsg);
 
-      return;
+      return undefined;
     }
 
-    const preset = presetWithConfig.preset;
-
-    const presetConfigData = getPresetConfigData(preset);
-
-    const presetInfo = {
-      name: presetWithConfig.name,
-      use: presetWithConfig.use,
-      preset: presetConfigData,
-      options: presetWithConfig.options,
-    };
-
     // 输出预设名称
-    console.log(`预设名称：${preset.name}`);
-
+    const presetInfo = this.getPresetWithConfigDataInfo(presetWithConfig);
+    console.log(`预设名称：${presetInfo.name}`);
     printData(presetInfo, options);
+    return presetInfo;
   }
 
   /**
@@ -60,19 +50,21 @@ export class PresetAction extends CliAction {
     }
 
     const launcher = await this.getLauncher();
-    const usedConfig = await launcher.presetManager.use(name, options);
+    const presetWithConfig = await launcher.presetManager.use(name, options);
 
-    if (!usedConfig) {
+    if (!presetWithConfig) {
       const noExistsMsg = name
         ? `没有找到预设 ${name}`
         : '当前没有使用任何预设';
 
       console.log(noExistsMsg);
-
-      return;
+      return undefined;
     }
 
-    printData(usedConfig, options);
+    const presetInfo = this.getPresetWithConfigDataInfo(presetWithConfig);
+    console.log(`正在使用预设：${presetInfo.name}`);
+
+    return presetInfo;
   }
 
   /** 列出当前插件有所预设 */
@@ -145,5 +137,21 @@ export class PresetAction extends CliAction {
     } else {
       printData(usedConfig.options);
     }
+  }
+
+  /** 获取预设及配置的数据（方便打印） */
+  getPresetWithConfigDataInfo(presetWithConfig: devkit.PresetWithConfigData) {
+    const preset = presetWithConfig.preset;
+
+    const presetConfigData = getPresetConfigData(preset);
+
+    const presetInfo = {
+      name: presetWithConfig.name,
+      use: presetWithConfig.use,
+      preset: presetConfigData,
+      options: presetWithConfig.options,
+    };
+
+    return presetInfo;
   }
 }

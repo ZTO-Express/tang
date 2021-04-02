@@ -10,9 +10,13 @@ describe('tang-cli/commands：launch', () => {
     CommandLoader.load(program);
   });
 
-  it('use', async () => {
-    const rawInfoArgs = ['node', 'tang', 'use'];
+  it('install', async () => {
+    const rawInfoArgs = ['node', 'tang', 'install', 'cowsay'];
+    await program.parseAsync(rawInfoArgs);
+  });
 
+  it('use', async () => {
+    const rawInfoArgs = ['node', 'tang', 'use', 'cowsay'];
     await program.parseAsync(rawInfoArgs);
   });
 });

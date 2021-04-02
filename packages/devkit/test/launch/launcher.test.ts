@@ -13,6 +13,16 @@ describe('tang/launcher：启动器', () => {
     launcher.configManager.unset(TANG_CONFIG_KEY_PRESETS);
   });
 
+  it('install', async () => {
+    await launcher.pluginManager.add('cowsay');
+  });
+
+  it('use', async () => {
+    // await launcher.presetManager.use('cowsay');
+
+    await launcher.presetManager.use('tang');
+  });
+
   it('inspect', async () => {
     const inspectData = await launcher.inspect(TANG_CONFIG_KEY_PRESET_DEFAULT, {
       entry: 'test.xxxx',

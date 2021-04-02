@@ -69,7 +69,7 @@ export class PluginManager {
   }
 
   /**
-   * 判断指定的预设是否存在
+   * 判断指定的插件是否存在
    * @param name 预设名称
    * @param version 预设版本
    * @returns true: 存在；false: 不存在

@@ -1,13 +1,9 @@
-import {
-  GenericConfigObject,
-  InvalidArguments,
-  TangPlugin,
-  TangPreset,
-} from '@devs-tang/common';
-import { CompilerProcessOptions, NormalizedTangOptions } from '@devs-tang/core';
+import { InvalidArguments, TangPreset } from '@devs-tang/common';
+import { CompilerProcessOptions } from '@devs-tang/core';
 import {
   TANG_CONFIG_KEY_PRESETS,
   TANG_CONFIG_KEY_PRESET_DEFAULT,
+  TANG_PLUGIN_PRESET_DEFAULT,
 } from '../consts';
 
 import { TangLauncher } from './launcher';
@@ -47,11 +43,14 @@ export class PresetManager {
    * @param options options为undefined时获取指定的预设
    * @returns
    */
-  async use(name?: string, options?: CompilerProcessOptions): Promise<any> {
-    const usedConfig = this.getUsedConfig();
-
+  async use(
+    name?: string,
+    options?: CompilerProcessOptions,
+  ): Promise<PresetWithConfigData> {
     // 若未提供名称，则返回正在使用的配置
-    if (name === undefined) return usedConfig;
+    if (name === undefined) {
+      return this.getUsedPresetWithConfig();
+    }
 
     const normalizedName = this.getNormalizedName(name);
     if (!normalizedName) throw new InvalidArguments(`无效名称 ${name}`);
@@ -64,7 +63,23 @@ export class PresetManager {
 
     // 检查插件是否存在，不存在则执行安装操作
     if (nameInfo.plugin && !this.isDefault(nameInfo.plugin)) {
-      throw new InvalidArguments(`未找到插件 ${nameInfo.plugin}`);
+      const existsPlugin = await this.launcher.pluginManager.exists(
+        nameInfo.plugin,
+      );
+
+      if (!existsPlugin) {
+        throw new InvalidArguments(`未找到插件 ${nameInfo.plugin}`);
+      }
+    }
+
+    let presetWithConfig = await this.getPresetWithConfigByName(nameInfo.name);
+
+    if (!presetWithConfig && nameInfo.plugin) {
+      if (nameInfo.plugin) {
+        throw new InvalidArguments(`插件 ${nameInfo.plugin} 不包含任何预设`);
+      } else {
+        throw new InvalidArguments(`无效预设名称 name`);
+      }
     }
 
     // 设置目标配置
@@ -76,7 +91,9 @@ export class PresetManager {
 
     await this.saveConfig();
 
-    return this.getUsedConfig();
+    presetWithConfig = await this.getUsedPresetWithConfig();
+
+    return presetWithConfig;
   }
 
   /**
@@ -345,7 +362,7 @@ export class PresetManager {
     } else if (parts.length === 1) {
       return {
         plugin: parts[0],
-        name: 'default',
+        name: TANG_PLUGIN_PRESET_DEFAULT,
       };
     }
 

@@ -132,7 +132,9 @@ export class CommandLoader {
         } catch (err) {
           console.log(chalk.red(err.message));
 
-          throw err;
+          if (process.env.NODE_ENV === 'test') {
+            throw err;
+          }
         }
       });
     }
