@@ -4,7 +4,6 @@ import { TangError } from './tang.error';
 /**
  * 插件错误
  */
-
 export class PresetError extends TangError {
   constructor(
     objectOrError?: string | object | any,

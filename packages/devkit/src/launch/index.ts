@@ -1,5 +1,7 @@
 import { TangLauncher } from './launcher';
 
+export * from './interfaces';
+
 export * from './launcher';
 
 export * from './preset-manager';
@@ -9,6 +11,6 @@ export * from './preset-manager';
  * @param force
  * @returns
  */
-export function launcher(force?: boolean) {
+export function getLauncher(force?: boolean) {
   return TangLauncher.getInstance(force);
 }

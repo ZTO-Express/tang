@@ -2,6 +2,7 @@ import { TangGeneration, TangOutput, TangOutputer } from '@devs-tang/common';
 
 import * as path from 'path';
 import { memfs } from '../utils';
+import { normalizeDevkitProcessor } from './util';
 
 const Volume = memfs.Volume;
 
@@ -9,7 +10,7 @@ const Volume = memfs.Volume;
  * 内存文件输出器，一般用于测试或watch的场景
  */
 export const memoryOutputer = (): TangOutputer => {
-  return {
+  return normalizeDevkitProcessor({
     type: 'outputer',
 
     name: 'memory',
@@ -44,5 +45,5 @@ export const memoryOutputer = (): TangOutputer => {
         vol,
       };
     },
-  };
+  });
 };

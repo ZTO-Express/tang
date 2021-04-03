@@ -8,6 +8,7 @@ import {
   get,
   set,
   pick,
+  delay,
 } from '../../src/utils';
 
 describe('utils/util：通用实用方法', () => {
@@ -280,5 +281,27 @@ describe('utils/util：通用实用方法', () => {
     ).toEqual({
       first: 1,
     });
+  });
+
+  it('delay 延时调试', async () => {
+    await delay(() => {
+      console.log('ok');
+    });
+
+    await delay(() => {
+      console.log('ok');
+    }, 10);
+
+    const result = await delay(() => 'test');
+    expect(result).toBe('test');
+
+    const result2 = await delay(() => Promise.resolve('test2'));
+    expect(result2).toBe('test2');
+
+    await expect(() => {
+      return delay(() => {
+        throw new Error('test error');
+      });
+    }).rejects.toThrow('test error');
   });
 });

@@ -5,19 +5,24 @@ import {
   TangProcessorsTypeKeys,
   TangPresetOptions,
   TangPreset,
+  TangPluginProcessor,
+  TangModuleTypes,
+  TangModuleTypeNames,
+  InvalidProcessorError,
   utils,
 } from '@devs-tang/common';
 
-import { TANG_CORE_PLUGIN_NAME } from '../consts';
 import { CompilerOptions } from '../compiler';
 import * as processors from '../processors';
 
-export interface NormalizedTangOptions extends CompilerOptions {
-  [prop: string]: any;
+export type NormalizedTangOptions = CompilerOptions;
+
+export interface PresetNormalizeOptions {
+  moduleType?: TangModuleTypeNames;
+  pluginName?: string;
 }
 
-export interface NormalizeOptions {
-  pluginName?: string;
+export interface ProcessorNormalizeOptions extends PresetNormalizeOptions {
   type?: TangProcessorTypeNames;
 }
 
@@ -34,7 +39,7 @@ export function getNormalizedOptions(options?: NormalizedTangOptions) {
       outputers: [processors.consoleOutputer()],
     },
     {
-      pluginName: TANG_CORE_PLUGIN_NAME,
+      moduleType: TangModuleTypes.core,
     },
   );
 
@@ -51,17 +56,20 @@ export function getNormalizedOptions(options?: NormalizedTangOptions) {
  */
 export function normalizePresetOptions(
   presetOptions: NormalizedTangOptions,
-  options: NormalizeOptions = {},
+  options: PresetNormalizeOptions = {},
 ) {
-  if (!presetOptions) return presetOptions;
+  if (!presetOptions) return undefined;
 
   // 合并处理器选项
   for (const typeKey in TangProcessorTypes) {
     const typeKeysName = typeKey + 's';
     const processors = (presetOptions as any)[typeKeysName] || [];
 
-    processors.forEach((it: TangProcessor) => {
-      normalizeProcessor(it, options);
+    processors.forEach((it: TangPluginProcessor) => {
+      normalizeProcessor(it, {
+        type: typeKey as TangProcessorTypeNames,
+        ...options,
+      });
     });
   }
 
@@ -69,20 +77,36 @@ export function normalizePresetOptions(
 }
 
 export function normalizeProcessor(
-  processor: TangProcessor,
-  options: NormalizeOptions = {},
-) {
-  if (!processor) return processor;
+  processor: TangPluginProcessor,
+  options: ProcessorNormalizeOptions = {},
+): TangProcessor {
+  if (!processor) return undefined;
 
-  if (!processor.pluginName && options.pluginName) {
-    processor.pluginName = options.pluginName;
+  processor.moduleType = processor.moduleType || options.moduleType || 'plugin';
+  processor.type = processor.type || options.type;
+  processor.pluginName = processor.pluginName || options.pluginName;
+
+  // 必须有处理器类型或名称
+  if (!processor.type || !processor.name)
+    throw new InvalidProcessorError('处理器预设必须提供名称和类型');
+
+  // 插件类型必须有插件名称
+  if (processor.moduleType === 'plugin' && !processor.pluginName)
+    throw new InvalidProcessorError('插件处理器必须提供插件名称');
+
+  if (!processor.code) {
+    processor.code = processor.moduleType + ':';
+
+    if (processor.moduleType === 'plugin') {
+      processor.code += processor.pluginName + ':';
+    }
+
+    processor.code += `${processor.type}:${processor.name}`;
   }
 
-  if (!processor.code && processor.pluginName) {
-    processor.code = `${processor.pluginName}:${processor.type}:${processor.name}`;
-  }
+  processor = utils.omitNil(processor);
 
-  return processor;
+  return (processor as any) as TangProcessor;
 }
 
 export function mergeOptions(
@@ -159,15 +183,12 @@ export function getPresetConfigData(preset: TangPreset) {
 
   if (!_config) return undefined;
 
-  const config = utils.omit(
-    {
-      name: preset.name,
-      version: preset.version,
-      description: preset.description,
-      ..._config,
-    },
-    it => !utils.isNil(it),
-  );
+  const config = utils.omitNil({
+    name: preset.name,
+    version: preset.version,
+    description: preset.description,
+    ..._config,
+  });
 
   return config;
 }
@@ -180,26 +201,23 @@ export function getPresetConfigData(preset: TangPreset) {
 export function getPresetOptionsConfigData(presetOptions: TangPresetOptions) {
   if (!presetOptions) return undefined;
 
-  const config = utils.omit(
-    {
-      defaultLoader: getPresetProcessorConfigData(presetOptions.defaultLoader),
-      loaders: getPresetProcessorsConfigsData(presetOptions.loaders),
+  const config = utils.omitNil({
+    defaultLoader: getPresetProcessorConfigData(presetOptions.defaultLoader),
+    loaders: getPresetProcessorsConfigsData(presetOptions.loaders),
 
-      defaultParser: getPresetProcessorConfigData(presetOptions.defaultParser),
-      parsers: getPresetProcessorsConfigsData(presetOptions.parsers),
+    defaultParser: getPresetProcessorConfigData(presetOptions.defaultParser),
+    parsers: getPresetProcessorsConfigsData(presetOptions.parsers),
 
-      defaultGenerator: getPresetProcessorConfigData(
-        presetOptions.defaultGenerator,
-      ),
-      generators: getPresetProcessorsConfigsData(presetOptions.generators),
+    defaultGenerator: getPresetProcessorConfigData(
+      presetOptions.defaultGenerator,
+    ),
+    generators: getPresetProcessorsConfigsData(presetOptions.generators),
 
-      defaultOutputer: getPresetProcessorConfigData(
-        presetOptions.defaultOutputer,
-      ),
-      outputers: getPresetProcessorsConfigsData(presetOptions.outputers),
-    },
-    it => !utils.isNil(it),
-  );
+    defaultOutputer: getPresetProcessorConfigData(
+      presetOptions.defaultOutputer,
+    ),
+    outputers: getPresetProcessorsConfigsData(presetOptions.outputers),
+  });
 
   return config;
 }

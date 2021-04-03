@@ -1,4 +1,5 @@
 import * as testUtil from '../util';
+import { normalizeProcessor } from '@devs-tang/core';
 import * as processors from '../../src';
 
 describe('parser/yaml：yaml解析器', () => {
@@ -12,6 +13,21 @@ describe('parser/yaml：yaml解析器', () => {
     const docPath = testUtil.resolveFixturePath('documents/openapi.yaml');
 
     docText = await docLoader.load<string>(docPath);
+  });
+
+  it('normalize方法', async () => {
+    expect(
+      normalizeProcessor(
+        {
+          name: 'yaml',
+          parse: yamlParser.parse,
+        },
+        {
+          type: 'parser',
+          moduleType: 'devkit',
+        },
+      ),
+    ).toEqual(yamlParser);
   });
 
   it('yamlParser parse方法', async () => {

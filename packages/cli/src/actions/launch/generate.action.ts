@@ -1,5 +1,5 @@
 import { GenericConfigObject } from '@devs-tang/common';
-import * as devkit from '@devs-tang/devkit';
+import { json5, utils } from '@devs-tang/devkit';
 import { CliAction } from '../../common';
 import { printData } from '../../utils';
 
@@ -9,8 +9,28 @@ export class GenerateAction extends CliAction {
 
     const opts: any = options || {};
 
-    if (opts.outputDir) {
-      devkit.utils.set(opts, 'outputOptions.outputDir', options.outputDir);
+    const {
+      loadOptions,
+      parseOptions,
+      generateOptions,
+      outputOptions,
+      outputDir,
+    } = opts;
+
+    if (loadOptions && utils.isString(loadOptions))
+      opts.loadOptions = json5.parse(loadOptions);
+
+    if (parseOptions && utils.isString(parseOptions))
+      opts.parseOptions = json5.parse(parseOptions);
+
+    if (generateOptions && utils.isString(generateOptions))
+      opts.generateOptions = json5.parse(generateOptions);
+
+    if (outputOptions && utils.isString(outputOptions))
+      opts.outputOptions = json5.parse(outputOptions);
+
+    if (outputDir && utils.isString(outputDir)) {
+      utils.set(opts, 'outputOptions.outputDir', outputDir);
     }
 
     if (opts.inspect) {

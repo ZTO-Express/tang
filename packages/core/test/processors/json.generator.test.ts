@@ -1,6 +1,6 @@
 import * as testUtil from '../util';
 import { TangGenerator } from '@devs-tang/common';
-import { Compilation, Compiler } from '../../src';
+import { Compilation, Compiler, normalizeProcessor } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('generator/json：json生成器', () => {
@@ -18,6 +18,21 @@ describe('generator/json：json生成器', () => {
     docCompilation = await compiler.load(tfDocPath, {
       parser: 'yaml',
     });
+  });
+
+  it('jsonGenerator normalize方法', async () => {
+    expect(
+      normalizeProcessor(
+        {
+          name: 'json',
+          generate: jsonGenerator.generate,
+        },
+        {
+          type: 'generator',
+          moduleType: 'core',
+        },
+      ),
+    ).toEqual(jsonGenerator);
   });
 
   it('jsonGenerator generate方法', async () => {

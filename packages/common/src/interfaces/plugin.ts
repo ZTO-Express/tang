@@ -1,10 +1,11 @@
 import { Hook } from './hook';
+import { GenericFunction } from './type';
 
-export interface Plugin {
+export interface Plugin<T = any> {
   name: string;
-  version: string;
+  version?: string;
   description?: string;
-  hooks?: Hook[];
-  methods?: { [name: string]: Function };
+  hooks?: Hook<T>[];
+  actions?: Record<string, GenericFunction>;
   [prop: string]: any;
 }

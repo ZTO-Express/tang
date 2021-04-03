@@ -1,10 +1,25 @@
 import { ErrorCodes } from '../enums';
 import { TangError } from './tang.error';
 
+export class InvalidProcessorError extends TangError {
+  constructor(
+    objectOrError?: string | object | any,
+    description = 'Invalid Processor',
+  ) {
+    super(
+      TangError.createBody(
+        objectOrError,
+        description,
+        ErrorCodes.INVALID_PROCESSOR,
+      ),
+      ErrorCodes.INVALID_PROCESSOR,
+    );
+  }
+}
+
 /**
  * 处理器错误
  */
-
 export class ProcessorError extends TangError {
   constructor(
     objectOrError?: string | object | any,

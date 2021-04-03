@@ -10,8 +10,7 @@
   },
   "plugins": [
     {
-      "name": "cowsay",
-      "version": "1.4.0"
+      "name": "cowsay@1.0.0"
     }
   ]
 }

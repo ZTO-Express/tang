@@ -1,10 +1,11 @@
 import { TangLoader, utils } from '@devs-tang/common';
+import { normalizeCoreProcessor } from './util';
 
 /**
  * 通过加载js模块
  */
 export const moduleLoader = (): TangLoader => {
-  return {
+  return normalizeCoreProcessor({
     type: 'loader',
 
     name: 'module',
@@ -16,5 +17,5 @@ export const moduleLoader = (): TangLoader => {
       const result = require(entry);
       return result;
     },
-  };
+  });
 };

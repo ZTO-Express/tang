@@ -38,12 +38,11 @@ export async function cleanTangLauncherTestEnv() {
   const launcher = await TangLauncher.getInstance();
   const { pluginManager } = launcher;
 
-  // 删除所有cowsay插件
-  await pluginManager.deleteAll('cowsay');
-  await pluginManager.deleteAll('test-tang');
+  // 删除所有插件
+  await fs.remove(pluginManager.pluginDir);
 
   // 清理缓存及无效插件、预设
-  launcher.prune();
+  await launcher.prune();
 }
 
 /** 创建默认编译器 */

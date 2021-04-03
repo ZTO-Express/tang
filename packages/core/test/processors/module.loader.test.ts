@@ -1,8 +1,25 @@
 import * as testUtil from '../util';
 import * as processors from '../../src/processors';
+import { normalizeProcessor } from '../../src';
 
 describe('loader/module：module加载器', () => {
   const moduleLoader = processors.moduleLoader();
+
+  it('moduleLoader normalize方法', async () => {
+    expect(
+      normalizeProcessor(
+        {
+          name: 'module',
+          test: moduleLoader.test,
+          load: moduleLoader.load,
+        },
+        {
+          type: 'loader',
+          moduleType: 'core',
+        },
+      ),
+    ).toEqual(moduleLoader);
+  });
 
   it('moduleLoader test方法', async () => {
     const loaderTest: any = moduleLoader.test;

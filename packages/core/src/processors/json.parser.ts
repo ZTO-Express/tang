@@ -1,10 +1,11 @@
 import { DocumentModel, TangParser } from '@devs-tang/common';
+import { normalizeCoreProcessor } from './util';
 
 /**
  * Json解析器
  */
 export const jsonParser = (): TangParser => {
-  return {
+  return normalizeCoreProcessor({
     type: 'parser',
 
     name: 'json',
@@ -14,5 +15,5 @@ export const jsonParser = (): TangParser => {
       const result = JSON.parse(content);
       return result;
     },
-  };
+  });
 };

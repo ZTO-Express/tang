@@ -1,9 +1,9 @@
 import { sortBy, ensureArray } from '../utils';
 
 import { throwInvalidHookError, throwHookError } from './hook-util';
-import { Hook, HookContext } from '../interfaces';
+import { Hook } from '../interfaces';
 
-export class HookDriver {
+export class HookDriver<T> {
   hooks: Hook[];
 
   constructor(hooks: Hook[]) {
@@ -15,7 +15,7 @@ export class HookDriver {
   // 异步并行执行钩子，忽略返回值
   hookParallel(
     hookName: string,
-    context: HookContext,
+    context: T,
     args?: any[],
   ): Promise<unknown | void> {
     const promises: Promise<unknown | void>[] = [];
@@ -30,7 +30,7 @@ export class HookDriver {
   }
 
   // 异步顺序执行钩子，忽略返回值
-  hookSeq(hookName: string, context: HookContext, args?: any): Promise<void> {
+  hookSeq(hookName: string, context: T, args?: any): Promise<void> {
     let promise = Promise.resolve();
     for (let i = 0; i < this.hooks.length; i++) {
       promise = promise.then(
@@ -49,7 +49,7 @@ export class HookDriver {
    */
   private runHook(
     hookName: string,
-    context: HookContext,
+    context: T,
     args: any[],
     hookIndex: number,
   ): Promise<any> {

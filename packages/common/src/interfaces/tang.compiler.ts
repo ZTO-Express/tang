@@ -1,4 +1,5 @@
 import {
+  TangGeneration,
   TangGenerator,
   TangLoader,
   TangOutput,
@@ -54,4 +55,21 @@ export interface TangCompiler {
     document: Document,
     options?: TangCompilerGenerateOptions,
   ) => Promise<TangOutput>;
+}
+
+// 钩子编译上下文
+export interface TangCompileContext {
+  compiler: TangCompiler;
+
+  loader?: TangLoader;
+  parser?: TangParser;
+  generator?: TangGenerator;
+  outputer?: TangOutputer;
+
+  document?: Document;
+  compilation?: TangCompilation;
+  generation?: TangGeneration;
+  output?: TangOutput;
+
+  [key: string]: unknown;
 }

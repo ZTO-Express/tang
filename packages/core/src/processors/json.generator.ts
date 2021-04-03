@@ -5,12 +5,13 @@ import {
   TangGenerateResult,
   TangGenerator,
 } from '@devs-tang/common';
+import { normalizeCoreProcessor } from './util';
 
 /**
  * json文件生成器
  */
 export const jsonGenerator = (): TangGenerator => {
-  return {
+  return normalizeCoreProcessor({
     type: 'generator',
 
     name: 'json',
@@ -32,5 +33,5 @@ export const jsonGenerator = (): TangGenerator => {
         chunks,
       };
     },
-  };
+  });
 };

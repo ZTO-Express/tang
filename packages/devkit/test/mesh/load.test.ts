@@ -28,7 +28,7 @@ describe('tang/mesh/load：加载预设', () => {
     const meshFile = testUtil.resolveFixturePath('meshs/cowsay/mesh.json');
     await meshManager.load(meshFile, { force: true });
 
-    const result = await launcher.pluginManager.run('cowsay@1.4.0', 'say', {
+    const result = await launcher.pluginManager.run('cowsay@1.0.0', 'say', {
       text: 'hello',
     });
 

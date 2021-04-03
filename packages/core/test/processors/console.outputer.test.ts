@@ -1,5 +1,6 @@
 import * as testUtil from '../util';
 import { Chunk } from '@devs-tang/common';
+import { normalizeProcessor } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('outputer/console：console输出器', () => {
@@ -24,6 +25,21 @@ describe('outputer/console：console输出器', () => {
         content: '',
       },
     ];
+  });
+
+  it('consoleOutputer normalize方法', async () => {
+    expect(
+      normalizeProcessor(
+        {
+          name: 'console',
+          output: consoleOutputer.output,
+        },
+        {
+          type: 'outputer',
+          moduleType: 'core',
+        },
+      ),
+    ).toEqual(consoleOutputer);
   });
 
   it('consoleOutputer output方法', async () => {

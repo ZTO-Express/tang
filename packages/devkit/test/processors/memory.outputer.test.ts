@@ -1,7 +1,8 @@
 import * as testUtil from '../util';
-import { memfs, json5 } from '../../src/utils';
 import { Chunk } from '@devs-tang/common';
+import { normalizeProcessor } from '@devs-tang/core';
 import * as processors from '../../src/processors';
+import { memfs, json5 } from '../../src/utils';
 
 describe('outputer/memory：memory输出器', () => {
   const memoryOutputer = processors.memoryOutputer();
@@ -29,6 +30,21 @@ describe('outputer/memory：memory输出器', () => {
         content: '',
       },
     ];
+  });
+
+  it('normalize方法', async () => {
+    expect(
+      normalizeProcessor(
+        {
+          name: 'memory',
+          output: memoryOutputer.output,
+        },
+        {
+          type: 'outputer',
+          moduleType: 'devkit',
+        },
+      ),
+    ).toEqual(memoryOutputer);
   });
 
   it('memoryOutputer output方法', async () => {

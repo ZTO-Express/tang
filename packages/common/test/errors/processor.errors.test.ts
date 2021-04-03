@@ -2,7 +2,48 @@ import { ErrorCodes, TangError } from '../../src';
 import * as errors from '../../src/errors';
 
 describe('common/error：处理器错误', () => {
-  it('无效插件 Processor Error', () => {
+  it('无效处理器错误 Invalid Processor Error', () => {
+    expect(new errors.InvalidProcessorError()).toMatchObject({
+      name: 'TangError',
+      code: ErrorCodes.INVALID_PROCESSOR,
+      message: 'Invalid Processor',
+    });
+
+    expect(
+      new errors.InvalidProcessorError(
+        { isTest: 'test', message: 'test message1' },
+        'test message2',
+      ),
+    ).toMatchObject({
+      name: 'TangError',
+      code: ErrorCodes.INVALID_PROCESSOR,
+      message: 'test message1',
+      body: {
+        isTest: 'test',
+        message: 'test message1',
+      },
+    });
+
+    expect(
+      new errors.InvalidProcessorError('test message1', 'test message2'),
+    ).toMatchObject({
+      name: 'TangError',
+      code: ErrorCodes.INVALID_PROCESSOR,
+      message: 'test message1',
+      body: { code: ErrorCodes.INVALID_PROCESSOR, message: 'test message1' },
+    });
+
+    expect(
+      new errors.InvalidProcessorError(undefined, 'test message2'),
+    ).toMatchObject({
+      name: 'TangError',
+      code: ErrorCodes.INVALID_PROCESSOR,
+      message: 'test message2',
+      body: { code: ErrorCodes.INVALID_PROCESSOR, message: 'test message2' },
+    });
+  });
+
+  it('处理器错误 Processor Error', () => {
     expect(new errors.ProcessorError()).toMatchObject({
       name: 'TangError',
       code: ErrorCodes.PROCESSOR_ERROR,

@@ -2,6 +2,7 @@ export * from './type';
 export * from './hook';
 export * from './document';
 export * from './plugin';
+export * from './tang';
 export * from './tang.preset';
 export * from './tang.plugin';
 export * from './tang.processor';

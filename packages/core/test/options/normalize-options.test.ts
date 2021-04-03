@@ -1,3 +1,4 @@
+import { TangModuleTypes } from '@devs-tang/common/lib';
 import {
   getNormalizedOptions,
   mergeProcessors,
@@ -5,7 +6,6 @@ import {
   normalizeProcessor,
   getPresetConfigData,
 } from '../../src';
-import { TANG_CORE_PLUGIN_NAME } from '../../src/consts';
 
 describe('options/normalizeOptions：规范化配置', () => {
   const testLoader: any = {
@@ -51,7 +51,8 @@ describe('options/normalizeOptions：规范化配置', () => {
 
     expect(options1.loaders.length).toBe(2);
     expect(options1.loaders[0].pluginName).toBeUndefined();
-    expect(options1.loaders[1].pluginName).toBe(TANG_CORE_PLUGIN_NAME);
+    expect(options1.loaders[1].pluginName).toBe(undefined);
+    expect(options1.loaders[1].moduleType).toBe(TangModuleTypes.core);
     expect(options1.parsers.length).toBe(2);
 
     expect(JSON.stringify(options1.defaultLoader)).toBe(
@@ -63,6 +64,10 @@ describe('options/normalizeOptions：规范化配置', () => {
   });
 
   it('获取规范化预设选项 normalizePresetOptions', () => {
+    expect(normalizePresetOptions(undefined)).toBe(undefined);
+    expect(normalizePresetOptions({})).toEqual({});
+    expect(normalizePresetOptions({ name: 'test' })).toEqual({ name: 'test' });
+
     const options1 = normalizePresetOptions(
       {
         defaultLoader: testLoader,
@@ -81,20 +86,57 @@ describe('options/normalizeOptions：规范化配置', () => {
 
     expect(loader0.pluginName).toBe('test');
     expect(loader0.code).toBe(
-      `${loader0.pluginName}:${loader0.type}:${loader0.name}`,
+      `plugin:${loader0.pluginName}:${loader0.type}:${loader0.name}`,
     );
 
     expect(parser0.pluginName).toBe('test');
     expect(parser0.code).toBe(
-      `${parser0.pluginName}:${parser0.type}:${parser0.name}`,
+      `plugin:${parser0.pluginName}:${parser0.type}:${parser0.name}`,
     );
 
-    expect(normalizePresetOptions(undefined)).toBe(undefined);
+    expect(
+      normalizePresetOptions(
+        {
+          name: 'test',
+          pluginName: 'test1',
+        },
+        {
+          pluginName: 'test2',
+        },
+      ),
+    ).toEqual({
+      name: 'test',
+      pluginName: 'test1',
+    });
   });
 
-  it('获取规范化预设选项 normalizePresetOptions', () => {
+  it('获取规范化预设选项 normalizeProcessor', () => {
     expect(normalizeProcessor(undefined)).toBe(undefined);
-    expect(normalizeProcessor({} as any)).toEqual({});
+    expect(() => normalizeProcessor({})).toThrow('必须提供名称和类型');
+    expect(() => normalizeProcessor({ name: 'test' })).toThrow(
+      '必须提供名称和类型',
+    );
+    expect(() => normalizeProcessor({ type: 'loader' })).toThrow(
+      '必须提供名称和类型',
+    );
+
+    expect(() => normalizeProcessor({ name: 'test', type: 'loader' })).toThrow(
+      '必须提供插件名称',
+    );
+
+    expect(
+      normalizeProcessor({
+        name: 'test',
+        type: 'loader',
+        pluginName: 'test',
+      }),
+    ).toEqual({
+      code: 'plugin:test:loader:test',
+      moduleType: 'plugin',
+      name: 'test',
+      pluginName: 'test',
+      type: 'loader',
+    });
 
     expect(
       normalizeProcessor(
@@ -104,6 +146,7 @@ describe('options/normalizeOptions：规范化配置', () => {
     ).toEqual({
       type: 'loader',
       name: 'test',
+      moduleType: 'plugin',
       pluginName: 'test',
       code: `xxx`,
     });
@@ -157,6 +200,7 @@ describe('options/normalizeOptions：规范化配置', () => {
     expect(
       getPresetConfigData({
         name: 'test',
+        moduleType: 'plugin',
         defaultLoader: undefined,
       }),
     ).toEqual({
@@ -166,6 +210,7 @@ describe('options/normalizeOptions：规范化配置', () => {
     expect(
       getPresetConfigData({
         name: 'test',
+        moduleType: 'plugin',
         defaultLoader: 'test',
         loaders: [testLoader],
         parsers: [testParser],
@@ -182,7 +227,7 @@ describe('options/normalizeOptions：规范化配置', () => {
       ],
       parsers: [
         {
-          code: `${testParser.pluginName}:${testParser.type}:${testParser.name}`,
+          code: `plugin:${testParser.pluginName}:${testParser.type}:${testParser.name}`,
           name: testParser.name,
           pluginName: testParser.pluginName,
           type: testParser.type,

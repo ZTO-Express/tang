@@ -37,7 +37,7 @@ export class ConfigAction extends CliAction {
       return;
     }
 
-    const { configManager } = await devkit.launcher();
+    const { configManager } = await devkit.getLauncher();
     await configManager.set(key, value);
     await configManager.save();
 
@@ -51,7 +51,7 @@ export class ConfigAction extends CliAction {
       return;
     }
 
-    const { configManager } = await devkit.launcher();
+    const { configManager } = await devkit.getLauncher();
 
     await configManager.unset(key);
     await configManager.save();
@@ -62,7 +62,7 @@ export class ConfigAction extends CliAction {
   /** 列出或获取某个配置信息 */
   async getConfig(key: string) {
     key = key || '.';
-    const { configManager } = await devkit.launcher();
+    const { configManager } = await devkit.getLauncher();
 
     const result = await configManager.get(key);
 

@@ -50,7 +50,7 @@ export type CliActionFn = (...args: any[]) => void | Promise<void>;
 export abstract class CliAction {
   /** 返回加载器 */
   protected async getLauncher() {
-    const launcher = await devkit.launcher();
+    const launcher = await devkit.getLauncher();
     return launcher;
   }
 }

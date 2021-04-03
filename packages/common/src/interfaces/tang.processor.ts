@@ -1,5 +1,7 @@
-import { GenericConfigObject } from './type';
+import { GenericConfigObject, GenericObject } from './type';
+import { TangModuleTypeNames } from './tang';
 import { Chunk, Document, DocumentModel } from './document';
+import { TangCompileContext } from './tang.compiler';
 
 export enum TangProcessorTypes {
   loader = 'loader', // 加载器
@@ -8,26 +10,40 @@ export enum TangProcessorTypes {
   outputer = 'outputer', // 输出器;
 }
 
+export type TangProcessorTypeNames = keyof typeof TangProcessorTypes;
+
+export const TangProcessorTypeKeys = Object.keys(TangProcessorTypes).map(
+  it => it,
+);
+
 export const TangProcessorsTypeKeys = Object.keys(TangProcessorTypes).map(
   it => `${it}s`,
 );
 
-export type TangProcessorTypeNames = keyof typeof TangProcessorTypes;
+export type TangPluginProcessorLoaderTest =
+  | string
+  | RegExp
+  | ((entry: string) => boolean);
 
 // 当前文档处理器
-export interface TangProcessor {
+export interface TangProcessor extends GenericObject {
   type: TangProcessorTypeNames; // 处理器类型
   name: string; // 处理器名称
-  code?: string; // 处理器编号
-  pluginName?: string; // 处理器所属插件
+  moduleType: TangModuleTypeNames; // 所属模块类型
+  code: string; // 处理器编号（唯一标识）
+  pluginName?: string; // 处理器所属插件/模块名称
   priority?: number; // 处理器优先级
 }
 
 // 文档加载器
 export interface TangLoader extends TangProcessor {
-  test?: string | RegExp | ((entry: string) => boolean); // 验证是否可以加载指定文档（一般通过目标名称/路径即可判断）
+  test?: TangPluginProcessorLoaderTest; // 验证是否可以加载指定文档（一般通过目标名称/路径即可判断）
   loadOptions?: GenericConfigObject;
-  load(entry: string, options?: GenericConfigObject): Promise<string | Buffer>;
+  load(
+    entry: string,
+    options: GenericConfigObject,
+    context: TangCompileContext,
+  ): Promise<string | Buffer>;
   load<T>(entry: string, options?: GenericConfigObject): Promise<T>; // 加载方法
 }
 
@@ -36,7 +52,8 @@ export interface TangParser extends TangProcessor {
   parseOptions?: GenericConfigObject;
   parse: (
     content: string,
-    options?: GenericConfigObject,
+    options: GenericConfigObject,
+    context: TangCompileContext,
   ) => Promise<DocumentModel>;
 }
 
@@ -57,7 +74,8 @@ export interface TangGenerator extends TangProcessor {
   generateOptions?: GenericConfigObject;
   generate: (
     document: Document,
-    options?: GenericConfigObject,
+    options: GenericConfigObject,
+    context: TangCompileContext,
   ) => Promise<TangGenerateResult>;
 }
 
@@ -72,6 +90,7 @@ export interface TangOutputer extends TangProcessor {
   outputOptions?: GenericConfigObject;
   output: (
     generation: TangGeneration,
-    options?: GenericConfigObject,
+    options: GenericConfigObject,
+    context: TangCompileContext,
   ) => Promise<TangOutput>;
 }

@@ -1,11 +1,13 @@
 import { GenericConfigObject, TangLoader, utils } from '@devs-tang/common';
+
 import { fs } from '../utils';
+import { normalizeDevkitProcessor } from './util';
 
 /**
  * 本地文件加载器
  */
 export const docLoader = (): TangLoader => {
-  return {
+  return normalizeDevkitProcessor({
     type: 'loader',
 
     name: 'doc',
@@ -17,5 +19,5 @@ export const docLoader = (): TangLoader => {
       const result = await fs.resolveFile(entry, encoding);
       return result;
     },
-  };
+  });
 };

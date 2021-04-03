@@ -55,6 +55,13 @@ describe('tang/cli/config.manager load：配置加载', () => {
     expect(cfgManager.get('test')).toEqual({ name: 'devKit' });
     expect(config.test).toEqual({ name: 'devKit' });
 
+    expect(cfgManager.get('.')).toEqual({
+      ...defaultConfig,
+      test: {
+        name: 'devKit',
+      },
+    });
+
     cfgManager.set('test', 'devKit');
     expect(config.test).toBe('devKit');
 

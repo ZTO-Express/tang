@@ -22,13 +22,10 @@ yarn-error.log
 /example
 
 # tests
-/test
-/fixtures/git/**/package-lock.json
+/packages/fixtures/git/**/package-lock.json
 /benchmarks/memory
 /coverage
 /.nyc_output
-/packages/graphql
-/benchmarks/memory
 build/config\.gypi
 .test_coverage
 .test_output

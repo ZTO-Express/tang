@@ -214,7 +214,11 @@ export class MeshManager {
 
     // 安装Mesh（主要是Mesh中包含的插件）
     if (mesh.plugins) {
-      await this.pluginManager.install(mesh.plugins as any);
+      const installOps = mesh.plugins.map(it => {
+        return this.pluginManager.add(it.name, it);
+      });
+
+      await Promise.all(installOps);
     }
 
     const filePath = this.getMeshPath(mesh.name, mesh.version);

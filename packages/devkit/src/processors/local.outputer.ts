@@ -1,6 +1,5 @@
 import {
   GenericConfigObject,
-  InvalidArguments,
   TangGeneration,
   TangOutput,
   TangOutputer,
@@ -10,12 +9,13 @@ import {
 import * as path from 'path';
 
 import { fs } from '../utils';
+import { normalizeDevkitProcessor } from './util';
 
 /**
  * 本地文件输出器
  */
 export const localOutputer = (): TangOutputer => {
-  return {
+  return normalizeDevkitProcessor({
     type: 'outputer',
 
     name: 'local',
@@ -61,5 +61,5 @@ export const localOutputer = (): TangOutputer => {
         files,
       };
     },
-  };
+  });
 };

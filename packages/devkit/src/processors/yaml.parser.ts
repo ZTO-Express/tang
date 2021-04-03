@@ -5,12 +5,13 @@ import {
 } from '@devs-tang/common';
 
 import { yaml } from '../utils';
+import { normalizeDevkitProcessor } from './util';
 
 /**
  * Yaml解析器
  */
 export const yamlParser = (): TangParser => {
-  return {
+  return normalizeDevkitProcessor({
     type: 'parser',
 
     name: 'yaml',
@@ -22,5 +23,5 @@ export const yamlParser = (): TangParser => {
       const result = yaml.load(content, options);
       return result as DocumentModel;
     },
-  };
+  });
 };

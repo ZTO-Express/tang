@@ -1,6 +1,7 @@
+import { GenericFunction } from '../interfaces';
 import { deepmergeAll, DeepmergeOptions } from './internal/deepmerge';
 import { baseGet, baseSet, baseUnset, last } from './internal';
-import { isNil, isObject, isPlainObject } from './check';
+import { isEmpty, isNil, isObject, isPlainObject } from './check';
 
 /** 返回数组最后一个元素 */
 export const arryLast = last;
@@ -196,6 +197,22 @@ export function omit(
 }
 
 /**
+ * 过滤对象所有为Nil的属性
+ * @param object 需要移除属性的对象
+ */
+export function omitNil(object: unknown) {
+  return omit(object, val => !isNil(val));
+}
+
+/**
+ * 过滤对象所有为Empty的属性
+ * @param object 需要移除属性的对象
+ */
+export function omitEmpty(object: unknown) {
+  return omit(object, val => !isEmpty(val));
+}
+
+/**
  * 简单的从目标中选取指定选项生成新的对象
  * @param source
  * @param keys
@@ -209,4 +226,26 @@ export function pick(source: any, ...keys: string[]) {
 
     return result;
   }, {});
+}
+
+/**
+ * 延时时间
+ * @param seconds
+ * @returns
+ */
+export async function delay<T>(fn: GenericFunction, seconds = 1): Promise<T> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      Promise.resolve()
+        .then(() => {
+          return fn.call(undefined);
+        })
+        .then(result => {
+          resolve(result as T);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    }, seconds);
+  });
 }

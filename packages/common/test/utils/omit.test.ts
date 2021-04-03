@@ -1,4 +1,4 @@
-import { omit } from '../../src/utils';
+import { omit, omitNil, omitEmpty } from '../../src/utils';
 
 describe('utils/util：omit方法', () => {
   it('should omit a key from the object', () => {
@@ -52,5 +52,28 @@ describe('utils/util：omit方法', () => {
 
   it('should return an empty object if no object is specified', () => {
     expect((omit as any)()).toEqual({});
+  });
+
+  it('omitNil', () => {
+    expect(omitNil(undefined)).toEqual({});
+    expect(omitNil(null)).toEqual({});
+    expect(omitNil(0)).toEqual({});
+    expect(omitNil(new Date())).toEqual({});
+
+    expect(omitNil({ a: 'a', b: undefined, c: null, d: '' })).toEqual({
+      a: 'a',
+      d: '',
+    });
+  });
+
+  it('omitEmpty', () => {
+    expect(omitEmpty(undefined)).toEqual({});
+    expect(omitEmpty(null)).toEqual({});
+    expect(omitEmpty(0)).toEqual({});
+    expect(omitEmpty(new Date())).toEqual({});
+
+    expect(omitEmpty({ a: 'a', b: undefined, c: null, d: '' })).toEqual({
+      a: 'a',
+    });
   });
 });

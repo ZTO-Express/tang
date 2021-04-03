@@ -76,6 +76,44 @@ describe('utils/check：check实用方法', () => {
     expect(util.isNull(NaN)).toBe(false);
   });
 
+  it('isEmptyArray', () => {
+    expect(util.isEmptyArray([])).toBe(true);
+    expect(util.isEmptyArray(null)).toBe(false);
+    expect(util.isEmptyArray(new Date())).toBe(false);
+  });
+
+  it('isEmptyObject', () => {
+    expect(util.isEmptyObject({})).toBe(true);
+    expect(util.isEmptyObject([])).toBe(false);
+    expect(util.isEmptyObject({ a: 1 })).toBe(false);
+    expect(util.isEmptyObject(null)).toBe(false);
+    expect(util.isEmptyObject(new Date())).toBe(false);
+  });
+
+  it('isEmpty', () => {
+    expect(util.isEmpty(undefined)).toBe(true);
+    expect(util.isEmpty(null)).toBe(true);
+
+    expect(util.isEmpty('')).toBe(true);
+    expect(util.isEmpty('', { blank: false })).toBe(false);
+
+    expect(util.isEmpty('  ')).toBe(false);
+    expect(util.isEmpty('  ', { trimBlank: true })).toBe(true);
+
+    expect(util.isEmpty(0)).toBe(false);
+    expect(util.isEmpty(0, { zero: true })).toBe(true);
+
+    expect(util.isEmpty('0')).toBe(false);
+    expect(util.isEmpty('0', { zeroStr: true })).toBe(true);
+
+    expect(util.isEmpty([])).toBe(false);
+    expect(util.isEmpty([], { emptyArray: true })).toBe(true);
+
+    expect(util.isEmpty({})).toBe(false);
+    expect(util.isEmpty({}, { emptyObject: true })).toBe(true);
+    expect(util.isEmpty(new Date(), { emptyObject: true })).toBe(false);
+  });
+
   it('验证isPlainObject', () => {
     expect(util.isPlainObject({})).toBe(true);
     expect(util.isPlainObject(new Object())).toBe(true);

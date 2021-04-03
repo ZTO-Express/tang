@@ -1,8 +1,25 @@
 import * as testUtil from '../util';
 import * as processors from '../../src/processors';
+import { normalizeProcessor } from '../../src';
 
 describe('loader/url：url加载器', () => {
   const urlLoader = processors.urlLoader();
+
+  it('urlLoader normalize方法', async () => {
+    expect(
+      normalizeProcessor(
+        {
+          name: 'url',
+          test: urlLoader.test,
+          load: urlLoader.load,
+        },
+        {
+          type: 'loader',
+          moduleType: 'core',
+        },
+      ),
+    ).toEqual(urlLoader);
+  });
 
   it('urlLoader test方法', async () => {
     const loaderTest: any = urlLoader.test;

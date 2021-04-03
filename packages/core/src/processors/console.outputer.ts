@@ -4,12 +4,13 @@ import {
   TangOutput,
   TangOutputer,
 } from '@devs-tang/common';
+import { normalizeCoreProcessor } from './util';
 
 /**
  * 内存文件输出器，一般用于测试或watch的场景
  */
 export const consoleOutputer = (): TangOutputer => {
-  return {
+  return normalizeCoreProcessor({
     type: 'outputer',
 
     name: 'console',
@@ -33,5 +34,5 @@ export const consoleOutputer = (): TangOutputer => {
         files,
       };
     },
-  };
+  });
 };

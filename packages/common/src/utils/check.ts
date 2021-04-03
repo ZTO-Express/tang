@@ -52,6 +52,43 @@ export const isUndefined = (o: any) => getTag(o) === '[object Undefined]';
 // 目标为null or undefined
 export const isNil = (o: any) => isNull(o) || isUndefined(o);
 
+// 数组是否为空
+export const isEmptyArray = (o: any) => Array.isArray(o) && !o.length;
+
+// 是否为空对象 如：{}, new Object()
+export const isEmptyObject = (o: any) =>
+  isObject(o) && Object.keys(o).length === 0 && o.constructor === Object;
+
+/**
+ * 判断目标是否为空
+ * @param o
+ * @param options
+ *  zero: 0为空
+ *  blank: 空字符串为空
+ * @returns
+ */
+export const isEmpty = (
+  o: any,
+  options: {
+    blank?: boolean; // 默认为true
+    zero?: boolean; // 默认为false
+    zeroStr?: boolean; // 默认为false
+    trimBlank?: boolean; // 默认为false
+    emptyArray?: boolean; // 默认为false
+    emptyObject?: boolean; // 默认为false
+  } = {},
+) => {
+  return (
+    isNil(o) ||
+    (options.blank !== false && o === '') ||
+    (options.zero === true && o === 0) ||
+    (options.zeroStr === true && o === '0') ||
+    (options.trimBlank === true && String(o).trim() === '') ||
+    (options.emptyArray === true && isEmptyArray(o)) ||
+    (options.emptyObject === true && isEmptyObject(o))
+  );
+};
+
 // 是否为function
 export const isFunction = (o: any) => typeof o === 'function';
 

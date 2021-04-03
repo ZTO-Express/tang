@@ -7,12 +7,13 @@ import {
 } from '@devs-tang/common';
 
 import { yaml } from '../utils';
+import { normalizeDevkitProcessor } from './util';
 
 /**
  * yaml文件生成器
  */
 export const yamlGenerator = (): TangGenerator => {
-  return {
+  return normalizeDevkitProcessor({
     type: 'generator',
 
     name: 'yaml',
@@ -35,5 +36,5 @@ export const yamlGenerator = (): TangGenerator => {
         chunks,
       };
     },
-  };
+  });
 };

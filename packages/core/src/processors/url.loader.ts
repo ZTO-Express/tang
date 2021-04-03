@@ -1,12 +1,13 @@
 import { TangLoader, utils } from '@devs-tang/common';
 
 import { http } from '../utils';
+import { normalizeCoreProcessor } from './util';
 
 /**
  * 通过url加载文件
  */
 export const urlLoader = (): TangLoader => {
-  return {
+  return normalizeCoreProcessor({
     type: 'loader',
 
     name: 'url',
@@ -20,5 +21,5 @@ export const urlLoader = (): TangLoader => {
       const result = await http.request<T>(entry, options);
       return result;
     },
-  };
+  });
 };

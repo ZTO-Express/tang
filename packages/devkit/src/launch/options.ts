@@ -1,4 +1,4 @@
-import { TangPreset } from '@devs-tang/common';
+import { TangPreset, TangModuleTypes } from '@devs-tang/common';
 import {
   mergeOptions,
   getNormalizedOptions as getCoreNormalizedOptions,
@@ -34,7 +34,7 @@ export function getNormalizedOptions(options?: NormalizedTangOptions) {
       generators: [processors.yamlGenerator()],
       outputers: [processors.localOutputer(), processors.memoryOutputer()],
     },
-    { pluginName: TANG_DEVKIT_PLUGIN_NAME },
+    { moduleType: TangModuleTypes.devkit },
   );
 
   let opts = mergePresetOptions(defaultProcessors, options);

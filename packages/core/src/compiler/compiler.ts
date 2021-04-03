@@ -7,7 +7,7 @@ import {
   Document,
   HookDriver,
   TangGenerator,
-  TangHookContext,
+  TangCompileContext,
   TangLoader,
   TangOutput,
   TangOutputer,
@@ -33,7 +33,7 @@ import { Compilation } from './compilation';
  * 生成器
  */
 export class Compiler implements TangCompiler {
-  hookDriver: HookDriver;
+  hookDriver: HookDriver<TangCompileContext>;
 
   loaders: TangLoader[]; // 加载器
   defaultLoader: TangLoader; // 默认加载器
@@ -49,7 +49,7 @@ export class Compiler implements TangCompiler {
 
   constructor(options: CompilerOptions) {
     this.initialize(options);
-    this.hookDriver = new HookDriver(options.hooks);
+    this.hookDriver = new HookDriver<TangCompileContext>(options.hooks);
   }
 
   private initialize(options: CompilerOptions) {
@@ -112,7 +112,7 @@ export class Compiler implements TangCompiler {
       model: null,
     };
 
-    const hookContext: TangHookContext = {
+    const compileContext: TangCompileContext = {
       compiler: this,
       loader,
       parser,
@@ -121,16 +121,24 @@ export class Compiler implements TangCompiler {
     };
 
     // 调用加载开始钩子
-    await this.hookDriver.hookSeq('load', hookContext);
+    await this.hookDriver.hookSeq('load', compileContext);
 
     // 加载器加载文档
-    document.content = await loader.load(entry, loader.loadOptions);
+    document.content = await loader.load(
+      entry,
+      loader.loadOptions,
+      compileContext,
+    );
 
     // 调用加载结束钩子
-    await this.hookDriver.hookSeq('parse', hookContext);
+    await this.hookDriver.hookSeq('parse', compileContext);
 
     // 解析器解析文档内容
-    const docModel = await parser.parse(document.content, parser.parseOptions);
+    const docModel = await parser.parse(
+      document.content,
+      parser.parseOptions,
+      compileContext,
+    );
     document.model = docModel;
 
     const compilation = new Compilation(this, {
@@ -140,8 +148,8 @@ export class Compiler implements TangCompiler {
     });
 
     // 调用加载结束钩子
-    hookContext.compilation = compilation;
-    await this.hookDriver.hookSeq('loaded', hookContext);
+    compileContext.compilation = compilation;
+    await this.hookDriver.hookSeq('loaded', compileContext);
 
     return compilation;
   }
@@ -160,7 +168,7 @@ export class Compiler implements TangCompiler {
     const outputer = this.getOutputer(options);
     if (!outputer) throw new OutputerError('未找到输出器');
 
-    const hookContext: TangHookContext = {
+    const compileContext: TangCompileContext = {
       compiler: this,
       generator,
       outputer,
@@ -170,25 +178,30 @@ export class Compiler implements TangCompiler {
     };
 
     // 调用生成钩子
-    await this.hookDriver.hookSeq('generate', hookContext);
+    await this.hookDriver.hookSeq('generate', compileContext);
 
     const generateResult = await generator.generate(
       document,
       generator.generateOptions,
+      compileContext,
     );
 
     const generation = { document: document, ...generateResult };
 
     // 调用输出钩子
-    hookContext.generation = generation;
-    await this.hookDriver.hookSeq('output', hookContext);
+    compileContext.generation = generation;
+    await this.hookDriver.hookSeq('output', compileContext);
 
     // 输出器生成
-    const output = await outputer.output(generation, outputer.outputOptions);
+    const output = await outputer.output(
+      generation,
+      outputer.outputOptions,
+      compileContext,
+    );
 
     // 调用生成完成钩子
-    hookContext.output = output;
-    await this.hookDriver.hookParallel('generated', hookContext);
+    compileContext.output = output;
+    await this.hookDriver.hookParallel('generated', compileContext);
 
     return output;
   }

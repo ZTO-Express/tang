@@ -1,14 +1,5 @@
-import { TangCompilation, TangCompiler } from './tang.compiler';
-import { Hook } from './hook';
-import { Document } from './document';
-import {
-  TangLoader,
-  TangGenerator,
-  TangParser,
-  TangOutputer,
-  TangGeneration,
-  TangOutput,
-} from './tang.processor';
+import { TangCompileContext } from './tang.compiler';
+import { Hook, HookFunction } from './hook';
 
 // Tang内置钩子函数
 export interface TangHooks {
@@ -43,31 +34,10 @@ export type TangSequentialHookNames = Exclude<
 >;
 
 // 钩子方法
-export type TangHookFunction = (
-  context: TangHookContext,
-  ...args: any[]
-) => Promise<unknown | void> | unknown | void;
-
-// 钩子执行上下文
-export interface TangHookContext {
-  compiler?: TangCompiler;
-
-  loader?: TangLoader;
-  parser?: TangParser;
-  generator?: TangGenerator;
-  outputer?: TangOutputer;
-
-  document?: Document;
-  compilation?: TangCompilation;
-  generation?: TangGeneration;
-  output?: TangOutput;
-
-  [key: string]: unknown;
-}
+export type TangHookFunction = HookFunction<TangCompileContext>;
 
 // 钩子
-export interface TangHook extends Hook {
+export interface TangHook extends Hook<TangCompileContext> {
   trigger?: TangHookNames | '*' | TangHookNames[]; //触发钩子执行
   plugin?: string; // 钩子所属插件
-  apply?: TangHookFunction;
 }

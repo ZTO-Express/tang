@@ -1,13 +1,18 @@
 import * as testUtil from '../util';
-import { PluginManager, TangLauncher } from '../../src';
+import {
+  PluginManager,
+  PluginNpmLinkInstallOptions,
+  TangLauncher,
+} from '../../src';
 
 describe('tang/plugin/install：安装插件', () => {
+  let launcher: TangLauncher;
   let pluginManager: PluginManager;
 
   beforeAll(async () => {
     await testUtil.cleanTangLauncherTestEnv();
 
-    const launcher = await TangLauncher.getInstance();
+    launcher = await TangLauncher.getInstance();
     pluginManager = launcher.pluginManager;
   });
 
@@ -22,7 +27,7 @@ describe('tang/plugin/install：安装插件', () => {
     });
 
     let list = await pluginManager.list('cowsay');
-    expect(list).toEqual(['cowsay@latest']);
+    expect(list).toEqual(['cowsay']);
 
     let exists = await pluginManager.exists('cowsay');
     expect(exists).toBe(true);
@@ -31,10 +36,10 @@ describe('tang/plugin/install：安装插件', () => {
     expect(exists).toBe(false);
 
     exists = await pluginManager.exists('cowsay', 'latest');
-    expect(exists).toBe(true);
+    expect(exists).toBe(false);
 
     exists = await pluginManager.exists('cowsay@latest');
-    expect(exists).toBe(true);
+    expect(exists).toBe(false);
 
     exists = await pluginManager.exists('cowsay1@latest');
     expect(exists).toBe(false);
@@ -51,7 +56,7 @@ describe('tang/plugin/install：安装插件', () => {
       return pluginManager.run('cowsay', 'name1');
     }).rejects.toThrow('未找到插件方法cowsay.name1');
 
-    await pluginManager.delete('cowsay@latest');
+    await pluginManager.delete('cowsay');
 
     list = await pluginManager.list('cowsay');
     expect(list).toEqual([]);
@@ -63,11 +68,12 @@ describe('tang/plugin/install：安装插件', () => {
       version: '1.4.0',
       package: packagePath,
       force: true,
-    };
+      type: 'npm_link',
+    } as PluginNpmLinkInstallOptions;
 
     const plugin = await pluginManager.add('cowsay', installOptions);
     expect(plugin).toMatchObject({
-      name: 'cowsay',
+      name: `cowsay@${installOptions.version}`,
       version: installOptions.version,
     });
 
@@ -90,6 +96,24 @@ describe('tang/plugin/install：安装插件', () => {
 
     const list1 = await pluginManager.list('cowsay');
     expect(list1).toEqual([]);
+  });
+
+  it('从shell Install安装插件', async () => {
+    const packagePath = testUtil.resolveFixturePath('plugins/test');
+
+    await expect(
+      pluginManager.add(packagePath, {
+        force: true,
+        type: 'shell',
+      }),
+    ).rejects.toThrow('Not Implemented');
+
+    await expect(
+      pluginManager.add(packagePath, {
+        force: true,
+        type: 'notExists' as any,
+      }),
+    ).rejects.toThrow('不支持');
   });
 
   it('安装插件（包含preset）', async () => {

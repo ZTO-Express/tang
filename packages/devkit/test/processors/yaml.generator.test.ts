@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { Compilation, Compiler } from '@devs-tang/core';
+import { Compilation, Compiler, normalizeProcessor } from '@devs-tang/core';
 import { yaml } from '../../src/utils';
 import * as processors from '../../src/processors';
 
@@ -15,6 +15,21 @@ describe('generator/yaml：yaml生成器', () => {
     docCompilation = await compiler.load(tfDocPath, {
       parser: 'yaml',
     });
+  });
+
+  it('normalize方法', async () => {
+    expect(
+      normalizeProcessor(
+        {
+          name: 'yaml',
+          generate: yamlGenerator.generate,
+        },
+        {
+          type: 'generator',
+          moduleType: 'devkit',
+        },
+      ),
+    ).toEqual(yamlGenerator);
   });
 
   it('yamlGenerator generate方法', async () => {
