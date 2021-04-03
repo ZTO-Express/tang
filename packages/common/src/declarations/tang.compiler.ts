@@ -6,14 +6,15 @@ import {
   TangOutputer,
   TangParser,
 } from './tang.processor';
-import { Document } from './document';
+import { TangDocument } from './tang.document';
 import { GenericConfigObject } from './type';
 
 export interface TangCompilation {
+  entry: string;
   compiler: TangCompiler;
-  document: Document;
-  loader: TangLoader;
-  parser: TangParser;
+  document: TangDocument;
+  loader?: TangLoader;
+  parser?: TangParser;
 }
 
 /** 加载选项 */
@@ -52,7 +53,7 @@ export interface TangCompiler {
   ) => Promise<TangCompilation>;
 
   generate: (
-    document: Document,
+    document: TangDocument,
     options?: TangCompilerGenerateOptions,
   ) => Promise<TangOutput>;
 }
@@ -66,7 +67,7 @@ export interface TangCompileContext {
   generator?: TangGenerator;
   outputer?: TangOutputer;
 
-  document?: Document;
+  document?: TangDocument;
   compilation?: TangCompilation;
   generation?: TangGeneration;
   output?: TangOutput;

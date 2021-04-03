@@ -4,7 +4,7 @@ import {
   TangCompiler,
   TangCompilerGenerateOptions,
   TangCompilerLoadOptions,
-  Document,
+  TangDocument,
   HookDriver,
   TangGenerator,
   TangCompileContext,
@@ -17,17 +17,16 @@ import {
   GeneratorError,
   OutputerError,
   LoaderError,
-  utils,
   TangProcessorTypes,
   ParserError,
+  utils,
 } from '@devs-tang/common';
 
 import {
   CompilerInspectOptions,
   CompilerOptions,
   ProcessorGetOptions,
-} from './compiler.interfaces';
-import { Compilation } from './compilation';
+} from './declarations';
 
 /**
  * 生成器
@@ -141,11 +140,13 @@ export class Compiler implements TangCompiler {
     );
     document.model = docModel;
 
-    const compilation = new Compilation(this, {
+    const compilation: TangCompilation = {
+      entry,
+      compiler: this,
       loader,
       parser,
       document,
-    });
+    };
 
     // 调用加载结束钩子
     compileContext.compilation = compilation;
@@ -159,7 +160,7 @@ export class Compiler implements TangCompiler {
    * @param document
    */
   async generate(
-    document: Document,
+    document: TangDocument,
     options?: TangCompilerGenerateOptions,
   ): Promise<TangOutput> {
     const generator = this.getGenerator(options);

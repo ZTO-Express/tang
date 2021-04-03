@@ -1,4 +1,4 @@
-import { DocumentModel, TangParser } from '@devs-tang/common';
+import { TangParser } from '@devs-tang/common';
 
 import { json5 } from '../utils';
 import { normalizeDevkitProcessor } from './util';
@@ -12,7 +12,7 @@ export const json5Parser = (): TangParser => {
 
     name: 'json5',
 
-    async parse(content: string): Promise<DocumentModel> {
+    async parse(content: string) {
       if (typeof content !== 'string') return content;
 
       const result = json5.parse(content);

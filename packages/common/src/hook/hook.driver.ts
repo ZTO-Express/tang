@@ -1,7 +1,7 @@
 import { sortBy, ensureArray } from '../utils';
 
 import { throwInvalidHookError, throwHookError } from './hook-util';
-import { Hook } from '../interfaces';
+import { Hook } from '../declarations';
 
 export class HookDriver<T> {
   hooks: Hook[];

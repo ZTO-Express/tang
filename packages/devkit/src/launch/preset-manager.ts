@@ -7,7 +7,10 @@ import {
   TangModuleTypeKeys,
   utils,
 } from '@devs-tang/common';
-import { CompilerProcessOptions } from '@devs-tang/core';
+import {
+  CompilerProcessOptions,
+  PresetNormalizeOptions,
+} from '@devs-tang/core';
 import { TANG_PRESET_DEFAULT, TANG_CONFIG_KEY_PRESETS } from '../consts';
 
 import { TangLauncher } from './launcher';
@@ -21,10 +24,20 @@ export interface PresetNameInfo {
   pluginName?: string;
 }
 
+/** 预设元数据 */
+export interface PresetMetadata {
+  mergeDefaultPreset?: boolean; // 加载预设时是否合并默认预设
+  noLoad?: boolean; // 是否关闭下载
+  noParse?: boolean; // 是否关闭解析
+  noGenerate?: boolean; // 是否关闭生成
+  noOutput?: boolean; // 是否关闭输出
+}
+
 /** 预设配置数据 */
 export interface PresetConfigData {
   use?: boolean;
-  options?: CompilerProcessOptions;
+  processOptions?: CompilerProcessOptions;
+  presetOptions?: PresetMetadata;
   [prop: string]: any;
 }
 
@@ -142,6 +155,7 @@ export class PresetManager {
     const presetWithConfig: PresetWithConfigData = {
       ...config,
       preset: undefined,
+      presetOptions: rawPresetOptions,
     };
 
     if (rawPresetOptions.mergeDefaultPreset === false) {

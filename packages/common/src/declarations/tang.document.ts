@@ -1,12 +1,12 @@
 // 文档
-export interface Document {
+export interface TangDocument {
   entry: string;
   content: string;
-  model: DocumentModel;
+  model: TangDocumentModel;
 }
 
 // 文档模型
-export interface DocumentModel {
+export interface TangDocumentModel {
   [key: string]: any;
 }
 

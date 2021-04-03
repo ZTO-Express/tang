@@ -1,4 +1,4 @@
-import { GenericFunction } from '../interfaces';
+import { GenericFunction } from '../declarations';
 import { deepmergeAll, DeepmergeOptions } from './internal/deepmerge';
 import { baseGet, baseSet, baseUnset, last } from './internal';
 import { isEmpty, isNil, isObject, isPlainObject } from './check';

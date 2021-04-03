@@ -1,6 +1,6 @@
 import { GenericConfigObject, GenericObject } from './type';
 import { TangModuleTypeNames } from './tang';
-import { Chunk, Document, DocumentModel } from './document';
+import { Chunk, TangDocument, TangDocumentModel } from './tang.document';
 import { TangCompileContext } from './tang.compiler';
 
 export enum TangProcessorTypes {
@@ -54,12 +54,12 @@ export interface TangParser extends TangProcessor {
     content: string,
     options: GenericConfigObject,
     context: TangCompileContext,
-  ) => Promise<DocumentModel>;
+  ) => Promise<TangDocumentModel>;
 }
 
 // 文档生成结果
 export interface TangGeneration {
-  document: Document;
+  document: TangDocument;
   chunks: Chunk[];
 }
 
@@ -73,7 +73,7 @@ export interface TangGenerateResult {
 export interface TangGenerator extends TangProcessor {
   generateOptions?: GenericConfigObject;
   generate: (
-    document: Document,
+    document: TangDocument,
     options: GenericConfigObject,
     context: TangCompileContext,
   ) => Promise<TangGenerateResult>;

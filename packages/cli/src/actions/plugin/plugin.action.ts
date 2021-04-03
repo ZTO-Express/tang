@@ -21,7 +21,7 @@ export class PluginAction extends CliAction {
 
     // 输出插件信息
     console.log('插件信息：');
-    console.log(`${plugin.name}@${plugin.version}`);
+    console.log(`${plugin.name}`);
     console.log(`${plugin.description || ''}`);
 
     return plugin;
@@ -60,7 +60,7 @@ export class PluginAction extends CliAction {
       return undefined;
     }
 
-    console.log(`已成功安装插件 ${plugin.name}@${plugin.version}`);
+    console.log(`已成功安装插件 ${plugin.name}`);
 
     return plugin;
   }

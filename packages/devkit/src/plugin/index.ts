@@ -1,2 +1,2 @@
-export * from './interfaces';
+export * from './declarations';
 export * from './plugin-manager';

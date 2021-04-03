@@ -1,6 +1,6 @@
 import { TangLauncher } from './launcher';
 
-export * from './interfaces';
+export * from './declarations';
 
 export * from './launcher';
 

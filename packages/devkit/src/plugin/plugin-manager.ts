@@ -27,7 +27,7 @@ import {
   PluginShellInstallOptions,
   PluginInstallOptions,
   PluginAddOptions,
-} from './interfaces';
+} from './declarations';
 import { exception } from 'node:console';
 
 export class PluginManager {

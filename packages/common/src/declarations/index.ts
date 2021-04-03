@@ -1,6 +1,6 @@
 export * from './type';
 export * from './hook';
-export * from './document';
+export * from './tang.document';
 export * from './plugin';
 export * from './tang';
 export * from './tang.preset';

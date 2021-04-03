@@ -4,6 +4,7 @@
  */
 
 import {
+  TangCompilation,
   TangCompilerLoadOptions,
   TangModuleTypes,
   utils,
@@ -69,7 +70,7 @@ export class TangLauncher {
     entry: string,
     presetName?: string | TangCompilerLoadOptions,
     options?: TangCompilerLoadOptions,
-  ) {
+  ): Promise<TangCompilation> {
     if (utils.isObject(presetName)) {
       options = presetName;
       presetName = undefined;

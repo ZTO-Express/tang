@@ -1,4 +1,4 @@
-import { Hook } from '../interfaces';
+import { Hook } from '../declarations';
 import { HookError, InvalidHookError, TangError } from '../errors';
 import { isString } from '../utils';
 
