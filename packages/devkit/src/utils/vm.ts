@@ -9,6 +9,7 @@ const Module = _Module as any;
 /**
  * 创建新的require方法，以路径目录为上下文
  * 目前在node 10以下版本测试没有问题
+ * 参考：require-like
  * @param path
  * @param uncached
  * @returns
@@ -18,7 +19,7 @@ export function requireFn(path: string, uncached = false) {
   parentModule.filename = path;
   parentModule.paths = Module._nodeModulePaths(dirname(path));
 
-  function requireLike(file: string) {
+  function _requireLike(file: string) {
     const cache = Module._cache;
     if (uncached) {
       Module._cache = {};
@@ -30,30 +31,29 @@ export function requireFn(path: string, uncached = false) {
     return exports;
   }
 
-  requireLike.resolve = function (request: any) {
+  _requireLike.resolve = function (request: any) {
     const resolved = Module._resolveFilename(request, parentModule);
-    // Module._resolveFilename returns a string since node v0.6.10,
-    // it used to return an array prior to that
-    return resolved instanceof Array ? resolved[1] : resolved;
+    return resolved;
   };
 
-  requireLike.main = require.main;
-  requireLike.cache = require.cache;
+  _requireLike.main = require.main;
+  _requireLike.cache = require.cache;
 
-  return requireLike;
+  return _requireLike;
 }
 
 // Return the exports/module.exports variable set in the content
 // content (String|VmScript): required
+// 参考：node-eval
 export function runScript(
-  content: string | vm.Script,
-  filename?: string,
-  scope?: any,
+  content: string | Buffer | vm.Script,
+  filename?: string | object | boolean,
+  scope?: object | boolean, // 沙盒域或是否包含includeGlobals
   includeGlobals?: boolean,
 ) {
   if (typeof filename !== 'string') {
     if (typeof filename === 'object') {
-      includeGlobals = scope;
+      includeGlobals = scope as boolean;
       scope = filename;
       filename = '';
     } else if (typeof filename === 'boolean') {
@@ -87,7 +87,7 @@ export function runScript(
     exports: exports,
     filename: _filename,
     id: _filename,
-    parent: module.parent,
+    children: module.children,
     require: sandbox.require || requireFn(_filename),
   };
   sandbox.global = sandbox;

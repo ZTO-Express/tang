@@ -2,7 +2,6 @@ import * as path from 'path';
 
 import {
   TangPlugin,
-  NotImplementedError,
   NotFoundError,
   InvalidPluginError,
   InvalidArguments,
@@ -18,7 +17,7 @@ import {
   TANG_PRESET_DEFAULT,
 } from '../consts';
 
-import { fs, uuid, runScript } from '../utils';
+import { fs, uuid, vm } from '../utils';
 import { Runner, RunnerFactory } from '../runners';
 
 import {
@@ -80,7 +79,7 @@ export class PluginManager {
       prefix = name + '@';
     }
 
-    const names = this.list(prefix);
+    const names = await this.list(prefix);
     return names;
   }
 
@@ -423,7 +422,7 @@ module.exports = require('${moduleName}');
       }
 
       // 为了防止缓存，这里采用沙盒运行脚本
-      const rawPlugin = runScript(
+      const rawPlugin = vm.runScript(
         pluginScript,
         pluginScriptPath,
         undefined,

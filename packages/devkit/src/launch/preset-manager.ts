@@ -71,7 +71,6 @@ export class PresetManager {
     }
 
     const nameInfo = this.parsePresetName(name);
-    if (!nameInfo) throw new InvalidArguments(`无效名称 ${name}`);
 
     const normalizedName = nameInfo.fullName;
 
@@ -88,10 +87,10 @@ export class PresetManager {
 
     let presetWithConfig = await this.getPresetWithConfigByName(normalizedName);
 
-    if (!presetWithConfig && nameInfo.pluginName) {
+    if (!presetWithConfig) {
       if (nameInfo.pluginName) {
         throw new InvalidArguments(
-          `插件 ${nameInfo.pluginName} 不包含任何预设`,
+          `插件 ${nameInfo.pluginName} 不包含预设 ${nameInfo.name}`,
         );
       } else {
         throw new InvalidArguments(`无效预设名称 ${name}`);
@@ -118,7 +117,6 @@ export class PresetManager {
    */
   async getUsedPresetWithConfig(): Promise<PresetWithConfigData> {
     const config = await this.getUsedConfig();
-    if (!config) return undefined;
 
     if (this.isDefault(config.name)) {
       const preset = this.getDefaultPreset();
@@ -131,8 +129,9 @@ export class PresetManager {
 
   /** 获取正在使用的插件及预设配置 */
   async getPresetWithConfigByName(name: string): Promise<PresetWithConfigData> {
+    if (!name) return undefined;
+
     const config = await this.getConfigByName(name);
-    if (!config) return undefined;
 
     if (this.isDefault(config.name)) {
       const preset = this.getDefaultPreset();
@@ -147,6 +146,16 @@ export class PresetManager {
       nameInfo.name,
     );
 
+    const presetWithConfig = this.normalizePresetWithConfig(rawPreset, config);
+
+    return presetWithConfig;
+  }
+
+  /** 规范化预设并返回预设及配置 */
+  normalizePresetWithConfig(
+    rawPreset: TangPreset,
+    config: PresetConfigDataWithName,
+  ): PresetWithConfigData {
     if (!rawPreset) return undefined;
 
     const rawPresetOptions = rawPreset.presetOptions || {};
@@ -200,13 +209,14 @@ export class PresetManager {
   /** 获取正在使用的插件名 */
   getUsedPluginName() {
     const config = this.getUsedConfig();
-    if (!config || !config.name) return undefined;
-
     const nameInfo = this.parsePresetName(config.name);
     return nameInfo && nameInfo.pluginName;
   }
 
-  /** 获取当前正在使用的预设，如果没有正在使用的预设，则返回默认预设 */
+  /**
+   * 获取当前正在使用的预设
+   * @returns 如果没有正在使用的预设，则返回默认预设, 所以一定会有返回值
+   */
   getUsedConfig(): PresetConfigDataWithName {
     const allConfigs = this.getAllConfigs();
 
@@ -326,7 +336,7 @@ export class PresetManager {
   }
 
   /**
-   * 解析预设名称
+   * 解析预设名称，只要presetName部位空，将永远不会返回空
    * @param presetName
    */
   parsePresetName(presetName: string): PresetNameInfo {

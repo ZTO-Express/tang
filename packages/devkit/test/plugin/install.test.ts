@@ -115,6 +115,15 @@ describe('tang/plugin/install：安装插件', () => {
 
     const pluginName = `cowsay@${installOptions.version}`;
 
+    let pluginNames = await pluginManager.listByName(pluginName);
+    expect(pluginNames[0]).toBe(pluginName);
+
+    pluginNames = await pluginManager.listByName('cowsay');
+    expect(pluginNames[0]).toBe(pluginName);
+
+    pluginNames = await pluginManager.listByName();
+    expect(pluginNames[0]).toBe(pluginName);
+
     const list = await pluginManager.list('cowsay');
     expect(list).toEqual([pluginName]);
 

@@ -6,8 +6,8 @@ export * as json5 from 'json5';
 export * as uuid from 'uuid';
 export * as fs from './fs';
 export * as memfs from './memfs';
+export * as vm from './vm';
 export * from './validate-schema';
-export * from './vm';
 
 export const execa = _execa;
 export const http = core.http;
