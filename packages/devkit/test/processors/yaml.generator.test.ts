@@ -1,5 +1,6 @@
 import * as testUtil from '../util';
-import { Compilation, Compiler, normalizeProcessor } from '@devs-tang/core';
+import { TangCompilation } from '@devs-tang/common';
+import { Compiler, normalizeProcessor } from '@devs-tang/core';
 import { yaml } from '../../src/utils';
 import * as processors from '../../src/processors';
 
@@ -7,7 +8,7 @@ describe('generator/yaml：yaml生成器', () => {
   const compiler: Compiler = testUtil.createDefaultCompiler();
   const yamlGenerator = processors.yamlGenerator();
 
-  let docCompilation: Compilation;
+  let docCompilation: TangCompilation;
 
   beforeAll(async () => {
     const tfDocPath = testUtil.resolveFixturePath('documents/openapi.yaml');

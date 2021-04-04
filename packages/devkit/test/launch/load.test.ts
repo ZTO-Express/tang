@@ -15,6 +15,8 @@ describe('tang/launch/load：文档加载', () => {
 
     launcher.configManager.unset(TANG_CONFIG_KEY_PRESETS);
 
+    await expect(launcher.load(docPath, 'nonExists')).resolves.toBeUndefined();
+
     let result = await launcher.load(docPath, undefined, {
       parser: 'yaml',
     });

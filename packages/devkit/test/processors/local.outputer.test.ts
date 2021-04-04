@@ -56,7 +56,7 @@ describe('outputer/local：local输出器', () => {
       chunks: sampleChunks,
     } as any;
 
-    const output = await localOutputer.output(sampleGeneration, {
+    let output = await localOutputer.output(sampleGeneration, {
       outputDir: testTmpDir,
       overwrite: true,
     });
@@ -71,26 +71,30 @@ describe('outputer/local：local输出器', () => {
     expect(testData.name).toStrictEqual('tang-yapi-sharing');
     expect(testData).toStrictEqual(samplePresetData);
 
-    const output2 = await localOutputer.output(sampleGeneration, {
+    output = await localOutputer.output(sampleGeneration, {
       outputDir: testTmpDir,
       clearDir: false,
       overwrite: false,
     });
-    expect(output2.files.length).toBe(0);
+    expect(output.files.length).toBe(0);
 
-    const output3 = await localOutputer.output(sampleGeneration, {
+    output = await localOutputer.output(sampleGeneration, {
       outputDir: testTmpDir,
       clearDir: false,
       overwrite: true,
     });
-    expect(output3.files.length).toBe(1);
+    expect(output.files.length).toBe(1);
 
-    const output4 = await localOutputer.output(sampleGeneration, {
+    output = await localOutputer.output(sampleGeneration, {
       outputDir: testTmpDir,
       clearDir: true,
       overwrite: false,
     });
-    expect(output3.files.length).toBe(1);
+    expect(output.files.length).toBe(1);
+
+    await expect(localOutputer.output(sampleGeneration, {})).rejects.toThrow(
+      '请提供输出目录',
+    );
 
     await fs.emptyDir(testTmpDir);
   });

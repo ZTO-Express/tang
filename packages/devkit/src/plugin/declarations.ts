@@ -14,12 +14,11 @@ export interface PluginManagerOptions extends GenericConfigObject {
   pluginDir?: string;
 }
 
-// 插件安装类型
+// 插件安装类型 (目前暂不支持脚本安装)
 export type PluginInstallTypes = 'npm' | 'npm_link' | 'shell';
 
 export interface BasePluginInstallOptions extends PluginNameInfo {
   type?: PluginInstallTypes;
-  install?: boolean | string[]; // 是否执行安装或安装脚本
   cwd?: string; // 安装命令执行目录
   force?: boolean; // 强制安装标志（强制删除原安装并重新安装）
 }

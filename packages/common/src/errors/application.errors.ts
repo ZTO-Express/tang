@@ -85,3 +85,20 @@ export class NotFoundError extends TangError {
     );
   }
 }
+
+// 命令/方法执行失败
+export class ExecuteFailedError extends TangError {
+  constructor(
+    objectOrError?: string | object | any,
+    description = 'Execute Failed',
+  ) {
+    super(
+      TangError.createBody(
+        objectOrError,
+        description,
+        ErrorCodes.EXECUTE_FAILED,
+      ),
+      ErrorCodes.EXECUTE_FAILED,
+    );
+  }
+}

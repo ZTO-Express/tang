@@ -11,6 +11,11 @@ import { http } from '@devs-tang/core';
 
 export * from 'fs-extra';
 
+/** 合并路径 */
+export function joinPath(...paths: string[]) {
+  return path.join(...paths);
+}
+
 /**
  * 同步读取json5
  * @param file
@@ -19,14 +24,10 @@ export * from 'fs-extra';
  */
 export function readJSON5Sync(file: string) {
   // 绝对路径
-  let _file = file;
+  const _file = file;
   let _data: any;
 
-  if (utils.isRelativePath(file)) {
-    _file = path.join(process.cwd(), file);
-  }
-
-  if (utils.isAbsolutePath(_file)) {
+  if (utils.isPath(_file)) {
     const exists = fs.pathExistsSync(_file);
     if (!exists) return undefined;
 
@@ -42,10 +43,17 @@ export function readJSON5Sync(file: string) {
 
 /** 读取node package信息 */
 export async function readPackageInfo(packagePath: string) {
+  if (!packagePath) return undefined;
+
   const exists = await fs.pathExists(packagePath);
   if (!exists) return undefined;
 
-  const jsonFile = path.join(packagePath, 'package.json');
+  let jsonFile = packagePath;
+
+  if (!jsonFile.endsWith('package.json')) {
+    jsonFile = path.join(packagePath, 'package.json');
+  }
+
   const existsJson = await fs.pathExists(jsonFile);
   if (!existsJson) return undefined;
 
@@ -60,16 +68,12 @@ export async function readPackageInfo(packagePath: string) {
  */
 export async function resolveFile(file: string, encoding = 'utf-8') {
   // 绝对路径
-  let _file = file;
+  const _file = file;
   let _data: any;
   let _encoding = encoding;
   if (!encoding || encoding === 'json') _encoding = 'utf-8';
 
-  if (utils.isRelativePath(file)) {
-    _file = path.join(process.cwd(), file);
-  }
-
-  if (utils.isAbsolutePath(_file)) {
+  if (utils.isPath(_file)) {
     const exists = await fs.pathExists(_file);
     if (!exists) return undefined;
 

@@ -33,6 +33,8 @@ export function resolveFixtureUrl(...args: string[]) {
 
 export const docLoader = devkit.docLoader;
 
+export const moduleLoader = devkit.moduleLoader;
+
 export const yamlParser = devkit.yamlParser;
 
 export const yamlGenerator = devkit.yamlGenerator;

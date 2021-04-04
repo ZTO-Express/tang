@@ -1,4 +1,5 @@
 import * as execa from 'execa';
+import { ExecuteFailedError } from '@devs-tang/common';
 
 export class AbstractRunner {
   constructor(protected binary: string, protected args: string[] = []) {}
@@ -17,11 +18,6 @@ export class AbstractRunner {
     };
 
     const results = await execa(this.binary, [...this.args, ...args], options);
-
-    if (results.exitCode !== 0) {
-      throw new Error(`\nFailed to execute command: ${this.binary} ${command}`);
-    } else {
-      return results.stdout;
-    }
+    return results.stdout;
   }
 }

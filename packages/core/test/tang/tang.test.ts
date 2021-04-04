@@ -1,18 +1,20 @@
 import * as testUtil from '../util';
 
 import { ErrorCodes } from '@devs-tang/common';
-import { createCompiler, moduleLoader } from '../../src';
+import { createCompiler } from '../../src';
 import { getNormalizedOptions } from '../../src/options/normalize-options';
 
 describe('tang：tang工具配置', () => {
-  const tfDocPath = testUtil.resolveFixturePath('mesh.js');
+  const jsDocPath = testUtil.resolveFixturePath('mesh.js');
 
   it('tang compiler', async () => {
-    const defaultOptions = getNormalizedOptions();
+    const defaultOptions = getNormalizedOptions({
+      loaders: [testUtil.moduleLoader()],
+    });
 
     const compiler = await createCompiler(defaultOptions);
 
-    expect(compiler.loaders.length).toBe(1);
+    expect(compiler.loaders.length).toBe(2);
     expect(compiler.parsers.length).toBe(1);
     expect(compiler.generators.length).toBe(1);
     expect(compiler.outputers.length).toBe(1);
@@ -30,12 +32,14 @@ describe('tang：tang工具配置', () => {
 
   it('tang compiler load & generate', async () => {
     const normalizedOptions = getNormalizedOptions({
-      loaders: [moduleLoader()],
+      loaders: [testUtil.moduleLoader()],
+      generators: [testUtil.yamlGenerator()],
+      outputers: [testUtil.memoryOutputer()],
     });
 
     const compiler = await createCompiler(normalizedOptions);
 
-    const compilation = await compiler.load(tfDocPath, {
+    const compilation = await compiler.load(jsDocPath, {
       parser: 'json',
     });
 
@@ -55,18 +59,18 @@ describe('tang：tang工具配置', () => {
       code: ErrorCodes.OUTPUTER_ERROR,
     });
 
-    // const output = await compiler.generate(compilation.document, {
-    //   generator: 'yaml',
-    //   outputer: 'memory',
-    // });
+    const output = await compiler.generate(compilation.document, {
+      generator: 'yaml',
+      outputer: 'memory',
+    });
 
-    // expect(output.files.length).toBe(1);
+    expect(output.files.length).toBe(1);
 
-    // const genFileBuffer = await output.vol.promises.readFile(
-    //   output.files[0].path,
-    // );
+    const genFileBuffer = await output.vol.promises.readFile(
+      output.files[0].path,
+    );
 
-    // expect(genFileBuffer).toBeInstanceOf(Buffer);
-    // expect(genFileBuffer.toString()).toMatch('openapi: 3.0.0');
+    expect(genFileBuffer).toBeInstanceOf(Buffer);
+    expect(genFileBuffer.toString()).toMatch('name:');
   });
 });

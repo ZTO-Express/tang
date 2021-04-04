@@ -4,13 +4,40 @@ import * as testUtil from '../util';
 
 describe('utils/fs：fs实用方法', () => {
   it('从本地目录获取文件', async () => {
-    const yfDocPath = testUtil.resolveFixturePath(
-      'meshs/yapi-fsharing/mesh.json',
-    );
+    const packagePath = testUtil.resolvePackagePath(true);
 
-    const meshContent = await fs.resolveFile(yfDocPath, 'json');
+    let fileData = await fs.resolveFile(packagePath, 'json');
+    expect(fileData.name).toBe('@devs-tang/devkit');
 
-    expect(meshContent.name).toEqual('tang-yapi-sharing');
+    fileData = await fs.resolveFile('/noneExists', 'json');
+    expect(fileData).toBeUndefined();
+  });
+
+  it('同步读取json5文件 readJSON5Sync', async () => {
+    expect(fs.readJSON5Sync(undefined)).toBeUndefined();
+    expect(fs.readJSON5Sync('./noneExists')).toBeUndefined();
+
+    const json5Path = testUtil.resolveFixturePath('documents/preset.json');
+    expect(fs.readJSON5Sync(json5Path).name).toEqual('@tang/yapi-sharing');
+  });
+
+  it('读取packageInfo readPackageInfo', async () => {
+    const packageDir = testUtil.resolvePackagePath(false);
+
+    let packageInfo = await fs.readPackageInfo(packageDir);
+    expect(packageInfo.name).toBe('@devs-tang/devkit');
+
+    packageInfo = await fs.readPackageInfo(packageDir + '/package.json');
+    expect(packageInfo.name).toBe('@devs-tang/devkit');
+
+    packageInfo = await fs.readPackageInfo(undefined);
+    expect(packageInfo).toBeUndefined();
+
+    packageInfo = await fs.readPackageInfo('../nonExists');
+    expect(packageInfo).toBeUndefined();
+
+    packageInfo = await fs.readPackageInfo(__dirname);
+    expect(packageInfo).toBeUndefined();
   });
 
   it('从url获取文件', async () => {

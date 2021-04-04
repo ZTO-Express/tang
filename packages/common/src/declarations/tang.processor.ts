@@ -41,8 +41,8 @@ export interface TangLoader extends TangProcessor {
   loadOptions?: GenericConfigObject;
   load(
     entry: string,
-    options: GenericConfigObject,
-    context: TangCompileContext,
+    options?: GenericConfigObject,
+    context?: TangCompileContext,
   ): Promise<string | Buffer>;
   load<T>(entry: string, options?: GenericConfigObject): Promise<T>; // 加载方法
 }
@@ -52,8 +52,8 @@ export interface TangParser extends TangProcessor {
   parseOptions?: GenericConfigObject;
   parse: (
     content: string,
-    options: GenericConfigObject,
-    context: TangCompileContext,
+    options?: GenericConfigObject,
+    context?: TangCompileContext,
   ) => Promise<TangDocumentModel>;
 }
 
@@ -74,8 +74,8 @@ export interface TangGenerator extends TangProcessor {
   generateOptions?: GenericConfigObject;
   generate: (
     document: TangDocument,
-    options: GenericConfigObject,
-    context: TangCompileContext,
+    options?: GenericConfigObject,
+    context?: TangCompileContext,
   ) => Promise<TangGenerateResult>;
 }
 
@@ -90,7 +90,7 @@ export interface TangOutputer extends TangProcessor {
   outputOptions?: GenericConfigObject;
   output: (
     generation: TangGeneration,
-    options: GenericConfigObject,
-    context: TangCompileContext,
+    options?: GenericConfigObject,
+    context?: TangCompileContext,
   ) => Promise<TangOutput>;
 }

@@ -1,9 +1,8 @@
 import * as testUtil from '../util';
-import { TangModuleTypes } from '@devs-tang/common';
 import { TangLauncher, PluginManager } from '../../src';
-import { TANG_CONFIG_KEY_PRESETS, TANG_PRESET_DEFAULT } from '../../src/consts';
+import { TANG_CONFIG_KEY_PRESETS } from '../../src/consts';
 
-describe('tang/plugin/pluginManager：插件管理', () => {
+describe('tang/plugin/pluginManager parse：解析插件名称', () => {
   let pluginManager: PluginManager;
   let launcher: TangLauncher;
 

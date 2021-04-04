@@ -1,16 +1,18 @@
 import { TangLoader, utils } from '@devs-tang/common';
-import { normalizeCoreProcessor } from './util';
+import { normalizeDevkitProcessor } from './util';
 
 /**
  * 通过加载js模块
  */
 export const moduleLoader = (): TangLoader => {
-  return normalizeCoreProcessor({
+  return normalizeDevkitProcessor({
     type: 'loader',
 
     name: 'module',
 
-    test: (entry: string) => utils.isPath(entry),
+    test: (entry: string) =>
+      utils.isAbsolutePath(entry) &&
+      (entry.endsWith('.js') || entry.endsWith('.json')),
 
     async load(entry: string): Promise<any> {
       // eslint-disable-next-line @typescript-eslint/no-var-requires

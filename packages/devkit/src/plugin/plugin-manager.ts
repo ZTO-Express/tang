@@ -1,4 +1,5 @@
 import * as path from 'path';
+
 import {
   TangPlugin,
   NotImplementedError,
@@ -7,6 +8,7 @@ import {
   InvalidArguments,
   TangPreset,
   utils,
+  TangError,
 } from '@devs-tang/common';
 import { normalizePresetOptions } from '@devs-tang/core';
 
@@ -16,7 +18,7 @@ import {
   TANG_PRESET_DEFAULT,
 } from '../consts';
 
-import { fs, uuid } from '../utils';
+import { fs, uuid, runScript } from '../utils';
 import { Runner, RunnerFactory } from '../runners';
 
 import {
@@ -24,11 +26,9 @@ import {
   PluginManagerOptions,
   PluginNpmInstallOptions,
   PluginNpmLinkInstallOptions,
-  PluginShellInstallOptions,
   PluginInstallOptions,
   PluginAddOptions,
 } from './declarations';
-import { exception } from 'node:console';
 
 export class PluginManager {
   readonly pluginDir: string;
@@ -52,7 +52,7 @@ export class PluginManager {
    * @returns true: 存在；false: 不存在
    */
   async exists(name: string, version?: string): Promise<boolean> {
-    const existsPluginName = await this.findExistsPluginName(name, version);
+    const existsPluginName = await this.getExistsPluginName(name, version);
     return !!existsPluginName;
   }
 
@@ -74,7 +74,12 @@ export class PluginManager {
    * @returns
    */
   async listByName(name?: string): Promise<string[]> {
-    const prefix = name ? `${name}@` : name;
+    let prefix = name;
+
+    if (name && name.indexOf('@') < 0) {
+      prefix = name + '@';
+    }
+
     const names = this.list(prefix);
     return names;
   }
@@ -89,12 +94,14 @@ export class PluginManager {
 
     const pluginNames = await this.getPluginNames(true);
 
-    for (const name in pluginNames) {
+    const ops = pluginNames.map(async name => {
       const pluginPath = this.getPluginPath(name);
 
       const exists = await fs.pathExists(`${pluginPath}/index.js`);
       if (!exists) await this.delete(name);
-    }
+    });
+
+    await Promise.all(ops);
   }
 
   /**
@@ -106,7 +113,7 @@ export class PluginManager {
   async get(name: string, version?: string): Promise<TangPlugin> {
     if (!name) return undefined;
 
-    const pluginName = await this.findExistsPluginName(name, version);
+    const pluginName = await this.getExistsPluginName(name, version);
     if (!pluginName) return undefined;
 
     const plugin = await this.getByName(pluginName);
@@ -123,9 +130,10 @@ export class PluginManager {
     if (utils.isPath(name)) {
       packageName = name;
       const packageInfo = await fs.readPackageInfo(packageName);
-      name = packageInfo.name;
 
       if (!packageInfo) return undefined;
+
+      name = packageInfo.name;
     }
 
     const nameInfo = this.parsePluginName(name, options.version);
@@ -147,22 +155,20 @@ export class PluginManager {
    * 删除指定插件
    * @param name 插件名称
    */
-  async delete(
-    name: string,
-    version?: string,
-  ): Promise<TangPlugin | undefined> {
-    const plugin = await this.get(name, version);
+  async delete(name: string, version?: string): Promise<boolean> {
+    if (!name) return undefined;
 
-    if (!plugin) return undefined;
+    const pluginName = await this.getExistsPluginName(name, version);
+    if (!pluginName) return undefined;
 
-    const pluginPath = this.getPluginPath(plugin.name);
+    const pluginPath = this.getPluginPath(pluginName);
 
     await fs.emptyDir(pluginPath);
     await fs.rmdir(pluginPath);
 
     await this.getPluginNames(true);
 
-    return plugin;
+    return true;
   }
 
   /**
@@ -209,11 +215,25 @@ export class PluginManager {
    */
   async getPreset(
     pluginName: string,
-    presetName: string = TANG_PRESET_DEFAULT,
+    presetName?: string,
   ): Promise<TangPreset> {
     const plugin = await this.get(pluginName);
 
+    const preset = this.getPresetFromPlugin(plugin, presetName);
+
+    return preset;
+  }
+
+  /**
+   * 从插件对象中获取指定的预设
+   * @param plugin
+   * @param presetName
+   * @returns
+   */
+  getPresetFromPlugin(plugin: TangPlugin, presetName?: string): TangPreset {
     if (!plugin) return undefined;
+
+    presetName = presetName || TANG_PRESET_DEFAULT;
 
     let rawPreset: any;
 
@@ -277,7 +297,7 @@ export class PluginManager {
     const tmpFolder = this.getPluginTmpPath(folderId);
 
     // 查询当前已存在的插件
-    const existsPluginName = await this.findExistsPluginName(
+    const existsPluginName = await this.getExistsPluginName(
       options.name,
       options.version,
     );
@@ -288,9 +308,6 @@ export class PluginManager {
     if (existsPluginName && !options.force) {
       return this.get(existsPluginName);
     }
-
-    // 不执行安装
-    if (options.install === false) return undefined;
 
     // 进入plugin，临时目录
     await fs.ensureDir(tmpFolder);
@@ -303,9 +320,6 @@ export class PluginManager {
         break;
       case 'npm_link':
         await this.npmLinkInstall(options as PluginNpmLinkInstallOptions);
-        break;
-      case 'shell':
-        await this.shellInstall(options as PluginShellInstallOptions);
         break;
       default:
         throw new InvalidArguments(`不支持安装类型${options.type}`);
@@ -368,8 +382,7 @@ module.exports = require('${moduleName}');
   async npmLinkInstall(options: PluginNpmLinkInstallOptions) {
     const runner = RunnerFactory.create(Runner.NPM);
 
-    let command = `link ${options.package}`;
-    if (options.extArgs) command += ` ${options.extArgs}`;
+    const command = `link ${options.package}`;
     await runner.run(command, true, options.cwd);
 
     const packageData = await fs.readPackageInfo(options.package);
@@ -387,14 +400,6 @@ module.exports = require('${moduleName}');
     await fs.writeFile(pluginModuleFile, pluginModuleText);
   }
 
-  /**
-   * 通过执行shell脚本安装
-   * @param options
-   */
-  async shellInstall(options: PluginShellInstallOptions) {
-    throw new NotImplementedError();
-  }
-
   /** 通过名称获取插件 */
   async getByName(name: string): Promise<TangPlugin> {
     const nameInfo = this.parsePluginName(name);
@@ -408,19 +413,24 @@ module.exports = require('${moduleName}');
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const plugin = require(pluginPath);
+      // const rawPlugin = require(pluginPath);
 
-      pluginData = plugin;
+      const pluginScriptPath = fs.joinPath(pluginPath, 'index.js');
+      const pluginScript = await fs.resolveFile(pluginScriptPath);
 
-      if (utils.isFunction(plugin)) {
-        pluginData = await Promise.resolve().then(() => plugin.call(this));
-      } else if (utils.isFunction(plugin.metadata)) {
-        pluginData = await Promise.resolve().then(() =>
-          plugin.metadata.call(this),
-        );
-      } else if (utils.isObject(plugin.metadata)) {
-        pluginData = plugin.metadata;
+      if (!pluginScript) {
+        throw new TangError('插件脚本不存在', 'MODULE_NOT_FOUND');
       }
+
+      // 为了防止缓存，这里采用沙盒运行脚本
+      const rawPlugin = runScript(
+        pluginScript,
+        pluginScriptPath,
+        undefined,
+        true,
+      );
+
+      pluginData = await this.retrievePluginMetadata(rawPlugin);
     } catch (ex) {
       if (ex.code === 'MODULE_NOT_FOUND') {
         await this.delete(name);
@@ -439,8 +449,31 @@ module.exports = require('${moduleName}');
     return pluginData;
   }
 
-  /** 查找已存在的预设名称 */
-  async findExistsPluginName(name: string, version?: string) {
+  /**
+   * 获取插件元数据
+   * @param rawPlugin 原始加载的插件数据
+   * @returns
+   */
+  async retrievePluginMetadata(rawPlugin: any) {
+    if (!rawPlugin) return rawPlugin;
+
+    let pluginData = rawPlugin;
+
+    if (utils.isFunction(rawPlugin)) {
+      pluginData = await Promise.resolve().then(() => rawPlugin.call(this));
+    } else if (utils.isFunction(rawPlugin.metadata)) {
+      pluginData = await Promise.resolve().then(() =>
+        rawPlugin.metadata.call(this),
+      );
+    } else if (utils.isObject(rawPlugin.metadata)) {
+      pluginData = rawPlugin.metadata;
+    }
+
+    return pluginData;
+  }
+
+  /** 获取已存在的预设名称 */
+  async getExistsPluginName(name: string, version?: string) {
     const nameInfo = this.parsePluginName(name, version);
 
     const pluginNames = await this.getPluginNames();
@@ -470,6 +503,7 @@ module.exports = require('${moduleName}');
         it => it && !['.', '_'].includes(it.charAt(0)),
       );
 
+      // 刷新缓存
       this.pluginNames = pluginNames;
     }
 

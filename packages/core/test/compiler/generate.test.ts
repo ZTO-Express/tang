@@ -1,7 +1,7 @@
 import * as testUtil from '../util';
-import { ErrorCodes } from '@devs-tang/common';
+import { TangCompilation, ErrorCodes } from '@devs-tang/common';
 
-import { Compilation, Compiler } from '../../src';
+import { Compiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/load：load 加载', () => {
@@ -15,7 +15,7 @@ describe('compiler/load：load 加载', () => {
 
   let compiler1: Compiler;
   let compiler2: Compiler;
-  let yamlCompilation: Compilation;
+  let yamlCompilation: TangCompilation;
 
   const tfDocPath = testUtil.resolveFixturePath('openapi.yaml');
 

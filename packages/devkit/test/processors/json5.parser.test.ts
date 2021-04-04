@@ -23,8 +23,11 @@ describe('parser/json5：json5解析器', () => {
   });
 
   it('json5Parser parse方法', async () => {
-    const presetData = await json5Parser.parse(presetText);
+    let presetData = await json5Parser.parse(presetText);
     expect(presetData.name).toBe('test-name');
+
+    presetData = await json5Parser.parse({ test: true } as any);
+    expect(presetData).toEqual({ test: true });
   });
 
   it('docLoader parse方法', async () => {

@@ -159,7 +159,7 @@ export class TangLauncher {
     if (!pluginName) return undefined;
 
     // 删除插件
-    const plugin = await this.pluginManager.delete(pluginName);
+    const result = await this.pluginManager.delete(pluginName);
 
     // 删除插件相关预设
     const presetNames = this.presetManager.getAllConfigNames(
@@ -169,7 +169,7 @@ export class TangLauncher {
     presetNames.forEach(name => this.presetManager.unsetConfig(name));
     await this.presetManager.saveConfig();
 
-    return plugin;
+    return result;
   }
 
   /**

@@ -90,4 +90,16 @@ describe('common/error：应用错误', () => {
       },
     });
   });
+
+  it('方法或命令执行错误 Execute Failed Error', () => {
+    expect(new errors.ExecuteFailedError()).toMatchObject({
+      name: 'TangError',
+      code: ErrorCodes.EXECUTE_FAILED,
+      message: 'Execute Failed',
+      body: {
+        code: ErrorCodes.EXECUTE_FAILED,
+        message: 'Execute Failed',
+      },
+    });
+  });
 });

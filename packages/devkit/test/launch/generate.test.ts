@@ -4,7 +4,6 @@ import { TangLauncher } from '../../src';
 import { TANG_CONFIG_KEY_PRESETS } from '../../src/consts';
 
 describe('tang/launch/generate：代码生成', () => {
-  const tmpOutputDir = testUtil.resolveTmpDir();
   const tfDocPath = testUtil.resolveFixturePath('documents/preset.json');
 
   let launcher: TangLauncher;
@@ -14,6 +13,10 @@ describe('tang/launch/generate：代码生成', () => {
   });
 
   it('generate', async () => {
+    await expect(
+      launcher.generate(tfDocPath, 'nonExists'),
+    ).resolves.toBeUndefined();
+
     await expect(
       launcher.generate(tfDocPath, { generator: 'NonExists' }),
     ).rejects.toMatchObject({

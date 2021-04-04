@@ -14,6 +14,13 @@ export { fs };
 export const appRescBaseUrl = 'http://resc.pisaas.com/apps/tang';
 export const appHomeDir = `${os.homedir}/.tang`;
 
+/** 当前package.json文件 */
+export function resolvePackagePath(isFilePath = true) {
+  const packageDir = path.join(__dirname, '../');
+  if (!isFilePath) return packageDir;
+  return path.join(packageDir, 'package.json');
+}
+
 /** 获取fixture位置 */
 export function resolveFixturePath(...args: string[]) {
   return path.join(__dirname, '../../fixtures', ...args);

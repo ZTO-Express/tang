@@ -3,7 +3,10 @@ import {
   PluginManager,
   PluginNpmLinkInstallOptions,
   TangLauncher,
+  fs,
 } from '../../src';
+
+import { TANG_PRESET_DEFAULT } from '../../src/consts';
 
 describe('tang/plugin/install：安装插件', () => {
   let launcher: TangLauncher;
@@ -24,6 +27,8 @@ describe('tang/plugin/install：安装插件', () => {
   it('从npm安装插件', async () => {
     await pluginManager.add('cowsay', {
       force: true,
+      registry: 'https://registry.npm.taobao.org/',
+      extArgs: '--no-save',
     });
 
     let list = await pluginManager.list('cowsay');
@@ -56,10 +61,41 @@ describe('tang/plugin/install：安装插件', () => {
       return pluginManager.run('cowsay', 'name1');
     }).rejects.toThrow('未找到插件方法cowsay.name1');
 
+    // 重复安装直接返回
+    const plugin = await pluginManager.add('cowsay');
+
+    expect(plugin.name).toBe('cowsay');
+
+    // 删除空值
+    await expect(pluginManager.delete(undefined)).resolves.toBeUndefined();
+
     await pluginManager.delete('cowsay');
 
     list = await pluginManager.list('cowsay');
     expect(list).toEqual([]);
+  });
+
+  it('本地安装插件（包含preset）', async () => {
+    const packagePath = testUtil.resolveFixturePath('plugins/test');
+
+    const plugin = await pluginManager.add(packagePath, {
+      force: true,
+    });
+
+    expect(plugin).not.toBeUndefined();
+
+    let preset = await pluginManager.getPreset('test-tang');
+    expect(preset).toEqual(plugin.preset);
+
+    preset = await pluginManager.getPreset('test-tang', TANG_PRESET_DEFAULT);
+    expect(preset).toEqual(plugin.preset);
+
+    const orderPreset = await pluginManager.getPreset('test-tang', 'order');
+    expect(orderPreset).toEqual(plugin.presets.find(it => it.name === 'order'));
+
+    await pluginManager.delete('test-tang');
+    const list1 = await pluginManager.list('test-tang');
+    expect(list1).toEqual([]);
   });
 
   it('从npm link安装插件', async () => {
@@ -92,41 +128,52 @@ describe('tang/plugin/install：安装插件', () => {
     });
     expect(result1).toContain('hello1');
 
-    await pluginManager.delete(pluginName, installOptions.version);
+    await expect(pluginManager.run('nonExists', 'actionName')).rejects.toThrow(
+      '未找到插件',
+    );
+
+    await pluginManager.deleteAll(pluginName);
 
     const list1 = await pluginManager.list('cowsay');
     expect(list1).toEqual([]);
   });
 
-  it('从shell Install安装插件', async () => {
+  it('暂不支持从脚本安装插件', async () => {
     const packagePath = testUtil.resolveFixturePath('plugins/test');
 
     await expect(
       pluginManager.add(packagePath, {
         force: true,
-        type: 'shell',
-      }),
-    ).rejects.toThrow('Not Implemented');
-
-    await expect(
-      pluginManager.add(packagePath, {
-        force: true,
-        type: 'notExists' as any,
+        type: 'shell' as any,
       }),
     ).rejects.toThrow('不支持');
   });
 
-  it('安装插件（包含preset）', async () => {
-    const packagePath = testUtil.resolveFixturePath('plugins/test');
+  it('安装/清理无效插件', async () => {
+    const badPluginName = 'bad-plugin';
+    const badPluginDir = fs.joinPath(pluginManager.pluginDir, badPluginName);
+    const pluginTmpDir = pluginManager.pluginTmpDir;
 
-    const plugin = await pluginManager.add(packagePath, {
-      force: true,
-    });
+    fs.ensureDirSync(badPluginDir);
+    await expect(pluginManager.add(badPluginDir)).resolves.toBeUndefined();
 
-    expect(plugin).not.toBeUndefined();
+    await expect(pluginManager.deleteAll(undefined)).rejects.toThrow(
+      '请提供插件名称',
+    );
 
-    await pluginManager.delete('test-tang');
-    const list1 = await pluginManager.list('test-tang');
-    expect(list1).toEqual([]);
+    fs.ensureDirSync(badPluginDir);
+    fs.ensureDirSync(pluginTmpDir);
+
+    expect(fs.pathExistsSync(badPluginDir)).toBe(true);
+    expect(fs.pathExistsSync(pluginTmpDir)).toBe(true);
+
+    await pluginManager.prune();
+
+    expect(fs.pathExistsSync(badPluginDir)).toBe(false);
+    expect(fs.pathExistsSync(pluginTmpDir)).toBe(false);
+
+    fs.emptyDirSync(pluginManager.pluginDir);
+    fs.rmdirSync(pluginManager.pluginDir);
+    await expect(pluginManager.getPluginNames()).resolves.toEqual([]);
   });
 });
