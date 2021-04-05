@@ -1,0 +1,407 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: Guitar系统服务端渲染接口文档
+  description: 基于Guitar服务端渲染的相关API
+  contact:
+    name: Kaitong Zhang
+    email: zhangkaitong@zto.com
+  x-config:
+    maven:
+      GROUP: com.starunion
+      ARTIFECT_ID: integration
+      parentArtifactId: starunion
+
+servers:
+  - description: Guitar Development Server
+    url: http://guitar.xinglian.xsalo.com
+components:
+  schemas:
+    Overview:
+      type: object
+      properties:
+        type: 
+          type: string
+          enum:
+            - overview
+        version: 
+          type: string
+          enum:
+            - '1.0'
+        title:
+          type: string
+        total:
+          type: string
+        trend:
+          description: 根据这个字段显示颜色：0不变1增2减
+          type: integer
+          format: int32
+          enum:
+            - 0
+            - 1
+            - 2
+        comp1:
+          $ref: '#/components/schemas/OverviewComponent'
+        comp2:
+          $ref: '#/components/schemas/OverviewComponent'
+      required:
+        - title
+        - total
+        - trend
+        - comp1
+        - comp2
+    OverviewComponent:
+      type: object
+      properties:
+        name:
+          type: string
+        trend:
+          description: 根据这个字段显示颜色：0不变1增2减
+          type: integer
+          format: int32
+          enum:
+            - 0
+            - 1
+            - 2
+        firstValueDes:
+          type: string
+        secondValueDes:
+          type: string
+      required:
+        - name
+        - trend
+        - firstValueDes
+        - secondValueDes
+    PieChart:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - pieChart
+        version:
+          type: string
+          enum:
+            - '1.0'
+        title:
+          type: string
+        unit:
+          type: string
+        hiddenValue:
+          type: boolean
+        chartName:
+          type: string
+        horizontal_action:
+          $ref: '#/components/schemas/Action'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PieChartDataItem'
+      required:
+        - type
+        - version
+        - title
+        - data
+    PieChartDataItem:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: number
+          format: double
+      required:
+        - name
+        - value
+    Histogram:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - histogram
+        version:
+          type: string
+          enum:
+            - '1.0'
+        action:
+          $ref: '#/components/schemas/Action'
+        data:
+          $ref: '#/components/schemas/HistogramData'
+      required:
+        - type
+        - version
+        - data
+    HistogramData:
+      type: object
+      properties:
+        title:
+          type: string
+        name:
+          type: string
+        unit:
+          type: string
+        ascItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistogramDataItem'
+        desItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistogramDataItem'
+      required:
+        - title
+        - name
+        - unit
+        - ascItems
+        - desItems
+    HistogramDataItem:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: number
+          format: double
+      required:
+        - name
+        - value
+    Group:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - group
+        version:
+          type: string
+          enum:
+            - '1.0'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Component'
+      required:
+        - type
+        - version
+        - data
+    SegmentedGroup:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - segmentedGroup
+        version:
+          type: string
+          enum:
+            - '1.0'
+        header:
+          type: array
+          items:
+            $ref: '#/components/schemas/Component'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Component'
+      required:
+        - type
+        - version
+        - header
+        - data
+    OverviewHorizontal:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - overview_horizontal
+        version:
+          type: string
+          enum:
+            - '1.0'
+        comp1:
+          $ref: '#/components/schemas/OverviewComponent'
+        comp2:
+          $ref: '#/components/schemas/OverviewComponent'
+      required:
+        - type
+        - version
+        - comp1
+        - comp2
+    FilterableSortableDataList:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - filterable_sortable_data_list
+        version:
+          type: string
+          enum:
+            - '1.0'
+        showPie:
+          type: boolean
+        header:
+          $ref: '#/components/schemas/FilterableSortableDataListHeader'
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterableSortableDataListItem'
+      required:
+        - type
+        - version
+        - header
+        - list
+    FilterableSortableDataListHeader:
+      type: object
+      properties:
+        nameTitle:
+          type: string
+        cols:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterableSortableDataListHeaderColumn'
+      required:
+        - nameTitle
+        - cols
+    FilterableSortableDataListHeaderColumn:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterableSortableDataListHeaderColumnItem'
+        defaultIndex:
+          type: integer
+          format: int32
+        load_more_full_path:
+          type: string
+        acs:
+          type: boolean
+      required:
+        - items
+    FilterableSortableDataListHeaderColumnItem:
+      type: object
+      properties:
+        title:
+          type: string
+        unit:
+          type: string
+        action:
+          $ref: '#/components/schemas/Action'
+      required:
+        - title
+        - unit
+    FilterableSortableDataListItem:
+      type: object
+      properties:
+        name:
+          type: string
+        action:
+          $ref: '#/components/schemas/Action'
+        trend:
+          type: integer
+          format: int32
+          enum:
+            - 0
+            - 1
+            - 2
+        value_cols:
+          type: array
+          items:
+            oneOf:
+              - type: string
+              - type: number
+              - type: integer
+      required:
+        - name
+        - action
+        - trend
+        - value_cols
+    RouteToHorizontal:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - route-to-horizontal
+        version:
+          type: string
+          enum:
+          - '1.0'
+        path:
+          type: string
+        params:
+          type: object
+      required:
+        - type
+        - version
+        - path
+    RouteTo:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - route_to
+        version:
+          type: string
+          enum:
+            - '1.0'
+        path:
+          type: string
+        params:
+          type: object
+    
+    ReloadSelf:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - reload-self
+        version:
+          type: string
+          enum:
+            - '1.0'
+        path:
+          type: string
+        params:
+          type: object
+      required:
+        - type
+        - version
+        - path
+
+    Component:
+      oneOf:
+        - $ref: '#/components/schemas/Overview'
+        - $ref: '#/components/schemas/PieChart'
+        - $ref: '#/components/schemas/Histogram'
+        - $ref: '#/components/schemas/Group'
+        - $ref: '#/components/schemas/FilterableSortableDataList'
+    Action:
+      oneOf:
+        - $ref: '#/components/schemas/RouteToHorizontal'
+        - $ref: '#/components/schemas/RouteTo'
+        - $ref: '#/components/schemas/ReloadSelf'
+paths:
+  /apps/{appKey}:
+    parameters:
+      - name: appKey
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      description: get index page
+      responses:
+        '200':
+          description: index page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Component'
+              example:
+                a: 1

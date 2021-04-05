@@ -110,6 +110,7 @@ export class Compiler implements TangCompiler {
         content: undefined,
         model: undefined,
       },
+      loadProcessOptions: options,
     };
 
     if (this.compileOptions.skipLoad !== true) {
@@ -178,6 +179,7 @@ export class Compiler implements TangCompiler {
         compiler: this,
       },
       compilation,
+      { generateProcessOptions: options },
     );
 
     if (this.compileOptions.skipGenerate !== true) {

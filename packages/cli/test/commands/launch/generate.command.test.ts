@@ -40,4 +40,20 @@ describe('tang-cli/commands：generate', () => {
 
     await program.parseAsync(rawInfoArgs);
   });
+
+  it('generate with openapi-gen', async () => {
+    const docPath = testUtil.resolveFixturePath('guitar.yaml');
+
+    const testTmpDirStr = testTmpDir;
+
+    const rawInfoArgs = [
+      'node',
+      'tang',
+      'generate',
+      docPath,
+      '--outputDir=' + testTmpDirStr,
+    ];
+
+    await program.parseAsync(rawInfoArgs);
+  });
 });

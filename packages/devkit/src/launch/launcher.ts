@@ -111,7 +111,7 @@ export class TangLauncher {
 
     if (!opts) return undefined;
 
-    const compiler = await createCompiler(opts.preset);
+    const compiler = await createCompiler({ ...opts.preset });
 
     const compilation = await compiler.load(entry, opts.processOptions);
 

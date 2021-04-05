@@ -1,8 +1,16 @@
 {
   "name": "@devs-tang/cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Tang命令行",
-  "main": "index.js",
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "dist/**"
+  ],
+  "directories": {
+    "lib": "dist"
+  },
   "bin": {
     "tang": "dist/bin/cli.js"
   },
@@ -18,9 +26,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@devs-tang/common": "^1.0.2",
-    "@devs-tang/core": "^1.0.2",
-    "@devs-tang/devkit": "^1.0.2",
+    "@devs-tang/common": "^1.0.3",
+    "@devs-tang/core": "^1.0.3",
+    "@devs-tang/devkit": "^1.0.3",
     "chalk": "^4.1.0",
     "cli-table3": "^0.6.0",
     "commander": "^7.1.0",
