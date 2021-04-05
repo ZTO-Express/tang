@@ -1,8 +1,9 @@
 // 文档
 export interface TangDocument {
   entry: string;
-  content: string;
-  model: TangDocumentModel;
+  content?: string | any;
+  model?: TangDocumentModel;
+  chunks?: Chunk[];
 }
 
 // 文档模型

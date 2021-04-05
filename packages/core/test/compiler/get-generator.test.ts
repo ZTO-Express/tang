@@ -4,6 +4,8 @@ import { Compiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/generator：获取生成器 getGenerator', () => {
+  const mockCompilation = { entry: 'mock' };
+
   const jsonGenerator = processors.jsonGenerator();
   const yamlGenerator = testUtil.yamlGenerator();
 
@@ -22,16 +24,22 @@ describe('compiler/generator：获取生成器 getGenerator', () => {
   });
 
   it('验证 getGenerator by name', async () => {
-    const generator = compiler1.getGenerator({ generator: 'yaml' });
+    const generator = compiler1.getGenerator(mockCompilation, {
+      generator: 'yaml',
+    });
     expect(generator).not.toBe(yamlGenerator);
     expect(generator.name).toBe(yamlGenerator.name);
     expect(generator.generate).toBe(yamlGenerator.generate);
 
-    expect(compiler1.getGenerator({ generator: 'xxx' })).toBeUndefined();
+    expect(
+      compiler1.getGenerator(mockCompilation, { generator: 'xxx' }),
+    ).toBeUndefined();
   });
 
   it('验证 getGenerator by instance', async () => {
-    const generator = compiler1.getGenerator({ generator: jsonGenerator });
+    const generator = compiler1.getGenerator(mockCompilation, {
+      generator: jsonGenerator,
+    });
 
     expect(generator).not.toBe(jsonGenerator);
     expect(generator.name).toBe(jsonGenerator.name);
@@ -39,8 +47,12 @@ describe('compiler/generator：获取生成器 getGenerator', () => {
   });
 
   it('验证 getGenerator by default', async () => {
-    expect(compiler1.getGenerator({}).name).toBe(jsonGenerator.name);
-    expect(compiler2.getGenerator({}).name).toBe(yamlGenerator.name);
+    expect(compiler1.getGenerator(mockCompilation, {}).name).toBe(
+      jsonGenerator.name,
+    );
+    expect(compiler2.getGenerator(mockCompilation, {}).name).toBe(
+      yamlGenerator.name,
+    );
   });
 
   it('验证 getGenerator Options', async () => {
@@ -62,14 +74,14 @@ describe('compiler/generator：获取生成器 getGenerator', () => {
       },
     };
 
-    const generator = compiler1.getGenerator({
+    const generator = compiler1.getGenerator(mockCompilation, {
       generateOptions,
     });
 
     expect(generator.generateOptions).not.toBe(generateOptions);
     expect(generator.generateOptions).toStrictEqual(generateOptions);
 
-    const generator2 = compiler1.getGenerator({
+    const generator2 = compiler1.getGenerator(mockCompilation, {
       generator: generator,
       generateOptions: generateOptions2,
     });

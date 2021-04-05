@@ -31,10 +31,12 @@ describe('tang/launch/generate：代码生成', () => {
       code: ErrorCodes.OUTPUTER_ERROR,
     });
 
-    const output = await launcher.generate(tfDocPath, {
+    const compilation = await launcher.generate(tfDocPath, {
       generator: 'yaml',
       outputer: 'memory',
     });
+
+    const output = compilation.output;
 
     expect(output.files.length).toBe(1);
 

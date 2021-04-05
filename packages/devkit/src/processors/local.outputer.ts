@@ -1,10 +1,10 @@
 import {
   GenericConfigObject,
-  TangGeneration,
   TangOutput,
   TangOutputer,
   Chunk,
   InvalidArguments,
+  TangDocument,
 } from '@devs-tang/common';
 
 import * as path from 'path';
@@ -22,7 +22,7 @@ export const localOutputer = (): TangOutputer => {
     name: 'local',
 
     async output(
-      generation: TangGeneration,
+      document: TangDocument,
       options: GenericConfigObject,
     ): Promise<TangOutput> {
       if (!options || !options.outputDir)
@@ -40,7 +40,7 @@ export const localOutputer = (): TangOutputer => {
 
       const files: any[] = [];
 
-      const ops = generation.chunks.map(async (chunk: Chunk) => {
+      const ops = document.chunks.map(async (chunk: Chunk) => {
         if (!chunk.content) return;
 
         const filePath = path.join(outputDir, chunk.name);

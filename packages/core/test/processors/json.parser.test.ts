@@ -23,11 +23,29 @@ describe('parser/json：json解析器', () => {
   });
 
   it('jsonParser parse方法', async () => {
-    const presetData = await jsonParser.parse(presetText);
-    expect(presetData.name).toBe('test-name');
+    const document = await jsonParser.parse({
+      entry: 'unknown',
+      content: presetText,
+    });
 
-    await expect(jsonParser.parse('xxxxx')).rejects.toThrowError(
-      'Unexpected token',
-    );
+    expect(document.model.name).toBe('test-name');
+
+    await expect(
+      jsonParser.parse({
+        entry: 'unknown',
+        content: '',
+      }),
+    ).resolves.toEqual({
+      entry: 'unknown',
+      content: '',
+      model: {},
+    });
+
+    await expect(
+      jsonParser.parse({
+        entry: 'unknown',
+        content: 'xxxxx',
+      }),
+    ).rejects.toThrowError('Unexpected token');
   });
 });

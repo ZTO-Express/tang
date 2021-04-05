@@ -91,13 +91,14 @@ export class PresetAction extends CliAction {
     }
 
     if (plugin.preset) {
-      console.log(`默认预设：${plugin.preset.name}`);
+      console.log(`默认预设：`);
+      printData(plugin.preset);
     }
 
     // 输出当前插件所有预设
     if (plugin.presets) {
-      console.log(`所有预设预设：`);
-      const presetNames = plugin.presets.map(it => it.name);
+      console.log(`所有预设预设名称：`);
+      const presetNames = plugin.presets.map((it: any) => it.name);
 
       console.log(presetNames.join());
     }

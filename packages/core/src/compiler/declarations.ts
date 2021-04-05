@@ -29,7 +29,6 @@ export interface ProcessorGetOptions {
   processMethodName: string;
   processOptionsName: string;
   defaultProcessor?: TangProcessor;
-  testProcessor?: (processor: TangProcessor, ...args: any[]) => boolean;
   testOptions?: any;
   [prop: string]: any;
 }

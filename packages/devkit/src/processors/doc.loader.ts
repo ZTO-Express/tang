@@ -1,4 +1,10 @@
-import { GenericConfigObject, TangLoader, utils } from '@devs-tang/common';
+import {
+  GenericConfigObject,
+  TangCompilation,
+  TangDocument,
+  TangLoader,
+  utils,
+} from '@devs-tang/common';
 
 import { fs } from '../utils';
 import { normalizeDevkitProcessor } from './util';
@@ -12,12 +18,19 @@ export const docLoader = (): TangLoader => {
 
     name: 'doc',
 
-    test: (entry: string) => utils.isAbsolutePath(entry) || utils.isUrl(entry),
+    test: (compilation: TangCompilation) =>
+      compilation &&
+      (utils.isAbsolutePath(compilation.entry) ||
+        utils.isUrl(compilation.entry)),
 
-    async load(entry: string, options?: GenericConfigObject): Promise<any> {
+    async load(
+      document: TangDocument,
+      options?: GenericConfigObject,
+    ): Promise<any> {
       const encoding = options?.encoding;
-      const result = await fs.resolveFile(entry, encoding);
-      return result;
+      document.content = await fs.resolveFile(document.entry, encoding);
+
+      return document;
     },
   });
 };

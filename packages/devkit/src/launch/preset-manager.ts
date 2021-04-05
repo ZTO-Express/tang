@@ -27,10 +27,10 @@ export interface PresetNameInfo {
 /** 预设元数据 */
 export interface PresetMetadata {
   mergeDefaultPreset?: boolean; // 加载预设时是否合并默认预设
-  noLoad?: boolean; // 是否关闭下载
-  noParse?: boolean; // 是否关闭解析
-  noGenerate?: boolean; // 是否关闭生成
-  noOutput?: boolean; // 是否关闭输出
+  skipLoad?: boolean; // 编译时跳过加载
+  skipParse?: boolean; // 编译时跳过解析
+  skipGenerate?: boolean; // 编译时跳过生成
+  skipOutput?: boolean; // 编译时跳过输出
 }
 
 /** 预设配置数据 */

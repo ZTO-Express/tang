@@ -1,4 +1,9 @@
-import { GenericConfigObject, TangParser } from '@devs-tang/common';
+import {
+  GenericConfigObject,
+  TangDocument,
+  TangDocumentModel,
+  TangParser,
+} from '@devs-tang/common';
 
 import { yaml } from '../utils';
 import { normalizeDevkitProcessor } from './util';
@@ -12,9 +17,13 @@ export const yamlParser = (): TangParser => {
 
     name: 'yaml',
 
-    async parse(content: string, options?: GenericConfigObject) {
-      const result = yaml.load(content, options);
-      return result;
+    async parse(document: TangDocument, options?: GenericConfigObject) {
+      document.model = yaml.load(
+        document.content,
+        options,
+      ) as TangDocumentModel;
+
+      return document;
     },
   });
 };

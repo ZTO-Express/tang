@@ -1,4 +1,9 @@
-import { TangLoader, utils } from '@devs-tang/common';
+import {
+  TangCompilation,
+  TangDocument,
+  TangLoader,
+  utils,
+} from '@devs-tang/common';
 
 import { http } from '../utils';
 import { normalizeCoreProcessor } from './util';
@@ -12,14 +17,12 @@ export const urlLoader = (): TangLoader => {
 
     name: 'url',
 
-    test: (entry: string) => utils.isUrl(entry),
+    test: (compilation: TangCompilation) =>
+      compilation && utils.isUrl(compilation.entry),
 
-    async load<T>(
-      entry: string,
-      options?: http.HttpRequestOptions,
-    ): Promise<T> {
-      const result = await http.request<T>(entry, options);
-      return result;
+    async load(document: TangDocument, options?: http.HttpRequestOptions) {
+      document.content = await http.request(document.entry, options);
+      return document;
     },
   });
 };

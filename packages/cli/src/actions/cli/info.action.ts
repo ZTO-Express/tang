@@ -1,13 +1,15 @@
 import { platform, release } from 'os';
 import osName = require('os-name');
 import {
-  chalk,
+  cli,
   AbstractPackageManager,
   PackageManagerFactory,
 } from '../../utils';
 import { BANNER } from '../../ui';
 import { CliAction } from '../../common';
 import { PluginAction } from '../plugin';
+
+const { chalk } = cli;
 
 export class InfoAction extends CliAction {
   async main() {

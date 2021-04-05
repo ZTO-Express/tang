@@ -7,6 +7,7 @@ export * as uuid from 'uuid';
 export * as fs from './fs';
 export * as memfs from './memfs';
 export * as vm from './vm';
+export * as cli from './cli';
 export * from './validate-schema';
 
 export const execa = _execa;

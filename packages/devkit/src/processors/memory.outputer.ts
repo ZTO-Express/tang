@@ -1,4 +1,4 @@
-import { TangGeneration, TangOutput, TangOutputer } from '@devs-tang/common';
+import { TangDocument, TangOutput, TangOutputer } from '@devs-tang/common';
 
 import * as path from 'path';
 import { memfs } from '../utils';
@@ -15,13 +15,13 @@ export const memoryOutputer = (): TangOutputer => {
 
     name: 'memory',
 
-    async output(generation: TangGeneration): Promise<TangOutput> {
+    async output(document: TangDocument): Promise<TangOutput> {
       const vol = Volume.fromJSON({});
       const fs = vol.promises;
 
       const files: any[] = [];
 
-      const ops = generation.chunks.map(async chunk => {
+      const ops = document.chunks.map(async chunk => {
         if (!chunk.content) return;
 
         const filePath = chunk.name;

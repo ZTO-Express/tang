@@ -11,7 +11,7 @@ export function printData(obj: any, options: PrintDataOptions = {}) {
   const format = options.format;
 
   if (format === 'json') {
-    text = JSON.stringify(obj, undefined, 2);
+    text = devkit.json5.stringify(obj, undefined, 2);
   } else {
     text = devkit.yaml.dump(obj);
   }

@@ -2,14 +2,13 @@ import {
   GenericConfigObject,
   TangCompilation,
   TangCompiler,
+  TangCompileOptions,
   TangCompilerGenerateOptions,
   TangCompilerLoadOptions,
   TangDocument,
   HookDriver,
   TangGenerator,
-  TangCompileContext,
   TangLoader,
-  TangOutput,
   TangOutputer,
   TangParser,
   TangProcessor,
@@ -32,7 +31,7 @@ import {
  * 生成器
  */
 export class Compiler implements TangCompiler {
-  hookDriver: HookDriver<TangCompileContext>;
+  hookDriver: HookDriver<TangCompilation>;
 
   loaders: TangLoader[]; // 加载器
   defaultLoader: TangLoader; // 默认加载器
@@ -46,12 +45,16 @@ export class Compiler implements TangCompiler {
   outputers: TangOutputer[]; // 输出器
   defaultOutputer: TangOutputer; /// 默认输出器
 
+  compileOptions: TangCompileOptions;
+
   constructor(options: CompilerOptions) {
     this.initialize(options);
-    this.hookDriver = new HookDriver<TangCompileContext>(options.hooks);
+    this.hookDriver = new HookDriver<TangCompilation>(options.hooks);
   }
 
   private initialize(options: CompilerOptions) {
+    this.compileOptions = options.compileOptions || {};
+
     for (const type in TangProcessorTypes) {
       this.initializeProcessors(type as TangProcessorTypeNames, options);
     }
@@ -99,58 +102,62 @@ export class Compiler implements TangCompiler {
     options = options || {};
     options.entry = entry;
 
-    const loader = this.getLoader(options);
-    if (!loader) throw new LoaderError('未找到加载器');
-
-    const parser = this.getParser(options);
-    if (!parser) throw new ParserError('未找到解析器');
-
-    const document: any = {
-      entry: options.entry,
-      content: undefined,
-      model: null,
-    };
-
-    const compileContext: TangCompileContext = {
-      compiler: this,
-      loader,
-      parser,
-      document,
-      compilation: undefined,
-    };
-
-    // 调用加载开始钩子
-    await this.hookDriver.hookSeq('load', compileContext);
-
-    // 加载器加载文档
-    document.content = await loader.load(
-      entry,
-      loader.loadOptions,
-      compileContext,
-    );
-
-    // 调用加载结束钩子
-    await this.hookDriver.hookSeq('parse', compileContext);
-
-    // 解析器解析文档内容
-    const docModel = await parser.parse(
-      document.content,
-      parser.parseOptions,
-      compileContext,
-    );
-    document.model = docModel;
-
     const compilation: TangCompilation = {
       entry,
-      compiler: this,
-      loader,
-      parser,
-      document,
+      compiler: (this as any) as TangCompiler,
+      document: {
+        entry: options.entry,
+        content: undefined,
+        model: undefined,
+      },
     };
 
+    if (this.compileOptions.skipLoad !== true) {
+      const loader = this.getLoader(compilation, options);
+      if (!loader) throw new LoaderError('未找到加载器');
+
+      compilation.loader = loader;
+
+      // 调用加载开始钩子
+      await this.hookDriver.hookSeq('load', compilation);
+
+      // 加载器加载文档
+      const loadDocument = await loader.load(
+        compilation.document,
+        loader.loadOptions,
+      );
+
+      if (loadDocument) {
+        // 如果加载的内容为对象，则直接赋给model
+        if (utils.isObject(loadDocument.content)) {
+          loadDocument.model = loadDocument.content;
+        }
+
+        compilation.document = loadDocument;
+      }
+    }
+
+    if (this.compileOptions.skipParse !== true) {
+      const parser = this.getParser(compilation, options);
+      if (!parser) throw new ParserError('未找到解析器');
+
+      compilation.parser = parser;
+
+      // 调用加载结束钩子
+      await this.hookDriver.hookSeq('parse', compilation);
+
+      // 解析器解析文档内容
+      const parseDocument = await parser.parse(
+        compilation.document,
+        parser.parseOptions,
+        compilation,
+      );
+
+      if (parseDocument) compilation.document = parseDocument;
+    }
+
     // 调用加载结束钩子
-    compileContext.compilation = compilation;
-    await this.hookDriver.hookSeq('loaded', compileContext);
+    await this.hookDriver.hookSeq('loaded', compilation);
 
     return compilation;
   }
@@ -162,49 +169,53 @@ export class Compiler implements TangCompiler {
   async generate(
     document: TangDocument,
     options?: TangCompilerGenerateOptions,
-  ): Promise<TangOutput> {
-    const generator = this.getGenerator(options);
-    if (!generator) throw new GeneratorError('未找到生成器');
-
-    const outputer = this.getOutputer(options);
-    if (!outputer) throw new OutputerError('未找到输出器');
-
-    const compileContext: TangCompileContext = {
-      compiler: this,
-      generator,
-      outputer,
-      document,
-      generation: undefined,
-      output: undefined,
-    };
-
-    // 调用生成钩子
-    await this.hookDriver.hookSeq('generate', compileContext);
-
-    const generateResult = await generator.generate(
-      document,
-      generator.generateOptions,
-      compileContext,
+    compilation?: TangCompilation,
+  ): Promise<TangCompilation> {
+    compilation = Object.assign(
+      {
+        entry: document.entry,
+        document,
+        compiler: this,
+      },
+      compilation,
     );
 
-    const generation = { document: document, ...generateResult };
+    if (this.compileOptions.skipGenerate !== true) {
+      const generator = this.getGenerator(compilation, options);
+      if (!generator) throw new GeneratorError('未找到生成器');
 
-    // 调用输出钩子
-    compileContext.generation = generation;
-    await this.hookDriver.hookSeq('output', compileContext);
+      compilation.generator = generator;
 
-    // 输出器生成
-    const output = await outputer.output(
-      generation,
-      outputer.outputOptions,
-      compileContext,
-    );
+      // 调用生成钩子
+      await this.hookDriver.hookSeq('generate', compilation);
 
-    // 调用生成完成钩子
-    compileContext.output = output;
-    await this.hookDriver.hookParallel('generated', compileContext);
+      const generateDocument = await generator.generate(
+        compilation.document,
+        generator.generateOptions,
+        compilation,
+      );
 
-    return output;
+      if (generateDocument) compilation.document = generateDocument;
+    }
+
+    if (this.compileOptions.skipOutput !== true) {
+      const outputer = this.getOutputer(compilation, options);
+      if (!outputer) throw new OutputerError('未找到输出器');
+
+      // 调用输出钩子
+      await this.hookDriver.hookSeq('output', compilation);
+
+      // 输出器生成
+      compilation.output = await outputer.output(
+        compilation.document,
+        outputer.outputOptions,
+        compilation,
+      );
+
+      await this.hookDriver.hookParallel('generated', compilation);
+    }
+
+    return compilation;
   }
 
   /**
@@ -213,32 +224,33 @@ export class Compiler implements TangCompiler {
    * @param options
    * @returns
    */
-  async inspect(options: CompilerInspectOptions) {
-    const loader = this.getLoader(options);
-    const parser = this.getParser(options);
-    const generator = this.getGenerator(options);
-    const outputer = this.getOutputer(options);
-
-    return {
-      loader,
-      parser,
-      generator,
-      outputer,
+  async inspect(options: CompilerInspectOptions): Promise<TangCompilation> {
+    const compilation: TangCompilation = {
+      entry: options.entry,
     };
+
+    compilation.loader = this.getLoader(compilation, options);
+    compilation.parser = this.getParser(compilation, options);
+    compilation.generator = this.getGenerator(compilation, options);
+    compilation.outputer = this.getOutputer(compilation, options);
+
+    return compilation;
   }
 
   /**
    * 根据加载选项选择loader，默认选择第一个
    * @param options 加载选项
    */
-  getLoader(options: TangCompilerLoadOptions): TangLoader | undefined {
-    const loader = this.getProcessor<TangLoader>({
+  getLoader(
+    compilation: TangCompilation,
+    options: TangCompilerLoadOptions = {},
+  ): TangLoader | undefined {
+    const loader = this.getProcessor<TangLoader>(compilation, {
       processors: this.loaders,
       processMethodName: 'load',
       processOptionsName: 'loadOptions',
       defaultProcessor: this.defaultLoader,
       processorOptions: options.loader,
-      testProcessor: this.testLoader as any,
       testOptions: options,
       loadOptions: options.loadOptions,
     });
@@ -247,40 +259,14 @@ export class Compiler implements TangCompiler {
   }
 
   /**
-   * 初步判断目标文件是否能被加载器加载
-   * @param entry 验证目标
-   */
-  testLoader(
-    loader: TangLoader,
-    options?: string | TangCompilerLoadOptions,
-  ): boolean {
-    let entry: string;
-
-    if (typeof options === 'string') {
-      entry = options;
-    } else if (options) {
-      entry = options.entry;
-    }
-
-    if (!entry || !loader.test) return true;
-
-    if (typeof loader.test === 'string') {
-      return new RegExp(loader.test).test(entry);
-    } else if (loader.test instanceof RegExp) {
-      return loader.test.test(entry);
-    } else if (typeof loader.test === 'function') {
-      return loader.test(entry);
-    }
-
-    return false;
-  }
-
-  /**
    * 根据加载选项选择parser，默认选择第一个
    * @param options 加载选项
    */
-  getParser(options?: TangCompilerLoadOptions): TangParser | undefined {
-    const parser = this.getProcessor<TangParser>({
+  getParser(
+    compilation: TangCompilation,
+    options: TangCompilerLoadOptions = {},
+  ): TangParser | undefined {
+    const parser = this.getProcessor<TangParser>(compilation, {
       processors: this.parsers,
       processMethodName: 'parse',
       processOptionsName: 'parseOptions',
@@ -297,9 +283,10 @@ export class Compiler implements TangCompiler {
    * @param options 生成选项
    */
   getGenerator(
-    options?: TangCompilerGenerateOptions,
+    compilation: TangCompilation,
+    options: TangCompilerGenerateOptions = {},
   ): TangGenerator | undefined {
-    const generator = this.getProcessor<TangGenerator>({
+    const generator = this.getProcessor<TangGenerator>(compilation, {
       processors: this.generators,
       processMethodName: 'generate',
       processOptionsName: 'generateOptions',
@@ -315,8 +302,11 @@ export class Compiler implements TangCompiler {
    * 根据生成选项选择输出
    * @param options
    */
-  getOutputer(options?: TangCompilerGenerateOptions): TangOutputer | undefined {
-    const outputer = this.getProcessor<TangOutputer>({
+  getOutputer(
+    compilation: TangCompilation,
+    options: TangCompilerGenerateOptions = {},
+  ): TangOutputer | undefined {
+    const outputer = this.getProcessor<TangOutputer>(compilation, {
       processors: this.outputers,
       processMethodName: 'output',
       processOptionsName: 'outputOptions',
@@ -334,13 +324,13 @@ export class Compiler implements TangCompiler {
    * @returns 处理器，以及处理器执行时的参数
    */
   getProcessor<T extends TangProcessor>(
+    compilation: TangCompilation,
     options: ProcessorGetOptions,
   ): T | undefined {
     const processorOptions: any = options.processorOptions || {};
     const processMethodName = options.processMethodName;
     const processOptionsName = options.processOptionsName;
     const defaultProcessor = (options.defaultProcessor as any) as T;
-    const testProcessor = options.testProcessor;
     const testOptions = options.testOptions;
     const processors = (options.processors as any) as T[];
 
@@ -358,14 +348,14 @@ export class Compiler implements TangCompiler {
       processor = processorOptions as T;
     } else if (
       defaultProcessor &&
-      (!testProcessor || testProcessor(defaultProcessor as any, testOptions))
+      this.testProcessor(defaultProcessor as any, compilation, testOptions)
     ) {
       // 如果未提供processr测尝试使用默认processr
       processor = defaultProcessor;
     } else {
       // 如果未提供parser及默认parser测尝试使用第一个parser
       processor = processors.filter(p =>
-        testProcessor(p as any, testOptions),
+        this.testProcessor(p as any, compilation, testOptions),
       )[0];
     }
 
@@ -380,6 +370,33 @@ export class Compiler implements TangCompiler {
 
     const result = utils.deepClone(processor) as T;
     return result;
+  }
+
+  /**
+   * 初步判断目标文件是否能被加载器加载
+   * @param entry 验证目标
+   */
+  testProcessor(
+    processor: TangProcessor,
+    compilation: TangCompilation,
+    testOptions?: any,
+  ): boolean {
+    if (!compilation) return false;
+
+    const entry: string = compilation.entry;
+
+    // 没有test，有entry返回true, 没有entry返回false
+    if (!processor.test) return !!entry;
+
+    if (typeof processor.test === 'string') {
+      return new RegExp(processor.test).test(entry);
+    } else if (processor.test instanceof RegExp) {
+      return processor.test.test(entry);
+    } else if (typeof processor.test === 'function') {
+      return processor.test(compilation, testOptions);
+    }
+
+    return false;
   }
 
   /**

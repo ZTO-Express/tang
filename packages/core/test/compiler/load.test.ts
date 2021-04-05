@@ -67,4 +67,26 @@ describe('compiler/load：load 加载', () => {
 
     expect(compilation.compiler).toBe(compiler2);
   });
+
+  it('验证 load with compileOptions', async () => {
+    const skipCompiler = testUtil.createDefaultCompiler({
+      defaultParser: 'yaml',
+      defaultGenerator: 'yaml',
+      loaders: [urlLoader, docLoader],
+      parsers: [jsonParser, yamlParser],
+      compileOptions: {
+        skipLoad: true,
+        skipParse: true,
+      },
+    });
+
+    const compilation = await skipCompiler.load(tfDocPath, {
+      parser: 'yaml',
+    });
+
+    expect(compilation.entry).toBe(tfDocPath);
+    expect(compilation.document.entry).toBe(tfDocPath);
+    expect(compilation.document.content).toBeUndefined();
+    expect(compilation.document.model).toBeUndefined();
+  });
 });

@@ -6,6 +6,8 @@ import {
   TangParser,
 } from './tang.processor';
 
+import { TangCompileOptions } from './tang.compiler';
+
 export interface TangPresetOptions {
   defaultLoader?: string | TangLoader;
   loaders?: TangLoader[];
@@ -20,6 +22,10 @@ export interface TangPresetOptions {
   outputers?: TangOutputer[];
 
   hooks?: TangHook[];
+
+  mergeDefaultPreset?: boolean; // 加载预设时是否合并默认预设
+
+  compileOptions?: TangCompileOptions; // 编译选项
 }
 
 export interface TangPreset extends TangPresetOptions {

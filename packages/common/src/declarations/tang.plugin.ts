@@ -1,4 +1,5 @@
 import { Plugin } from './plugin';
+import { TangCompilation } from './tang.compiler';
 import { TangPreset } from './tang.preset';
 import {
   TangGenerator,
@@ -7,9 +8,8 @@ import {
   TangParser,
   TangProcessor,
 } from './tang.processor';
-import { TangCompileContext } from './tang.compiler';
 
-export interface TangPlugin extends Plugin<TangCompileContext> {
+export interface TangPlugin extends Plugin<TangCompilation> {
   preset?: TangPreset;
   presets?: TangPreset[];
 }

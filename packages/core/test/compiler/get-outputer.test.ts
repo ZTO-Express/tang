@@ -2,6 +2,8 @@ import * as testUtil from '../util';
 import { Compiler } from '../../src';
 
 describe('compiler/outputer：获取输出器 getOutputer', () => {
+  const mockCompilation = { entry: 'mock' };
+
   const localOutputer = testUtil.localOutputer();
   const memoryOutputer = testUtil.memoryOutputer();
 
@@ -20,16 +22,22 @@ describe('compiler/outputer：获取输出器 getOutputer', () => {
   });
 
   it('验证 getOutputer by name', async () => {
-    const outputer = compiler1.getOutputer({ outputer: 'memory' });
+    const outputer = compiler1.getOutputer(mockCompilation, {
+      outputer: 'memory',
+    });
     expect(outputer).not.toBe(memoryOutputer);
     expect(outputer.name).toBe(memoryOutputer.name);
     expect(outputer.output).toBe(memoryOutputer.output);
 
-    expect(compiler1.getOutputer({ outputer: 'xxx' })).toBeUndefined();
+    expect(
+      compiler1.getOutputer(mockCompilation, { outputer: 'xxx' }),
+    ).toBeUndefined();
   });
 
   it('验证 getOutputer by instance', async () => {
-    const outputer = compiler1.getOutputer({ outputer: localOutputer });
+    const outputer = compiler1.getOutputer(mockCompilation, {
+      outputer: localOutputer,
+    });
 
     expect(outputer).not.toBe(localOutputer);
     expect(outputer.name).toBe(localOutputer.name);
@@ -37,8 +45,12 @@ describe('compiler/outputer：获取输出器 getOutputer', () => {
   });
 
   it('验证 getOutputer by default', async () => {
-    expect(compiler1.getOutputer({}).name).toBe(localOutputer.name);
-    expect(compiler2.getOutputer({}).name).toBe(memoryOutputer.name);
+    expect(compiler1.getOutputer(mockCompilation).name).toBe(
+      localOutputer.name,
+    );
+    expect(compiler2.getOutputer(mockCompilation).name).toBe(
+      memoryOutputer.name,
+    );
   });
 
   it('验证 getOutputer Options', async () => {
@@ -60,14 +72,14 @@ describe('compiler/outputer：获取输出器 getOutputer', () => {
       },
     };
 
-    const outputer = compiler1.getOutputer({
+    const outputer = compiler1.getOutputer(mockCompilation, {
       outputOptions,
     });
 
     expect(outputer.outputOptions).not.toBe(outputOptions);
     expect(outputer.outputOptions).toStrictEqual(outputOptions);
 
-    const outputer2 = compiler1.getOutputer({
+    const outputer2 = compiler1.getOutputer(mockCompilation, {
       outputer: outputer,
       outputOptions: outputOptions2,
     });

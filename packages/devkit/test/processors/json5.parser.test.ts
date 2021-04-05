@@ -23,16 +23,33 @@ describe('parser/json5：json5解析器', () => {
   });
 
   it('json5Parser parse方法', async () => {
-    let presetData = await json5Parser.parse(presetText);
-    expect(presetData.name).toBe('test-name');
+    let document = await json5Parser.parse({
+      entry: 'unknown',
+      content: presetText,
+    });
+    expect(document.model).toEqual({
+      name: 'test-name',
+    });
 
-    presetData = await json5Parser.parse({ test: true } as any);
-    expect(presetData).toEqual({ test: true });
+    document = await json5Parser.parse({
+      entry: 'unknown',
+      content: undefined,
+    });
+    expect(document.model).toEqual({});
+
+    document = await json5Parser.parse({
+      entry: 'unknown',
+      content: { test: true },
+    });
+    expect(document.model).toEqual({ test: true });
   });
 
   it('docLoader parse方法', async () => {
-    await expect(json5Parser.parse('xxxxx')).rejects.toThrowError(
-      'JSON5: invalid character',
-    );
+    await expect(
+      json5Parser.parse({
+        entry: 'unknown',
+        content: 'xxxxx',
+      }),
+    ).rejects.toThrowError('JSON5: invalid character');
   });
 });

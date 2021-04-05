@@ -39,7 +39,7 @@ describe('tang：tang工具配置', () => {
 
     const compiler = await createCompiler(normalizedOptions);
 
-    const compilation = await compiler.load(jsDocPath, {
+    let compilation = await compiler.load(jsDocPath, {
       parser: 'json',
     });
 
@@ -59,10 +59,12 @@ describe('tang：tang工具配置', () => {
       code: ErrorCodes.OUTPUTER_ERROR,
     });
 
-    const output = await compiler.generate(compilation.document, {
+    compilation = await compiler.generate(compilation.document, {
       generator: 'yaml',
       outputer: 'memory',
     });
+
+    const output = compilation.output;
 
     expect(output.files.length).toBe(1);
 

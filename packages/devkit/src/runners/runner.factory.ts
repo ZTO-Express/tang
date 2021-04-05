@@ -1,4 +1,4 @@
-import * as chalk from 'chalk';
+import { cli } from '../utils';
 import { GitRunner } from './git.runner';
 import { NpmRunner } from './npm.runner';
 import { YarnRunner } from './yarn.runner';
@@ -22,7 +22,7 @@ export class RunnerFactory {
         return new GitRunner();
 
       default:
-        console.info(chalk.yellow(`[WARN] Unsupported runner: ${runner}`));
+        console.info(cli.chalk.yellow(`[WARN] Unsupported runner: ${runner}`));
         return undefined;
     }
   }

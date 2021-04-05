@@ -1,4 +1,9 @@
-import { TangLoader, utils } from '@devs-tang/common';
+import {
+  TangCompilation,
+  TangDocument,
+  TangLoader,
+  utils,
+} from '@devs-tang/common';
 import { normalizeDevkitProcessor } from './util';
 
 /**
@@ -10,14 +15,19 @@ export const moduleLoader = (): TangLoader => {
 
     name: 'module',
 
-    test: (entry: string) =>
-      utils.isAbsolutePath(entry) &&
-      (entry.endsWith('.js') || entry.endsWith('.json')),
+    test: (compilation: TangCompilation) => {
+      const entry = compilation.entry;
+      return (
+        entry &&
+        utils.isAbsolutePath(entry) &&
+        (entry.endsWith('.js') || entry.endsWith('.json'))
+      );
+    },
 
-    async load(entry: string): Promise<any> {
+    async load(document: TangDocument): Promise<any> {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const result = require(entry);
-      return result;
+      document.content = require(document.entry);
+      return document;
     },
   });
 };

@@ -24,12 +24,12 @@ describe('loader/url：url加载器', () => {
   it('urlLoader test方法', async () => {
     const loaderTest: any = urlLoader.test;
     // 路径必须为绝对路径，并且存在
-    expect(loaderTest('../fixture/')).toBeFalsy();
-    expect(loaderTest('http://www.example.org')).toBeTruthy();
+    expect(loaderTest({ entry: '../fixture/' })).toBeFalsy();
+    expect(loaderTest({ entry: 'http://www.example.org' })).toBeTruthy();
 
     const yfDocUrl = testUtil.resolveFixtureUrl('mesh.json');
 
-    expect(loaderTest(yfDocUrl)).toBeTruthy();
+    expect(loaderTest({ entry: yfDocUrl })).toBeTruthy();
   });
 
   it('urlLoader load方法', async () => {
@@ -39,43 +39,52 @@ describe('loader/url：url加载器', () => {
 
     const yfDocTitle = 'yapi文档生成';
 
-    const text = (await urlLoader.load(yfDocUrl, {
-      type: 'text',
-    })) as string;
+    let document = await urlLoader.load(
+      { entry: yfDocUrl },
+      {
+        type: 'text',
+      },
+    );
 
-    expect(text.length).toBeGreaterThan(10);
-    const textJson = JSON.parse(text);
+    expect(document.content.length).toBeGreaterThan(10);
+    const textJson = JSON.parse(document.content);
     expect(textJson.title).toBe(yfDocTitle);
 
-    const json = await urlLoader.load<any>(yfDocUrl, { type: 'json' });
-    expect(json.title).toBe(yfDocTitle);
+    document = await urlLoader.load({ entry: yfDocUrl }, { type: 'json' });
+    expect(document.content.title).toBe(yfDocTitle);
 
-    const def = await urlLoader.load<any>(yfDocUrl);
-    expect(def.title).toBe(yfDocTitle);
+    document = await urlLoader.load({ entry: yfDocUrl });
+    expect(document.content.title).toBe(yfDocTitle);
 
-    const blob = await urlLoader.load<Blob>(yfDocUrl, { type: 'blob' });
-    expect(blob.type).toBe('application/json');
-    expect(blob.size).toBeGreaterThan(10);
+    document = await urlLoader.load({ entry: yfDocUrl }, { type: 'blob' });
 
-    const buffer = await urlLoader.load<ArrayBuffer>(yfDocUrl, {
-      type: 'buffer',
-    });
-    expect(buffer.byteLength).toBeGreaterThan(10);
+    expect(document.content.type).toBe('application/json');
+    expect(document.content.size).toBeGreaterThan(10);
 
-    const unknown = await urlLoader.load<any>('https://www.baidu.com');
-    expect(typeof unknown).toBe('string');
-    expect(unknown.length).toBeGreaterThan(10);
+    document = await urlLoader.load(
+      { entry: yfDocUrl },
+      {
+        type: 'buffer',
+      },
+    );
+    expect(document.content.byteLength).toBeGreaterThan(10);
+
+    document = await urlLoader.load({ entry: 'https://www.baidu.com' });
+    expect(typeof document.content).toBe('string');
+    expect(document.content.length).toBeGreaterThan(10);
   });
 
   it('urlLoader load方法 文件不存在', async () => {
     await expect(() =>
-      urlLoader.load('https://www.baidu.com/xxx'),
+      urlLoader.load({ entry: 'https://www.baidu.com/xxx' }),
     ).rejects.toThrowError(/not found/i);
 
     const yfDocUrl = testUtil.resolveFixtureUrl(
-      'presets/yapi-fsharing/preset.json1',
+      'presets/yapi-fsharing/nonExists.json1',
     );
 
-    await expect(urlLoader.load(yfDocUrl)).rejects.toThrowError(/not found/i);
+    await expect(urlLoader.load({ entry: yfDocUrl })).rejects.toThrowError(
+      /not found/i,
+    );
   });
 });

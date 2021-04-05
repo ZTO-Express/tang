@@ -1,4 +1,6 @@
-import * as chalk from 'chalk';
+import { cli } from '../utils';
+
+const { chalk } = cli;
 
 export const ERROR_PREFIX = chalk.bgRgb(210, 0, 75).bold.rgb(0, 0, 0)(
   ' Error ',

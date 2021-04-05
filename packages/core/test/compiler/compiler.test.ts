@@ -62,4 +62,67 @@ describe('compiler/load：load 加载', () => {
         .defaultOutputer,
     ).toBe(memoryOutputer);
   });
+
+  it('没有返回值的加载器', async () => {
+    const nonReturnLoader = {
+      name: 'nonReturnLoader',
+      load: (): any => undefined,
+    } as any;
+
+    const compile = new Compiler({
+      loaders: [nonReturnLoader],
+      compileOptions: {
+        skipParse: true,
+      },
+    });
+
+    const testDoc = 'testdoc';
+    const compilation = await compile.load(testDoc);
+
+    expect(compilation.document).toEqual({
+      entry: testDoc,
+    });
+  });
+
+  it('没有返回值的解析器', async () => {
+    const nonReturnParser = {
+      name: 'nonReturnParser',
+      parse: (): any => undefined,
+    } as any;
+
+    const compile = new Compiler({
+      parsers: [nonReturnParser],
+      compileOptions: {
+        skipLoad: true,
+      },
+    });
+
+    const testDoc = 'testdoc';
+    const compilation = await compile.load(testDoc);
+
+    expect(compilation.document).toEqual({
+      entry: testDoc,
+    });
+  });
+
+  it('没有返回值的生成器', async () => {
+    const nonReturnGenerator = {
+      name: 'nonReturnGenerator',
+      generate: (): any => undefined,
+    } as any;
+
+    const compile = new Compiler({
+      generators: [nonReturnGenerator],
+      compileOptions: {
+        skipOutput: true,
+      },
+    });
+
+    const testDoc = 'testdoc';
+    const compilation = await compile.generate({ entry: testDoc });
+
+    expect(compilation.document).toEqual({
+      entry: testDoc,
+    });
+  });
 });

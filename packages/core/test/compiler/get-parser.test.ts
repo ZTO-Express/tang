@@ -4,6 +4,8 @@ import { Compiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/parser：获取解析器 getParser', () => {
+  const mockCompilation = { entry: 'mock' };
+
   const jsonParser = processors.jsonParser();
   const yamlParser = testUtil.yamlParser();
 
@@ -22,16 +24,18 @@ describe('compiler/parser：获取解析器 getParser', () => {
   });
 
   it('验证 getParser by name', async () => {
-    const parser = compiler1.getParser({ parser: 'yaml' });
+    const parser = compiler1.getParser(mockCompilation, { parser: 'yaml' });
     expect(parser).not.toBe(yamlParser);
     expect(parser.name).toBe(yamlParser.name);
     expect(parser.parse).toBe(yamlParser.parse);
 
-    expect(compiler1.getParser({ parser: 'xxx' })).toBeUndefined();
+    expect(
+      compiler1.getParser(mockCompilation, { parser: 'xxx' }),
+    ).toBeUndefined();
   });
 
   it('验证 getParser by instance', async () => {
-    const parser = compiler1.getParser({ parser: jsonParser });
+    const parser = compiler1.getParser(mockCompilation, { parser: jsonParser });
 
     expect(parser).not.toBe(jsonParser);
     expect(parser.name).toBe(jsonParser.name);
@@ -39,8 +43,8 @@ describe('compiler/parser：获取解析器 getParser', () => {
   });
 
   it('验证 getParser by default', async () => {
-    expect(compiler1.getParser({}).name).toBe(jsonParser.name);
-    expect(compiler2.getParser({}).name).toBe(yamlParser.name);
+    expect(compiler1.getParser(mockCompilation).name).toBe(jsonParser.name);
+    expect(compiler2.getParser(mockCompilation).name).toBe(yamlParser.name);
   });
 
   it('验证 getParser Options', async () => {
@@ -62,14 +66,14 @@ describe('compiler/parser：获取解析器 getParser', () => {
       },
     };
 
-    const parser = compiler1.getParser({
+    const parser = compiler1.getParser(mockCompilation, {
       parseOptions,
     });
 
     expect(parser.parseOptions).not.toBe(parseOptions);
     expect(parser.parseOptions).toStrictEqual(parseOptions);
 
-    const parser2 = compiler1.getParser({
+    const parser2 = compiler1.getParser(mockCompilation, {
       parser: parser,
       parseOptions: parseOptions2,
     });

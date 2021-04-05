@@ -1,5 +1,4 @@
 import {
-  TangGeneration,
   TangGenerator,
   TangLoader,
   TangOutput,
@@ -9,12 +8,30 @@ import {
 import { TangDocument } from './tang.document';
 import { GenericConfigObject } from './type';
 
+/** 编译许选项 */
+export interface TangCompileOptions {
+  skipLoad?: boolean; // 编译时跳过加载
+
+  skipParse?: boolean; // 编译时跳过解析
+
+  skipGenerate?: boolean; // 编译时跳过生成
+
+  skipOutput?: boolean; // 编译时跳过输出
+}
+
 export interface TangCompilation {
   entry: string;
-  compiler: TangCompiler;
-  document: TangDocument;
+  document?: TangDocument;
+  compiler?: TangCompiler;
+
   loader?: TangLoader;
   parser?: TangParser;
+  generator?: TangGenerator;
+  outputer?: TangOutputer;
+
+  output?: TangOutput;
+
+  [key: string]: unknown;
 }
 
 /** 加载选项 */
@@ -47,6 +64,8 @@ export interface TangCompiler {
   outputers: TangOutputer[]; // 输出器
   defaultOutputer: TangOutputer; /// 默认输出器
 
+  compileOptions: TangCompileOptions; // 编译器选项
+
   load: (
     entry: string,
     options?: TangCompilerLoadOptions,
@@ -55,22 +74,6 @@ export interface TangCompiler {
   generate: (
     document: TangDocument,
     options?: TangCompilerGenerateOptions,
-  ) => Promise<TangOutput>;
-}
-
-// 钩子编译上下文
-export interface TangCompileContext {
-  compiler: TangCompiler;
-
-  loader?: TangLoader;
-  parser?: TangParser;
-  generator?: TangGenerator;
-  outputer?: TangOutputer;
-
-  document?: TangDocument;
-  compilation?: TangCompilation;
-  generation?: TangGeneration;
-  output?: TangOutput;
-
-  [key: string]: unknown;
+    compilation?: TangCompilation,
+  ) => Promise<TangCompilation>;
 }

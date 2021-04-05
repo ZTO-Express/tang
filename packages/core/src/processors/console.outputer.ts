@@ -1,6 +1,6 @@
 import {
   Chunk,
-  TangGeneration,
+  TangDocument,
   TangOutput,
   TangOutputer,
 } from '@devs-tang/common';
@@ -15,10 +15,10 @@ export const consoleOutputer = (): TangOutputer => {
 
     name: 'console',
 
-    async output(generation: TangGeneration): Promise<TangOutput> {
+    async output(document: TangDocument): Promise<TangOutput> {
       const files: any[] = [];
 
-      (generation.chunks || []).forEach(async (chunk: Chunk) => {
+      (document.chunks || []).forEach(async (chunk: Chunk) => {
         console.log(`${chunk.name} :`);
         console.log(chunk.content || '');
         console.log('');

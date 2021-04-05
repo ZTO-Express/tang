@@ -1,12 +1,10 @@
 import * as testUtil from '../util';
-import { TangCompilation, ErrorCodes } from '@devs-tang/common';
+import { TangCompilation, ErrorCodes, utils } from '@devs-tang/common';
 
 import { Compiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/load：load 加载', () => {
-  const testTmpDir = testUtil.resolveTmpDir('localOutputer');
-
   const urlLoader = processors.urlLoader();
   const docLoader = testUtil.docLoader();
 
@@ -38,7 +36,7 @@ describe('compiler/load：load 加载', () => {
   });
 
   it('验证 generate by name', async () => {
-    const compilation = yamlCompilation;
+    let compilation = utils.deepClone(yamlCompilation);
     expect(compilation.parser).not.toBe(yamlParser);
     expect(compilation.parser).toStrictEqual(yamlParser);
     expect(compilation.document.entry).toBe(tfDocPath);
@@ -58,11 +56,12 @@ describe('compiler/load：load 加载', () => {
       code: ErrorCodes.OUTPUTER_ERROR,
     });
 
-    const output = await compiler1.generate(compilation.document, {
+    compilation = await compiler1.generate(compilation.document, {
       generator: 'yaml',
       outputer: 'memory',
     });
 
+    const output = compilation.output;
     expect(output.files.length).toBe(1);
 
     const genFileBuffer = await output.vol.promises.readFile(
@@ -71,5 +70,26 @@ describe('compiler/load：load 加载', () => {
 
     expect(genFileBuffer).toBeInstanceOf(Buffer);
     expect(genFileBuffer.toString()).toMatch('openapi: 3.0.0');
+  });
+
+  it('验证 generate with compileOptions', async () => {
+    let compilation = utils.deepClone(yamlCompilation);
+
+    const skipCompiler = testUtil.createDefaultCompiler({
+      loaders: [urlLoader, docLoader],
+      parsers: [jsonParser, yamlParser],
+      compileOptions: {
+        skipGenerate: true,
+        skipOutput: true,
+      },
+    });
+
+    compilation = await skipCompiler.generate(compilation.document, {
+      generator: 'yaml',
+      outputer: 'memory',
+    });
+
+    expect(compilation.model).toBeUndefined();
+    expect(compilation.output).toBeUndefined();
   });
 });

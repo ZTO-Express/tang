@@ -1,5 +1,3 @@
-import { utils } from '@devs-tang/common';
-import * as chalk from 'chalk';
 import * as commander from 'commander';
 import {
   CliAction,
@@ -8,9 +6,12 @@ import {
   CliCommandConfig,
 } from '../common';
 
+import { cli } from '../utils';
 import { ERROR_PREFIX } from '../ui';
 
 import { getCliCommandActions } from './command.actions';
+
+const chalk = cli.chalk;
 
 export class CommandLoader {
   static load(program: commander.Command, existWhenError = true): void {

@@ -4,6 +4,8 @@ import { Compiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/loader：获取加载器 getLoader', () => {
+  const mockCompilation = { entry: 'mock' };
+
   const urlLoader = processors.urlLoader();
   const docLoader = testUtil.docLoader();
 
@@ -22,27 +24,24 @@ describe('compiler/loader：获取加载器 getLoader', () => {
   });
 
   it('验证 getLoader by name', async () => {
-    const loader = compiler1.getLoader({ loader: 'doc' });
+    const loader = compiler1.getLoader(mockCompilation, { loader: 'doc' });
     expect(loader).not.toBe(docLoader);
     expect(loader.name).toBe(docLoader.name);
     expect(loader.load).toBe(docLoader.load);
     expect(loader.test).toBe(docLoader.test);
 
-    expect(compiler1.getLoader({ loader: 'xxx' })).toBeUndefined();
+    expect(
+      compiler1.getLoader(mockCompilation, { loader: 'xxx' }),
+    ).toBeUndefined();
   });
 
   it('验证 getLoader by instance', async () => {
-    const loader = compiler1.getLoader({ loader: urlLoader });
+    const loader = compiler1.getLoader(mockCompilation, { loader: urlLoader });
 
     expect(loader).not.toBe(urlLoader);
     expect(loader.name).toBe(urlLoader.name);
     expect(loader.load).toBe(urlLoader.load);
     expect(loader.test).toBe(urlLoader.test);
-  });
-
-  it('验证 getLoader by default', async () => {
-    expect(compiler1.getLoader({}).name).toBe(urlLoader.name);
-    expect(compiler2.getLoader({}).name).toBe(docLoader.name);
   });
 
   it('验证 getLoader by entry', async () => {
@@ -80,17 +79,27 @@ describe('compiler/loader：获取加载器 getLoader', () => {
       },
     };
 
-    const loader = compiler1.getLoader({
-      loadOptions,
-    });
+    const loader = compiler1.getLoader(
+      {
+        entry: 'http://www.example.com',
+      },
+      {
+        loadOptions,
+      },
+    );
 
     expect(loader.loadOptions).not.toBe(loadOptions);
     expect(loader.loadOptions).toStrictEqual(loadOptions);
 
-    const loader2 = compiler1.getLoader({
-      loader: loader,
-      loadOptions: loadOptions2,
-    });
+    const loader2 = compiler1.getLoader(
+      {
+        entry: 'http://www.example.com',
+      },
+      {
+        loader: loader,
+        loadOptions: loadOptions2,
+      },
+    );
 
     expect(loader2.loadOptions).toStrictEqual({
       a1: 'a.1',

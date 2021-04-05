@@ -1,5 +1,7 @@
-import * as chalk from 'chalk';
+import { cli } from '../utils';
 import { EMOJIS } from './emojis';
+
+const { chalk } = cli;
 
 export const MESSAGES = {
   PROJECT_SELECTION_QUESTION: 'Which project would you like to generate to?',

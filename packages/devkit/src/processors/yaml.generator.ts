@@ -2,7 +2,6 @@ import {
   GenericConfigObject,
   Chunk,
   TangDocument,
-  TangGenerateResult,
   TangGenerator,
 } from '@devs-tang/common';
 
@@ -18,10 +17,7 @@ export const yamlGenerator = (): TangGenerator => {
 
     name: 'yaml',
 
-    async generate(
-      document: TangDocument,
-      options: GenericConfigObject,
-    ): Promise<TangGenerateResult> {
+    async generate(document: TangDocument, options: GenericConfigObject) {
       const opts = Object.assign(
         { name: 'default.yaml', skipInvalid: true },
         options,
@@ -30,11 +26,9 @@ export const yamlGenerator = (): TangGenerator => {
       const content = yaml.dump(document.model, options);
       const name = opts.name as string;
 
-      const chunks: Chunk[] = [{ name, content }];
+      document.chunks = [{ name, content }];
 
-      return {
-        chunks,
-      };
+      return document;
     },
   });
 };
