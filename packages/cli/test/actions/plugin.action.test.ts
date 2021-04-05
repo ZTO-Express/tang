@@ -4,10 +4,9 @@ describe('tang-cli/actions：plugin', () => {
   const pluginAction = new PluginAction();
 
   it('plugin info', async () => {
-    const plugin = await pluginAction.install('cowsay');
+    await pluginAction.delete('cowsay');
 
-    if (plugin) {
-      expect(plugin.name).toBe('cowsay');
-    }
+    const plugin = await pluginAction.install('cowsay');
+    expect(plugin && plugin.name).toBe('cowsay');
   });
 });

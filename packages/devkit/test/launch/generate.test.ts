@@ -9,10 +9,13 @@ describe('tang/launch/generate：代码生成', () => {
   let launcher: TangLauncher;
   beforeEach(async () => {
     launcher = await TangLauncher.getInstance();
-    launcher.configManager.unset(TANG_CONFIG_KEY_PRESETS);
   });
 
   it('generate', async () => {
+    // await expect(
+    //   launcher.inspect(undefined, { entry: 'xxxx' }),
+    // ).resolves.toBeUndefined();
+
     await expect(
       launcher.generate(tfDocPath, 'nonExists'),
     ).resolves.toBeUndefined();

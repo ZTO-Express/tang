@@ -34,21 +34,15 @@ export class GenerateAction extends CliAction {
     }
 
     if (opts.inspect) {
-      const presetWithConfig = await launcher.getPresetWithConfigOptions(
-        opts.preset,
-      );
-
-      const preset = presetWithConfig && presetWithConfig.preset;
-
-      if (!preset) {
-        console.log('当前没有任何预设！');
-        return;
-      }
-
-      const inspectData = await launcher.inspect(preset.name, {
+      const inspectData = await launcher.inspect(opts.preset, {
         entry,
         ...opts,
       });
+
+      if (!inspectData) {
+        console.log('当前没有任何预设！');
+        return;
+      }
 
       console.log('当前文件编译选项！');
       printData(inspectData);

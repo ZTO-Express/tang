@@ -128,6 +128,8 @@ export class TangLauncher {
   async inspect(presetName: string, options: CompilerInspectOptions) {
     const opts = await this.getPresetWithConfigOptions(presetName, options);
 
+    if (!opts || !opts.preset) return undefined;
+
     const compiler = await createCompiler(opts.preset);
 
     const processors: any = await compiler.inspect(

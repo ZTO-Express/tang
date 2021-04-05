@@ -25,11 +25,13 @@ describe('tang/plugin/install：安装插件', () => {
   });
 
   it('从npm安装插件', async () => {
-    await pluginManager.add('cowsay', {
+    const installedPlugin = await pluginManager.add('cowsay', {
       force: true,
       registry: 'https://registry.npm.taobao.org/',
       extArgs: '--no-save',
     });
+
+    expect(installedPlugin).not.toBeUndefined();
 
     let list = await pluginManager.list('cowsay');
     expect(list).toEqual(['cowsay']);
