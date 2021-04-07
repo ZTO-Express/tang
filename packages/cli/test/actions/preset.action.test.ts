@@ -13,4 +13,8 @@ describe('tang-cli/actions：preset', () => {
 
     const listResult = await presetAction.list('');
   });
+
+  it('preset info', async () => {
+    const presetInfo = await presetAction.info('', {});
+  });
 });

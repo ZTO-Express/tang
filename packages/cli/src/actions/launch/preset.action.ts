@@ -50,6 +50,12 @@ export class PresetAction extends CliAction {
     }
 
     const launcher = await this.getLauncher();
+
+    if (options.unset) {
+      await launcher.presetManager.unsetUsedConfig();
+      return launcher.presetManager.saveConfig();
+    }
+
     const presetWithConfig = await launcher.presetManager.use(name, options);
 
     if (!presetWithConfig) {
@@ -150,7 +156,7 @@ export class PresetAction extends CliAction {
       name: presetWithConfig.name,
       use: presetWithConfig.use,
       preset: presetConfigData,
-      options: presetWithConfig.options,
+      presetOptions: presetWithConfig.presetOptions,
     };
 
     return presetInfo;

@@ -44,6 +44,10 @@ export class PresetCommand implements CliCommand {
               flags: '-od --outputDir <outputDir>',
               description: '输出文件夹',
             },
+            {
+              flags: '--unset',
+              description: '移除正在使用的预设',
+            },
           ],
         },
         {

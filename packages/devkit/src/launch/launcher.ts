@@ -7,6 +7,7 @@ import {
   TangCompilation,
   TangCompilerLoadOptions,
   TangModuleTypes,
+  TangProcessorTypeKeys,
   utils,
 } from '@devs-tang/common';
 
@@ -142,8 +143,11 @@ export class TangLauncher {
       processOptions: opts.processOptions,
     };
 
-    Object.keys(processors).forEach(key => {
-      inspectData[key] = getPresetProcessorConfigData(processors[key]);
+    TangProcessorTypeKeys.forEach(key => {
+      const configData = getPresetProcessorConfigData(processors[key]);
+      if (configData) {
+        inspectData[key] = configData;
+      }
     });
 
     return inspectData;

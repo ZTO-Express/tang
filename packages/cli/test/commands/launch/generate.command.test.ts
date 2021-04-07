@@ -29,12 +29,26 @@ describe('tang-cli/commands：generate', () => {
     await program.parseAsync(rawInfoArgs);
   });
 
+  it('generate yaml 2 json', async () => {
+    const rawInfoArgs = [
+      'node',
+      'tang',
+      'generate',
+      'http://resc.pisaas.com/apps/tang/fixtures/documents/guitar.yaml',
+      '--parser=yaml',
+      '--generator=json',
+      '--outputer=local',
+    ];
+
+    await program.parseAsync(rawInfoArgs);
+  });
+
   it('generate inspect', async () => {
     const rawInfoArgs = [
       'node',
       'tang',
       'generate',
-      'testFile.json',
+      'http://resc.pisaas.com/apps/tang/fixtures/documents/guitar.yaml',
       '--inspect',
     ];
 

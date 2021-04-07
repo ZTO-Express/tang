@@ -23,7 +23,7 @@ export const jsonGenerator = (): TangGenerator => {
 
       const content = JSON.stringify(document.model, opts.replacer, opts.space);
 
-      document.chunks = [{ name: opts.name, content }];
+      document.chunks = [{ name: opts.fileName || opts.name, content }];
       document.chunks;
 
       return document;
