@@ -1,4 +1,4 @@
-import { HookContext, HookDriver } from '../../src';
+import { HookDriver } from '../../src';
 import * as testUtil from '../util';
 
 describe('common/HookDriver：钩子驱动并行执行 hookParallel', () => {
@@ -6,41 +6,41 @@ describe('common/HookDriver：钩子驱动并行执行 hookParallel', () => {
     {
       name: 'simple_load1',
       trigger: ['load', 'parse'],
-      apply: (context: HookContext) => {
+      apply: (context: any) => {
         context.test_load = 'simple_load1';
       },
     },
     {
       name: 'simple_load2',
       trigger: ['load'],
-      apply: async (context: HookContext) => {
+      apply: async (context: any) => {
         context.test_load = 'simple_load2';
       },
     },
     {
       name: 'simple_parse2',
       trigger: ['parse'],
-      async apply(context: HookContext) {
+      async apply(context: any) {
         context.test_load = 'simple_parse2';
       },
     },
     {
       name: 'simple:hook:parse',
       priority: 20,
-      apply: (context: HookContext) => {
+      apply: (context: any) => {
         context.test_load = 'simple_parse1';
       },
     },
     {
       name: 'simple:hook:generated',
-      apply(context: HookContext) {
+      apply(context: any) {
         context.test_generated1 = 'test_generated1';
       },
     },
     {
       name: 'simple',
       trigger: ['generated'],
-      async apply(context: HookContext) {
+      async apply(context: any) {
         context.test_generated2 = 'test_generated2';
       },
     },

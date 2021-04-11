@@ -54,7 +54,6 @@ describe('tang/plugin/install：安装插件', () => {
     const result = await pluginManager.run('cowsay', 'say', { text: 'hello' });
     expect(result).toContain('hello');
 
-    expect(result).toContain('hello');
     await expect(() => {
       return pluginManager.run('cowsay', 'name');
     }).rejects.toThrow('无效插件方法cowsay.name');
@@ -75,6 +74,15 @@ describe('tang/plugin/install：安装插件', () => {
 
     list = await pluginManager.list('cowsay');
     expect(list).toEqual([]);
+
+    const installedPlugin2 = await pluginManager.add('cowsay', {
+      extArgs: '--no-save',
+    });
+    expect(installedPlugin2).not.toBeUndefined();
+    await pluginManager.delete('cowsay');
+
+    list = await pluginManager.list('cowsay');
+    expect(list).toEqual([]);
   });
 
   it('本地安装插件（包含preset）', async () => {
@@ -82,6 +90,7 @@ describe('tang/plugin/install：安装插件', () => {
 
     const plugin = await pluginManager.add(packagePath, {
       force: true,
+      registry: 'https://registry.npm.taobao.org/',
     });
 
     expect(plugin).not.toBeUndefined();
@@ -98,6 +107,13 @@ describe('tang/plugin/install：安装插件', () => {
     await pluginManager.delete('test-tang');
     const list1 = await pluginManager.list('test-tang');
     expect(list1).toEqual([]);
+
+    // 默认安装
+    const plugin2 = await pluginManager.add(packagePath);
+    expect(plugin2).not.toBeUndefined();
+    await pluginManager.delete('test-tang');
+    const list2 = await pluginManager.list('test-tang');
+    expect(list2).toEqual([]);
   });
 
   it('从npm link安装插件', async () => {

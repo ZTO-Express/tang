@@ -344,6 +344,11 @@ export class PluginManager {
     let moduleName = options.prefixName;
 
     if (utils.isPath(packageName)) {
+      let command = `install`;
+      if (options.registry) command += ` --registry=${options.registry}`;
+
+      await runner.run(command, true, packageName);
+
       const packageData = await fs.readPackageInfo(packageName);
       moduleName = packageData.name;
 

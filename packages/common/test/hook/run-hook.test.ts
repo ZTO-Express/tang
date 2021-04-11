@@ -1,4 +1,4 @@
-import { HookContext, HookDriver } from '../../src';
+import { HookDriver } from '../../src';
 
 describe('common/HookDriver：钩子驱动 testHook & runHook', () => {
   it('判断钩子是否满足执行条件 testHook', () => {
@@ -67,7 +67,7 @@ describe('common/HookDriver：钩子驱动 testHook & runHook', () => {
       {
         name: 'simple_load1',
         trigger: ['load', 'parse'],
-        apply: (context: HookContext) => {
+        apply: (context: any) => {
           context.test_load = 'simple_load1';
           return 'good';
         },

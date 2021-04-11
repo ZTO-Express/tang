@@ -11,7 +11,9 @@ describe('tang/launcher：启动器', () => {
   });
 
   it('plugin 操作', async () => {
-    const result = await launcher.install('cowsay');
+    const result = await launcher.install('cowsay', {
+      registry: 'https://registry.npm.taobao.org/',
+    });
     expect(result.name).toBe('cowsay');
 
     let plugin = await launcher.getPlugin('cowsay');
@@ -57,6 +59,11 @@ describe('tang/launcher：启动器', () => {
   });
 
   it('inspect', async () => {
+    const nonExistsData = await launcher.inspect('nonExists', {
+      entry: 'test.xxxx',
+    });
+    expect(nonExistsData).toBeUndefined();
+
     const inspectData = await launcher.inspect(TANG_PRESET_DEFAULT, {
       entry: 'test.xxxx',
     });

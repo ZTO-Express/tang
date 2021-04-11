@@ -68,9 +68,9 @@ export function sortBy<T>(
     const a_v = !a || a[sortKey] === undefined ? defaultValue : a[sortKey];
     const b_v = !b || b[sortKey] === undefined ? defaultValue : b[sortKey];
 
+    if (a_v === b_v) return 0;
     if (!a_v) return -1 * sortOrder; // 升序时，不存在则默认往后拍，降序相反
     if (!b_v) return 1 * sortOrder; // 同上
-    if (a_v === b_v) return 0;
     return (a_v > b_v ? 1 : -1) * sortOrder;
   });
 
