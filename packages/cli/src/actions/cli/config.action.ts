@@ -1,4 +1,4 @@
-import { GenericConfigObject } from '@devs-tang/common';
+import { GenericConfigObject, InvalidArguments } from '@devs-tang/common';
 import * as devkit from '@devs-tang/devkit';
 import { CliAction } from '../../common';
 import { printData } from '../../utils';
@@ -16,6 +16,12 @@ export class ConfigAction extends CliAction {
   }
 
   // 列出所有或特定配置，以json格式展示
+  /**
+   *
+   * @param key
+   * @param options
+   * @returns
+   */
   async get(key: string, options: GenericConfigObject = {}) {
     const result = await this.getConfig(key);
     if (!result) return result;
@@ -28,13 +34,11 @@ export class ConfigAction extends CliAction {
   // 设置特定配置
   async set(key: string, value: string) {
     if (!key) {
-      console.error('请提供配置路径');
-      return;
+      throw new InvalidArguments('请提供配置路径');
     }
 
     if (!value) {
-      console.error('请提供配置值');
-      return;
+      throw new InvalidArguments('请提供配置值');
     }
 
     const { configManager } = await devkit.getLauncher();
@@ -47,8 +51,7 @@ export class ConfigAction extends CliAction {
   // 取消特定配置
   async unset(key: string) {
     if (!key) {
-      console.error('请提供配置路径');
-      return;
+      throw new InvalidArguments('请提供配置路径');
     }
 
     const { configManager } = await devkit.getLauncher();

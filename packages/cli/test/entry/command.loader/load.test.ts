@@ -22,7 +22,7 @@ describe('tang-cli/commands：command.loader命令加载器 load', () => {
   it('加载action short方法', async () => {
     CommandLoader.load(program, false);
 
-    const rawInfoArgs = ['node', 'tang', 'i'];
+    const rawInfoArgs = ['node', 'tang', 'info'];
 
     await program.parseAsync(rawInfoArgs);
 

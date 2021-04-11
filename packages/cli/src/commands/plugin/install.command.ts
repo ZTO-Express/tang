@@ -5,6 +5,7 @@ export class InstallCommand implements CliCommand {
     return {
       name: 'install',
       args: '<package>',
+      aliases: ['i'],
       description: '安装插件',
       argsDescription: {
         package: '插件包名或路径(类似npm install)',

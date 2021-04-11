@@ -1,4 +1,5 @@
 import { utils } from '@devs-tang/common';
+import * as os from 'os';
 import { fs } from '../../src/utils';
 import * as testUtil from '../util';
 
@@ -65,5 +66,36 @@ describe('utils/fs：fs实用方法', () => {
     const meshBuffer = await fs.resolveFile(yfDocUrl, 'buffer');
     expect(meshBuffer).toBeInstanceOf(ArrayBuffer);
     expect(meshBuffer.byteLength).toBeGreaterThan(10);
+  });
+
+  it('打开文件', async () => {
+    const result = await fs.explore(os.homedir());
+    expect(result.exitCode).toBe(0);
+
+    await expect(fs.explore(os.homedir(), 'badCommand')).rejects.toThrow(
+      'ENOENT:',
+    );
+  });
+
+  it('获取文件浏览器 getFileExplorer', async () => {
+    const osPlatformFn = os.platform;
+
+    const osAny = os as any;
+
+    osAny.platform = () => 'darwin';
+    expect(fs.getFileExplorer()).toBe('open');
+
+    osAny.platform = () => 'win32';
+    expect(fs.getFileExplorer()).toBe('explorer');
+
+    osAny.platform = () => 'linux';
+    expect(fs.getFileExplorer()).toBe('nautilus');
+
+    osAny.platform = () => 'unknown';
+    expect(fs.getFileExplorer()).toBe(undefined);
+
+    await expect(fs.explore(os.homedir())).rejects.toThrow('无法确定执行命令');
+
+    osAny.platform = osPlatformFn;
   });
 });

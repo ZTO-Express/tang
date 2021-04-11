@@ -35,7 +35,13 @@ Tang 是很蠢萌的海水鱼，学名黄高鳍刺尾鱼， 别名，黄金吊�
 2. 安装：执行 node 命令安装
 
 ```
+git clone git@github.com:ZTO-Express/tang.git
+
+cd tang
+
 npm i
+
+npm run test
 ```
 
 ### 其它

@@ -22,7 +22,6 @@ export class PluginCommand implements CliCommand {
         {
           name: 'info',
           args: '[name]',
-          aliases: ['i'],
           description: '查看插件名称',
           argsDescription: {
             name: '插件名称',
@@ -31,6 +30,7 @@ export class PluginCommand implements CliCommand {
         {
           name: 'install',
           args: '<package>',
+          aliases: ['i'],
           description: '安装插件',
           argsDescription: {
             package: '插件包名或路径(类似npm install)',

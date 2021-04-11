@@ -1,12 +1,13 @@
 /**
  * 文件系统相关实用方法
  */
-
+import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as json5 from 'json5';
+import * as execa from 'execa';
 
-import { utils, InvalidArguments } from '@devs-tang/common';
+import { utils, InvalidArguments, ExecuteFailedError } from '@devs-tang/common';
 import { http } from '@devs-tang/core';
 
 export * from 'fs-extra';
@@ -93,4 +94,39 @@ export async function resolveFile(file: string, encoding = 'utf-8') {
   if (encoding === 'json') _data = json5.parse(_data);
 
   return _data;
+}
+
+/**
+ * 打开指定文件或目录，使用指定的命令
+ * @param pathName
+ * @param cmd
+ */
+export async function explore(pathName: string, cmd?: string) {
+  if (!cmd) {
+    cmd = getFileExplorer();
+  }
+
+  if (!cmd) throw new ExecuteFailedError('无法确定执行命令');
+
+  return execa(cmd, [pathName]);
+}
+
+/** 获取平台文件浏览器 */
+export function getFileExplorer() {
+  const platform = os.platform();
+
+  let cmd: string;
+  switch (platform) {
+    case 'darwin': // mac
+      cmd = 'open';
+      break;
+    case 'win32': // windows
+      cmd = 'explorer';
+      break;
+    case 'linux': // linux
+      cmd = 'nautilus';
+      break;
+  }
+
+  return cmd;
 }

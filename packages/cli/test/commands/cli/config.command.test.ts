@@ -2,16 +2,54 @@ import * as commander from 'commander';
 import { CommandLoader } from '../../../src/entry';
 
 describe('tang-cli/commands：config', () => {
-  const program = commander.createCommand();
+  let program: commander.Command;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    program = commander.createCommand();
     CommandLoader.load(program);
   });
 
-  it('config list', async () => {
-    const rawInfoArgs = ['node', 'tang', 'config', 'list'];
+  it('config get/set/unset', async () => {
+    let cmdResult: any = await program.parseAsync([
+      'node',
+      'tang',
+      'config',
+      'test',
+      'test_0',
+    ]);
+    await expect(cmdResult._actionResults[0]).resolves.toBe('test_0');
+    cmdResult._actionResults = [];
 
-    await program.parseAsync(rawInfoArgs);
+    cmdResult = await program.parseAsync(['node', 'tang', 'config', 'test']);
+    await expect(cmdResult._actionResults[0]).resolves.toBe('test_0');
+    cmdResult._actionResults = [];
+
+    cmdResult = await program.parseAsync([
+      'node',
+      'tang',
+      'config',
+      'unset',
+      'test',
+    ]);
+    await expect(cmdResult._actionResults[0]).resolves.toBe(undefined);
+    cmdResult._actionResults = [];
+
+    cmdResult = await program.parseAsync(['node', 'tang', 'config', 'test']);
+    await expect(cmdResult._actionResults[0]).resolves.toBe(undefined);
+    cmdResult._actionResults = [];
+  });
+
+  it('config list', async () => {
+    const cmdResult: any = await program.parseAsync([
+      'node',
+      'tang',
+      'config',
+      'list',
+    ]);
+    const actionResult = await cmdResult._actionResults[0];
+    cmdResult._actionResults = [];
+
+    debugger;
   });
 
   it('config set/unset', async () => {

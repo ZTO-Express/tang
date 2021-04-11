@@ -6,7 +6,7 @@
     "lint": "echo eslint",
     "test": "npm run lint && lerna run test",
     "build": "lerna run build",
-    "publish": "lerna publish && git commit -am \"Update version and changelog\" && git push origin master",
+    "publish": "lerna publish",
     "clean": "lerna clean",
     "commit": "git-cz",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",

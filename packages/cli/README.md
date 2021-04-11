@@ -2,12 +2,12 @@
 
 ## 描述
 
-一般全局按照用于执行 tang 的相关命令
+一般全局安装，用于执行 tang 的相关命令
 
 ## 安装
 
 ```
-$ npm install -g tang-cli
+$ npm install -g @devs-tang/cli
 ```
 
 ## 使用

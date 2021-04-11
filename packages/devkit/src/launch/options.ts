@@ -6,7 +6,6 @@ import {
   NormalizedTangOptions,
 } from '@devs-tang/core';
 
-import { TANG_DEVKIT_PLUGIN_NAME } from '../consts';
 import * as processors from '../processors';
 
 /**
