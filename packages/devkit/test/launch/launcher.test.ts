@@ -1,6 +1,10 @@
 import * as testUtil from '../util';
 import { TangLauncher, utils, getLauncher } from '../../src';
-import { TANG_CONFIG_KEY_PRESETS, TANG_PRESET_DEFAULT } from '../../src/consts';
+import {
+  TANG_CONFIG_KEY_PRESETS,
+  TANG_PRESET_DEFAULT,
+  TANG_HOME,
+} from '../../src/consts';
 
 describe('tang/launcher：启动器', () => {
   let launcher: TangLauncher;
@@ -15,6 +19,8 @@ describe('tang/launcher：启动器', () => {
       registry: 'https://registry.npm.taobao.org/',
     });
     expect(result.name).toBe('cowsay');
+
+    expect(launcher.configDir).toBe(TANG_HOME);
 
     let plugin = await launcher.getPlugin('cowsay');
     expect(plugin.name).toBe('cowsay');

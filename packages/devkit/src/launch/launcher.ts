@@ -57,7 +57,6 @@ export class TangLauncher {
 
   // 初始化加载器
   async initialize() {
-    await fs.ensureDir(this.configDir);
     await this.configManager.load();
   }
 

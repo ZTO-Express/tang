@@ -4,9 +4,38 @@ import {
   getNormalizedOptions as getCoreNormalizedOptions,
   normalizePresetOptions,
   NormalizedTangOptions,
+  UnnormalizedTangOptions,
+  PresetNormalizeOptions,
 } from '@devs-tang/core';
 
 import * as processors from '../processors';
+
+/**
+ * 对传入的选项进行规范化
+ * @param config
+ */
+export function getNormalizedOptions(
+  tangOptions?: UnnormalizedTangOptions,
+  options?: PresetNormalizeOptions,
+) {
+  const defaultProcessors = normalizePresetOptions(
+    {
+      loaders: [processors.docLoader()],
+      parsers: [processors.json5Parser(), processors.yamlParser()],
+      generators: [processors.yamlGenerator()],
+      outputers: [processors.localOutputer(), processors.memoryOutputer()],
+    },
+    { moduleType: TangModuleTypes.devkit },
+  );
+
+  const normalizedOptions = normalizePresetOptions(tangOptions, options);
+
+  let opts = mergePresetOptions(defaultProcessors, normalizedOptions);
+
+  opts = getCoreNormalizedOptions(opts);
+
+  return opts;
+}
 
 /**
  * 对传入的选项进行规范化
@@ -18,28 +47,6 @@ export function mergePresetAndOptions(
 ) {
   let opts = mergePresetOptions(preset, options);
   opts = getNormalizedOptions(opts);
-  return opts;
-}
-
-/**
- * 对传入的选项进行规范化
- * @param config
- */
-export function getNormalizedOptions(options?: NormalizedTangOptions) {
-  const defaultProcessors = normalizePresetOptions(
-    {
-      loaders: [processors.docLoader()],
-      parsers: [processors.json5Parser(), processors.yamlParser()],
-      generators: [processors.yamlGenerator()],
-      outputers: [processors.localOutputer(), processors.memoryOutputer()],
-    },
-    { moduleType: TangModuleTypes.devkit },
-  );
-
-  let opts = mergePresetOptions(defaultProcessors, options);
-
-  opts = getCoreNormalizedOptions(opts);
-
   return opts;
 }
 

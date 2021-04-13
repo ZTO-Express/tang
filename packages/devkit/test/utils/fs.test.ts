@@ -98,4 +98,59 @@ describe('utils/fs：fs实用方法', () => {
 
     osAny.platform = osPlatformFn;
   });
+
+  it('相对路径 relativePath', async () => {
+    expect(fs.relativePath('/aaa/b', '/aaa/b/c')).toBe('c');
+    expect(fs.relativePath('/aaa/b', '/aaa/b')).toBe('');
+    expect(fs.relativePath('/aaa/b', '/aaa')).toBe('..');
+    expect(fs.relativePath('/aaa/b', '/aaa/c/xxx')).toBe('../c/xxx');
+  });
+
+  it('同步遍历目录 walkSync', async () => {
+    const parentDir = fs.joinPath(__dirname, '..');
+    const testFile = fs.joinPath(__dirname, 'fs.test.ts');
+
+    const files: string[] = [];
+    fs.walkSync(parentDir, (filePath: string) => {
+      files.push(filePath);
+    });
+
+    expect(files.includes(testFile)).toBe(true);
+  });
+
+  it('向上寻找 lookupFile', async () => {
+    const packagePath = fs.joinPath(__dirname, '../../package.json');
+    const lookupPath = await fs.lookupFile('package.json', __dirname);
+    expect(lookupPath).toBe(packagePath);
+  });
+
+  it('向上寻找 lookupFile', async () => {
+    let fileData = await fs.resolveAnyOf(
+      [
+        'nonExists',
+        fs.joinPath(__dirname, 'nonExist'),
+        fs.joinPath(__dirname, '../../package.json'),
+        testUtil.resolveFixturePath('documents/preset.json'),
+      ],
+      'json',
+    );
+    expect(fileData.name).toBe('@devs-tang/devkit');
+
+    fileData = await fs.resolveAnyOf(
+      [
+        'nonExists',
+        testUtil.resolveFixturePath('documents/preset.json'),
+        fs.joinPath(__dirname, 'nonExist'),
+        fs.joinPath(__dirname, '../../package.json'),
+      ],
+      'json',
+    );
+    expect(fileData.name).toBe('@tang/yapi-sharing');
+
+    fileData = await fs.resolveAnyOf(
+      ['nonExists', fs.joinPath(__dirname, 'nonExist')],
+      'json',
+    );
+    expect(fileData).toBeUndefined();
+  });
 });

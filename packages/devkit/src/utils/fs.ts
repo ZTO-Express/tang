@@ -17,6 +17,11 @@ export function joinPath(...paths: string[]) {
   return path.join(...paths);
 }
 
+/** 相对路径 */
+export function relativePath(from: string, to: string) {
+  return path.relative(from, to);
+}
+
 /**
  * 同步读取json5
  * @param file
@@ -97,6 +102,34 @@ export async function resolveFile(file: string, encoding = 'utf-8') {
 }
 
 /**
+ * 读取任意文件
+ * @param files
+ * @param encoding
+ * @returns
+ */
+export async function resolveAnyOf(
+  files: string[],
+  encoding?: string,
+): Promise<any> {
+  const nextRound = files.slice(1, files.length);
+  try {
+    for (const file of files) {
+      const result = await resolveFile(file, encoding);
+
+      if (result === undefined) {
+        return resolveAnyOf(nextRound, encoding);
+      }
+
+      return result;
+    }
+  } catch (err) {
+    return resolveAnyOf(nextRound, encoding);
+  }
+
+  return undefined;
+}
+
+/**
  * 打开指定文件或目录，使用指定的命令
  * @param pathName
  * @param cmd
@@ -129,4 +162,54 @@ export function getFileExplorer() {
   }
 
   return cmd;
+}
+
+/**
+ * 同步遍历目录
+ * @param dir 目录地址
+ * @param callback 遍历方法
+ */
+export function walkSync(dir: string, callback: Function) {
+  const files = fs.readdirSync(dir);
+
+  for (const file of files) {
+    const filePath = joinPath(dir, file);
+    const fileStat = fs.statSync(filePath);
+
+    if (fileStat.isDirectory()) {
+      walkSync(filePath, callback);
+    } else if (fileStat.isFile()) {
+      callback(filePath, {
+        stat: fileStat,
+      });
+    }
+  }
+}
+
+/**
+ * 向上寻找指定文件
+ * @param fileName
+ * @param dir
+ */
+export async function lookupFile(
+  fileName: string,
+  cwd?: string,
+): Promise<string> {
+  cwd = cwd || process.cwd();
+
+  const filePath = path.join(cwd, fileName);
+
+  // 存在codegen目录和package.json文件，则为项目目录
+  const exists = await fs.pathExists(filePath);
+
+  if (exists) return filePath;
+
+  const cwdParts = cwd.split('/');
+
+  const parentPath = cwdParts.slice(0, cwdParts.length - 1).join('/');
+
+  // 防止死循环
+  if (!parentPath) return undefined;
+
+  return lookupFile(fileName, parentPath);
 }

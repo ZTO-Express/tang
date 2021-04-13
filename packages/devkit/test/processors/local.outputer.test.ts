@@ -73,28 +73,19 @@ describe('outputer/local：local输出器', () => {
 
     output = await localOutputer.output(sampleGeneration, {
       outputDir: testTmpDir,
-      clearDir: false,
       overwrite: false,
     });
     expect(output.files.length).toBe(0);
 
     output = await localOutputer.output(sampleGeneration, {
       outputDir: testTmpDir,
-      clearDir: false,
       overwrite: true,
     });
     expect(output.files.length).toBe(1);
 
-    output = await localOutputer.output(sampleGeneration, {
-      outputDir: testTmpDir,
-      clearDir: true,
-      overwrite: false,
-    });
-    expect(output.files.length).toBe(1);
-
-    await expect(localOutputer.output(sampleGeneration, {})).rejects.toThrow(
-      '请提供输出目录',
-    );
+    // await expect(localOutputer.output(sampleGeneration, {})).rejects.toThrow(
+    //   '请提供输出目录',
+    // );
 
     await fs.emptyDir(testTmpDir);
   });

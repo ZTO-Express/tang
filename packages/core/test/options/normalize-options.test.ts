@@ -41,16 +41,21 @@ describe('options/normalizeOptions：规范化配置', () => {
   });
 
   it('获取规范化选项 默认值验证', () => {
-    const options1 = getNormalizedOptions({
-      defaultLoader: testLoader,
-      loaders: [testLoader],
-      parsers: [testParser, testParser2],
-      loadOptions: { isTest: true },
-      exProp: { isTestExProp: true },
-    });
+    const options1 = getNormalizedOptions(
+      {
+        defaultLoader: testLoader,
+        loaders: [testLoader],
+        parsers: [testParser, testParser2],
+        loadOptions: { isTest: true },
+        exProp: { isTestExProp: true },
+      },
+      {
+        pluginName: 'test',
+      },
+    );
 
     expect(options1.loaders.length).toBe(2);
-    expect(options1.loaders[0].pluginName).toBeUndefined();
+    expect(options1.loaders[0].pluginName).toBe('test');
     expect(options1.loaders[1].pluginName).toBe(undefined);
     expect(options1.loaders[1].moduleType).toBe(TangModuleTypes.core);
     expect(options1.parsers.length).toBe(2);
@@ -112,11 +117,11 @@ describe('options/normalizeOptions：规范化配置', () => {
 
   it('获取规范化预设选项 normalizeProcessor', () => {
     expect(normalizeProcessor(undefined)).toBe(undefined);
-    expect(() => normalizeProcessor({})).toThrow('必须提供名称和类型');
+    expect(() => normalizeProcessor({} as any)).toThrow('必须提供名称和类型');
     expect(() => normalizeProcessor({ name: 'test' })).toThrow(
       '必须提供名称和类型',
     );
-    expect(() => normalizeProcessor({ type: 'loader' })).toThrow(
+    expect(() => normalizeProcessor({ type: 'loader' } as any)).toThrow(
       '必须提供名称和类型',
     );
 

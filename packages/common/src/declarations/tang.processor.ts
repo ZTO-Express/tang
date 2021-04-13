@@ -25,8 +25,8 @@ export type TangPluginProcessorTest =
   | RegExp
   | ((compilation: TangCompilation, options?: any) => boolean);
 
-// 当前文档处理器
-export interface TangProcessor extends GenericObject {
+// 严格文档处理器
+export interface StrictTangProcessor {
   type: TangProcessorTypeNames; // 处理器类型
   name: string; // 处理器名称
   moduleType: TangModuleTypeNames; // 所属模块类型
@@ -36,8 +36,8 @@ export interface TangProcessor extends GenericObject {
   test?: TangPluginProcessorTest; // 验证是否可以加载指定文档（一般通过目标名称/路径即可判断）
 }
 
-// 文档加载器
-export interface TangLoader extends TangProcessor {
+// 严格文档加载器
+export interface StrictTangLoader extends StrictTangProcessor {
   loadOptions?: GenericConfigObject;
   load(
     document: TangDocument,
@@ -46,8 +46,8 @@ export interface TangLoader extends TangProcessor {
   ): Promise<TangDocument>;
 }
 
-// 文档解析器
-export interface TangParser extends TangProcessor {
+// 严格文档解析器
+export interface StrictTangParser extends StrictTangProcessor {
   parseOptions?: GenericConfigObject;
   parse: (
     document: TangDocument,
@@ -56,8 +56,8 @@ export interface TangParser extends TangProcessor {
   ) => Promise<TangDocument>;
 }
 
-// 文档生成器
-export interface TangGenerator extends TangProcessor {
+// 严格文档生成器
+export interface StrictTangGenerator extends StrictTangProcessor {
   generateOptions?: GenericConfigObject;
   generate: (
     document: TangDocument,
@@ -72,8 +72,8 @@ export interface TangOutput {
   [prop: string]: any;
 }
 
-// 文件输出器
-export interface TangOutputer extends TangProcessor {
+// 严格文件输出器
+export interface StrictTangOutputer extends StrictTangProcessor {
   outputOptions?: GenericConfigObject;
   output: (
     document: TangDocument,
@@ -81,3 +81,18 @@ export interface TangOutputer extends TangProcessor {
     compilation?: TangCompilation,
   ) => Promise<TangOutput>;
 }
+
+// 文档处理器
+export interface TangProcessor extends StrictTangProcessor, GenericObject {}
+
+// 文档加载器
+export interface TangLoader extends StrictTangLoader, GenericObject {}
+
+// 文档解析器
+export interface TangParser extends StrictTangParser, GenericObject {}
+
+// 文档生成器
+export interface TangGenerator extends StrictTangGenerator, GenericObject {}
+
+// 文件输出器
+export interface TangOutputer extends StrictTangOutputer, GenericObject {}

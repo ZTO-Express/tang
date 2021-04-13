@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { GenericConfigObject, utils } from '@devs-tang/common';
-import { json5 } from '../utils';
+import { json5, fs } from '../utils';
 import { TANG_HOME, TANG_CONFIG_FILENAME } from '../consts';
 import { Config } from './interfaces';
 import { IO, LocalIO } from '../io';
@@ -16,20 +16,23 @@ export interface ConfigManagerOptions extends GenericConfigObject {
  * 配置管理器
  */
 export class ConfigManager {
-  readonly configDir: string;
+  private _configDir: string;
+  private _io: IO;
+
   readonly configFileName: string;
 
-  io: IO;
   config: Config;
 
   constructor(options?: ConfigManagerOptions) {
     options = Object.assign({}, options);
 
-    this.configDir = options.configDir || TANG_HOME;
+    this._configDir = options.configDir;
     this.configFileName = options.configFile || TANG_CONFIG_FILENAME;
     this.config = defaultConfig;
+  }
 
-    this.io = new LocalIO(this.configDir);
+  get configDir() {
+    return this._configDir;
   }
 
   get configFilePath() {
@@ -59,7 +62,14 @@ export class ConfigManager {
   // 加载配置
   async load(name?: string): Promise<Config> {
     name = name || this.configFileName;
-    const content: string | undefined = await this.io.readAnyOf([name]);
+    if (!this._configDir) {
+      this._configDir = await this.retrieveConfigDir(name);
+    }
+
+    await fs.ensureDir(this._configDir);
+    this._io = new LocalIO(this._configDir);
+
+    const content: string | undefined = await this._io.readAnyOf([name]);
 
     if (!content) {
       this.config = defaultConfig;
@@ -82,9 +92,20 @@ export class ConfigManager {
     return this.config;
   }
 
+  /** 获取配置文件目录 */
+  async retrieveConfigDir(name: string) {
+    const filePath = await fs.lookupFile(name);
+
+    if (filePath === undefined) {
+      return TANG_HOME;
+    }
+
+    return path.dirname(filePath);
+  }
+
   /** 保存配置 */
   async save() {
-    return this.io.write(this.config, {
+    return this._io.write(this.config, {
       file: this.configFileName,
     });
   }

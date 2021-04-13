@@ -25,16 +25,14 @@ export const localOutputer = (): TangOutputer => {
       document: TangDocument,
       options: GenericConfigObject,
     ): Promise<TangOutput> {
-      if (!options || !options.outputDir)
-        throw new InvalidArguments('请提供输出目录');
+      options = options || {};
+
+      if (!options.outputDir) {
+        options.outputDir = process.cwd();
+      }
 
       const outputDir = options.outputDir;
-      const clearDir = options.clearDir === true; // 是否晴空目录(默认false)
-      const overwrite = options.overwrite !== false; // 是否覆盖已存在目录(默认true)
-
-      if (clearDir) {
-        await fs.emptyDir(outputDir);
-      }
+      const overwrite = (options.overwrite = options.overwrite !== false); // 是否覆盖已存在目录(默认true)
 
       await fs.ensureDir(outputDir); // 确认目录存在
 
@@ -50,11 +48,14 @@ export const localOutputer = (): TangOutputer => {
           if (existsFile) return;
         }
 
+        await fs.ensureDir(path.dirname(filePath));
+
         await fs.writeFile(filePath, chunk.content);
 
         files.push({
           path: filePath,
           chunk,
+          options,
         });
       });
 

@@ -9,6 +9,8 @@ import {
   TangModuleTypes,
   TangModuleTypeNames,
   InvalidProcessorError,
+  GenericObject,
+  TangPluginPresetOptions,
   utils,
 } from '@devs-tang/common';
 
@@ -22,6 +24,10 @@ export interface PresetNormalizeOptions {
   pluginName?: string;
 }
 
+export interface UnnormalizedTangOptions
+  extends TangPluginPresetOptions,
+    GenericObject {}
+
 export interface ProcessorNormalizeOptions extends PresetNormalizeOptions {
   type?: TangProcessorTypeNames;
 }
@@ -30,7 +36,10 @@ export interface ProcessorNormalizeOptions extends PresetNormalizeOptions {
  * 对传入的选项进行规范化
  * @param config
  */
-export function getNormalizedOptions(options?: NormalizedTangOptions) {
+export function getNormalizedOptions(
+  tangOptions?: UnnormalizedTangOptions,
+  options?: PresetNormalizeOptions,
+) {
   const defaultProcessors = normalizePresetOptions(
     {
       loaders: [processors.urlLoader()],
@@ -43,7 +52,9 @@ export function getNormalizedOptions(options?: NormalizedTangOptions) {
     },
   );
 
-  const opts = mergeOptions(defaultProcessors, options);
+  const normalizedOptions = normalizePresetOptions(tangOptions, options);
+
+  const opts = mergeOptions(defaultProcessors, normalizedOptions);
 
   return opts;
 }
@@ -55,9 +66,9 @@ export function getNormalizedOptions(options?: NormalizedTangOptions) {
  * @returns
  */
 export function normalizePresetOptions(
-  presetOptions: NormalizedTangOptions,
+  presetOptions: UnnormalizedTangOptions,
   options: PresetNormalizeOptions = {},
-) {
+): NormalizedTangOptions {
   if (!presetOptions) return undefined;
 
   // 合并处理器选项
@@ -73,7 +84,7 @@ export function normalizePresetOptions(
     });
   }
 
-  return presetOptions;
+  return presetOptions as NormalizedTangOptions;
 }
 
 export function normalizeProcessor(
