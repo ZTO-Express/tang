@@ -1,6 +1,6 @@
 {
   "name": "@devs-tang/devkit",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Tang开发库",
   "main": "lib/",
   "types": "lib/",
