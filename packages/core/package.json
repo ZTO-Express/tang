@@ -1,6 +1,6 @@
 {
   "name": "@devs-tang/core",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Tang核心库",
   "main": "lib/",
   "types": "lib/",
@@ -22,7 +22,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@devs-tang/common": "^1.0.5",
+    "@devs-tang/common": "^1.0.6",
     "isomorphic-unfetch": "^3.1.0"
   },
   "devDependencies": {
