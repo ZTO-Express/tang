@@ -50,4 +50,10 @@ describe('tang/launch/generate：代码生成', () => {
     expect(genFileBuffer).toBeInstanceOf(Buffer);
     expect(genFileBuffer.toString()).toMatch('name: ');
   });
+
+  // 指定preset
+  it('generate指定preset', async () => {
+    debugger;
+    const compilation = await launcher.generate('.', 'zf-gen:ts', {});
+  });
 });

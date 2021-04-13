@@ -70,4 +70,17 @@ describe('tang-cli/commands：generate', () => {
 
     await program.parseAsync(rawInfoArgs);
   });
+
+  it('generate use preset', async () => {
+    const rawInfoArgs = [
+      'node',
+      'tang',
+      'gen',
+      '.',
+      '--preset=zf-gen:ts',
+      '--overwrite',
+    ];
+
+    await program.parseAsync(rawInfoArgs);
+  });
 });

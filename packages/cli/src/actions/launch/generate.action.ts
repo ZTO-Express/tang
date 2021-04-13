@@ -50,6 +50,6 @@ export class GenerateAction extends CliAction {
       return inspectData;
     }
 
-    return launcher.generate(entry, options.perset as string, opts);
+    return launcher.generate(entry, options.preset as string, opts);
   }
 }
