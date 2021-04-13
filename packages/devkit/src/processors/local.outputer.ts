@@ -32,7 +32,7 @@ export const localOutputer = (): TangOutputer => {
       }
 
       const outputDir = options.outputDir;
-      const overwrite = (options.overwrite = options.overwrite !== false); // 是否覆盖已存在目录(默认true)
+      const overwrite = (options.overwrite = options.overwrite === true); // 是否覆盖已存在目录(默认false)
 
       await fs.ensureDir(outputDir); // 确认目录存在
 
