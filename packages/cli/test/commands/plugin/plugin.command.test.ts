@@ -31,6 +31,11 @@ describe('tang-cli/commands：plugin', () => {
     await program.parseAsync(rawInfoArgs);
   });
 
+  it('plugin info', async () => {
+    const rawInfoArgs = ['node', 'tang', 'plugin', 'info', 'cowsay'];
+    await program.parseAsync(rawInfoArgs);
+  });
+
   it('plugin delete', async () => {
     const rawInfoArgs = ['node', 'tang', 'plugin', 'delete', 'cowsay'];
     await program.parseAsync(rawInfoArgs);

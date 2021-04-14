@@ -16,7 +16,7 @@
   },
   "scripts": {
     "prepublish": "npm run build",
-    "build": "../../node_modules/.bin/rimraf -rf lib/ && ../../node_modules/.bin/tsc --project tsconfig.build.json",
+    "build": "node ../../scripts/build --name=openapi",
     "test": "jest --coverage --runInBand"
   },
   "engines": {

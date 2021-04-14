@@ -16,7 +16,7 @@
   },
   "scripts": {
     "prepublish": "npm run build",
-    "build": "node scripts/build",
+    "build": "node ../../scripts/build --name=cli",
     "start": "node dist/bin/cli",
     "start-ts": "../../node_modules/.bin/ts-node src/bin/tang",
     "test": "jest --coverage --runInBand",

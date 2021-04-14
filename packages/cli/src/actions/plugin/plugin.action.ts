@@ -24,7 +24,17 @@ export class PluginAction extends CliAction {
     if (plugin.version) console.log(`版本：${plugin.version || '暂无'}`);
     console.log(`描述：${plugin.description || '暂无'}`);
 
-    if (plugin.packageInfo) {
+    const packageInfo = plugin.packageInfo;
+
+    if (packageInfo) {
+      console.log(`包信息：`);
+      const cleanPackageInfo = devkit.utils.omitNil({
+        name: packageInfo.name,
+        version: packageInfo.version,
+        description: packageInfo.description,
+      });
+
+      console.log(devkit.json5.stringify(cleanPackageInfo, null, 2));
     }
 
     console.log();

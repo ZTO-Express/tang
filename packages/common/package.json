@@ -15,7 +15,7 @@
   },
   "scripts": {
     "prepublish": "npm run build",
-    "build": "../../node_modules/.bin/rimraf -rf lib/ && ../../node_modules/.bin/tsc --project tsconfig.build.json",
+    "build": "node ../../scripts/build --name=common",
     "test": "jest --coverage --runInBand"
   },
   "keywords": [],
