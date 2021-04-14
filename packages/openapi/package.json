@@ -1,6 +1,6 @@
 {
   "name": "@devs-tang/openapi",
-  "version": "1.0.1",
+  "version": "1.0.9",
   "description": "tang openapi相关插件",
   "main": "lib/",
   "types": "lib/",
