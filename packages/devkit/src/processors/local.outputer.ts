@@ -54,8 +54,7 @@ export const localOutputer = (): TangOutputer => {
 
         files.push({
           path: filePath,
-          chunk,
-          options,
+          ...chunk,
         });
       });
 
@@ -64,6 +63,7 @@ export const localOutputer = (): TangOutputer => {
       return {
         result: true,
         files,
+        options,
       };
     },
   });

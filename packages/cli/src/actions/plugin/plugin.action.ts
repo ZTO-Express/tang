@@ -20,9 +20,14 @@ export class PluginAction extends CliAction {
     }
 
     // 输出插件信息
-    console.log('插件信息：');
-    console.log(`${plugin.name}`);
-    console.log(`${plugin.description || ''}`);
+    console.log(`插件：${plugin.name}`);
+    if (plugin.version) console.log(`版本：${plugin.version || '暂无'}`);
+    console.log(`描述：${plugin.description || '暂无'}`);
+
+    if (plugin.packageInfo) {
+    }
+
+    console.log();
 
     return plugin;
   }

@@ -95,6 +95,11 @@ describe('tang/plugin/install：安装插件', () => {
 
     expect(plugin).not.toBeUndefined();
 
+    expect(plugin.packageInfo.name).toBe('test-tang');
+    expect(plugin.packageInfo.version).not.toBeUndefined();
+    expect(plugin.packageInfo.description).not.toBeUndefined();
+    expect(plugin.packageInfo.author).not.toBeUndefined();
+
     let preset = await pluginManager.getPreset('test-tang');
     expect(preset).toEqual(plugin.preset);
 

@@ -22,6 +22,17 @@ export function relativePath(from: string, to: string) {
   return path.relative(from, to);
 }
 
+/** 获取父路径 */
+export function parentPath(pathStr: string) {
+  if (!pathStr) return undefined;
+
+  const parentPath = path.dirname(pathStr);
+
+  if (!parentPath || parentPath === pathStr) return undefined;
+
+  return parentPath;
+}
+
 /**
  * 同步读取json5
  * @param file
@@ -204,12 +215,10 @@ export async function lookupFile(
 
   if (exists) return filePath;
 
-  const cwdParts = cwd.split('/');
-
-  const parentPath = cwdParts.slice(0, cwdParts.length - 1).join('/');
+  const pPath = parentPath(cwd);
 
   // 防止死循环
-  if (!parentPath) return undefined;
+  if (!pPath) return undefined;
 
-  return lookupFile(fileName, parentPath);
+  return lookupFile(fileName, pPath);
 }

@@ -42,17 +42,17 @@ describe('tang/launcher：启动器', () => {
       use: true,
     });
 
-    let isDeleted = await launcher.delete('cowsay');
+    const isDeleted = await launcher.delete('cowsay');
     expect(isDeleted).toBe(true);
 
     plugin = await launcher.getPlugin('cowsay');
     expect(plugin).toBeUndefined();
 
-    isDeleted = await launcher.delete('');
-    expect(isDeleted).toBe(undefined);
+    let isDeleted1 = await launcher.delete('');
+    expect(isDeleted1).toBe(undefined);
 
-    isDeleted = await launcher.delete('nonExists');
-    expect(isDeleted).toBe(undefined);
+    isDeleted1 = await launcher.delete('nonExists');
+    expect(isDeleted1).toBe(undefined);
   });
 
   it('插件卸载特殊情况处理', async () => {

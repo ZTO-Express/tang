@@ -106,6 +106,20 @@ describe('utils/fs：fs实用方法', () => {
     expect(fs.relativePath('/aaa/b', '/aaa/c/xxx')).toBe('../c/xxx');
   });
 
+  it('父路径 parentPath', async () => {
+    expect(fs.parentPath('/aaa/b/c')).toBe('/aaa/b');
+    expect(fs.parentPath('/aaa/b/c.jpg')).toBe('/aaa/b');
+    expect(fs.parentPath('/aaa/b')).toBe('/aaa');
+    expect(fs.parentPath('/aaa')).toBe('/');
+    expect(fs.parentPath('/')).toBe(undefined);
+    expect(fs.parentPath('')).toBe(undefined);
+    expect(fs.parentPath('.')).toBe(undefined);
+    expect(fs.parentPath(undefined)).toBe(undefined);
+    expect(fs.parentPath('a')).toBe('.');
+    expect(fs.parentPath('..')).toBe('.');
+    expect(fs.parentPath('/..')).toBe('/');
+  });
+
   it('同步遍历目录 walkSync', async () => {
     const parentDir = fs.joinPath(__dirname, '..');
     const testFile = fs.joinPath(__dirname, 'fs.test.ts');

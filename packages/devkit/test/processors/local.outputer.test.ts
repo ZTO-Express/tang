@@ -83,9 +83,47 @@ describe('outputer/local：local输出器', () => {
     });
     expect(output.files.length).toBe(1);
 
-    // await expect(localOutputer.output(sampleGeneration, {})).rejects.toThrow(
-    //   '请提供输出目录',
-    // );
+    output = await localOutputer.output(sampleGeneration, {});
+
+    expect(output.options).toEqual({
+      outputDir: process.cwd(),
+      overwrite: false,
+    });
+
+    output = await localOutputer.output(sampleGeneration);
+    expect(output.options).toEqual({
+      outputDir: process.cwd(),
+      overwrite: false,
+    });
+
+    await fs.writeFile(fs.joinPath(testTmpDir, 'test1.json'), 'test1');
+
+    output = await localOutputer.output(
+      {
+        entry: '',
+        chunks: [
+          {
+            name: 'test1.json',
+            content: 'test1',
+          },
+          {
+            name: 'test3.json',
+            content: 'test3',
+          },
+        ],
+      },
+      {
+        outputDir: testTmpDir,
+      },
+    );
+
+    expect(output.files).toEqual([
+      {
+        name: 'test3.json',
+        content: 'test3',
+        path: fs.joinPath(testTmpDir, 'test3.json'),
+      },
+    ]);
 
     await fs.emptyDir(testTmpDir);
   });

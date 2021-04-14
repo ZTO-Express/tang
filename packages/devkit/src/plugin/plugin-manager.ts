@@ -450,6 +450,28 @@ module.exports = require('${moduleName}');
       pluginData.version = nameInfo.version;
     }
 
+    const packageInfo = await fs.resolveAnyOf(
+      [
+        fs.joinPath(
+          pluginPath,
+          'node_modules',
+          nameInfo.prefixName,
+          'package.json',
+        ), // npm install 安装
+        fs.joinPath(
+          pluginPath,
+          'node_modules',
+          nameInfo.shortName,
+          'package.json',
+        ), // npm install path安装
+      ],
+      'json',
+    );
+
+    if (packageInfo) {
+      pluginData.packageInfo = packageInfo;
+    }
+
     return pluginData;
   }
 

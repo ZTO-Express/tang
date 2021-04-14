@@ -17,6 +17,7 @@ import {
 export interface TangPlugin extends Plugin<TangCompilation> {
   preset?: TangPreset;
   presets?: TangPreset[];
+  packageInfo?: GenericObject;
 }
 
 type TangPluginProcessorOmitKeys = 'moduleType' | 'code' | 'type';
