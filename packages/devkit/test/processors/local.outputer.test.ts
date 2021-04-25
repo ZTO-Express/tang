@@ -23,11 +23,11 @@ describe('outputer/local：local输出器', () => {
 
     sampleChunks = [
       {
-        name: 'mesh.json',
+        name: 'test_mesh.json',
         content: JSON.stringify(samplePresetData),
       },
       {
-        name: 'blank.json',
+        name: 'test_blank.json',
         content: '',
       },
     ];
@@ -95,6 +95,8 @@ describe('outputer/local：local输出器', () => {
       outputDir: process.cwd(),
       overwrite: false,
     });
+
+    await fs.remove(fs.joinPath(process.cwd(), sampleChunks[0].name));
 
     await fs.writeFile(fs.joinPath(testTmpDir, 'test1.json'), 'test1');
 

@@ -33,7 +33,7 @@ describe('tang/cli/config.manager load：配置加载', () => {
     await cfgManager.save();
 
     expect(cfgManager.config.textOptions).toEqual({ isTest: true });
-    expect(cfgManager.configFilePath).toBe(`${tmpDir}/tang.json`);
+    expect(cfgManager.configFilePath).toBe(path.join(tmpDir, 'tang.json'));
 
     const config2 = await cfgManager.load();
     expect(config2.textOptions).toEqual({ isTest: true });
