@@ -9,6 +9,8 @@ import {
   set,
   pick,
   delay,
+  equal,
+  deepEqual,
 } from '../../src/utils';
 
 describe('utils/util：通用实用方法', () => {
@@ -283,7 +285,7 @@ describe('utils/util：通用实用方法', () => {
     });
   });
 
-  it('delay 延时调试', async () => {
+  it('delay 延时调用', async () => {
     await delay(() => {
       console.log('ok');
     });
@@ -303,5 +305,49 @@ describe('utils/util：通用实用方法', () => {
         throw new Error('test error');
       });
     }).rejects.toThrow('test error');
+  });
+
+  it('equal 浅度比较', async () => {
+    expect(equal(null, null)).toBe(true);
+    expect(equal(undefined, null)).toBe(false);
+    expect(equal(undefined, undefined)).toBe(true);
+    expect(equal({ a: 1 }, undefined)).toBe(false);
+    expect(equal({ a: 1 }, [])).toBe(false);
+    expect(equal({ a: 1 }, { a: 1, b: 1 })).toBe(false);
+    expect(equal(1, 2)).toBe(true);
+    expect(equal({ a: 1 }, { a: 1 })).toBe(true);
+    expect(equal({ a: 1, b: 2 }, { b: 2, a: 1 })).toBe(true);
+    expect(equal({ a: 1, b: { c: 1 } }, { b: { c: 1 }, a: 1 })).toBe(false);
+
+    // 数组比较
+    expect(equal([], [])).toBe(true);
+    expect(equal([1, 2, 3], [1, 2, 3])).toBe(true);
+    expect(equal([1, 2, 3], [1, 3, 2])).toBe(false);
+    expect(
+      equal([1, 2, { a: 1, b: { c: 1 } }], [1, 2, { a: 1, b: { c: 1 } }]),
+    ).toBe(false);
+  });
+
+  it('deepEqual 浅度比较', async () => {
+    expect(deepEqual(null, null)).toBe(true);
+    expect(deepEqual(undefined, null)).toBe(false);
+    expect(deepEqual(undefined, undefined)).toBe(true);
+    expect(deepEqual(1, 2)).toBe(true);
+    expect(deepEqual({ a: 1 }, { a: 1 })).toBe(true);
+    expect(deepEqual({ a: 1, b: 2 }, { b: 2, a: 1 })).toBe(true);
+    expect(deepEqual({ a: 1, b: { c: 1 } }, { b: { c: 1 }, a: 1 })).toBe(true);
+    expect(deepEqual({ a: 1 }, [])).toBe(false);
+    expect(deepEqual({ a: 1 }, { a: 1, b: 1 })).toBe(false);
+    expect(
+      deepEqual({ a: 1, b: 1, c: { d: undefined } }, { a: 1, b: 1, c: {} }),
+    ).toBe(false);
+
+    // 数组比较
+    expect(deepEqual([], [])).toBe(true);
+    expect(deepEqual([1, 2, 3], [1, 2, 3])).toBe(true);
+    expect(deepEqual([1, 2, 3], [1, 3, 2])).toBe(false);
+    expect(
+      deepEqual([1, 2, { a: 1, b: { c: 1 } }], [1, 2, { a: 1, b: { c: 1 } }]),
+    ).toBe(true);
   });
 });

@@ -77,6 +77,64 @@ export function sortBy<T>(
   return _items;
 }
 
+/**
+ * 浅度比较对象是否相等
+ * @param obj1
+ * @param obj2
+ * @returns
+ */
+export function equal(obj1: any, obj2: any) {
+  if (obj1 === obj2) return true;
+  if (!obj1 || !obj2) return false;
+
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  for (const key of keys1) {
+    if (obj1[key] !== obj2[key]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * 深度比较两个对象是否相等
+ * @param obj1
+ * @param obj2
+ * @returns
+ */
+export function deepEqual(obj1: any, obj2: any) {
+  if (obj1 === obj2) return true;
+  if (!obj1 || !obj2) return false;
+
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  for (const key of keys1) {
+    const val1 = obj1[key];
+    const val2 = obj2[key];
+    const areObjects = isObject(val1) && isObject(val2);
+    if (
+      (areObjects && !deepEqual(val1, val2)) ||
+      (!areObjects && val1 !== val2)
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 /** 深度克隆，并支持循环应用 */
 export function deepClone(obj: any, cache: any[] = []) {
   if (null == obj || 'object' != typeof obj) return obj;

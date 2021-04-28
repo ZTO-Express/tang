@@ -9,7 +9,6 @@ export class LaunchAction extends CliAction {
   /** 使用指定预设 */
   async use(name: string, options: GenericConfigObject) {
     const presetAction = new PresetAction();
-
     return presetAction.use(name, options);
   }
 

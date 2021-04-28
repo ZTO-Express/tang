@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as testUtil from '../util';
 import { TANG_HOME, TANG_CONFIG_FILENAME } from '../../src/consts';
-import { ConfigManager, defaultConfig } from '../../src/config';
+import { ConfigManager, getDefaultConfig } from '../../src/config';
 
 describe('tang/cli/config.manager load：配置加载', () => {
   const tmpDir = testUtil.resolveTmpDir();
@@ -27,7 +27,7 @@ describe('tang/cli/config.manager load：配置加载', () => {
     const cfgManager = new ConfigManager({ configDir: tmpDir });
 
     const config = await cfgManager.load();
-    expect(config).toEqual(defaultConfig);
+    expect(config).toEqual(getDefaultConfig());
 
     config.textOptions = { isTest: true };
     await cfgManager.save();
@@ -37,9 +37,11 @@ describe('tang/cli/config.manager load：配置加载', () => {
 
     const config2 = await cfgManager.load();
     expect(config2.textOptions).toEqual({ isTest: true });
+    expect(cfgManager.getUpdatedConfig()).toEqual({
+      textOptions: { isTest: true },
+    });
 
     await testUtil.fs.writeFile(cfgManager.configFilePath, 'test_error');
-
     await expect(() => cfgManager.load()).rejects.toThrow('配置文件格式错误。');
 
     await testUtil.fs.emptyDir(tmpDir);
@@ -49,7 +51,7 @@ describe('tang/cli/config.manager load：配置加载', () => {
     const cfgManager = new ConfigManager({ configDir: tmpDir });
 
     const config = await cfgManager.load();
-    expect(config).toEqual(defaultConfig);
+    expect(config).toEqual(getDefaultConfig());
 
     cfgManager.set('test.name', 'devKit');
     expect(cfgManager.get('test.name')).toBe('devKit');
@@ -57,7 +59,13 @@ describe('tang/cli/config.manager load：配置加载', () => {
     expect(config.test).toEqual({ name: 'devKit' });
 
     expect(cfgManager.get('.')).toEqual({
-      ...defaultConfig,
+      ...getDefaultConfig(),
+      test: {
+        name: 'devKit',
+      },
+    });
+
+    expect(cfgManager.getUpdatedConfig()).toEqual({
       test: {
         name: 'devKit',
       },
@@ -65,9 +73,11 @@ describe('tang/cli/config.manager load：配置加载', () => {
 
     cfgManager.set('test', 'devKit');
     expect(config.test).toBe('devKit');
+    expect(cfgManager.getUpdatedConfig()).toEqual({ test: 'devKit' });
 
     cfgManager.unset('test');
     expect(config.test).toBeUndefined();
+    expect(cfgManager.getUpdatedConfig()).toEqual({});
   });
 
   it('从本地目录加载文件', async () => {
@@ -89,21 +99,22 @@ describe('tang/cli/config.manager load：配置加载', () => {
     await cfgManager.load();
     expect(cfgManager.get('test')).toBe('test1');
     expect(cfgManager.configDir).toBe(path.dirname(localPath));
+    expect(cfgManager.getUpdatedConfig()).toEqual({ test: 'test1' });
 
-    await testUtil.fs.writeJSON(parentPath, {
-      test: 'test2',
-    });
+    await testUtil.fs.writeJSON(parentPath, { test: 'test2' });
 
     cfgManager = new ConfigManager();
     await cfgManager.load();
     expect(cfgManager.get('test')).toBe('test1');
     expect(cfgManager.configDir).toBe(path.dirname(localPath));
+    expect(cfgManager.getUpdatedConfig()).toEqual({ test: 'test1' });
 
     await testUtil.fs.remove(localPath);
     cfgManager = new ConfigManager();
     await cfgManager.load();
     expect(cfgManager.get('test')).toBe('test2');
     expect(cfgManager.configDir).toBe(path.dirname(parentPath));
+    expect(cfgManager.getUpdatedConfig()).toEqual({ test: 'test2' });
 
     await testUtil.fs.remove(parentPath);
     cfgManager = new ConfigManager();
@@ -111,14 +122,13 @@ describe('tang/cli/config.manager load：配置加载', () => {
     expect(cfgManager.configDir).toBe(TANG_HOME);
 
     const testPath = testUtil.fs.joinPath(__dirname, '..', 'test.json');
-    await testUtil.fs.writeJSON(testPath, {
-      test: 'test3',
-    });
+    await testUtil.fs.writeJSON(testPath, { test: 'test3' });
 
     cfgManager = new ConfigManager();
     await cfgManager.load('test.json');
     expect(cfgManager.get('test')).toBe('test3');
     expect(cfgManager.configDir).toBe(path.dirname(testPath));
+    expect(cfgManager.getUpdatedConfig()).toEqual({ test: 'test3' });
 
     await testUtil.fs.remove(testPath);
     cfgManager = new ConfigManager();

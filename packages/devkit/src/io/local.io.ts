@@ -72,7 +72,7 @@ export class LocalIO implements IO {
     if (typeof data === 'string') {
       text = data;
     } else {
-      text = json5.stringify(data, { space: 2 });
+      text = JSON.stringify(data, undefined, 2);
     }
 
     const filePath = path.join(this.loadDirectory, file);

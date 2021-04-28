@@ -4,7 +4,7 @@ import { json5, fs } from '../utils';
 import { TANG_HOME, TANG_CONFIG_FILENAME } from '../consts';
 import { Config } from './interfaces';
 import { IO, LocalIO } from '../io';
-import { defaultConfig } from './defaults';
+import { getDefaultConfig } from './defaults';
 
 // 配置选项
 export interface ConfigManagerOptions extends GenericConfigObject {
@@ -28,7 +28,7 @@ export class ConfigManager {
 
     this._configDir = options.configDir;
     this.configFileName = options.configFile || TANG_CONFIG_FILENAME;
-    this.config = defaultConfig;
+    this.config = getDefaultConfig();
   }
 
   get configDir() {
@@ -72,7 +72,7 @@ export class ConfigManager {
     const content: string | undefined = await this._io.readAnyOf([name]);
 
     if (!content) {
-      this.config = defaultConfig;
+      this.config = getDefaultConfig();
       return this.config;
     }
 
@@ -85,7 +85,7 @@ export class ConfigManager {
     }
 
     this.config = {
-      ...defaultConfig,
+      ...getDefaultConfig(),
       ...fileConfig,
     };
 
@@ -105,8 +105,23 @@ export class ConfigManager {
 
   /** 保存配置 */
   async save() {
-    return this._io.write(this.config, {
-      file: this.configFileName,
+    const updatedConfig = this.getUpdatedConfig();
+    return this._io.write(updatedConfig, { file: this.configFileName });
+  }
+
+  /** 获取与默认配置不同的配置项，以便于保存 */
+  getUpdatedConfig() {
+    const defaultConfig = getDefaultConfig();
+    const config: any = this.config;
+
+    const saveConfig: any = {};
+
+    Object.keys(config).forEach(key => {
+      if (config[key] && !utils.deepEqual(config[key], defaultConfig[key])) {
+        saveConfig[key] = config[key];
+      }
     });
+
+    return saveConfig;
   }
 }
