@@ -117,6 +117,7 @@ describe('tang/plugin/install：安装插件', () => {
     const plugin2 = await pluginManager.add(packagePath);
     expect(plugin2).not.toBeUndefined();
     await pluginManager.delete('test-tang');
+
     const list2 = await pluginManager.list('test-tang');
     expect(list2).toEqual([]);
   });

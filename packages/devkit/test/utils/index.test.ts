@@ -1,5 +1,4 @@
-import { utils } from '@devs-tang/common';
-import { json5 } from '../../src/utils';
+import { json5, utils } from '../../src/utils';
 import * as testUtil from '../util';
 
 describe('utils/index：通用实用方法', () => {

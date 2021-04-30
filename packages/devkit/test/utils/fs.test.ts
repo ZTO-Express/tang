@@ -1,6 +1,6 @@
-import { utils } from '@devs-tang/common';
 import * as os from 'os';
-import { fs } from '../../src/utils';
+
+import { fs, utils } from '../../src/utils';
 import * as testUtil from '../util';
 
 describe('utils/fs：fs实用方法', () => {
@@ -69,12 +69,16 @@ describe('utils/fs：fs实用方法', () => {
   });
 
   it('打开文件', async () => {
+    // 尝试打开explore
     const result = await fs.explore(os.homedir());
-    expect(result.exitCode).toBe(0);
 
-    await expect(fs.explore(os.homedir(), 'badCommand')).rejects.toThrow(
-      'ENOENT:',
-    );
+    if (os.platform() === 'win32') {
+      expect(result.exitCode).toBe(1);
+    } else {
+      expect(result.exitCode).toBe(0);
+    }
+
+    await expect(fs.explore(os.homedir(), 'badCommand')).rejects.toThrow();
   });
 
   it('获取文件浏览器 getFileExplorer', async () => {
@@ -103,7 +107,10 @@ describe('utils/fs：fs实用方法', () => {
     expect(fs.relativePath('/aaa/b', '/aaa/b/c')).toBe('c');
     expect(fs.relativePath('/aaa/b', '/aaa/b')).toBe('');
     expect(fs.relativePath('/aaa/b', '/aaa')).toBe('..');
-    expect(fs.relativePath('/aaa/b', '/aaa/c/xxx')).toBe('../c/xxx');
+
+    expect(fs.relativePath('/aaa/b', '/aaa/c/xxx')).toBe(
+      fs.joinPath('..', 'c', 'xxx'),
+    );
   });
 
   it('父路径 parentPath', async () => {

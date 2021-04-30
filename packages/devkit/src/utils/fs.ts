@@ -152,7 +152,18 @@ export async function explore(pathName: string, cmd?: string) {
 
   if (!cmd) throw new ExecuteFailedError('无法确定执行命令');
 
-  return execa(cmd, [pathName]);
+  // windows 平台 (打开explorer可以打开文件浏览器，但返回exitCode不为0)
+  if (cmd === 'explorer') {
+    cmd = 'explorer /select';
+
+    return execa(cmd, [pathName], {
+      stdio: 'ignore',
+      shell: true,
+      reject: false,
+    });
+  } else {
+    return execa(cmd, [pathName]);
+  }
 }
 
 /** 获取平台文件浏览器 */

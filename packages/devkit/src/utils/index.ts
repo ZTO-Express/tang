@@ -1,3 +1,4 @@
+import * as common from '@devs-tang/common';
 import * as core from '@devs-tang/core';
 import * as _execa from 'execa';
 
@@ -12,3 +13,4 @@ export * from './validate-schema';
 
 export const execa = _execa;
 export const http = core.http;
+export const utils = common.utils;

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { GenericConfigObject } from '@devs-tang/common';
-import { fs, json5 } from '../utils';
-import { IO } from './io.interfaces';
+import { fs } from '../utils';
+import { IO } from './declarations';
 
 export interface LocalWriteOptions extends GenericConfigObject {
   file?: string;

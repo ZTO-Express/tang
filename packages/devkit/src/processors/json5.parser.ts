@@ -1,6 +1,6 @@
-import { TangDocument, TangParser, utils } from '@devs-tang/common';
+import { TangDocument, TangParser } from '@devs-tang/common';
 
-import { json5 } from '../utils';
+import { json5, utils } from '../utils';
 import { normalizeDevkitProcessor } from './util';
 
 /**

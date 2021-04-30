@@ -23,7 +23,7 @@ export function resolvePackagePath(isFilePath = true) {
 
 /** 获取fixture位置 */
 export function resolveFixturePath(...args: string[]) {
-  return path.join(__dirname, '../../fixtures', ...args);
+  return path.join(__dirname, '../../../fixtures', ...args);
 }
 
 /** 获取fixture url位置 */

@@ -1,9 +1,5 @@
-import {
-  TangCompilation,
-  TangDocument,
-  TangLoader,
-  utils,
-} from '@devs-tang/common';
+import { TangCompilation, TangDocument, TangLoader } from '@devs-tang/common';
+import { utils } from '../utils';
 import { normalizeDevkitProcessor } from './util';
 
 /**

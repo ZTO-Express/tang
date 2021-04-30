@@ -56,6 +56,15 @@ export interface TangCompilerProcessOptions
   extends TangCompilerLoadOptions,
     TangCompilerGenerateOptions {}
 
+// 编译器编译执行选项
+export interface TangCompilerCompileOptions {
+  mergeDefaultPreset?: boolean; // 加载预设时是否合并默认预设
+  skipLoad?: boolean; // 编译时跳过加载
+  skipParse?: boolean; // 编译时跳过解析
+  skipGenerate?: boolean; // 编译时跳过生成
+  skipOutput?: boolean; // 编译时跳过输出
+}
+
 // 编译器检查选项
 export interface TangCompilerInspectOptions extends TangCompilerProcessOptions {
   entry: string;

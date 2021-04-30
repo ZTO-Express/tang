@@ -48,8 +48,6 @@ describe('tang-cli/commands：config', () => {
     ]);
     const actionResult = await cmdResult._actionResults[0];
     cmdResult._actionResults = [];
-
-    debugger;
   });
 
   it('config set/unset', async () => {

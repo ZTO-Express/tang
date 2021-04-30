@@ -18,3 +18,7 @@ export const TANG_PLUGIN_DIR = `${TANG_HOME}/plugins`;
 
 export const TANG_MESH_DIR = `${TANG_HOME}/meshs`;
 export const TANG_MESH_FILENAME = `mesh.json`;
+
+export const CODE_GEN_DEFAULT_DIR = './codegen'; // 代码生成目录
+export const CODE_GEN_DEFAULT_TEMPLATES_DIR = './codegen/templates';
+export const CODE_GEN_DEFAULT_CONFIG_FILE = 'config.json';

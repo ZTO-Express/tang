@@ -6,7 +6,13 @@ import {
 
 describe('interfaces/ tang：类型验证', () => {
   it('验证指定常量是否符合预期', () => {
-    expect(TangModuleTypeKeys).toEqual(['core', 'devkit', 'openapi', 'plugin']);
+    expect(TangModuleTypeKeys).toEqual([
+      'core',
+      'devkit',
+      'openapi',
+      'plugin',
+      'project',
+    ]);
 
     expect(TangProcessorTypeKeys).toEqual([
       'loader',

@@ -9,7 +9,6 @@ export * from './processors';
 export * from './runners';
 export * from './io';
 
-export const utils = { ..._common.utils };
 export const errors = { ..._common.errors };
 export const HookDriver = _common.HookDriver;
 

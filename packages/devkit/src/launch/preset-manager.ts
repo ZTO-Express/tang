@@ -5,10 +5,12 @@ import {
   TangModuleTypes,
   TangPreset,
   TangModuleTypeKeys,
+  GenericConfigObject,
   TangCompilerProcessOptions,
-  utils,
+  TangCompilerCompileOptions,
 } from '@devs-tang/common';
 import { TANG_PRESET_DEFAULT, TANG_CONFIG_KEY_PRESETS } from '../consts';
+import { utils } from '../utils';
 
 import { TangLauncher } from './launcher';
 import { mergePresetAndOptions } from './options';
@@ -21,21 +23,11 @@ export interface PresetNameInfo {
   pluginName?: string;
 }
 
-/** 预设元数据 */
-export interface PresetMetadata {
-  mergeDefaultPreset?: boolean; // 加载预设时是否合并默认预设
-  skipLoad?: boolean; // 编译时跳过加载
-  skipParse?: boolean; // 编译时跳过解析
-  skipGenerate?: boolean; // 编译时跳过生成
-  skipOutput?: boolean; // 编译时跳过输出
-}
-
 /** 预设配置数据 */
-export interface PresetConfigData {
+export interface PresetConfigData extends GenericConfigObject {
   use?: boolean;
   processOptions?: TangCompilerProcessOptions;
-  presetOptions?: PresetMetadata;
-  [prop: string]: any;
+  compileOptions?: TangCompilerCompileOptions;
 }
 
 /** 预设配置数据 */
@@ -124,7 +116,7 @@ export class PresetManager {
     return presetWithConfig;
   }
 
-  /** 获取正在使用的插件及预设配置 */
+  /** 通过名称获取正在使用的预设 */
   async getPresetWithConfigByName(name: string): Promise<PresetWithConfigData> {
     if (!name) return undefined;
 

@@ -1,5 +1,4 @@
 import * as execa from 'execa';
-import { ExecuteFailedError } from '@devs-tang/common';
 
 export class AbstractRunner {
   constructor(protected binary: string, protected args: string[] = []) {}

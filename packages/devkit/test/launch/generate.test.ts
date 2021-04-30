@@ -1,7 +1,6 @@
 import * as testUtil from '../util';
 import { ErrorCodes } from '@devs-tang/common';
 import { TangLauncher } from '../../src';
-import { TANG_CONFIG_KEY_PRESETS } from '../../src/consts';
 
 describe('tang/launch/generate：代码生成', () => {
   const tfDocPath = testUtil.resolveFixturePath('documents/preset.json');
@@ -53,7 +52,6 @@ describe('tang/launch/generate：代码生成', () => {
 
   // 指定preset
   it('generate指定preset', async () => {
-    debugger;
     const compilation = await launcher.generate('.', 'zf-gen:ts', {});
   });
 });

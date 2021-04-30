@@ -1,10 +1,10 @@
 import * as testUtil from '../util';
 import { TangCompilation, TangGenerator } from '@devs-tang/common';
-import { Compiler, normalizeProcessor } from '../../src';
+import { DefaultTangCompiler, normalizeProcessor } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('generator/json：json生成器', () => {
-  let compiler: Compiler;
+  let compiler: DefaultTangCompiler;
   let jsonGenerator: TangGenerator;
 
   let docCompilation: TangCompilation;

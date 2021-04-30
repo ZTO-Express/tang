@@ -3,6 +3,7 @@ export enum TangModuleTypes {
   devkit = 'devkit', // 开发包模块
   openapi = 'openapi', // openapi模块
   plugin = 'plugin', // 插件模块
+  project = 'project', // 项目模块
 }
 
 export const TangModuleTypeKeys = Object.keys(TangModuleTypes).map(it => it);

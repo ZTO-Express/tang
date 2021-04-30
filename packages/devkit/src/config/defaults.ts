@@ -1,5 +1,5 @@
 import { TANG_PLUGIN_DIR, TANG_MESH_DIR } from '../consts';
-import { Config } from './interfaces';
+import { Config } from './declarations';
 
 export const getDefaultConfig = (): Required<Config> => {
   return {

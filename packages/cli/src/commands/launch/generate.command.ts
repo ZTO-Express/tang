@@ -52,6 +52,10 @@ export class GenerateCommand implements CliCommand {
           description: '输出文件夹',
         },
         {
+          flags: '-c --config <configData>',
+          description: '配置数据',
+        },
+        {
           flags: '--overwrite',
           description: '是否覆盖源文档',
           defaultValue: false,

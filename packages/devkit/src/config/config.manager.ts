@@ -1,8 +1,8 @@
 import * as path from 'path';
-import { GenericConfigObject, utils } from '@devs-tang/common';
-import { json5, fs } from '../utils';
+import { GenericConfigObject } from '@devs-tang/common';
+import { json5, fs, utils } from '../utils';
 import { TANG_HOME, TANG_CONFIG_FILENAME } from '../consts';
-import { Config } from './interfaces';
+import { Config } from './declarations';
 import { IO, LocalIO } from '../io';
 import { getDefaultConfig } from './defaults';
 

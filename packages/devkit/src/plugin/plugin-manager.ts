@@ -7,7 +7,6 @@ import {
   InvalidArguments,
   TangPreset,
   TangError,
-  utils,
 } from '@devs-tang/common';
 import { normalizePresetOptions } from '@devs-tang/core';
 
@@ -17,7 +16,7 @@ import {
   TANG_PRESET_DEFAULT,
 } from '../consts';
 
-import { fs, uuid, vm } from '../utils';
+import { fs, uuid, vm, utils } from '../utils';
 import { Runner, RunnerFactory } from '../runners';
 
 import {

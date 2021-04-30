@@ -10,7 +10,6 @@ import {
   TangCompilerProcessOptions,
   TangModuleTypes,
   TangProcessorTypeKeys,
-  utils,
 } from '@devs-tang/common';
 
 import {
@@ -18,6 +17,7 @@ import {
   getPresetProcessorConfigData,
 } from '@devs-tang/core';
 
+import { utils } from '../utils';
 import { ConfigManager } from '../config';
 import { PluginAddOptions, PluginManager } from '../plugin';
 import { PresetManager, PresetWithConfigData } from './preset-manager';
