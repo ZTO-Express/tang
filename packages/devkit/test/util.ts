@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as os from 'os';
 
 import { GenericConfigObject } from '@devs-tang/common';
-import { Compiler, getNormalizedOptions } from '@devs-tang/core';
+import { DefaultTangCompiler, getNormalizedOptions } from '@devs-tang/core';
 
 import * as processors from '../src/processors';
 
@@ -76,6 +76,6 @@ export function createDefaultCompiler(options?: GenericConfigObject) {
 
   const opts = getNormalizedOptions(options);
 
-  const compiler = new Compiler(opts);
+  const compiler = new DefaultTangCompiler(opts);
   return compiler;
 }

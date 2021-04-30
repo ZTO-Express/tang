@@ -1,4 +1,4 @@
-import * as devkit from '@devs-tang/devkit';
+import { getTangLauncher } from '@devs-tang/devkit';
 import * as commander from 'commander';
 
 /** 命令选项 */
@@ -50,7 +50,7 @@ export type CliActionFn = (...args: any[]) => void | Promise<void>;
 export abstract class CliAction {
   /** 返回加载器 */
   protected async getLauncher() {
-    const launcher = await devkit.getLauncher();
+    const launcher = await getTangLauncher();
     return launcher;
   }
 }

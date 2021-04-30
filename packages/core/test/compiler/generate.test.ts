@@ -1,7 +1,7 @@
 import * as testUtil from '../util';
 import { TangCompilation, ErrorCodes, utils } from '@devs-tang/common';
 
-import { Compiler } from '../../src';
+import { DefaultTangCompiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/load：load 加载', () => {
@@ -11,8 +11,8 @@ describe('compiler/load：load 加载', () => {
   const jsonParser = processors.jsonParser();
   const yamlParser = testUtil.yamlParser();
 
-  let compiler1: Compiler;
-  let compiler2: Compiler;
+  let compiler1: DefaultTangCompiler;
+  let compiler2: DefaultTangCompiler;
   let yamlCompilation: TangCompilation;
 
   const tfDocPath = testUtil.resolveFixturePath('openapi.yaml');

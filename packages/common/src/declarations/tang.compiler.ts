@@ -51,7 +51,17 @@ export interface TangCompilerGenerateOptions {
   outputOptions?: GenericConfigObject;
 }
 
-export interface TangCompiler {
+// 编译器处理器执行选项
+export interface TangCompilerProcessOptions
+  extends TangCompilerLoadOptions,
+    TangCompilerGenerateOptions {}
+
+// 编译器检查选项
+export interface TangCompilerInspectOptions extends TangCompilerProcessOptions {
+  entry: string;
+}
+
+export interface TangCompiler extends Record<string, any> {
   loaders: TangLoader[]; // 加载器
   defaultLoader: TangLoader; // 默认加载器
 
@@ -76,4 +86,6 @@ export interface TangCompiler {
     options?: TangCompilerGenerateOptions,
     compilation?: TangCompilation,
   ) => Promise<TangCompilation>;
+
+  inspect: (options: TangCompilerInspectOptions) => Promise<TangCompilation>;
 }

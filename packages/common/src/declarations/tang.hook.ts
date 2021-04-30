@@ -4,22 +4,22 @@ import { Hook, HookFunction } from './hook';
 // Tang内置钩子函数
 export interface TangHooks {
   // 加载开始
-  load: TangHookFunction;
+  load?: TangHookFunction;
 
   // 解析开始
-  parse: TangHookFunction;
+  parse?: TangHookFunction;
 
   // 加载结束
-  loaded: TangHookFunction;
+  loaded?: TangHookFunction;
 
   // 生成开始
-  generate: TangHookFunction;
+  generate?: TangHookFunction;
 
   // 输出开始
-  output: TangHookFunction;
+  output?: TangHookFunction;
 
   // 生成结束
-  generated: TangHookFunction;
+  generated?: TangHookFunction;
 }
 
 export type TangHookNames = keyof TangHooks;

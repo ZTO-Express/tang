@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { Compiler } from '../../src';
+import { DefaultTangCompiler } from '../../src';
 
 import * as processors from '../../src/processors';
 
@@ -9,8 +9,8 @@ describe('compiler/generator：获取生成器 getGenerator', () => {
   const jsonGenerator = processors.jsonGenerator();
   const yamlGenerator = testUtil.yamlGenerator();
 
-  let compiler1: Compiler;
-  let compiler2: Compiler;
+  let compiler1: DefaultTangCompiler;
+  let compiler2: DefaultTangCompiler;
 
   beforeAll(() => {
     compiler1 = testUtil.createDefaultCompiler({

@@ -1,6 +1,5 @@
 import {
   GenericConfigObject,
-  Chunk,
   TangDocument,
   TangGenerator,
 } from '@devs-tang/common';

@@ -1,11 +1,11 @@
 import * as testUtil from '../util';
 import { TangCompilation } from '@devs-tang/common';
-import { Compiler, normalizeProcessor } from '@devs-tang/core';
+import { DefaultTangCompiler, normalizeProcessor } from '@devs-tang/core';
 import { yaml } from '../../src/utils';
 import * as processors from '../../src/processors';
 
 describe('generator/yaml：yaml生成器', () => {
-  const compiler: Compiler = testUtil.createDefaultCompiler();
+  const compiler: DefaultTangCompiler = testUtil.createDefaultCompiler();
   const yamlGenerator = processors.yamlGenerator();
 
   let docCompilation: TangCompilation;

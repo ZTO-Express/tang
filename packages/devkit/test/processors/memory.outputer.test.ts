@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { Chunk } from '@devs-tang/common';
+import { TangChunk } from '@devs-tang/common';
 import { normalizeProcessor } from '@devs-tang/core';
 import * as processors from '../../src/processors';
 import { memfs, json5 } from '../../src/utils';
@@ -9,7 +9,7 @@ describe('outputer/memory：memory输出器', () => {
   const compiler = testUtil.createDefaultCompiler();
 
   let samplePresetData: any;
-  let sampleChunks: Chunk[];
+  let sampleChunks: TangChunk[];
 
   beforeAll(async () => {
     const yfDocPath = testUtil.resolveFixturePath(

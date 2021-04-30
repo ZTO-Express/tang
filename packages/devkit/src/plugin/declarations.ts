@@ -21,6 +21,7 @@ export interface BasePluginInstallOptions extends PluginNameInfo {
   type?: PluginInstallTypes;
   cwd?: string; // 安装命令执行目录
   force?: boolean; // 强制安装标志（强制删除原安装并重新安装）
+  engineStrict?: boolean; // 安装时是否严格判断环境需求
 }
 
 export interface PluginNpmInstallOptions extends BasePluginInstallOptions {

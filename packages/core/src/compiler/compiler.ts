@@ -5,6 +5,7 @@ import {
   TangCompileOptions,
   TangCompilerGenerateOptions,
   TangCompilerLoadOptions,
+  TangCompilerInspectOptions,
   TangDocument,
   HookDriver,
   TangGenerator,
@@ -21,16 +22,12 @@ import {
   utils,
 } from '@devs-tang/common';
 
-import {
-  CompilerInspectOptions,
-  CompilerOptions,
-  ProcessorGetOptions,
-} from './declarations';
+import { CompilerOptions, ProcessorGetOptions } from './declarations';
 
 /**
  * 生成器
  */
-export class Compiler implements TangCompiler {
+export class DefaultTangCompiler implements TangCompiler {
   hookDriver: HookDriver<TangCompilation>;
 
   loaders: TangLoader[]; // 加载器
@@ -226,7 +223,7 @@ export class Compiler implements TangCompiler {
    * @param options
    * @returns
    */
-  async inspect(options: CompilerInspectOptions): Promise<TangCompilation> {
+  async inspect(options: TangCompilerInspectOptions): Promise<TangCompilation> {
     const compilation: TangCompilation = {
       entry: options.entry,
     };

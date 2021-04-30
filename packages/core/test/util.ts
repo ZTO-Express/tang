@@ -5,7 +5,7 @@ import * as devkit from '../../devkit';
 
 import { GenericConfigObject } from '@devs-tang/common';
 import { getNormalizedOptions } from '../src/options/normalize-options';
-import { Compiler } from '../src/compiler';
+import { DefaultTangCompiler } from '../src/compiler';
 
 export * as json5 from 'json5';
 
@@ -60,6 +60,6 @@ export function createDefaultCompiler(options?: GenericConfigObject) {
 
   const opts = getNormalizedOptions(options);
 
-  const compiler = new Compiler(opts);
+  const compiler = new DefaultTangCompiler(opts);
   return compiler;
 }

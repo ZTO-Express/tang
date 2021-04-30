@@ -1,5 +1,8 @@
-import { GenericConfigObject, InvalidArguments } from '@devs-tang/common';
-import * as devkit from '@devs-tang/devkit';
+import {
+  getTangLauncher,
+  GenericConfigObject,
+  errors,
+} from '@devs-tang/devkit';
 import { CliAction } from '../../common';
 import { printData } from '../../utils';
 
@@ -34,14 +37,14 @@ export class ConfigAction extends CliAction {
   // 设置特定配置
   async set(key: string, value: string) {
     if (!key) {
-      throw new InvalidArguments('请提供配置路径');
+      throw new errors.InvalidArguments('请提供配置路径');
     }
 
     if (!value) {
-      throw new InvalidArguments('请提供配置值');
+      throw new errors.InvalidArguments('请提供配置值');
     }
 
-    const { configManager } = await devkit.getLauncher();
+    const { configManager } = await getTangLauncher();
     await configManager.set(key, value);
     await configManager.save();
 
@@ -51,10 +54,10 @@ export class ConfigAction extends CliAction {
   // 取消特定配置
   async unset(key: string) {
     if (!key) {
-      throw new InvalidArguments('请提供配置路径');
+      throw new errors.InvalidArguments('请提供配置路径');
     }
 
-    const { configManager } = await devkit.getLauncher();
+    const { configManager } = await getTangLauncher();
 
     await configManager.unset(key);
     await configManager.save();
@@ -65,7 +68,7 @@ export class ConfigAction extends CliAction {
   /** 列出或获取某个配置信息 */
   async getConfig(key: string) {
     key = key || '.';
-    const { configManager } = await devkit.getLauncher();
+    const { configManager } = await getTangLauncher();
 
     const result = await configManager.get(key);
 

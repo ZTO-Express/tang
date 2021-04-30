@@ -11,5 +11,5 @@
     "noImplicitReturns": true,
     "esModuleInterop": true
   },
-  "exclude": ["node_modules", "dist", ".test_coverage"]
+  "exclude": ["node_modules", "dist", "lib", ".test_coverage"]
 }

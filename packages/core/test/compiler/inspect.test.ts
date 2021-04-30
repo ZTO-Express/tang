@@ -1,6 +1,6 @@
 import * as testUtil from '../util';
 
-import { Compiler } from '../../src';
+import { DefaultTangCompiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/insepct：测试服务器生成时完整配置', () => {
@@ -10,8 +10,8 @@ describe('compiler/insepct：测试服务器生成时完整配置', () => {
   const jsonParser = processors.jsonParser();
   const yamlParser = testUtil.yamlParser();
 
-  let compiler1: Compiler;
-  let compiler2: Compiler;
+  let compiler1: DefaultTangCompiler;
+  let compiler2: DefaultTangCompiler;
 
   const tfDocPath = testUtil.resolveFixturePath('openapi.yaml');
 

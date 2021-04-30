@@ -1,11 +1,13 @@
 import { NormalizedTangOptions } from '../options';
-import { Compiler } from '../compiler';
+import { DefaultTangCompiler } from '../compiler';
 
 /**
  * 根据给定的配置，创建生成器
  * @param rawOptions 原选项
  */
-export function createCompiler(options: NormalizedTangOptions): Compiler {
-  const compiler = new Compiler(options);
+export function createDefaultCompiler(
+  options: NormalizedTangOptions,
+): DefaultTangCompiler {
+  const compiler = new DefaultTangCompiler(options);
   return compiler;
 }

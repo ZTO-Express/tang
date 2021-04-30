@@ -6,19 +6,18 @@
 import {
   TangCompilation,
   TangCompilerLoadOptions,
+  TangCompilerInspectOptions,
+  TangCompilerProcessOptions,
   TangModuleTypes,
   TangProcessorTypeKeys,
   utils,
 } from '@devs-tang/common';
 
 import {
-  createCompiler,
-  CompilerInspectOptions,
-  CompilerProcessOptions,
+  createDefaultCompiler,
   getPresetProcessorConfigData,
 } from '@devs-tang/core';
 
-import { fs } from '../utils';
 import { ConfigManager } from '../config';
 import { PluginAddOptions, PluginManager } from '../plugin';
 import { PresetManager, PresetWithConfigData } from './preset-manager';
@@ -83,7 +82,7 @@ export class TangLauncher {
 
     if (!opts) return undefined;
 
-    const compiler = await createCompiler(opts.preset);
+    const compiler = await createDefaultCompiler(opts.preset);
     const compilation = await compiler.load(entry, opts.processOptions);
     return compilation;
   }
@@ -96,8 +95,8 @@ export class TangLauncher {
    */
   async generate(
     entry: string,
-    presetName?: string | CompilerProcessOptions,
-    options?: CompilerProcessOptions,
+    presetName?: string | TangCompilerProcessOptions,
+    options?: TangCompilerProcessOptions,
   ) {
     if (utils.isObject(presetName)) {
       options = presetName;
@@ -111,7 +110,7 @@ export class TangLauncher {
 
     if (!opts) return undefined;
 
-    const compiler = await createCompiler({ ...opts.preset });
+    const compiler = await createDefaultCompiler({ ...opts.preset });
 
     const compilation = await compiler.load(entry, opts.processOptions);
 
@@ -125,15 +124,15 @@ export class TangLauncher {
   /**
    * 获取编译器完整选项
    */
-  async inspect(presetName: string, options: CompilerInspectOptions) {
+  async inspect(presetName: string, options: TangCompilerInspectOptions) {
     const opts = await this.getPresetWithConfigOptions(presetName, options);
 
     if (!opts || !opts.preset) return undefined;
 
-    const compiler = await createCompiler(opts.preset);
+    const compiler = await createDefaultCompiler(opts.preset);
 
     const processors: any = await compiler.inspect(
-      opts.processOptions as CompilerInspectOptions,
+      opts.processOptions as TangCompilerInspectOptions,
     );
 
     const inspectData: any = {
@@ -187,7 +186,7 @@ export class TangLauncher {
   /**
    * 加载或获取指定的预设
    */
-  async use(name?: string, options?: CompilerProcessOptions) {
+  async use(name?: string, options?: TangCompilerProcessOptions) {
     return this.presetManager.use(name, options);
   }
 
@@ -211,7 +210,7 @@ export class TangLauncher {
    */
   async getPresetWithConfigOptions(
     presetName: string,
-    options?: CompilerProcessOptions,
+    options?: TangCompilerProcessOptions,
   ) {
     let presetWithConfig: PresetWithConfigData;
 
@@ -228,7 +227,7 @@ export class TangLauncher {
     presetWithConfig.processOptions = utils.deepMerge(
       presetWithConfig.processOptions,
       options,
-    ) as CompilerProcessOptions;
+    ) as TangCompilerProcessOptions;
 
     return presetWithConfig;
   }

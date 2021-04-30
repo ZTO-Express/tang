@@ -5,12 +5,9 @@ import {
   TangModuleTypes,
   TangPreset,
   TangModuleTypeKeys,
+  TangCompilerProcessOptions,
   utils,
 } from '@devs-tang/common';
-import {
-  CompilerProcessOptions,
-  PresetNormalizeOptions,
-} from '@devs-tang/core';
 import { TANG_PRESET_DEFAULT, TANG_CONFIG_KEY_PRESETS } from '../consts';
 
 import { TangLauncher } from './launcher';
@@ -36,7 +33,7 @@ export interface PresetMetadata {
 /** 预设配置数据 */
 export interface PresetConfigData {
   use?: boolean;
-  processOptions?: CompilerProcessOptions;
+  processOptions?: TangCompilerProcessOptions;
   presetOptions?: PresetMetadata;
   [prop: string]: any;
 }
@@ -63,7 +60,7 @@ export class PresetManager {
    */
   async use(
     name?: string,
-    options?: CompilerProcessOptions,
+    options?: TangCompilerProcessOptions,
   ): Promise<PresetWithConfigData> {
     // 若未提供名称，则返回正在使用的配置
     if (!name) {
@@ -249,7 +246,7 @@ export class PresetManager {
       name: fullName,
       use,
       moduleType: nameInfo.moduleType,
-      processOptions: options as CompilerProcessOptions,
+      processOptions: options as TangCompilerProcessOptions,
     };
   }
 

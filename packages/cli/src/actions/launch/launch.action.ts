@@ -1,6 +1,5 @@
-import { GenericConfigObject, utils } from '@devs-tang/common';
+import { GenericConfigObject } from '@devs-tang/devkit';
 import { CliAction } from '../../common';
-import { printData } from '../../utils';
 import { PluginAction } from '../plugin';
 import { PresetAction } from './preset.action';
 

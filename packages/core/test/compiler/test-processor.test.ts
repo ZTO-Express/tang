@@ -1,10 +1,10 @@
 import * as testUtil from '../util';
 
-import { Compiler } from '../../src';
+import { DefaultTangCompiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/loader：测试loader testProcessor', () => {
-  let compiler: Compiler;
+  let compiler: DefaultTangCompiler;
   const urlLoader = processors.urlLoader();
   const docLoader = testUtil.docLoader();
 

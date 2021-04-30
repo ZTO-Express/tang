@@ -1,6 +1,6 @@
 import * as testUtil from '../util';
 import { fs } from '../../src/utils';
-import { Chunk } from '@devs-tang/common';
+import { TangChunk } from '@devs-tang/common';
 import { normalizeProcessor } from '@devs-tang/core';
 import * as processors from '../../src/processors';
 
@@ -10,7 +10,7 @@ describe('outputer/local：local输出器', () => {
   const testTmpDir = testUtil.resolveTmpDir('localOutputer');
 
   let samplePresetData: any;
-  let sampleChunks: Chunk[];
+  let sampleChunks: TangChunk[];
 
   beforeAll(async () => {
     const yfPresetPath = testUtil.resolveFixturePath(

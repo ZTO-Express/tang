@@ -1,6 +1,11 @@
-import { GenericConfigObject, TangPlugin } from '@devs-tang/common';
-import { getPresetConfigData } from '@devs-tang/core';
-import * as devkit from '@devs-tang/devkit';
+import {
+  utils,
+  cli,
+  GenericConfigObject,
+  TangPlugin,
+  PresetWithConfigData,
+  getPresetConfigData,
+} from '@devs-tang/devkit';
 import { CliAction } from '../../common';
 import { printData } from '../../utils';
 
@@ -42,7 +47,7 @@ export class PresetAction extends CliAction {
     let presetOptions = options.options;
 
     if (presetOptions && presetOptions.outputDir) {
-      presetOptions = devkit.utils.deepMerge(options.options, {
+      presetOptions = utils.deepMerge(options.options, {
         outputOptions: {
           outputDir: presetOptions.outputDir,
         },
@@ -96,6 +101,8 @@ export class PresetAction extends CliAction {
       return;
     }
 
+    cli.chalk.green(`当前插件 ${plugin.name} 预设信息`);
+
     if (plugin.preset) {
       console.log(`默认预设：`);
       printData(plugin.preset);
@@ -147,7 +154,7 @@ export class PresetAction extends CliAction {
   }
 
   /** 获取预设及配置的数据（方便打印） */
-  getPresetWithConfigDataInfo(presetWithConfig: devkit.PresetWithConfigData) {
+  getPresetWithConfigDataInfo(presetWithConfig: PresetWithConfigData) {
     const preset = presetWithConfig.preset;
 
     const presetConfigData = getPresetConfigData(preset);

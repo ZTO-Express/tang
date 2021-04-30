@@ -1,5 +1,4 @@
-import { GenericConfigObject } from '@devs-tang/common';
-import * as devkit from '@devs-tang/devkit';
+import { GenericConfigObject, json5, utils } from '@devs-tang/devkit';
 import { CliAction } from '../../common';
 
 export class PluginAction extends CliAction {
@@ -28,13 +27,13 @@ export class PluginAction extends CliAction {
 
     if (packageInfo) {
       console.log(`包信息：`);
-      const cleanPackageInfo = devkit.utils.omitNil({
+      const cleanPackageInfo = utils.omitNil({
         name: packageInfo.name,
         version: packageInfo.version,
         description: packageInfo.description,
       });
 
-      console.log(devkit.json5.stringify(cleanPackageInfo, null, 2));
+      console.log(json5.stringify(cleanPackageInfo, null, 2));
     }
 
     console.log();
@@ -116,7 +115,7 @@ export class PluginAction extends CliAction {
     let args: any[] = [];
     if (Array.isArray(options.args)) {
       args = options.args.map(arg => {
-        return devkit.json5.parse(arg);
+        return json5.parse(arg);
       });
     }
 

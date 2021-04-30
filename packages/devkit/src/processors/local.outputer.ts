@@ -2,7 +2,7 @@ import {
   GenericConfigObject,
   TangOutput,
   TangOutputer,
-  Chunk,
+  TangChunk,
   InvalidArguments,
   TangDocument,
 } from '@devs-tang/common';
@@ -38,7 +38,7 @@ export const localOutputer = (): TangOutputer => {
 
       const files: any[] = [];
 
-      const ops = document.chunks.map(async (chunk: Chunk) => {
+      const ops = document.chunks.map(async (chunk: TangChunk) => {
         if (!chunk.content) return;
 
         const filePath = path.join(outputDir, chunk.name);

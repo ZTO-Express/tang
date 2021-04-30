@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { TangLauncher, utils, getLauncher } from '../../src';
+import { TangLauncher, utils, getTangLauncher } from '../../src';
 import {
   TANG_CONFIG_KEY_PRESETS,
   TANG_PRESET_DEFAULT,
@@ -10,7 +10,7 @@ describe('tang/launcher：启动器', () => {
   let launcher: TangLauncher;
 
   beforeEach(async () => {
-    launcher = await getLauncher();
+    launcher = await getTangLauncher();
     launcher.configManager.unset(TANG_CONFIG_KEY_PRESETS);
   });
 

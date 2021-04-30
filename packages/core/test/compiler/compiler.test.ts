@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { Compiler } from '../../src';
+import { DefaultTangCompiler } from '../../src';
 import * as processors from '../../src/processors';
 
 describe('compiler/load：load 加载', () => {
@@ -23,7 +23,7 @@ describe('compiler/load：load 加载', () => {
   };
 
   it('验证 constructor', () => {
-    const compiler1 = new Compiler({ ...defaultOptions });
+    const compiler1 = new DefaultTangCompiler({ ...defaultOptions });
 
     expect(compiler1.defaultLoader).toBe(urlLoader);
     expect(compiler1.defaultParser).toBe(jsonParser);
@@ -35,31 +35,35 @@ describe('compiler/load：load 加载', () => {
     expect(compiler1.parsers[1]).toBe(yamlParser);
 
     expect(
-      new Compiler({ defaultLoader: 'doc', ...defaultOptions }).defaultLoader,
-    ).toBe(docLoader);
-
-    expect(
-      new Compiler({ defaultLoader: docLoader, ...defaultOptions })
+      new DefaultTangCompiler({ defaultLoader: 'doc', ...defaultOptions })
         .defaultLoader,
     ).toBe(docLoader);
 
     expect(
-      new Compiler({ defaultParser: 'yaml', ...defaultOptions }).defaultParser,
-    ).toBe(yamlParser);
+      new DefaultTangCompiler({ defaultLoader: docLoader, ...defaultOptions })
+        .defaultLoader,
+    ).toBe(docLoader);
 
     expect(
-      new Compiler({ defaultParser: yamlParser, ...defaultOptions })
+      new DefaultTangCompiler({ defaultParser: 'yaml', ...defaultOptions })
         .defaultParser,
     ).toBe(yamlParser);
 
     expect(
-      new Compiler({ defaultGenerator: 'yaml', ...defaultOptions })
+      new DefaultTangCompiler({ defaultParser: yamlParser, ...defaultOptions })
+        .defaultParser,
+    ).toBe(yamlParser);
+
+    expect(
+      new DefaultTangCompiler({ defaultGenerator: 'yaml', ...defaultOptions })
         .defaultGenerator,
     ).toBe(yamlGenerator);
 
     expect(
-      new Compiler({ defaultOutputer: memoryOutputer, ...defaultOptions })
-        .defaultOutputer,
+      new DefaultTangCompiler({
+        defaultOutputer: memoryOutputer,
+        ...defaultOptions,
+      }).defaultOutputer,
     ).toBe(memoryOutputer);
   });
 
@@ -69,7 +73,7 @@ describe('compiler/load：load 加载', () => {
       load: (): any => undefined,
     } as any;
 
-    const compile = new Compiler({
+    const compile = new DefaultTangCompiler({
       loaders: [nonReturnLoader],
       compileOptions: {
         skipParse: true,
@@ -90,7 +94,7 @@ describe('compiler/load：load 加载', () => {
       parse: (): any => undefined,
     } as any;
 
-    const compile = new Compiler({
+    const compile = new DefaultTangCompiler({
       parsers: [nonReturnParser],
       compileOptions: {
         skipLoad: true,
@@ -111,7 +115,7 @@ describe('compiler/load：load 加载', () => {
       generate: (): any => undefined,
     } as any;
 
-    const compile = new Compiler({
+    const compile = new DefaultTangCompiler({
       generators: [nonReturnGenerator],
       compileOptions: {
         skipOutput: true,

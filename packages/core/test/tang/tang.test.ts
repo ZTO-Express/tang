@@ -1,7 +1,7 @@
 import * as testUtil from '../util';
 
 import { ErrorCodes } from '@devs-tang/common';
-import { createCompiler } from '../../src';
+import { createDefaultCompiler } from '../../src';
 import { getNormalizedOptions } from '../../src/options/normalize-options';
 
 describe('tang：tang工具配置', () => {
@@ -12,7 +12,7 @@ describe('tang：tang工具配置', () => {
       loaders: [testUtil.moduleLoader()],
     });
 
-    const compiler = await createCompiler(defaultOptions);
+    const compiler = await createDefaultCompiler(defaultOptions);
 
     expect(compiler.loaders.length).toBe(2);
     expect(compiler.parsers.length).toBe(1);
@@ -37,7 +37,7 @@ describe('tang：tang工具配置', () => {
       outputers: [testUtil.memoryOutputer()],
     });
 
-    const compiler = await createCompiler(normalizedOptions);
+    const compiler = await createDefaultCompiler(normalizedOptions);
 
     let compilation = await compiler.load(jsDocPath, {
       parser: 'json',

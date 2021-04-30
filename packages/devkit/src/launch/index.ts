@@ -13,6 +13,6 @@ export * from './options';
  * @param force
  * @returns
  */
-export function getLauncher(force?: boolean) {
+export function getTangLauncher(force?: boolean) {
   return TangLauncher.getInstance(force);
 }

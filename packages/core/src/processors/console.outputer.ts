@@ -1,5 +1,5 @@
 import {
-  Chunk,
+  TangChunk,
   TangDocument,
   TangOutput,
   TangOutputer,
@@ -18,7 +18,7 @@ export const consoleOutputer = (): TangOutputer => {
     async output(document: TangDocument): Promise<TangOutput> {
       const files: any[] = [];
 
-      (document.chunks || []).forEach(async (chunk: Chunk) => {
+      (document.chunks || []).forEach(async (chunk: TangChunk) => {
         console.log(`${chunk.name} :`);
         console.log(chunk.content || '');
         console.log('');

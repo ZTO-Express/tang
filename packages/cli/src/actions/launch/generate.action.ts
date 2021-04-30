@@ -1,5 +1,4 @@
-import { GenericConfigObject } from '@devs-tang/common';
-import { json5, utils } from '@devs-tang/devkit';
+import { json5, utils, GenericConfigObject } from '@devs-tang/devkit';
 import { CliAction } from '../../common';
 import { printData } from '../../utils';
 

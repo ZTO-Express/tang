@@ -1,5 +1,5 @@
 import * as testUtil from '../util';
-import { Compiler } from '../../src';
+import { DefaultTangCompiler } from '../../src';
 
 describe('compiler/outputer：获取输出器 getOutputer', () => {
   const mockCompilation = { entry: 'mock' };
@@ -7,8 +7,8 @@ describe('compiler/outputer：获取输出器 getOutputer', () => {
   const localOutputer = testUtil.localOutputer();
   const memoryOutputer = testUtil.memoryOutputer();
 
-  let compiler1: Compiler;
-  let compiler2: Compiler;
+  let compiler1: DefaultTangCompiler;
+  let compiler2: DefaultTangCompiler;
 
   beforeAll(() => {
     compiler1 = testUtil.createDefaultCompiler({

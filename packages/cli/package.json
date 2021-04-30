@@ -26,8 +26,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@devs-tang/common": "^1.0.9",
-    "@devs-tang/core": "^1.0.9",
     "@devs-tang/devkit": "^1.0.9",
     "chalk": "^4.1.0",
     "cli-table3": "^0.6.0",
