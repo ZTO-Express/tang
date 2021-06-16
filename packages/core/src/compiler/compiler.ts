@@ -2,6 +2,7 @@ import {
   GenericConfigObject,
   TangCompilation,
   TangCompiler,
+  TangCompilerContext,
   TangCompileOptions,
   TangCompilerGenerateOptions,
   TangCompilerLoadOptions,
@@ -28,6 +29,8 @@ import { CompilerOptions, ProcessorGetOptions } from './declarations';
  * 生成器
  */
 export class DefaultTangCompiler implements TangCompiler {
+  context: TangCompilerContext;
+
   hookDriver: HookDriver<TangCompilation>;
 
   loaders: TangLoader[]; // 加载器
@@ -44,7 +47,8 @@ export class DefaultTangCompiler implements TangCompiler {
 
   compileOptions: TangCompileOptions;
 
-  constructor(options: CompilerOptions) {
+  constructor(options: CompilerOptions, context: TangCompilerContext) {
+    this.context = context;
     this.initialize(options);
     this.hookDriver = new HookDriver<TangCompilation>(options.hooks);
   }
@@ -123,6 +127,8 @@ export class DefaultTangCompiler implements TangCompiler {
       const loadDocument = await loader.load(
         compilation.document,
         loader.loadOptions,
+        compilation,
+        this.context,
       );
 
       if (loadDocument) {
@@ -149,6 +155,7 @@ export class DefaultTangCompiler implements TangCompiler {
         compilation.document,
         parser.parseOptions,
         compilation,
+        this.context,
       );
 
       if (parseDocument) compilation.document = parseDocument;
@@ -192,6 +199,7 @@ export class DefaultTangCompiler implements TangCompiler {
         compilation.document,
         generator.generateOptions,
         compilation,
+        this.context,
       );
 
       if (generateDocument) compilation.document = generateDocument;
@@ -209,6 +217,7 @@ export class DefaultTangCompiler implements TangCompiler {
         compilation.document,
         outputer.outputOptions,
         compilation,
+        this.context,
       );
 
       await this.hookDriver.hookParallel('generated', compilation);

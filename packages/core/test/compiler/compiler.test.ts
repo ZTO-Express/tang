@@ -23,7 +23,10 @@ describe('compiler/load：load 加载', () => {
   };
 
   it('验证 constructor', () => {
-    const compiler1 = new DefaultTangCompiler({ ...defaultOptions });
+    const compiler1 = new DefaultTangCompiler(
+      { ...defaultOptions },
+      { isWorkspace: false },
+    );
 
     expect(compiler1.defaultLoader).toBe(urlLoader);
     expect(compiler1.defaultParser).toBe(jsonParser);
@@ -35,35 +38,48 @@ describe('compiler/load：load 加载', () => {
     expect(compiler1.parsers[1]).toBe(yamlParser);
 
     expect(
-      new DefaultTangCompiler({ defaultLoader: 'doc', ...defaultOptions })
-        .defaultLoader,
+      new DefaultTangCompiler(
+        { defaultLoader: 'doc', ...defaultOptions },
+        { isWorkspace: false },
+      ).defaultLoader,
     ).toBe(docLoader);
 
     expect(
-      new DefaultTangCompiler({ defaultLoader: docLoader, ...defaultOptions })
-        .defaultLoader,
+      new DefaultTangCompiler(
+        { defaultLoader: docLoader, ...defaultOptions },
+        { isWorkspace: false },
+      ).defaultLoader,
     ).toBe(docLoader);
 
     expect(
-      new DefaultTangCompiler({ defaultParser: 'yaml', ...defaultOptions })
-        .defaultParser,
+      new DefaultTangCompiler(
+        { defaultParser: 'yaml', ...defaultOptions },
+        { isWorkspace: false },
+      ).defaultParser,
     ).toBe(yamlParser);
 
     expect(
-      new DefaultTangCompiler({ defaultParser: yamlParser, ...defaultOptions })
-        .defaultParser,
+      new DefaultTangCompiler(
+        { defaultParser: yamlParser, ...defaultOptions },
+        { isWorkspace: false },
+      ).defaultParser,
     ).toBe(yamlParser);
 
     expect(
-      new DefaultTangCompiler({ defaultGenerator: 'yaml', ...defaultOptions })
-        .defaultGenerator,
+      new DefaultTangCompiler(
+        { defaultGenerator: 'yaml', ...defaultOptions },
+        { isWorkspace: false },
+      ).defaultGenerator,
     ).toBe(yamlGenerator);
 
     expect(
-      new DefaultTangCompiler({
-        defaultOutputer: memoryOutputer,
-        ...defaultOptions,
-      }).defaultOutputer,
+      new DefaultTangCompiler(
+        {
+          defaultOutputer: memoryOutputer,
+          ...defaultOptions,
+        },
+        { isWorkspace: false },
+      ).defaultOutputer,
     ).toBe(memoryOutputer);
   });
 
@@ -73,12 +89,15 @@ describe('compiler/load：load 加载', () => {
       load: (): any => undefined,
     } as any;
 
-    const compile = new DefaultTangCompiler({
-      loaders: [nonReturnLoader],
-      compileOptions: {
-        skipParse: true,
+    const compile = new DefaultTangCompiler(
+      {
+        loaders: [nonReturnLoader],
+        compileOptions: {
+          skipParse: true,
+        },
       },
-    });
+      { isWorkspace: false },
+    );
 
     const testDoc = 'testdoc';
     const compilation = await compile.load(testDoc);
@@ -94,12 +113,17 @@ describe('compiler/load：load 加载', () => {
       parse: (): any => undefined,
     } as any;
 
-    const compile = new DefaultTangCompiler({
-      parsers: [nonReturnParser],
-      compileOptions: {
-        skipLoad: true,
+    const compile = new DefaultTangCompiler(
+      {
+        parsers: [nonReturnParser],
+        compileOptions: {
+          skipLoad: true,
+        },
       },
-    });
+      {
+        isWorkspace: false,
+      },
+    );
 
     const testDoc = 'testdoc';
     const compilation = await compile.load(testDoc);
@@ -115,12 +139,17 @@ describe('compiler/load：load 加载', () => {
       generate: (): any => undefined,
     } as any;
 
-    const compile = new DefaultTangCompiler({
-      generators: [nonReturnGenerator],
-      compileOptions: {
-        skipOutput: true,
+    const compile = new DefaultTangCompiler(
+      {
+        generators: [nonReturnGenerator],
+        compileOptions: {
+          skipOutput: true,
+        },
       },
-    });
+      {
+        isWorkspace: false,
+      },
+    );
 
     const testDoc = 'testdoc';
     const compilation = await compile.generate({ entry: testDoc });

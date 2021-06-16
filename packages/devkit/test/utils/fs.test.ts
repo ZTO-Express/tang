@@ -1,4 +1,5 @@
 import * as os from 'os';
+import * as path from 'path';
 
 import { fs, utils } from '../../src/utils';
 import * as testUtil from '../util';
@@ -125,6 +126,13 @@ describe('utils/fs：fs实用方法', () => {
     expect(fs.parentPath('a')).toBe('.');
     expect(fs.parentPath('..')).toBe('.');
     expect(fs.parentPath('/..')).toBe('/');
+  });
+
+  it('获取绝对路径 absolutePath', async () => {
+    expect(fs.absolutePath('/aaa/b/c', 'd')).toBe('/aaa/b/c');
+    expect(fs.absolutePath('aaa', '/b')).toBe('/b/aaa');
+    expect(fs.absolutePath('aaa', 'b')).toBe(path.resolve('b/aaa'));
+    expect(fs.absolutePath('aaa', '')).toBe(path.resolve('aaa'));
   });
 
   it('同步遍历目录 walkSync', async () => {

@@ -1,7 +1,7 @@
 import { GenericConfigObject, GenericObject } from './type';
 import { TangModuleTypeNames } from './tang';
 import { TangDocument } from './tang.document';
-import { TangCompilation } from './tang.compiler';
+import { TangCompilation, TangCompilerContext } from './tang.compiler';
 
 export enum TangProcessorTypes {
   loader = 'loader', // 加载器
@@ -43,6 +43,7 @@ export interface StrictTangLoader extends StrictTangProcessor {
     document: TangDocument,
     options?: GenericConfigObject,
     compilation?: TangCompilation,
+    context?: TangCompilerContext,
   ): Promise<TangDocument>;
 }
 
@@ -53,6 +54,7 @@ export interface StrictTangParser extends StrictTangProcessor {
     document: TangDocument,
     options?: GenericConfigObject,
     compilation?: TangCompilation,
+    context?: TangCompilerContext,
   ) => Promise<TangDocument>;
 }
 
@@ -63,6 +65,7 @@ export interface StrictTangGenerator extends StrictTangProcessor {
     document: TangDocument,
     options?: GenericConfigObject,
     compilation?: TangCompilation,
+    context?: TangCompilerContext,
   ) => Promise<TangDocument>;
 }
 
@@ -79,6 +82,7 @@ export interface StrictTangOutputer extends StrictTangProcessor {
     document: TangDocument,
     options?: GenericConfigObject,
     compilation?: TangCompilation,
+    context?: TangCompilerContext,
   ) => Promise<TangOutput>;
 }
 

@@ -1,6 +1,7 @@
 import * as _Module from 'module';
 import * as vm from 'vm';
-import { dirname } from 'path';
+import { dirname, isAbsolute } from 'path';
+import { pathToFileURL } from 'url';
 
 const isBuffer = Buffer.isBuffer;
 
@@ -111,6 +112,58 @@ export function runScript(
   }
 
   return sandbox.module.exports;
+}
+
+// copied from https://github.com/babel/babel/blob/56044c7851d583d498f919e9546caddf8f80a72f/packages/babel-helpers/src/helpers.js#L558-L562
+export function interopRequireDefault(obj: any): any {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+export async function requireOrImportModule<T>(
+  filePath: string,
+  applyInteropRequireDefault = true,
+): Promise<T> {
+  if (!isAbsolute(filePath) && filePath[0] === '.') {
+    throw new Error(`Tang: requireOrImportModule path must be absolute`);
+  }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const requiredModule = require(filePath);
+    if (!applyInteropRequireDefault) {
+      return requiredModule;
+    }
+    return interopRequireDefault(requiredModule).default;
+  } catch (error) {
+    if (error.code === 'ERR_REQUIRE_ESM') {
+      try {
+        const moduleUrl = pathToFileURL(filePath);
+
+        // node `import()` supports URL, but TypeScript doesn't know that
+        const importedModule = await import(moduleUrl.href);
+
+        if (!applyInteropRequireDefault) {
+          return importedModule;
+        }
+
+        if (!importedModule.default) {
+          throw new Error(
+            `Tang: Failed to load ESM at ${filePath} - did you use a default export?`,
+          );
+        }
+
+        return importedModule.default;
+      } catch (innerError) {
+        if (innerError.message === 'Not supported') {
+          throw new Error(
+            `Tang: Your version of Node does not support dynamic import - please enable it or use a .cjs file extension for file ${filePath}`,
+          );
+        }
+        throw innerError;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 // 简单合并

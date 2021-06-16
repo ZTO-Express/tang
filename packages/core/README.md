@@ -1,4 +1,4 @@
-# tang-tang
+# tang-core
 
 tang 基础库
 

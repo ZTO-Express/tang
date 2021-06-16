@@ -1,0 +1,32 @@
+{
+  "name": "@devs-tang/yapi",
+  "version": "1.0.9",
+  "description": "tang yapi相关操作",
+  "main": "lib/",
+  "types": "lib/",
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "schemas/**",
+    "lib/**"
+  ],
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "node ../../scripts/build --name=yapi",
+    "test": "jest --coverage --runInBand"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@devs-tang/common": "^1.0.9",
+    "@devs-tang/core": "^1.0.9"
+  }
+}

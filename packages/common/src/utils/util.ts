@@ -163,7 +163,7 @@ export function deepClone(obj: any, cache: any[] = []) {
 }
 
 /**
- * 深度合并，合并后会产生新的对象
+ * 深度合并，合并后会产生新的对象，排序靠后的会合并考前的对象
  * @param args 被和并的对象
  */
 export function deepMerge(...args: any[]) {
@@ -174,8 +174,9 @@ export function deepMerge(...args: any[]) {
 }
 
 /**
- * 深度合并，合并后会产生新的对象
- * @param args 被和并的对象
+ * 深度合并，合并后会产生新的对象，排序靠后的会合并考前的对象
+ * @param args 被和并的对象，合并对象数组
+ * @param options 支持合并选项
  */
 export function deepMerge2(args: any[], options?: DeepmergeOptions) {
   const items = args.filter(it => !isNil(it));

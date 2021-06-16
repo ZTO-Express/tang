@@ -70,4 +70,20 @@ describe('utils/vm：vm实用方法', () => {
     const fileData = fs.readFileSync(jsDocPath);
     expect(vm.runScript(fileData).name).toBe('tang-test-mesh');
   });
+
+  it('引用模块 requireOrImportModule', async () => {
+    await expect(() => vm.requireOrImportModule('./abc')).rejects.toThrow(
+      'Tang:',
+    );
+
+    const configPath = testUtil.resolveFixturePath('workspace/tang.config.js');
+    const configObject: any = await vm.requireOrImportModule(configPath);
+    expect(configObject.rootDir).toBe('./');
+
+    const configObject1: any = await vm.requireOrImportModule(
+      configPath,
+      false,
+    );
+    expect(configObject.rootDir).toBe('./');
+  });
 });

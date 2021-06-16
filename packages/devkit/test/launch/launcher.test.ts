@@ -20,8 +20,6 @@ describe('tang/launcher：启动器', () => {
     });
     expect(result.name).toBe('cowsay');
 
-    expect(launcher.configDir).toBe(TANG_HOME);
-
     let plugin = await launcher.getPlugin('cowsay');
     expect(plugin.name).toBe('cowsay');
 

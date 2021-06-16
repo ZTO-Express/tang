@@ -12,7 +12,9 @@ describe('tang：tang工具配置', () => {
       loaders: [testUtil.moduleLoader()],
     });
 
-    const compiler = await createDefaultCompiler(defaultOptions);
+    const compiler = await createDefaultCompiler(defaultOptions, {
+      isWorkspace: false,
+    });
 
     expect(compiler.loaders.length).toBe(2);
     expect(compiler.parsers.length).toBe(1);
@@ -37,7 +39,9 @@ describe('tang：tang工具配置', () => {
       outputers: [testUtil.memoryOutputer()],
     });
 
-    const compiler = await createDefaultCompiler(normalizedOptions);
+    const compiler = await createDefaultCompiler(normalizedOptions, {
+      isWorkspace: false,
+    });
 
     let compilation = await compiler.load(jsDocPath, {
       parser: 'json',

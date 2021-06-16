@@ -93,8 +93,10 @@ export class PresetManager {
     // 设置当前正在使用的配置
     this.setUsedConfig(normalizedName);
 
+    // 保存配置
     await this.saveConfig();
 
+    // 获取正在使用的预设
     presetWithConfig = await this.getUsedPresetWithConfig();
 
     return presetWithConfig;
@@ -309,7 +311,11 @@ export class PresetManager {
   }
 
   /** 保存当前预设 */
-  saveConfig() {
+  async saveConfig() {
+    if (this.launcher.isWorkspace) {
+      return undefined;
+    }
+
     return this.launcher.configManager.save();
   }
 

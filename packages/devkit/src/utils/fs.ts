@@ -22,6 +22,15 @@ export function relativePath(from: string, to: string) {
   return path.relative(from, to);
 }
 
+/** 获取绝对路径 */
+export function absolutePath(pathStr: string, rootPath: string) {
+  if (!path.isAbsolute(pathStr)) {
+    pathStr = path.resolve(rootPath, pathStr);
+  }
+
+  return pathStr;
+}
+
 /** 获取父路径 */
 export function parentPath(pathStr: string) {
   if (!pathStr) return undefined;

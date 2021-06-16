@@ -158,4 +158,12 @@ describe('utils/util：get方法', () => {
   it('get should return the default value when `path` is empty', () => {
     expect(get({}, [], 'a')).toBe('a');
   });
+
+  it('get should return reference of the value', () => {
+    const a = { v: { v1: 1 } };
+    const av = get(a, 'v');
+    av.v1 = 2;
+
+    expect(a.v.v1).toBe(2);
+  });
 });

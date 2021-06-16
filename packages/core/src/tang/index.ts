@@ -1,3 +1,4 @@
+import { TangCompilerContext } from '@devs-tang/common';
 import { NormalizedTangOptions } from '../options';
 import { DefaultTangCompiler } from '../compiler';
 
@@ -7,7 +8,8 @@ import { DefaultTangCompiler } from '../compiler';
  */
 export function createDefaultCompiler(
   options: NormalizedTangOptions,
+  context: TangCompilerContext,
 ): DefaultTangCompiler {
-  const compiler = new DefaultTangCompiler(options);
+  const compiler = new DefaultTangCompiler(options, context);
   return compiler;
 }

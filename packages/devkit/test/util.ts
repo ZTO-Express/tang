@@ -76,6 +76,8 @@ export function createDefaultCompiler(options?: GenericConfigObject) {
 
   const opts = getNormalizedOptions(options);
 
-  const compiler = new DefaultTangCompiler(opts);
+  const compiler = new DefaultTangCompiler(opts, {
+    isWorkspace: false,
+  });
   return compiler;
 }

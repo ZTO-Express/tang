@@ -6,7 +6,7 @@ import {
   TangParser,
 } from './tang.processor';
 import { TangDocument } from './tang.document';
-import { GenericConfigObject } from './type';
+import { GenericConfigObject, GenericObject } from './type';
 
 /** 编译许选项 */
 export interface TangCompileOptions {
@@ -70,7 +70,14 @@ export interface TangCompilerInspectOptions extends TangCompilerProcessOptions {
   entry: string;
 }
 
+/** 编译器的执行上下文 */
+export interface TangCompilerContext extends GenericObject {
+  isWorkspace: boolean;
+}
+
 export interface TangCompiler extends Record<string, any> {
+  context: TangCompilerContext; // 编译器的执行上下文（可为空）
+
   loaders: TangLoader[]; // 加载器
   defaultLoader: TangLoader; // 默认加载器
 

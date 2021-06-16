@@ -5,6 +5,7 @@
 
 import {
   TangCompilation,
+  TangCompilerContext,
   TangCompilerLoadOptions,
   TangCompilerInspectOptions,
   TangCompilerProcessOptions,
@@ -20,12 +21,18 @@ import {
 import { utils } from '../utils';
 import { ConfigManager } from '../config';
 import { PluginAddOptions, PluginManager } from '../plugin';
+import { ProjectWorkspace } from '../project';
 import { PresetManager, PresetWithConfigData } from './preset-manager';
 
-export class TangLauncher {
+/**
+ * tang的加载器，也是tang的编译上下文
+ */
+export class TangLauncher implements TangCompilerContext {
   readonly configManager: ConfigManager;
   readonly pluginManager: PluginManager;
   readonly presetManager: PresetManager;
+
+  private _workspace: ProjectWorkspace;
 
   private static instance: TangLauncher;
 
@@ -50,13 +57,23 @@ export class TangLauncher {
     return TangLauncher.instance;
   }
 
-  get configDir() {
-    return this.configManager.configDir;
+  get workspace() {
+    return this._workspace;
+  }
+
+  // 是否工作区加载器
+  get isWorkspace() {
+    return this.configManager.isWorkspace;
   }
 
   // 初始化加载器
   async initialize() {
     await this.configManager.load();
+
+    const workspace = await ProjectWorkspace.getInstance();
+    if (workspace.exists) {
+      this._workspace = workspace;
+    }
   }
 
   /**
@@ -82,7 +99,7 @@ export class TangLauncher {
 
     if (!opts) return undefined;
 
-    const compiler = await createDefaultCompiler(opts.preset);
+    const compiler = await createDefaultCompiler(opts.preset, this);
     const compilation = await compiler.load(entry, opts.processOptions);
     return compilation;
   }
@@ -110,7 +127,7 @@ export class TangLauncher {
 
     if (!opts) return undefined;
 
-    const compiler = await createDefaultCompiler({ ...opts.preset });
+    const compiler = await createDefaultCompiler({ ...opts.preset }, this);
 
     const compilation = await compiler.load(entry, opts.processOptions);
 
@@ -118,6 +135,7 @@ export class TangLauncher {
       compilation.document,
       opts.processOptions,
     );
+
     return output;
   }
 
@@ -129,7 +147,7 @@ export class TangLauncher {
 
     if (!opts || !opts.preset) return undefined;
 
-    const compiler = await createDefaultCompiler(opts.preset);
+    const compiler = await createDefaultCompiler(opts.preset, this);
 
     const processors: any = await compiler.inspect(
       opts.processOptions as TangCompilerInspectOptions,
