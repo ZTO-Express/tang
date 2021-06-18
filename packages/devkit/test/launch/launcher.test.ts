@@ -7,6 +7,9 @@ import {
 } from '../../src/consts';
 
 describe('tang/launcher：启动器', () => {
+  //保存初始cwd
+  const origCwd = process.cwd;
+
   let launcher: TangLauncher;
 
   beforeEach(async () => {
@@ -51,6 +54,10 @@ describe('tang/launcher：启动器', () => {
 
     isDeleted1 = await launcher.delete('nonExists');
     expect(isDeleted1).toBe(undefined);
+
+    // 非workspace
+    expect(launcher.isWorkspace).toBe(false);
+    expect(launcher.workspace).toBeUndefined();
   });
 
   it('插件卸载特殊情况处理', async () => {
@@ -60,6 +67,10 @@ describe('tang/launcher：启动器', () => {
 
     await launcher.delete('cowsay');
     expect(launcher.presetManager.getConfig('cowsay')).toBeUndefined();
+
+    // 非workspace
+    expect(launcher.isWorkspace).toBe(false);
+    expect(launcher.workspace).toBeUndefined();
   });
 
   it('inspect', async () => {
@@ -120,5 +131,19 @@ describe('tang/launcher：启动器', () => {
 
     expect(preset.parsers[0].name).toBe('json5');
     expect(utils.arryLast(preset.parsers).name).toBe('json');
+  });
+
+  it('workspace launcher', async () => {
+    process.cwd = () => testUtil.resolveFixturePath('workspace');
+
+    launcher = await getTangLauncher(true);
+
+    expect(launcher.isWorkspace).toBe(true);
+    expect(launcher.workspace.rootDir).toBe(process.cwd());
+
+    await expect(() => launcher.presetManager.saveConfig()).rejects.toThrow();
+
+    process.cwd = origCwd;
+    launcher = await getTangLauncher(true);
   });
 });

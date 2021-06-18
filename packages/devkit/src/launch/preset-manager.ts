@@ -312,10 +312,6 @@ export class PresetManager {
 
   /** 保存当前预设 */
   async saveConfig() {
-    if (this.launcher.isWorkspace) {
-      return undefined;
-    }
-
     return this.launcher.configManager.save();
   }
 
