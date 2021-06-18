@@ -72,9 +72,7 @@ describe('utils/vm：vm实用方法', () => {
   });
 
   it('引用模块 requireOrImportModule', async () => {
-    await expect(() => vm.requireOrImportModule('./abc')).rejects.toThrow(
-      'Tang:',
-    );
+    await expect(() => vm.requireOrImportModule('./abc')).rejects.toThrow();
 
     const configPath = testUtil.resolveFixturePath('workspace/tang.config.js');
     const configObject: any = await vm.requireOrImportModule(configPath);
@@ -84,6 +82,17 @@ describe('utils/vm：vm实用方法', () => {
       configPath,
       false,
     );
-    expect(configObject.rootDir).toBe('./');
+    expect(configObject1.rootDir).toBe('./');
+
+    expect(configObject).toEqual(configObject1);
+  });
+
+  it('获取默认模块 interopRequireDefault', async () => {
+    expect(vm.interopRequireDefault(undefined)).toEqual({ default: undefined });
+    expect(vm.interopRequireDefault({ a: 1 })).toEqual({ default: { a: 1 } });
+    expect(vm.interopRequireDefault({ a: 1, __esModule: true })).toEqual({
+      a: 1,
+      __esModule: true,
+    });
   });
 });

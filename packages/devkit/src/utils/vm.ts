@@ -126,44 +126,15 @@ export async function requireOrImportModule<T>(
   if (!filePath || (!isAbsolute(filePath) && filePath[0] === '.')) {
     throw new Error(`Tang: requireOrImportModule path must be absolute`);
   }
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const requiredModule = require(filePath);
-    if (!applyInteropRequireDefault) {
-      return requiredModule;
-    }
-    return interopRequireDefault(requiredModule).default;
-  } catch (error) {
-    if (error.code === 'ERR_REQUIRE_ESM') {
-      try {
-        const moduleUrl = pathToFileURL(filePath);
 
-        // node `import()` supports URL, but TypeScript doesn't know that
-        const importedModule = await import(moduleUrl.href);
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const requiredModule = require(filePath);
 
-        if (!applyInteropRequireDefault) {
-          return importedModule;
-        }
-
-        if (!importedModule.default) {
-          throw new Error(
-            `Tang: Failed to load ESM at ${filePath} - did you use a default export?`,
-          );
-        }
-
-        return importedModule.default;
-      } catch (innerError) {
-        if (innerError.message === 'Not supported') {
-          throw new Error(
-            `Tang: Your version of Node does not support dynamic import - please enable it or use a .cjs file extension for file ${filePath}`,
-          );
-        }
-        throw innerError;
-      }
-    } else {
-      throw error;
-    }
+  if (!applyInteropRequireDefault) {
+    return requiredModule;
   }
+
+  return interopRequireDefault(requiredModule).default;
 }
 
 // 简单合并
