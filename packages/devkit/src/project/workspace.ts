@@ -21,41 +21,18 @@ export class ProjectWorkspace {
   // 项目工作区配置信息
   private _config: WorkspaceConfig = {};
 
-  // 当前项目工作区实例
-  private static instance: ProjectWorkspace;
-
-  /**
-   * 获取加载器实例
-   * @param force 强制重新实例化加载器
-   * @returns
-   */
-  static async getInstance(configPath?: string, options?: GenericConfigObject) {
-    if (!ProjectWorkspace.instance) {
-      const workspace = new ProjectWorkspace(configPath);
-      ProjectWorkspace.instance = workspace;
-      await workspace.initialize(options);
-    }
-
-    return ProjectWorkspace.instance;
-  }
-
   constructor(configPath?: string) {
     this._configPath = configPath;
   }
 
   // 工作区根目录
   get rootDir() {
-    return this._config?.rootDir;
-  }
-
-  // 工作区是否存在
-  get exists() {
-    return this.rootDir && fs.existsSync(this.rootDir);
+    return this._config.rootDir;
   }
 
   // 代码生成配置选项
   get codegenConfig() {
-    return this.getOptions('codegen');
+    return this.getOption('codegen');
   }
 
   // 代码生成目录
@@ -74,8 +51,28 @@ export class ProjectWorkspace {
     return codegenDir;
   }
 
+  // 工作区是否存在
+  exists() {
+    return !!this.rootDir && fs.existsSync(this.rootDir);
+  }
+
+  /**
+   * 获取加载器实例
+   * @param force 强制重新实例化加载器
+   * @returns
+   */
+  static async createInstance(
+    configPath?: string,
+    options?: GenericConfigObject,
+  ) {
+    const workspace = new ProjectWorkspace(configPath as string);
+    await workspace._initialize(options as GenericConfigObject);
+
+    return workspace;
+  }
+
   // 初始化加载器
-  async initialize(options?: GenericConfigObject) {
+  private async _initialize(options?: GenericConfigObject) {
     const config = await this.readWorkspaceConfig();
 
     if (options) {
@@ -85,28 +82,8 @@ export class ProjectWorkspace {
     }
   }
 
-  // 获取配置信息 (返回配置对象的克隆)
-  get<T = any>(pathStr: string, defaultValue?: T): T {
-    if (pathStr === '.') {
-      return this._config as T;
-    }
-
-    const result = utils.get(this._config, pathStr, defaultValue);
-    return result;
-  }
-
-  // 获取配置下options节点下选项
-  getOptions<T = any>(pathStr: string, defaultValue?: T): T {
-    if (!pathStr || pathStr === '.') {
-      pathStr = 'options';
-    } else {
-      pathStr = `options.${pathStr}`;
-    }
-    return this.get<T>(pathStr, defaultValue);
-  }
-
   // 读取工作区配置
-  async readWorkspaceConfig() {
+  private async readWorkspaceConfig() {
     let configPath = this._configPath;
 
     if (!configPath) {
@@ -114,6 +91,7 @@ export class ProjectWorkspace {
       configPath = await fs.lookupFile(TANG_WORKSPACE_CONFIG_FILENAME);
     }
 
+    // 如果未找到工作区配置文件，则返回空
     if (!configPath) {
       return undefined;
     }
@@ -134,6 +112,26 @@ export class ProjectWorkspace {
     return configObject;
   }
 
+  // 获取配置信息 (返回配置对象的克隆)
+  get<T = any>(pathStr: string, defaultValue?: T): T {
+    if (pathStr === '.') {
+      return this._config as T;
+    }
+
+    const result = utils.get(this._config, pathStr, defaultValue);
+    return result;
+  }
+
+  // 获取配置下options节点下选项
+  getOption<T = any>(pathStr: string, defaultValue?: T): T {
+    if (pathStr === '.') {
+      pathStr = 'options';
+    } else {
+      pathStr = `options.${pathStr}`;
+    }
+    return this.get<T>(pathStr, defaultValue);
+  }
+
   /**
    * 获取代码生成目录下所有模版
    * @param templatesDir 模版路径
@@ -150,6 +148,10 @@ export class ProjectWorkspace {
 
     if (!path.isAbsolute(templatesDir)) {
       templatesDir = path.join(this.codegenDir, templatesDir);
+    }
+
+    if (!fs.existsSync(templatesDir)) {
+      throw new Error(`目录${templatesDir}不存在。`);
     }
 
     const templates: any[] = [];

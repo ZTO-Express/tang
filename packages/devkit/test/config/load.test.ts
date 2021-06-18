@@ -96,15 +96,15 @@ describe('tang/cli/config.manager load：配置加载', () => {
     expect(cfgManager.get<string>('test.none')).toBeUndefined();
     expect(cfgManager.get<string>('test.none', 'devkit')).toBe('devkit');
 
-    expect(cfgManager.getOptions('devkit')).toEqual({
+    expect(cfgManager.getOption('devkit')).toEqual({
       isTest: true,
     });
 
-    expect(cfgManager.getOptions<boolean>('devkit.isTest')).toBe(true);
-    expect(cfgManager.getOptions<boolean>('devkit.none')).toBeUndefined();
-    expect(cfgManager.getOptions<boolean>('devkit.none', true)).toBe(true);
-    expect(cfgManager.getOptions('')).toEqual(cfgManager.get('options'));
-    expect(cfgManager.getOptions('.')).toEqual(cfgManager.get('options'));
+    expect(cfgManager.getOption<boolean>('devkit.isTest')).toBe(true);
+    expect(cfgManager.getOption<boolean>('devkit.none')).toBeUndefined();
+    expect(cfgManager.getOption<boolean>('devkit.none', true)).toBe(true);
+    expect(cfgManager.getOption('')).toEqual(cfgManager.get('options'));
+    expect(cfgManager.getOption('.')).toEqual(cfgManager.get('options'));
 
     await testUtil.fs.remove(localPath);
   });

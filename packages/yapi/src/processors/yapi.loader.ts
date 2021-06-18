@@ -35,7 +35,7 @@ export const yapiLoader = (config: any = {}): TangPluginLoader => {
 
       let url = options.url || loadOptions.url || config.url;
 
-      const ws = await ProjectWorkspace.getInstance();
+      const ws = await ProjectWorkspace.createInstance();
 
       if (!url) {
         url = ws.get('yapi.url') || YAPI_URL;

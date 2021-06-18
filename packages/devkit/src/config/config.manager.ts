@@ -63,7 +63,7 @@ export class ConfigManager {
   }
 
   /** 获取配置下options节点下选项 */
-  getOptions<T = any>(pathStr: string, defaultValue?: T): T {
+  getOption<T = any>(pathStr: string, defaultValue?: T): T {
     if (!pathStr || pathStr === '.') {
       pathStr = 'options';
     } else {
@@ -96,7 +96,7 @@ export class ConfigManager {
 
   // 读取工作区配置
   async readWorkspaceConfig() {
-    const ws = await ProjectWorkspace.getInstance(this._configPath);
+    const ws = await ProjectWorkspace.createInstance();
     const config = ws.get('.');
     return config;
   }

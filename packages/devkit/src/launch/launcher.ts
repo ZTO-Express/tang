@@ -70,7 +70,7 @@ export class TangLauncher implements TangCompilerContext {
   async initialize() {
     await this.configManager.load();
 
-    const workspace = await ProjectWorkspace.getInstance();
+    const workspace = await ProjectWorkspace.createInstance();
     if (workspace.exists) {
       this._workspace = workspace;
     }

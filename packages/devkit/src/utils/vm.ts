@@ -123,7 +123,7 @@ export async function requireOrImportModule<T>(
   filePath: string,
   applyInteropRequireDefault = true,
 ): Promise<T> {
-  if (!isAbsolute(filePath) && filePath[0] === '.') {
+  if (!filePath || (!isAbsolute(filePath) && filePath[0] === '.')) {
     throw new Error(`Tang: requireOrImportModule path must be absolute`);
   }
   try {
