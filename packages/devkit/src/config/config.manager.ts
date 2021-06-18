@@ -49,7 +49,7 @@ export class ConfigManager {
 
   // 当前工作区根路径
   get workspaceRootDir() {
-    return this.isWorkspace ? undefined : this.config.rootDir;
+    return this.isWorkspace ? this.config.rootDir : undefined;
   }
 
   // 获取配置信息
@@ -96,7 +96,7 @@ export class ConfigManager {
 
   // 读取工作区配置
   async readWorkspaceConfig() {
-    const ws = await ProjectWorkspace.createInstance();
+    const ws = await ProjectWorkspace.createInstance(this.configPath);
     const config = ws.get('.');
     return config;
   }
@@ -160,7 +160,7 @@ export class ConfigManager {
   /** 获取与默认配置不同的配置项，以便于保存 */
   getUpdatedConfig() {
     const defaultConfig = getDefaultConfig();
-    const config: any = this.config || {};
+    const config: any = this.config;
 
     const ignoreKeys = ['configDir']; // 应当忽略保存的key
 

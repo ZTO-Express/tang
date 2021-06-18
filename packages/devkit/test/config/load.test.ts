@@ -27,6 +27,13 @@ describe('tang/cli/config.manager load：配置加载', () => {
     expect(cfgManager.isWorkspace).toBe(false);
     expect(cfgManager.configPath).toBeUndefined();
     expect(cfgManager.workspaceRootDir).toBeUndefined();
+
+    let cfgManager1 = new ConfigManager({ configPath: 'a/b' });
+    expect(cfgManager1.configPath).toBe(
+      testUtil.fs.joinPath(process.cwd(), 'a/b'),
+    );
+    cfgManager1 = new ConfigManager({ configPath: '/a/b' });
+    expect(cfgManager1.configPath).toBe('/a/b');
   });
 
   it('从本地目录加载文件', async () => {
@@ -170,10 +177,22 @@ describe('tang/cli/config.manager load：配置加载', () => {
     expect(cfgManager.getUpdatedConfig()).toEqual({
       textOptions: { isTest: true },
     });
+    expect(cfgManager.workspaceRootDir).toBeUndefined();
 
     await testUtil.fs.writeFile(localPath, 'test_error');
     await expect(() => cfgManager.load()).rejects.toThrow('配置文件格式错误。');
 
     await testUtil.fs.remove(localPath);
+  });
+
+  it('工作区配置', async () => {
+    const configPath = testUtil.resolveFixturePath('workspace/tang.config.js');
+    const cfgManager = new ConfigManager({ configPath });
+
+    const config = await cfgManager.load();
+    expect(cfgManager.workspaceRootDir).toBe(
+      testUtil.resolveFixturePath('workspace'),
+    );
+    await expect(() => cfgManager.save()).rejects.toThrow();
   });
 });
