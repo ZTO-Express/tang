@@ -1,0 +1,8 @@
+{
+  "api": {
+    "query": "/form_model/query",
+    "edit": "/form_model/save",
+    "add": "/form_model/save",
+    "detail": "/form_model/detail"
+  }
+}

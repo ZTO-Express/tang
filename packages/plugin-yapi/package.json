@@ -1,5 +1,5 @@
 {
-  "name": "@devs-tang/yapi",
+  "name": "tang-plugin-yapi",
   "version": "1.0.9",
   "description": "tang yapi相关操作",
   "main": "lib/",
@@ -28,5 +28,8 @@
   "dependencies": {
     "@devs-tang/common": "^1.0.9",
     "@devs-tang/core": "^1.0.9"
+  },
+  "devDependencies": {
+    "@devs-tang/devkit": "^1.0.9"
   }
 }

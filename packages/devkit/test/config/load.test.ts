@@ -3,8 +3,7 @@ import { TANG_HOME, TANG_CONFIG_FILENAME } from '../../src/consts';
 import { ConfigManager, getDefaultConfig } from '../../src/config';
 
 describe('tang/cli/config.manager load：配置加载', () => {
-  //保存初始cwd
-  const origCwd = process.cwd;
+  const origCwd = process.cwd; //保存初始cwd
 
   const tmpDir = testUtil.resolveTmpDir();
 

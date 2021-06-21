@@ -1,3 +1,4 @@
+import { utils } from '@devs-tang/common';
 import { http } from '@devs-tang/core';
 
 import {
@@ -7,12 +8,12 @@ import {
   ApiProjectItem,
 } from './types';
 
-export const ApiItemTypes: Record<string, string> = {
-  ApiDoc: 'api_doc',
-  ApiProject: 'api_project',
-  ApiCategory: 'api_category',
-  Api: 'api',
-};
+export enum ApiItemTypes {
+  ApiDoc = 'api_doc',
+  ApiProject = 'api_project',
+  ApiCategory = 'api_category',
+  Api = 'api',
+}
 
 export class YApiService {
   protected _config: YApiServiceConfig;
@@ -30,23 +31,24 @@ export class YApiService {
   }
 
   // 获取特定类型链接
-  getLink(type: string | number, options: any = {}): string {
-    let link = this.url;
+  getLink(type?: ApiItemTypes, options: any = {}): string {
+    const baseUrl = this.baseUrl;
+    let link = baseUrl;
 
     switch (type) {
       case ApiItemTypes.ApiDoc:
         if (options._id) {
-          link = `${this.url}/project/${options._id}/interface/api`;
+          link = `${baseUrl}/project/${options._id}/interface/api`;
         }
         break;
       case ApiItemTypes.ApiProject:
-        link = `${this.url}/project/${options._id}/interface/api`;
+        link = `${baseUrl}/project/${options._id}/interface/api`;
         break;
       case ApiItemTypes.ApiCategory:
-        link = `${this.url}/project/${options.projectId}/interface/api/cat_${options._id}`;
+        link = `${baseUrl}/project/${options.projectId}/interface/api/cat_${options._id}`;
         break;
       case ApiItemTypes.Api:
-        link = `${this.url}/project/${options.projectId}/interface/api/${options._id}`;
+        link = `${baseUrl}/project/${options.projectId}/interface/api/${options._id}`;
         break;
     }
 
@@ -72,10 +74,6 @@ export class YApiService {
       },
     });
 
-    if (!apisData || !apisData.list) {
-      return [];
-    }
-
     const apisList = apisData.list.map((item: any) => {
       return this.formatApiItem(item);
     });
@@ -84,29 +82,13 @@ export class YApiService {
   }
 
   /** 获取项目分类信息 */
-  async fetchCateory(
-    id: string | number,
-  ): Promise<ApiCategoryItem | undefined> {
-    const catNodes = await this.fetchCateories();
-    const catNode = catNodes.find(item => {
-      return item._id === id;
-    });
-
-    return catNode;
-  }
-
-  /** 获取项目分类信息 */
-  async fetchCateories(): Promise<ApiCategoryItem[]> {
+  async fetchCategories(): Promise<ApiCategoryItem[]> {
     const catMenu: any = await this.request('api/interface/getCatMenu', {
       params: {
         page: 1,
         limit: 100,
       },
     });
-
-    if (!catMenu || !catMenu.length) {
-      return [];
-    }
 
     const catList = catMenu.map((menu: any) => {
       menu.type = 'category';
@@ -120,6 +102,18 @@ export class YApiService {
     return catList;
   }
 
+  /** 获取项目分类信息 */
+  async fetchCategory(
+    id: string | number,
+  ): Promise<ApiCategoryItem | undefined> {
+    const catNodes = await this.fetchCategories();
+    const catNode = catNodes.find(item => {
+      return item._id === id;
+    });
+
+    return catNode;
+  }
+
   /** 获取分类下api信息 */
   async fetchApiListByCategory(catid: number | string): Promise<ApiItem[]> {
     const apisData: any = await this.request('api/interface/list_cat', {
@@ -128,10 +122,6 @@ export class YApiService {
         limit: 100,
       },
     });
-
-    if (!apisData || !apisData.list) {
-      return [];
-    }
 
     const apisList = apisData.list.map((item: any) => {
       return this.formatApiItem(item);
@@ -241,12 +231,13 @@ export class YApiService {
    * @param url 查询地址
    * @param options 请求选项
    */
-  protected async request(urlPath: string, options?: any) {
-    let requestUrl = `${this.baseUrl}/${urlPath}`;
+  async request(urlPath: string, options?: any) {
+    const baseUrl = utils.strings.trimEnd(this.baseUrl, '/');
+    urlPath = utils.strings.trimStart(urlPath, '/');
 
-    if (urlPath.startsWith('/')) {
-      requestUrl = `${this.baseUrl}${urlPath}`;
-    }
+    let requestUrl = `${baseUrl}/${urlPath}`;
+
+    options = options || {};
 
     const reqParams = Object.assign(
       {
@@ -255,6 +246,7 @@ export class YApiService {
       options.params,
     );
 
+    options.type = options.type || 'json';
     options.method = (options.method || 'get').toUpperCase();
     if (options.data) {
       options.body = JSON.stringify(options.data);

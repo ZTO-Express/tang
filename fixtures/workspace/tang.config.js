@@ -1,4 +1,5 @@
 const processors = require('./codegen/processors');
+const templateRender = require('./codegen/templateRender');
 
 module.exports = {
   rootDir: './',
@@ -6,12 +7,7 @@ module.exports = {
     codegen: {
       baseDir: './codegen',
       templatesDir: './templates',
-      render(template, model) {
-        return {
-          name: template.relativePath,
-          content: '{test: true}',
-        };
-      },
+      render: templateRender,
     },
     yapi: {
       url: 'http://yapi.dev.ztosys.com/',
@@ -19,9 +15,7 @@ module.exports = {
         '6ee016eabd75db091ad615891004f74e9c922bd76bcea4116294324d34b4fc58',
       ],
     },
-    openapi: {},
   },
-  plugins: ['yapi'],
   presets: [
     {
       use: true,
@@ -30,7 +24,7 @@ module.exports = {
       // 执行选项
       processOptions: {
         loader: 'yapi',
-        parser: 'openapi',
+        parser: processors.pageParser(),
         generator: 'codegen',
         output: 'local',
       },

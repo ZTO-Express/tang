@@ -8,6 +8,7 @@ export * from './plugin';
 export * from './processors';
 export * from './runners';
 export * from './io';
+export * from './project';
 
 export const errors = { ..._common.errors };
 export const HookDriver = _common.HookDriver;

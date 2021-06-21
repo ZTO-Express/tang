@@ -3,7 +3,7 @@ import * as actions from './actions';
 
 export function metadata() {
   return {
-    description: '测试插件描述',
+    description: 'Tang openapi插件描述',
     contact: {
       name: 'rayl',
       url: 'https://github.com/ZTO-Express/tang',

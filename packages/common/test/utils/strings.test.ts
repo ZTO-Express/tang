@@ -68,4 +68,33 @@ describe('utils/strings：字符串转换相关处理', () => {
     expect(strings.levenshtein('tang', '')).toBe(4);
     expect(strings.levenshtein('', 'tang')).toBe(4);
   });
+
+  it('trim', () => {
+    expect(strings.trimStart('')).toBe('');
+    expect(strings.trimStart(undefined)).toBe(undefined);
+    expect(strings.trimStart(' kitten')).toBe('kitten');
+    expect(strings.trimStart('  kitten')).toBe('kitten');
+    expect(strings.trimStart('kitten', 'k')).toBe('itten');
+    expect(strings.trimStart('kkitten', 'k')).toBe('itten');
+    expect(strings.trimStart('kitten', 'ki')).toBe('tten');
+    expect(strings.trimStart('kitten', 'x')).toBe('kitten');
+
+    expect(strings.trimEnd('')).toBe('');
+    expect(strings.trimEnd(undefined)).toBe(undefined);
+    expect(strings.trimEnd(' kitten ')).toBe(' kitten');
+    expect(strings.trimEnd('  kitten  ')).toBe('  kitten');
+    expect(strings.trimEnd('kitten', 'n')).toBe('kitte');
+    expect(strings.trimEnd('kittenn', 'n')).toBe('kitte');
+    expect(strings.trimEnd('kitten', 'en')).toBe('kitt');
+    expect(strings.trimEnd('kitten', 'x')).toBe('kitten');
+
+    expect(strings.trim('')).toBe('');
+    expect(strings.trim(undefined)).toBe(undefined);
+    expect(strings.trim(' kitten ')).toBe('kitten');
+    expect(strings.trim('  kitten  ')).toBe('kitten');
+    expect(strings.trim('kittenk', 'k')).toBe('itten');
+    expect(strings.trim('kittenn', 'n')).toBe('kitte');
+    expect(strings.trim('kitten', 'en')).toBe('kitt');
+    expect(strings.trim('kitten', 'x')).toBe('kitten');
+  });
 });

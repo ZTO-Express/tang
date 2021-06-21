@@ -177,3 +177,33 @@ export function levenshtein(a: string, b: string) {
   }
   return matrix[b.length][a.length];
 }
+
+// 去除字符串所有自定word的连续开始
+export function trimStart(str: string, word = ' ') {
+  if (!str) return str;
+
+  const len = word.length;
+  const end = str.length;
+  let start = 0;
+
+  while (start < end && str.indexOf(word, start) === start) start += len;
+  return start > 0 ? str.substring(start, end) : str;
+}
+
+// 去除字符串所有自定word的连续结尾
+export function trimEnd(str: string, word = ' ') {
+  if (!str) return str;
+
+  const len = word.length;
+  const start = 0;
+  let end = str.length;
+
+  while (end > start && str.indexOf(word, end - len) === end - len) end -= len;
+  return end < str.length ? str.substring(start, end) : str;
+}
+
+// 去除字符串所有自定word的连续开始和结尾
+export function trim(str: string, word = ' ') {
+  if (!str) return str;
+  return trimStart(trimEnd(str, word), word);
+}

@@ -21,7 +21,7 @@ export class ProjectWorkspace {
   // 项目工作区配置信息
   private _config: WorkspaceConfig = {};
 
-  constructor(configPath?: string) {
+  private constructor(configPath?: string) {
     this._configPath = configPath;
   }
 
