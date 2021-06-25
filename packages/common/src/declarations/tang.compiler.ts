@@ -76,6 +76,8 @@ export interface TangCompilerContext extends GenericObject {
 }
 
 export interface TangCompiler extends Record<string, any> {
+  readonly isWorkspace: boolean; // 是否工作区编译器
+
   context: TangCompilerContext; // 编译器的执行上下文（可为空）
 
   loaders: TangLoader[]; // 加载器

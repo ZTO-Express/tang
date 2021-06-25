@@ -11,7 +11,7 @@ describe('interfaces/ tang：类型验证', () => {
       'devkit',
       'openapi',
       'plugin',
-      'project',
+      'workspace',
     ]);
 
     expect(TangProcessorTypeKeys).toEqual([

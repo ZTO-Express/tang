@@ -21,6 +21,7 @@ import {
   TangProcessorTypes,
   ParserError,
   utils,
+  TangModuleTypes,
 } from '@devs-tang/common';
 
 import { CompilerOptions, ProcessorGetOptions } from './declarations';
@@ -51,6 +52,11 @@ export class DefaultTangCompiler implements TangCompiler {
     this.context = context;
     this.initialize(options);
     this.hookDriver = new HookDriver<TangCompilation>(options.hooks);
+  }
+
+  // 是否工作区编译器
+  get isWorkspace() {
+    return this.context?.isWorkspace === true;
   }
 
   private initialize(options: CompilerOptions) {
@@ -254,6 +260,7 @@ export class DefaultTangCompiler implements TangCompiler {
     options: TangCompilerLoadOptions = {},
   ): TangLoader | undefined {
     const loader = this.getProcessor<TangLoader>(compilation, {
+      type: TangProcessorTypes.loader,
       processors: this.loaders,
       processMethodName: 'load',
       processOptionsName: 'loadOptions',
@@ -275,6 +282,7 @@ export class DefaultTangCompiler implements TangCompiler {
     options: TangCompilerLoadOptions = {},
   ): TangParser | undefined {
     const parser = this.getProcessor<TangParser>(compilation, {
+      type: TangProcessorTypes.parser,
       processors: this.parsers,
       processMethodName: 'parse',
       processOptionsName: 'parseOptions',
@@ -295,6 +303,7 @@ export class DefaultTangCompiler implements TangCompiler {
     options: TangCompilerGenerateOptions = {},
   ): TangGenerator | undefined {
     const generator = this.getProcessor<TangGenerator>(compilation, {
+      type: TangProcessorTypes.generator,
       processors: this.generators,
       processMethodName: 'generate',
       processOptionsName: 'generateOptions',
@@ -315,6 +324,7 @@ export class DefaultTangCompiler implements TangCompiler {
     options: TangCompilerGenerateOptions = {},
   ): TangOutputer | undefined {
     const outputer = this.getProcessor<TangOutputer>(compilation, {
+      type: TangProcessorTypes.outputer,
       processors: this.outputers,
       processMethodName: 'output',
       processOptionsName: 'outputOptions',
@@ -335,6 +345,11 @@ export class DefaultTangCompiler implements TangCompiler {
     compilation: TangCompilation,
     options: ProcessorGetOptions,
   ): T | undefined {
+    const processorType: any = options.type;
+
+    if (this.context.isWorkspace) {
+    }
+
     const processorOptions: any = options.processorOptions || {};
     const processMethodName = options.processMethodName;
     const processOptionsName = options.processOptionsName;
@@ -375,6 +390,21 @@ export class DefaultTangCompiler implements TangCompiler {
       processorOptions[processOptionsName],
       options[processOptionsName],
     ) as GenericConfigObject;
+
+    // 附加默认type
+    if (!processor.type && processorType) {
+      processor.type = processorType;
+    }
+
+    // 附加默认处理器名称
+    if (!processor.name && this.isWorkspace) {
+      processor.name = 'unknown';
+    }
+
+    // 附加默认moduleType
+    if (!processor.moduleType && this.isWorkspace) {
+      processor.moduleType = TangModuleTypes.workspace;
+    }
 
     const result = utils.deepClone(processor) as T;
     return result;

@@ -149,22 +149,31 @@ export class TangLauncher implements TangCompilerContext {
 
     const compiler = await createDefaultCompiler(opts.preset, this);
 
-    const processors: any = await compiler.inspect(
-      opts.processOptions as TangCompilerInspectOptions,
-    );
+    const processOptions = opts.processOptions as TangCompilerInspectOptions;
+    const processors: any = await compiler.inspect(processOptions);
 
     const inspectData: any = {
       name: opts.name,
       use: opts.use,
-      processOptions: opts.processOptions,
     };
+
+    const inspectProcessOptions: any = {};
 
     TangProcessorTypeKeys.forEach(key => {
       const configData = getPresetProcessorConfigData(processors[key]);
       if (configData) {
         inspectData[key] = configData;
       }
+
+      const processOptionsData = getPresetProcessorConfigData(
+        (processOptions as any)[key],
+      );
+      if (processOptionsData) {
+        inspectProcessOptions[key] = processOptionsData;
+      }
     });
+
+    inspectData.processOptions = inspectProcessOptions;
 
     return inspectData;
   }

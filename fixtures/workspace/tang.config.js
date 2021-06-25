@@ -1,5 +1,9 @@
+const yapiPlugin = require('tang-plugin-yapi');
+
 const processors = require('./codegen/processors');
 const templateRender = require('./codegen/templateRender');
+
+const yapiLoader = yapiPlugin.yapiLoader();
 
 module.exports = {
   rootDir: './',
@@ -10,31 +14,28 @@ module.exports = {
       render: templateRender,
     },
     yapi: {
-      url: 'http://yapi.dev.ztosys.com/',
+      url: 'https://yapi.baidu.com',
       tokens: [
-        '6ee016eabd75db091ad615891004f74e9c922bd76bcea4116294324d34b4fc58',
+        '842ed98e16b54025921fadf015c80270c4184a6607ce46b81d80972657fb494c',
       ],
     },
   },
-  presets: [
-    {
+  presets: {
+    page: {
       use: true,
-      name: 'page',
 
       // 执行选项
       processOptions: {
-        loader: 'yapi',
+        loader: yapiLoader,
         parser: processors.pageParser(),
         generator: 'codegen',
         output: 'local',
       },
     },
-    {
-      name: 'api',
-
+    api: {
       // 执行选项
       processOptions: {
-        loader: 'yapi',
+        loader: yapiLoader,
         generator: processors.yapiTsGenerator(),
       },
 
@@ -44,12 +45,10 @@ module.exports = {
         skipOutput: true, // 跳过输出
       },
     },
-    {
-      name: 'json',
-
+    json: {
       // 执行选项
       processOptions: {
-        loader: 'yapi',
+        loader: yapiLoader,
         parser: 'json',
         generator: 'json',
         generateOptions: {
@@ -61,5 +60,5 @@ module.exports = {
         },
       },
     },
-  ],
+  },
 };

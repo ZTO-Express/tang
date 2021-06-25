@@ -1,3 +1,5 @@
+import * as processors from './processors';
+
 export * from './processors';
 export * from './service';
 
@@ -8,6 +10,9 @@ export function metadata() {
       name: 'rayl',
       url: 'https://github.com/ZTO-Express/tang',
       email: 'rayl@pisaas.com',
+    },
+    preset: {
+      loaders: [processors.yapiLoader()],
     },
   };
 }

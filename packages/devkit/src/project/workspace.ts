@@ -1,4 +1,5 @@
-import { GenericConfigObject } from '@devs-tang/common';
+import { GenericConfigObject, TangPreset } from '@devs-tang/common';
+import { normalizePresetOptions } from '@devs-tang/core';
 import * as path from 'path';
 
 import { fs, utils, vm } from '../utils';
@@ -6,6 +7,7 @@ import { fs, utils, vm } from '../utils';
 import {
   CODE_GEN_DEFAULT_DIR,
   CODE_GEN_DEFAULT_TEMPLATES_DIR,
+  TANG_CONFIG_KEY_PRESETS,
   TANG_WORKSPACE_CONFIG_FILENAME,
 } from '../consts';
 
@@ -168,5 +170,21 @@ export class ProjectWorkspace {
     });
 
     return templates;
+  }
+
+  // 获取工作区预设
+  async getPreset(name: string): Promise<TangPreset> {
+    const rawPresets = this.get(TANG_CONFIG_KEY_PRESETS);
+    const rawPreset = rawPresets[name];
+
+    // 默认预设
+    if (!rawPreset) return undefined;
+
+    const preset = normalizePresetOptions({
+      name,
+      ...rawPreset,
+    }) as TangPreset;
+
+    return preset;
   }
 }

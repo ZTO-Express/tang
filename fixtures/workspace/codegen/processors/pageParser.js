@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 
 /**
@@ -6,14 +6,16 @@ const path = require('path');
  */
 module.exports.pageParser = () => {
   return {
+    name: 'page',
+
     async parse(document, options, compilation, context) {
       const ws = context.workspace;
-      const projectDir = context.workspaceRootDir;
+      const projectDir = ws.rootDir;
 
       const content = document.content;
       const entry = document.entry;
 
-      const pageConfig = readPageConfig(entry);
+      const pageConfig = await readPageConfig(entry);
       pageConfig.api = pageConfig.api || {};
 
       const model = parsePageModel({
@@ -44,10 +46,10 @@ async function readPageConfig(dir) {
 
   let configDir = dir;
 
-  if (utils.isAbsolutePath(dir)) {
+  if (path.isAbsolute(dir)) {
     configDir = dir;
   } else {
-    configDir = fs.joinPath(cwd, dir);
+    configDir = path.join(cwd, dir);
   }
 
   const existsDir = await fs.pathExists(configDir);
@@ -57,13 +59,13 @@ async function readPageConfig(dir) {
 
   let configPath = configDir;
   if (stat.isDirectory()) {
-    configPath = fs.joinPath(configDir, 'page.json');
+    configPath = path.join(configDir, 'page.json');
   }
 
   const existsPath = await fs.pathExists(configPath);
   if (!existsPath) return undefined;
 
-  const configData = await fs.resolveFile(configPath, 'json');
+  const configData = await fs.readJSON(configPath);
 
   const pageDir = path.dirname(configPath);
   const pageName = path.basename(pageDir);

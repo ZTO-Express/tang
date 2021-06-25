@@ -16,7 +16,7 @@
   },
   "scripts": {
     "prepublish": "npm run build",
-    "build": "node ../../scripts/build --name=yapi",
+    "build": "node ../../scripts/build --name=plugin-yapi",
     "test": "jest --coverage --runInBand"
   },
   "engines": {

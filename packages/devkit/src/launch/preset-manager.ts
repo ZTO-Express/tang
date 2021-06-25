@@ -9,6 +9,7 @@ import {
   TangCompilerProcessOptions,
   TangCompilerCompileOptions,
 } from '@devs-tang/common';
+
 import { TANG_PRESET_DEFAULT, TANG_CONFIG_KEY_PRESETS } from '../consts';
 import { utils } from '../utils';
 
@@ -43,6 +44,11 @@ export interface PresetWithConfigData extends PresetConfigDataWithName {
 /** 加载器预设 */
 export class PresetManager {
   constructor(private readonly launcher: TangLauncher) {}
+
+  // 是否工作区预设
+  get isWorkspace() {
+    return this.launcher.isWorkspace;
+  }
 
   /**
    * 加载或获取指定的预设
@@ -130,12 +136,23 @@ export class PresetManager {
     }
 
     const nameInfo = this.parsePresetName(config.name);
-    if (!nameInfo || !nameInfo.pluginName) return undefined;
+    if (
+      !nameInfo ||
+      (nameInfo.moduleType !== TangModuleTypes.workspace &&
+        !nameInfo.pluginName)
+    ) {
+      return undefined;
+    }
 
-    const rawPreset = await this.launcher.pluginManager.getPreset(
-      nameInfo.pluginName,
-      nameInfo.name,
-    );
+    let rawPreset: TangPreset;
+    if (nameInfo.moduleType === TangModuleTypes.workspace) {
+      rawPreset = await this.launcher.workspace.getPreset(nameInfo.name);
+    } else {
+      rawPreset = await this.launcher.pluginManager.getPreset(
+        nameInfo.pluginName,
+        nameInfo.name,
+      );
+    }
 
     const presetWithConfig = this.normalizePresetWithConfig(rawPreset, config);
 
@@ -229,18 +246,20 @@ export class PresetManager {
     const fullName = nameInfo.fullName;
 
     const allConfigs = this.getAllConfigs();
-    let options = allConfigs[fullName];
+
+    // 工作区配置直接取名字，其他情况取全名
+    const options = this.isWorkspace
+      ? allConfigs[nameInfo.name]
+      : allConfigs[fullName];
 
     if (!options) return { name: fullName };
 
-    const use = options.use;
-    options = utils.omit(options, 'use');
-
     return {
+      ...options,
       name: fullName,
-      use,
       moduleType: nameInfo.moduleType,
-      processOptions: options as TangCompilerProcessOptions,
+      use: options.use,
+      processOptions: options.processOptions as TangCompilerProcessOptions,
     };
   }
 
@@ -341,6 +360,11 @@ export class PresetManager {
       };
     }
 
+    // 默认模型类型
+    const defaultModuleType = this.isWorkspace
+      ? TangModuleTypes.workspace
+      : TangModuleTypes.plugin;
+
     let nameInfo: any = undefined;
 
     const parts = presetName.split(':');
@@ -373,15 +397,24 @@ export class PresetManager {
         };
       }
     } else if (parts.length === 1) {
-      const name = TANG_PRESET_DEFAULT;
-      const pluginName = parts[0];
+      if (this.isWorkspace) {
+        const name = parts[0];
+        nameInfo = {
+          moduleType: defaultModuleType,
+          name,
+          fullName: `${defaultModuleType}:${name}`,
+        };
+      } else {
+        const name = TANG_PRESET_DEFAULT;
+        const pluginName = parts[0];
 
-      nameInfo = {
-        moduleType: TangModuleTypes.plugin,
-        pluginName,
-        name,
-        fullName: `${TangModuleTypes.plugin}:${pluginName}:${name}`,
-      };
+        nameInfo = {
+          moduleType: defaultModuleType,
+          pluginName,
+          name,
+          fullName: `${defaultModuleType}:${pluginName}:${name}`,
+        };
+      }
     }
 
     if (!nameInfo || !nameInfo.name)
