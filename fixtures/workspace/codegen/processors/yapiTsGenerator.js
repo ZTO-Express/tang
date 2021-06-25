@@ -1,7 +1,7 @@
 /**
  * yapi typescript调用接口生成器
  */
-module.exports.yapiTsGenerator = (config = {}) => {
+module.exports.yapiTsGenerator = () => {
   return {
     name: 'yapi-ts',
 

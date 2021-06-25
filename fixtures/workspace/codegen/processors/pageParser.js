@@ -4,7 +4,7 @@ const path = require('path');
 /**
  * Json解析器
  */
-module.exports = () => {
+module.exports.pageParser = () => {
   return {
     async parse(document, options, compilation, context) {
       const ws = context.workspace;

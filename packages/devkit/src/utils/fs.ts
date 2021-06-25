@@ -24,6 +24,8 @@ export function relativePath(from: string, to: string) {
 
 /** 获取绝对路径 */
 export function absolutePath(pathStr: string, rootPath: string) {
+  if (!pathStr) return path.resolve(rootPath);
+
   if (!path.isAbsolute(pathStr)) {
     pathStr = path.resolve(rootPath, pathStr);
   }

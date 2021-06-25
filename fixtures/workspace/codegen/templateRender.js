@@ -1,5 +1,6 @@
 const ejs = require('ejs');
 const prettier = require('prettier');
+const path = require('path');
 
 module.exports = (tmpl, model) => {
   const text = ejs.render(tmpl.content, model);
@@ -8,7 +9,7 @@ module.exports = (tmpl, model) => {
 
   let content = text;
 
-  let _format = {
+  const format = {
     printWidth: 120,
     tabWidth: 2,
     parser: 'vue',
@@ -20,11 +21,11 @@ module.exports = (tmpl, model) => {
 
   switch (extName) {
     case '.ts':
-      _format = Object.assign({}, format, { parser: 'typescript' });
+      format.parser = 'typescript';
       break;
   }
 
-  content = prettier.format(text, _format);
+  content = prettier.format(text, format);
 
   return {
     name: tmpl.relativePath,

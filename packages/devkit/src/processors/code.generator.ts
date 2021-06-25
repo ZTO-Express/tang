@@ -9,7 +9,10 @@ import {
 } from '@devs-tang/common';
 
 import * as path from 'path';
-import { utils } from '../utils';
+
+import { ProjectWorkspace } from '../../src';
+
+import { fs, utils } from '../utils';
 import {
   CODE_GEN_DEFAULT_DIR,
   CODE_GEN_DEFAULT_TEMPLATES_DIR,
@@ -52,49 +55,22 @@ export const codeGenerator = (): TangGenerator => {
       const launcher = context as TangLauncher;
       const workspace = launcher?.workspace;
 
-      const codegenOptions = workspace?.codegenConfig;
-      const rootDir = launcher?.workspace.rootDir || process.cwd();
-
-      const codegenConfig = utils.deepMerge(
-        {},
-        codegenOptions,
+      const normalizedOptions: any = normalizeCodegenOptions(
+        workspace,
         options,
-      ) as GenericConfigObject;
-
-      // 获取代码生成目录
-      let codegenDir = utils.get(
-        codegenConfig,
-        'baseDir',
-        CODE_GEN_DEFAULT_DIR,
       );
 
-      if (!path.isAbsolute(codegenDir)) {
-        codegenDir = path.join(rootDir, codegenDir);
+      const codegenRender = normalizedOptions.render as CodegenRender;
+
+      const templates = await getCodegenTemplates(normalizedOptions, workspace);
+      if (!templates?.length) {
+        throw new Error('未找到任何代码模版。');
       }
-
-      // 获取代码生成模版目录
-      let templatesDir = utils.get(
-        codegenConfig,
-        'templatesDir',
-        CODE_GEN_DEFAULT_TEMPLATES_DIR,
-      );
-
-      if (!path.isAbsolute(templatesDir)) {
-        templatesDir = path.join(codegenDir, templatesDir);
-      }
-
-      // 获取模版信息
-      const templates = workspace.retrieveCodegenTemplates(templatesDir);
 
       const chunks: TangChunk[] = [];
 
-      const codegenRender = codegenConfig.render as CodegenRender;
-      if (!codegenRender) {
-        throw new Error('未找到代码渲染器。');
-      }
-
       for (const tmpl of templates) {
-        if (!tmpl || !tmpl.fullPath || !tmpl.content) continue;
+        if (!tmpl) continue;
 
         const chunk = await Promise.resolve().then(() => {
           return codegenRender(
@@ -107,7 +83,9 @@ export const codeGenerator = (): TangGenerator => {
           );
         });
 
-        chunks.push(chunk);
+        if (chunk) {
+          chunks.push(chunk);
+        }
       }
 
       document.chunks = chunks;
@@ -116,3 +94,72 @@ export const codeGenerator = (): TangGenerator => {
     },
   });
 };
+
+// 规范化代码生成配置
+export function normalizeCodegenOptions(
+  workspace?: ProjectWorkspace,
+  options?: GenericConfigObject,
+) {
+  const codegenOptions = workspace?.codegenConfig;
+  const rootDir = fs.absolutePath(workspace?.rootDir, process.cwd());
+
+  const codegenConfig = utils.deepMerge(
+    {},
+    codegenOptions,
+    options,
+  ) as GenericConfigObject;
+
+  // 获取代码生成目录
+  let codegenDir = utils.get(codegenConfig, 'baseDir', CODE_GEN_DEFAULT_DIR);
+  codegenDir = fs.absolutePath(codegenDir, rootDir);
+
+  // 获取代码生成模版目录
+  let templatesDir = utils.get(
+    codegenConfig,
+    'templatesDir',
+    CODE_GEN_DEFAULT_TEMPLATES_DIR,
+  );
+  templatesDir = fs.absolutePath(templatesDir, codegenDir);
+
+  let render = codegenConfig.render;
+  if (!render) {
+    // 默认代码渲染函数
+    render = (tmpl: CodegenTemplate) => {
+      return {
+        name: tmpl.relativePath,
+        content: tmpl.content,
+      };
+    };
+  }
+
+  return {
+    ...codegenConfig,
+    rootDir,
+    codegenDir,
+    templatesDir,
+    render,
+  };
+}
+
+// 获取代码生成模版
+export async function getCodegenTemplates(
+  normalizedOptions: GenericConfigObject,
+  workspace?: ProjectWorkspace,
+) {
+  // 获取模版信息
+  let templates = normalizedOptions.templates;
+
+  if (templates) return templates;
+
+  if (normalizedOptions.getTemplates) {
+    templates = await Promise.resolve().then(() => {
+      return normalizedOptions.getTemplates();
+    });
+  } else if (workspace?.retrieveCodegenTemplates) {
+    templates = await Promise.resolve().then(() =>
+      workspace.retrieveCodegenTemplates(normalizedOptions.templatesDir),
+    );
+  }
+
+  return templates;
+}
