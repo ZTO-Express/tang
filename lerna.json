@@ -1,9 +1,14 @@
 {
-  "packages": ["packages/*", "fixtures/workspace"],
+  "packages": [
+    "packages/*",
+    "fixtures/workspace"
+  ],
   "command": {
     "bootstrap": {
-      "npmClientArgs": ["--no-package-lock"]
+      "npmClientArgs": [
+        "--no-package-lock"
+      ]
     }
   },
-  "version": "1.0.9"
+  "version": "1.0.10"
 }
