@@ -14,6 +14,7 @@ export class GenerateAction extends CliAction {
       generateOptions,
       outputOptions,
       outputDir,
+      overwrite,
     } = opts;
 
     if (loadOptions && utils.isString(loadOptions))
@@ -31,6 +32,8 @@ export class GenerateAction extends CliAction {
     if (outputDir && utils.isString(outputDir)) {
       utils.set(opts, 'outputOptions.outputDir', outputDir);
     }
+
+    utils.set(opts, 'outputOptions.overwrite', overwrite === true);
 
     if (opts.inspect) {
       const inspectData = await launcher.inspect(opts.preset, {
