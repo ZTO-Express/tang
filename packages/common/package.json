@@ -1,6 +1,6 @@
 {
   "name": "@devs-tang/common",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Tang通用库",
   "main": "lib/",
   "types": "lib/",

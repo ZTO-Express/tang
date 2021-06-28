@@ -1,6 +1,6 @@
 {
   "name": "@devs-tang/cli",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Tang命令行",
   "files": [
     "CHANGELOG.md",
@@ -26,7 +26,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@devs-tang/devkit": "^1.0.10",
+    "@devs-tang/devkit": "^1.0.11",
     "chalk": "^4.1.0",
     "cli-table3": "^0.6.0",
     "commander": "^7.1.0",

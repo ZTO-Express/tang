@@ -1,7 +1,7 @@
 {
   "name": "tang-fixtures-workspace",
   "private": true,
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "",
   "main": "tang.config.js",
   "scripts": {},
@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "tang-plugin-yapi": "^1.0.10"
+    "tang-plugin-yapi": "^1.0.11"
   },
   "devDependencies": {
     "execa": "^5.1.1"
