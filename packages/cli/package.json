@@ -1,6 +1,6 @@
 {
   "name": "@devs-tang/cli",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Tang命令行",
   "files": [
     "CHANGELOG.md",
