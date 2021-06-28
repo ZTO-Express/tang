@@ -157,7 +157,9 @@ export class TangLauncher implements TangCompilerContext {
       use: opts.use,
     };
 
-    const inspectProcessOptions: any = {};
+    const inspectProcessOptions: any = {
+      ...processOptions,
+    };
 
     TangProcessorTypeKeys.forEach(key => {
       const configData = getPresetProcessorConfigData(processors[key]);
@@ -168,6 +170,7 @@ export class TangLauncher implements TangCompilerContext {
       const processOptionsData = getPresetProcessorConfigData(
         (processOptions as any)[key],
       );
+
       if (processOptionsData) {
         inspectProcessOptions[key] = processOptionsData;
       }

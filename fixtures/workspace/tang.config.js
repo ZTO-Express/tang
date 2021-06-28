@@ -2,8 +2,10 @@ const yapiPlugin = require('tang-plugin-yapi');
 
 const processors = require('./codegen/processors');
 const templateRender = require('./codegen/templateRender');
+const yapiTsGeneratorConfig = require('./codegen/tsGeneratorConfig');
 
 const yapiLoader = yapiPlugin.yapiLoader();
+const yapiTsGenerator = yapiPlugin.tsGenerator(yapiTsGeneratorConfig);
 
 module.exports = {
   rootDir: './',
@@ -31,19 +33,78 @@ module.exports = {
         generator: 'codegen',
         output: 'local',
       },
+      hooks: [
+        {
+          trigger: 'load',
+          apply(compilation) {
+            console.log('正在加载文档');
+          },
+        },
+        {
+          trigger: 'parse',
+          apply(compilation) {
+            console.log('正在解析文档');
+          },
+        },
+        {
+          trigger: 'loaded',
+          apply(compilation) {
+            console.log('文档加载完成');
+          },
+        },
+        {
+          trigger: 'generate',
+          apply(compilation) {
+            console.log('正在生成文档');
+          },
+        },
+        {
+          trigger: 'output',
+          apply(compilation) {
+            console.log('正在输出文档');
+          },
+        },
+        {
+          trigger: 'generated',
+          apply(compilation) {
+            console.log('文档已生成');
+          },
+        },
+      ],
     },
     api: {
       // 执行选项
       processOptions: {
         loader: yapiLoader,
-        generator: processors.yapiTsGenerator(),
+        generator: yapiTsGenerator,
+        output: 'local',
       },
 
       // 编译选项
       compileOptions: {
         skipParse: true,
-        skipOutput: true, // 跳过输出
       },
+
+      hooks: [
+        {
+          trigger: 'load',
+          apply(compilation) {
+            console.log('正在加载文档');
+          },
+        },
+        {
+          trigger: 'loaded',
+          apply(compilation) {
+            console.log('文档加载完成');
+          },
+        },
+        {
+          trigger: 'generate',
+          apply(compilation) {
+            console.log('正在生成文档');
+          },
+        },
+      ],
     },
     json: {
       // 执行选项

@@ -139,7 +139,7 @@ export class DefaultTangCompiler implements TangCompiler {
 
       if (loadDocument) {
         // 如果加载的内容为对象，则直接赋给model
-        if (utils.isObject(loadDocument.content)) {
+        if (!loadDocument.model && utils.isObject(loadDocument.content)) {
           loadDocument.model = loadDocument.content;
         }
 
@@ -215,6 +215,8 @@ export class DefaultTangCompiler implements TangCompiler {
       const outputer = this.getOutputer(compilation, options);
       if (!outputer) throw new OutputerError('未找到输出器');
 
+      compilation.outputer = outputer;
+
       // 调用输出钩子
       await this.hookDriver.hookSeq('output', compilation);
 
@@ -263,7 +265,6 @@ export class DefaultTangCompiler implements TangCompiler {
       type: TangProcessorTypes.loader,
       processors: this.loaders,
       processMethodName: 'load',
-      processOptionsName: 'loadOptions',
       defaultProcessor: this.defaultLoader,
       processorOptions: options.loader,
       testOptions: options,
@@ -285,7 +286,6 @@ export class DefaultTangCompiler implements TangCompiler {
       type: TangProcessorTypes.parser,
       processors: this.parsers,
       processMethodName: 'parse',
-      processOptionsName: 'parseOptions',
       defaultProcessor: this.defaultParser,
       processorOptions: options.parser,
       parseOptions: options.parseOptions,
@@ -306,7 +306,6 @@ export class DefaultTangCompiler implements TangCompiler {
       type: TangProcessorTypes.generator,
       processors: this.generators,
       processMethodName: 'generate',
-      processOptionsName: 'generateOptions',
       defaultProcessor: this.defaultGenerator,
       processorOptions: options.generator,
       generateOptions: options.generateOptions,
@@ -327,7 +326,6 @@ export class DefaultTangCompiler implements TangCompiler {
       type: TangProcessorTypes.outputer,
       processors: this.outputers,
       processMethodName: 'output',
-      processOptionsName: 'outputOptions',
       defaultProcessor: this.defaultOutputer,
       processorOptions: options.outputer,
       outputOptions: options.outputOptions,
@@ -347,12 +345,10 @@ export class DefaultTangCompiler implements TangCompiler {
   ): T | undefined {
     const processorType: any = options.type;
 
-    if (this.context.isWorkspace) {
-    }
-
     const processorOptions: any = options.processorOptions || {};
     const processMethodName = options.processMethodName;
-    const processOptionsName = options.processOptionsName;
+    const processOptionsName = `${processMethodName}Options`;
+    const compilationProcessOptionsName = `${processMethodName}ProcessOptions`;
     const defaultProcessor = (options.defaultProcessor as any) as T;
     const testOptions = options.testOptions;
     const processors = (options.processors as any) as T[];
@@ -388,6 +384,7 @@ export class DefaultTangCompiler implements TangCompiler {
     processor[processOptionsName] = utils.deepMerge(
       processor[processOptionsName],
       processorOptions[processOptionsName],
+      compilation[compilationProcessOptionsName],
       options[processOptionsName],
     ) as GenericConfigObject;
 

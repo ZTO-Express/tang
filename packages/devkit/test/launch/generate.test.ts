@@ -27,7 +27,10 @@ describe('tang/launch/generate：代码生成', () => {
     });
 
     await expect(
-      launcher.generate(tfDocPath, { outputer: 'NonExists' }),
+      launcher.generate(tfDocPath, {
+        generator: 'yaml',
+        outputer: 'NonExists',
+      }),
     ).rejects.toMatchObject({
       message: '未找到输出器',
       code: ErrorCodes.OUTPUTER_ERROR,

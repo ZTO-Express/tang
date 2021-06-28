@@ -17,7 +17,6 @@ export interface ProcessorGetOptions {
   processors: TangProcessor[]; // 待选择处理器
   processor?: string | TangProcessor;
   processMethodName: string;
-  processOptionsName: string;
   defaultProcessor?: TangProcessor;
   testOptions?: any;
   [prop: string]: any;

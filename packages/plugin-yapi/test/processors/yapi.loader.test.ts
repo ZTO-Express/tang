@@ -64,5 +64,6 @@ describe('YApi Loader', () => {
     );
 
     expect(Array.isArray(document.content)).toBe(true);
+    expect(Array.isArray(document.model)).toBe(true);
   });
 });

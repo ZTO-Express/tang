@@ -13,6 +13,7 @@ export function metadata() {
     },
     preset: {
       loaders: [processors.yapiLoader()],
+      generators: [processors.tsGenerator()],
     },
   };
 }

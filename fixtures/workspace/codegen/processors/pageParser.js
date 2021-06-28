@@ -12,10 +12,15 @@ module.exports.pageParser = () => {
       const ws = context.workspace;
       const projectDir = ws.rootDir;
 
-      const content = document.content;
+      const content = document.content.flat();
       const entry = document.entry;
 
       const pageConfig = await readPageConfig(entry);
+
+      if (!pageConfig) {
+        throw new Error('为找到页面配置信息。');
+      }
+
       pageConfig.api = pageConfig.api || {};
 
       const model = parsePageModel({
@@ -24,7 +29,11 @@ module.exports.pageParser = () => {
       });
 
       const pageRelativeDir =
-        pageConfig.pageDir && fs.relativePath(projectDir, pageConfig.pageDir);
+        pageConfig.pageDir && path.relative(projectDir, pageConfig.pageDir);
+
+      compilation.outputProcessOptions = {
+        pageDir: pageConfig.pageDir,
+      };
 
       document.model = {
         projectDir,

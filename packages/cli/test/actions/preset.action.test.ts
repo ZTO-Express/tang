@@ -10,7 +10,6 @@ describe('tang-cli/actions：preset', () => {
 
   it('preset use / list', async () => {
     const result = await presetAction.use('cowsay', {});
-
     const listResult = await presetAction.list('');
   });
 

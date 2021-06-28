@@ -1,10 +1,6 @@
 import * as testUtil from '../util';
 import { TangLauncher, utils, getTangLauncher } from '../../src';
-import {
-  TANG_CONFIG_KEY_PRESETS,
-  TANG_PRESET_DEFAULT,
-  TANG_HOME,
-} from '../../src/consts';
+import { TANG_CONFIG_KEY_PRESETS, TANG_PRESET_DEFAULT } from '../../src/consts';
 
 describe('tang/launcher：启动器', () => {
   //保存初始cwd
@@ -63,10 +59,10 @@ describe('tang/launcher：启动器', () => {
   it('插件卸载特殊情况处理', async () => {
     launcher.presetManager.setConfig('cowsay', 'use', true);
     await launcher.presetManager.saveConfig();
-    expect(launcher.presetManager.getConfig('cowsay')).not.toBeUndefined();
+    expect(launcher.presetManager.getConfig('cowsay', 'use')).toBe(true);
 
     await launcher.delete('cowsay');
-    expect(launcher.presetManager.getConfig('cowsay')).toBeUndefined();
+    expect(launcher.presetManager.getConfig('cowsay', 'use')).toBeUndefined();
 
     // 非workspace
     expect(launcher.isWorkspace).toBe(false);

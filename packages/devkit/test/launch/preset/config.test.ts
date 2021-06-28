@@ -28,15 +28,15 @@ describe('tang/launch/presetManager：预设配置管理', () => {
 
     expect(presetManager.setConfig('', 'loader', 'yaml')).toBeUndefined();
 
-    expect(presetManager.getConfig('test')).toEqual({
-      loader: 'yaml',
-    });
+    expect(presetManager.getConfig('test', 'loader')).toBe('yaml');
 
     expect(presetManager.unsetConfig('', 'loader')).toBeUndefined();
 
     expect(presetManager.getConfig('test', 'loader')).toBe('yaml');
 
-    expect(presetManager.getConfig('testxxx')).toBe(undefined);
+    expect(presetManager.getConfig('testxxx')).toEqual({
+      name: 'plugin:testxxx:~',
+    });
   });
 
   it('设置正在使用的配置', async () => {
@@ -45,7 +45,7 @@ describe('tang/launch/presetManager：预设配置管理', () => {
     expect(presetManager.getUsedConfig()).toEqual({
       moduleType: 'plugin',
       name: 'plugin:cowsayx:~',
-      processOptions: {},
+      processOptions: undefined,
       use: true,
     });
 
@@ -53,7 +53,7 @@ describe('tang/launch/presetManager：预设配置管理', () => {
     expect(presetManager.getUsedConfig()).toEqual({
       moduleType: 'plugin',
       name: 'plugin:cowsayx:~',
-      processOptions: {},
+      processOptions: undefined,
       use: true,
     });
 

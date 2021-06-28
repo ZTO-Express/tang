@@ -1,4 +1,6 @@
-const processors = require('./codegen/processors');
+const yapiPlugin = require('tang-plugin-yapi');
+
+const yapiTsGenerator = yapiPlugin.tsGenerator();
 
 module.exports = {
   options: {
@@ -40,7 +42,7 @@ module.exports = {
       // 执行选项
       processOptions: {
         loader: 'yapi',
-        generator: processors.yapiTsGenerator(),
+        generator: yapiTsGenerator,
       },
 
       // 编译选项

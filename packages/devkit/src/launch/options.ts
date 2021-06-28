@@ -22,7 +22,7 @@ export function getNormalizedOptions(
     {
       loaders: [processors.docLoader()],
       parsers: [processors.json5Parser(), processors.yamlParser()],
-      generators: [processors.codeGenerator(), processors.yamlGenerator()],
+      generators: [processors.yamlGenerator(), processors.codeGenerator()],
       outputers: [processors.localOutputer(), processors.memoryOutputer()],
     },
     { moduleType: TangModuleTypes.devkit },

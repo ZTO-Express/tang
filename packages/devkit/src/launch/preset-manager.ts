@@ -94,7 +94,7 @@ export class PresetManager {
 
     // 设置目标配置
     if (options !== undefined)
-      this.setConfig(normalizedName, undefined, options);
+      this.setConfig(normalizedName, 'processOptions', options);
 
     // 设置当前正在使用的配置
     this.setUsedConfig(normalizedName);
@@ -271,11 +271,11 @@ export class PresetManager {
    */
   getConfig(presetName: string, pathName?: string) {
     const config = this.getConfigByName(presetName);
-    if (!config || !config.processOptions) return undefined;
+    if (!config) return undefined;
 
-    if (!pathName) return config.processOptions;
+    if (!pathName) return config;
 
-    const pathConfig = utils.get(config.processOptions, pathName);
+    const pathConfig = utils.get(config, pathName);
     return pathConfig;
   }
 

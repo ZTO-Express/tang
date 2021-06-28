@@ -26,10 +26,7 @@ export const yapiLoader = (): TangPluginLoader => {
 
       options = options || {};
 
-      const loadOptions: any =
-        (compilation && compilation.loadProcessOptions) || {};
-
-      let url = options.url || loadOptions.url;
+      let url = options.url;
 
       if (!url) {
         url = ws?.getOption('yapi.url');
@@ -41,7 +38,7 @@ export const yapiLoader = (): TangPluginLoader => {
         );
       }
 
-      let tokens = options.tokens || loadOptions.tokens;
+      let tokens = options.tokens;
       if (!tokens) {
         tokens = ws?.getOption('yapi.tokens');
       }
@@ -63,6 +60,7 @@ export const yapiLoader = (): TangPluginLoader => {
 
       const exportDatas = await Promise.all(fetchOps);
       document.content = exportDatas;
+      document.model = exportDatas.reduce((acc, val) => acc.concat(val), []); // 展开数组
 
       return document;
     },
