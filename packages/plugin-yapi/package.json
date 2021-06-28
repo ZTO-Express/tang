@@ -1,6 +1,6 @@
 {
   "name": "tang-plugin-yapi",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "tang yapi相关操作",
   "main": "lib/",
   "types": "lib/",
@@ -26,11 +26,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@devs-tang/common": "^1.0.9",
-    "@devs-tang/core": "^1.0.9",
+    "@devs-tang/common": "^1.0.10",
+    "@devs-tang/core": "^1.0.10",
     "json-schema-to-typescript": "^10.1.4"
   },
   "devDependencies": {
-    "@devs-tang/devkit": "^1.0.9"
+    "@devs-tang/devkit": "^1.0.10"
   }
 }
