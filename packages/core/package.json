@@ -1,10 +1,10 @@
 {
   "name": "@zpage/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "@zpage/core",
   "main": "index.js",
   "module": "dist/zpage-core.esm.js",
-  "types": "src/types/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
     "index.js",
     "dist",

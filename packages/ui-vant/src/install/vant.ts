@@ -1,5 +1,6 @@
 import { warn } from '@zpage/zpage'
-import { Toast, Dialog, Loading, Button, Icon, Col, Row, Cell, CellGroup, List, Empty } from 'vant'
+
+import * as componentsMap from './vant_components'
 
 import type { AppOptions, Runtime } from '@zpage/zpage'
 import type { App } from 'vue'
@@ -12,20 +13,7 @@ export default (instance: Runtime, options?: AppOptions): void => {
     return
   }
 
-  app.use(Toast)
-
-  const componentsMap: any = {
-    Loading,
-    Dialog,
-    Button,
-    Icon,
-    Col,
-    Row,
-    Cell,
-    CellGroup,
-    List,
-    Empty
-  }
+  app.use(componentsMap.Toast)
 
   Object.keys(componentsMap).forEach(key => {
     install(app, componentsMap[key], key)

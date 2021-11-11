@@ -1,6 +1,6 @@
 {
   "name": "@zpage/ui-vant",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "@zpage/ui-vant",
   "main": "index.js",
   "module": "dist/zpage-ui-vant.esm.js",
