@@ -8,6 +8,7 @@
     "lint": "eslint --fix \"./src/**/*.{ts,tsx,js,vue}\""
   },
   "dependencies": {
+    "@zpage/ui-vant": "workspace:*",
     "vant": "^3.2.4"
   },
   "devDependencies": {

@@ -5,8 +5,6 @@ import styleImport from 'vite-plugin-style-import'
 
 const vuePlugin = createVuePlugin({ include: [/\.vue$/] })
 
-const projRoot = resolve(__dirname, '..', '..')
-
 export default defineConfig(async () => {
   return {
     root: __dirname,
@@ -52,7 +50,7 @@ export default defineConfig(async () => {
         scss: {
           additionalData: `
             @use "sass:math";
-            @import "${projRoot}/node_modules/@zpage/ui-element/src/styles/theme.scss";
+            @import "${__dirname}/src/styles/theme.scss";
           `
         }
       }
