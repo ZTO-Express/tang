@@ -1,7 +1,7 @@
-import { warn } from '@zto/zpage'
+import { warn } from '@zpage/zpage'
 import { Toast, Dialog, Loading, Button, Icon, Col, Row, Cell, CellGroup, List, Empty } from 'vant'
 
-import type { AppOptions, Runtime } from '@zto/zpage'
+import type { AppOptions, Runtime } from '@zpage/zpage'
 import type { App } from 'vue'
 
 export default (instance: Runtime, options?: AppOptions): void => {

@@ -1,7 +1,7 @@
 import installVant from './vant'
 import installComponents from './components'
 import installWidgets from './widgets'
-import type { Runtime, AppOptions } from '@zto/zpage'
+import type { Runtime, AppOptions } from '@zpage/zpage'
 
 /** 安装插件 */
 export async function install(instance: Runtime, options?: AppOptions) {

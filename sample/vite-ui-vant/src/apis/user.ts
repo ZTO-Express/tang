@@ -1,6 +1,6 @@
 /** 资源管理相关Api */
 
-import { UserApi, HttpRequest, clearTokenData } from '@zto/zpage'
+import { UserApi, HttpRequest, clearTokenData } from '@zpage/zpage'
 import { ENV } from '../config/env'
 import { httpConfig } from '../config/http'
 

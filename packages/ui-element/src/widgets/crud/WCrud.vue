@@ -125,7 +125,7 @@ import {
   useWidgetSchema,
   useApiRequest,
   useAppContext
-} from '@zto/zpage'
+} from '@zpage/zpage'
 
 import { useMessage } from '../../composables'
 import { DEFAULT_ACTIONS } from './consts'

@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute, useRouter } from '@zto/zpage'
+import { useRoute, useRouter } from '@zpage/zpage'
 
 const router = useRouter()
 

@@ -1,7 +1,7 @@
-import { warn } from '@zto/zpage'
+import { warn } from '@zpage/zpage'
 import * as componentsMap from '../components'
 
-import type { AppOptions, Runtime } from '@zto/zpage'
+import type { AppOptions, Runtime } from '@zpage/zpage'
 
 export default (instance: Runtime, options?: AppOptions): void => {
   const { app } = instance

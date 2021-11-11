@@ -1,6 +1,6 @@
 import { defineComponent, ref, useSlots, h, resolveComponent } from 'vue'
 import { ElTableColumn, ElFormItem } from 'element-plus'
-import { renderHtml, tpl, _, useAppContext } from '@zto/zpage'
+import { renderHtml, tpl, _, useAppContext } from '@zpage/zpage'
 
 import CPoptip from '../poptip/CPoptip.vue'
 import BatchEditor from './batch-editor.vue'

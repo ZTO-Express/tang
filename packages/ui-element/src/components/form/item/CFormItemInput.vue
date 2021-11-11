@@ -18,7 +18,7 @@ export default {
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useConfig } from '@zto/zpage'
+import { useConfig } from '@zpage/zpage'
 
 const inputConfig = useConfig('components.formItem.input', {})
 

@@ -1,13 +1,14 @@
 {
-  "name": "@zto/zpage-ui-element",
-  "version": "0.1.0",
-  "description": "@zto/zpage-ui-element",
+  "name": "@zpage/ui-element",
+  "version": "0.1.1",
+  "description": "@zpage/ui-element",
   "main": "index.js",
   "module": "dist/zpage-ui-element.esm.js",
   "types": "src/index.ts",
   "files": [
     "index.js",
     "dist",
+    "src",
     "README.md"
   ],
   "scripts": {
@@ -18,13 +19,16 @@
   },
   "dependencies": {
     "@element-plus/icons": "^0.0.11",
-    "@zto/zpage": "workspace:*",
+    "@zpage/zpage": "workspace:*",
     "element-plus": "1.1.0-beta.8",
     "nprogress": "^0.2.0",
     "xlsx": "^0.17.3"
   },
   "devDependencies": {
     "@types/nprogress": "^0.2.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "author": "rayl"
 }

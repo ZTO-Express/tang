@@ -1,4 +1,4 @@
-import { tpl } from '@zto/zpage'
+import { tpl } from '@zpage/zpage'
 import type { TableColumn } from './types'
 
 /** 扁平化所有子列

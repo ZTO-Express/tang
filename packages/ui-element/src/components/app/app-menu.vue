@@ -36,10 +36,10 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { onBeforeRouteUpdate } from 'vue-router'
-import { useRoute, useRouter, useStore, useConfig } from '@zto/zpage'
+import { useRoute, useRouter, useStore, useConfig } from '@zpage/zpage'
 import { useMessage } from '../../composables'
 
-import type { NavMenuItem } from '@zto/zpage'
+import type { NavMenuItem } from '@zpage/zpage'
 
 const props = defineProps<{
   collapse?: boolean

@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useConfig, useRouter, useStore } from '@zto/zpage'
+import { useConfig, useRouter, useStore } from '@zpage/zpage'
 
 const router = useRouter()
 const store = useStore()

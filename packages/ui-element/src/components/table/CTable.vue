@@ -100,7 +100,7 @@ export default { inheritAttrs: false }
 
 <script setup lang="ts">
 import { ref, reactive, nextTick, computed, useAttrs } from 'vue'
-import { _, useApiRequest, useConfig } from '@zto/zpage'
+import { _, useApiRequest, useConfig } from '@zpage/zpage'
 
 import { useMessage } from '../../composables'
 import { xlsxUtil } from '../../utils'

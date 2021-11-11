@@ -1,8 +1,8 @@
-import { warn } from '@zto/zpage'
+import { warn } from '@zpage/zpage'
 import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
-import type { Runtime, AppOptions } from '@zto/zpage'
+import type { Runtime, AppOptions } from '@zpage/zpage'
 
 export default (instance: Runtime, options?: AppOptions): void => {
   const { app } = instance

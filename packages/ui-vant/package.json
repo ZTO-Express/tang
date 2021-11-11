@@ -1,13 +1,14 @@
 {
-  "name": "@zto/zpage-ui-vant",
-  "version": "0.1.0",
-  "description": "@zto/zpage-ui-vant",
+  "name": "@zpage/ui-vant",
+  "version": "0.1.1",
+  "description": "@zpage/ui-vant",
   "main": "index.js",
   "module": "dist/zpage-ui-vant.esm.js",
   "types": "src/index.ts",
   "files": [
     "index.js",
     "dist",
+    "src",
     "README.md"
   ],
   "scripts": {
@@ -17,9 +18,11 @@
     "test": "jest --coverage --runInBand"
   },
   "dependencies": {
-    "@zto/zpage": "workspace:*",
+    "@zpage/zpage": "workspace:*",
     "vant": "^3.2.4"
   },
-  "devDependencies": {},
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "rayl"
 }

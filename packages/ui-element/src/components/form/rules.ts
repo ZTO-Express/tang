@@ -1,4 +1,4 @@
-import { _, validator as v, useConfig } from '@zto/zpage'
+import { _, validator as v, useConfig } from '@zpage/zpage'
 
 /** 外部注册规则 */
 export const outerRules = useConfig('components.form.rules')

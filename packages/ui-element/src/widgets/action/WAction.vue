@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useWidgetEmitter, useWidgetSchema } from '@zto/zpage'
+import { useWidgetEmitter, useWidgetSchema } from '@zpage/zpage'
 
 // 属性
 const props = defineProps<{

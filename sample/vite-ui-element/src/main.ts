@@ -1,5 +1,5 @@
-import { startApp } from '@zto/zpage'
-import { ZPageElementUI } from '@zto/zpage-ui-element/src'
+import { startApp } from '@zpage/zpage'
+import { ZPageElementUI } from '@zpage/ui-element/src'
 import './styles/app.scss'
 
 import { ENV } from './config/env'

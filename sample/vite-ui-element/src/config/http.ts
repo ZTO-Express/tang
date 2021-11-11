@@ -5,7 +5,7 @@ import { user as userApi } from '../apis'
 import { ENV } from './env'
 import ffb from './ffb'
 
-import type { HttpRequestConfig } from '@zto/zpage'
+import type { HttpRequestConfig } from '@zpage/zpage'
 
 ZFfb.use(ffb)
 

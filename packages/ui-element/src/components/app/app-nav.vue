@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter, useStore } from '@zto/zpage'
+import { useRoute, useRouter, useStore } from '@zpage/zpage'
 
 const store = useStore()
 const router = useRouter()

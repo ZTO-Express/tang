@@ -69,7 +69,7 @@ export default { inheritAttrs: false }
 import { computed, getCurrentInstance, ref, useAttrs } from 'vue'
 import { onBeforeRouteUpdate } from 'vue-router'
 
-import { tpl, noop, _, useApiRequest, useAppContext } from '@zto/zpage'
+import { tpl, noop, _, useApiRequest, useAppContext } from '@zpage/zpage'
 import { useMessage } from '../../composables'
 
 const props = withDefaults(

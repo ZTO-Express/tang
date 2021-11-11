@@ -1,5 +1,5 @@
 import { Toast } from 'vant'
-import { HttpRequestConfig, uuid, getAccessToken, useRouter, ZFfb } from '@zto/zpage'
+import { HttpRequestConfig, uuid, getAccessToken, useRouter, ZFfb } from '@zpage/zpage'
 
 import { ENV } from './env'
 import ffb from '../config/ffb'

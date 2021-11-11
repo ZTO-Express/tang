@@ -46,7 +46,7 @@ async function _generateDts(packageName: string) {
       outDir: resolve(pkgRoot, 'dist', 'types'),
       paths: {
         '@zpage/*': ['packages/*'],
-        '@zto/zpage': ['packages/zpage']
+        '@zpage/zpage': ['packages/zpage']
       }
     }
   })

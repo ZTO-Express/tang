@@ -1,7 +1,7 @@
 import * as widgetsMap from '../widgets'
 
 import type { Component } from 'vue'
-import type { AppOptions, Runtime } from '@zto/zpage'
+import type { AppOptions, Runtime } from '@zpage/zpage'
 
 export default (instance: Runtime, options?: AppOptions): void => {
   const innerWidgets: Component[] = []

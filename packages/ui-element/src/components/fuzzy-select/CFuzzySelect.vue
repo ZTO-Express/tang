@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { computed, ref, useAttrs, watch, nextTick } from 'vue'
-import { _, tpl, useApiRequest, useAppContext, useConfig } from '@zto/zpage'
+import { _, tpl, useApiRequest, useAppContext, useConfig } from '@zpage/zpage'
 
 import type { FuzzySelectOption, FuzzySelectRemoteMethod, FuzzySelectResponse } from './types'
 

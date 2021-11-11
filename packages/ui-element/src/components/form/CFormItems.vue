@@ -44,7 +44,7 @@ export default { inheritAttrs: false }
 
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
-import { tpl, useAppContext, useConfig } from '@zto/zpage'
+import { tpl, useAppContext, useConfig } from '@zpage/zpage'
 
 import { getFormItemRules } from './util'
 

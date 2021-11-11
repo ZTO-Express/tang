@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed, ref, useAttrs } from 'vue'
-import { _, useRouter, useApiRequest, useAppContext, emitter, tpl } from '@zto/zpage'
+import { _, useRouter, useApiRequest, useAppContext, emitter, tpl } from '@zpage/zpage'
 import { useMessage } from '../../composables'
 
 const router = useRouter()

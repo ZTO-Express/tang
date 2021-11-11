@@ -1,7 +1,7 @@
 {
-  "name": "@zto/zpage",
-  "version": "0.1.0",
-  "description": "@zto/zpage",
+  "name": "@zpage/zpage",
+  "version": "0.1.1",
+  "description": "@zpage/zpage",
   "main": "index.js",
   "module": "dist/zpage.esm.js",
   "types": "dist/types/index.d.ts",
@@ -10,11 +10,18 @@
     "dist",
     "README.md"
   ],
+  "dependencies": {
+    "@zpage/runtime": "workspace:*",
+    "@zpage/ffb": "workspace:*"
+  },
   "scripts": {
     "prepublish": "npm run build",
     "build": "sucrase-node ../../scripts/build --name=zpage",
     "clean": "rimraf dist",
     "test": "jest --coverage --runInBand"
   },
-  "author": "rayl"
+  "author": "rayl",
+  "publishConfig": {
+    "access": "public"
+  }
 }

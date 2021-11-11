@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useConfig } from '@zto/zpage'
+import { useConfig } from '@zpage/zpage'
 
 const config = useConfig('app')
 const title = config.title

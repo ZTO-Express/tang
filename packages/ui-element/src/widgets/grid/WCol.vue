@@ -10,7 +10,7 @@ export default { inheritAttrs: false }
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { _, useWidgetSchema } from '@zto/zpage'
+import { _, useWidgetSchema } from '@zpage/zpage'
 
 // 属性
 const props = defineProps<{

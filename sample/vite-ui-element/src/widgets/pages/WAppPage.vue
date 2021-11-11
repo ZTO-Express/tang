@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { computed, watch, onMounted } from 'vue'
-import { useStore, emitter, useWidgetSchema, useApi } from '@zto/zpage'
+import { useStore, emitter, useWidgetSchema, useApi } from '@zpage/zpage'
 
 import { GLOBAL_EVENTS } from '@/consts'
 

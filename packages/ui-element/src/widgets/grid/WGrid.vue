@@ -32,7 +32,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { Widget, useWidgetSchema } from '@zto/zpage'
+import { Widget, useWidgetSchema } from '@zpage/zpage'
 
 // 属性
 const props = defineProps<{

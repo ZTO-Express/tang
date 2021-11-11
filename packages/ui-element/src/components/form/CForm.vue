@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useConfig } from '@zto/zpage'
+import { useConfig } from '@zpage/zpage'
 
 const formConfig = useConfig('components.form', {})
 

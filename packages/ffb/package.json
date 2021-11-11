@@ -16,5 +16,8 @@
     "clean": "rimraf dist",
     "test": "jest --coverage --runInBand"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "rayl"
 }

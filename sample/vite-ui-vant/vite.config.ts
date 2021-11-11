@@ -52,7 +52,7 @@ export default defineConfig(async () => {
         scss: {
           additionalData: `
             @use "sass:math";
-            @import "${projRoot}/node_modules/@zto/zpage-ui-element/src/styles/theme.scss";
+            @import "${projRoot}/node_modules/@zpage/ui-element/src/styles/theme.scss";
           `
         }
       }
