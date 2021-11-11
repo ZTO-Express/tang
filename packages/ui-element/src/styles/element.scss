@@ -1,0 +1,73 @@
+@import './variables.scss';
+
+$--font-path: 'element-plus/packages/theme-chalk/src/fonts';
+
+@import '~nprogress/nprogress.css';
+@import '~element-plus/theme-chalk/index.css';
+
+:root {
+  --el-color-primary: #{$primary};
+  --el-color-success: #{$positive};
+  --el-color-warning: #{$warning};
+  --el-color-danger: #{$negative};
+  --el-color-info: #{$info};
+
+  --el-font-size-extra-large: 20px;
+  --el-font-size-large: 16px;
+  --el-font-size-medium: 14px;
+  --el-font-size-base: 12px;
+  --el-font-size-small: 12px;
+  --el-font-size-extra-small: 12px;
+}
+
+.el-input-group {
+  &__append,
+  &__prepend {
+    padding: 0 12px;
+  }
+}
+
+.el-table {
+  th.el-table__cell {
+    background-color: $bg-color;
+  }
+}
+
+.el-dialog {
+  &__header {
+    background: $bg-color;
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
+    border-bottom: solid 1px $light-border-color;
+  }
+
+  &__title {
+    font-weight: bold;
+  }
+
+  &__headerbtn i {
+    font-weight: bold;
+  }
+
+  &__footer {
+    border-top: solid 1px $light-border-color;
+  }
+}
+
+.el-form-item {
+  &__content {
+    font-size: 12px;
+    height: 28px;
+  }
+}
+
+.el-overlay-dialog {
+  overflow-y: auto;
+}
+
+.el-tabs {
+  &.fixed > &__content {
+    height: calc(100% - 42px);
+    overflow: auto;
+  }
+}

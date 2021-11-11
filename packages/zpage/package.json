@@ -1,0 +1,23 @@
+{
+  "name": "zpage",
+  "version": "0.1.0",
+  "description": "zpage",
+  "main": "index.js",
+  "module": "dist/zpage.esm.js",
+  "types": "src/index.ts",
+  "files": [
+    "index.js",
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "@zpage/runtime": "workspace:*",
+    "@zpage/ffb": "workspace:*"
+  },
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "sucrase-node ../../scripts/build --name=zpage",
+    "test": "jest --coverage --runInBand"
+  },
+  "author": "rayl"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@zpage/core",
+  "version": "0.1.0",
+  "description": "@zpage/core",
+  "main": "index.js",
+  "module": "dist/zpage-core.esm.js",
+  "types": "src/index.ts",
+  "files": [
+    "index.js",
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "sucrase-node ../../scripts/build --name=core",
+    "test": "jest --coverage --runInBand"
+  },
+  "author": "rayl"
+}

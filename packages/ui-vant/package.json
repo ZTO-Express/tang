@@ -1,0 +1,38 @@
+{
+  "name": "@zpage/ui-vant",
+  "version": "0.1.0",
+  "description": "ZPage Vant UI",
+  "main": "lib/",
+  "types": "lib/",
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "lib/**"
+  ],
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "npx vite build --config vite.config.js",
+    "test": "jest --coverage --runInBand"
+  },
+  "keywords": [],
+  "author": "rayl",
+  "dependencies": {
+    "zpage": "0.1.0"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0",
+    "vuex": "^4.0.0"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

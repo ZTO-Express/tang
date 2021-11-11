@@ -1,0 +1,19 @@
+{
+  "name": "@zpage/ffb",
+  "version": "0.1.0",
+  "description": "@zpage/ffb",
+  "main": "index.js",
+  "module": "dist/zpage-ffb.esm.js",
+  "types": "src/index.ts",
+  "files": [
+    "index.js",
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "sucrase-node ../../scripts/build --name=ffb",
+    "test": "jest --coverage --runInBand"
+  },
+  "author": "rayl"
+}

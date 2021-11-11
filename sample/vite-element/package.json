@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "description": "zpage sample项目",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint --fix \"./src/**/*.{ts,tsx,js,vue}\""
+  },
+  "dependencies": {
+    "element-plus": "1.1.0-beta.8",
+    "nprogress": "^0.2.0",
+    "vue-echarts": "^6.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.9.4",
+    "vite": "^2.6.14"
+  }
+}

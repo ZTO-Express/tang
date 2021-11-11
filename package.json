@@ -1,0 +1,146 @@
+{
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*",
+    "play",
+    "docs",
+    "sample"
+  ],
+  "scripts": {
+    "prepare": "husky install",
+    "commit": "git-cz",
+    "test": "jest",
+    "dev": "pnpm dev --dir site",
+    "build": "sucrase-node scripts/build/build.ts",
+    "gen:version": "sucrase-node scripts/version/gen-version.ts",
+    "update:version": "sucrase-node scripts/version/update-version.ts",
+    "clean": "pnpm run clean:lib && pnpm run clean -r --stream",
+    "clean:lib": "rimraf dist",
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx --max-warnings 0 && pretty-quick --check --branch dev",
+    "lint:fix": "eslint --fix . --ext .vue,.js,.ts,.jsx,.tsx && pretty-quick --branch dev",
+    "release": "standard-version",
+    "docs:dev": "pnpm run -C docs dev",
+    "docs:build": "pnpm run -C docs build",
+    "postinstall": "pnpm gen:version"
+  },
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  },
+  "dependencies": {
+    "@zpage/core": "workspace:*",
+    "@zpage/ffb": "workspace:*",
+    "@zpage/runtime": "workspace:*",
+    "@zpage/ui-element": "workspace:*",
+    "@zpage/ui-vant": "workspace:*",
+    "dayjs": "^1.10.7",
+    "lodash": "^4.17.21",
+    "zpage": "workspace:*"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^14.1.0",
+    "@commitlint/config-conventional": "^14.1.0",
+    "@element-plus/icons": "^0.0.11",
+    "@pnpm/find-workspace-packages": "^3.1.21",
+    "@pnpm/logger": "^4.0.0",
+    "@pnpm/types": "^7.5.0",
+    "@rollup/plugin-alias": "^3.1.8",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "@rollup/plugin-replace": "^3.0.0",
+    "@sucrase/jest-plugin": "^2.2.0",
+    "@types/fs-extra": "^9.0.13",
+    "@types/gulp": "^4.0.9",
+    "@types/jest": "^27.0.2",
+    "@types/lodash": "^4.14.176",
+    "@types/node": "^16.11.6",
+    "@types/sass": "^1.43.0",
+    "@types/through2": "^2.0.36",
+    "@typescript-eslint/eslint-plugin": "^5.3.0",
+    "@typescript-eslint/parser": "^5.3.0",
+    "@vue/compiler-sfc": "^3.2.21",
+    "@vue/test-utils": "^2.0.0-rc.16",
+    "autoprefixer": "^10.4.0",
+    "chalk": "^4.1.2",
+    "components-helper": "^1.0.4",
+    "cz-conventional-changelog": "^3.3.0",
+    "element-plus": "1.1.0-beta.8",
+    "esbuild": "^0.13.12",
+    "eslint": "^8.2.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-define-config": "^1.1.3",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "expect-type": "^0.13.0",
+    "fast-glob": "^3.2.7",
+    "fs-extra": "^10.0.0",
+    "gulp": "^4.0.2",
+    "gulp-typescript": "^6.0.0-alpha.1",
+    "husky": "^7.0.4",
+    "jest": "^27.3.1",
+    "lint-staged": "^11.2.6",
+    "ora": "^6.0.1",
+    "postcss-import": "^14.0.2",
+    "postcss-nested": "^5.0.6",
+    "postcss-simple-vars": "^6.0.3",
+    "postcss-url": "^10.1.3",
+    "prettier": "^2.4.1",
+    "pretty-quick": "^3.1.1",
+    "resize-observer-polyfill": "^1.5.1",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.59.0",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-esbuild": "^4.6.0",
+    "rollup-plugin-filesize": "^9.1.1",
+    "rollup-plugin-postcss": "^4.0.1",
+    "rollup-plugin-vue": "^6.0.0",
+    "sass": "^1.43.4",
+    "stylelint": "^14.0.1",
+    "sucrase": "^3.20.3",
+    "through2": "^4.0.2",
+    "ts-jest": "^27.0.7",
+    "ts-morph": "^12.2.0",
+    "typescript": "^4.4.4",
+    "vue": "^3.2.21",
+    "vue-jest": "^5.0.0-alpha.10",
+    "vue-router": "^4.0.12",
+    "vue-tsc": "^0.29.0",
+    "vuex": "^4.0.2"
+  },
+  "packageManager": "pnpm@6.20.4",
+  "engines": {
+    "node": ">= 14"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
+  },
+  "lint-staged": {
+    "*.md": "prettier --write",
+    "*.{ts,tsx,js,vue,less}": "prettier --write",
+    "*.{ts,tsx,js,vue}": "eslint --fix",
+    "*.{vue,css,less}": "stylelint --fix"
+  },
+  "browserslist": [
+    "> 5%",
+    "not ie 11",
+    "not op_mini all"
+  ],
+  "description": "",
+  "keywords": [
+    "zpage",
+    "lowcode"
+  ],
+  "author": "rayl",
+  "homepage": "https://tech.tuxi.com/zpage",
+  "bugs": {
+    "url": "https://github.com/tuxi-tech/zpage/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tuxi-tech/zpage.git"
+  }
+}
