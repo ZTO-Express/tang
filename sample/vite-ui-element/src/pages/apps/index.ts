@@ -13,6 +13,7 @@ export default {
 
     table: {
       noPager: true,
+      showCheckbox: true,
       operation: {
         width: 100,
         items: [{ action: 'view', label: '查看' }]

@@ -157,7 +157,6 @@ const props = withDefaults(
     operationWidth: 'auto',
     paginationSmall: false,
     totalRows: 0,
-    selectableFn: () => true,
     editable: false,
     batchEditable: false
   }
