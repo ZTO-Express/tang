@@ -4,7 +4,7 @@
   "description": "@zpage/runtime",
   "main": "index.js",
   "module": "dist/zpage-runtime.esm.js",
-  "types": "src/index.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
     "index.js",
     "dist",
@@ -13,6 +13,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "sucrase-node ../../scripts/build --name=runtime",
+    "clean": "rimraf dist",
     "test": "jest --coverage --runInBand"
   },
   "dependencies": {

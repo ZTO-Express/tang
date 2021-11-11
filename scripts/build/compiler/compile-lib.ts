@@ -21,12 +21,16 @@ import type { OutputOptions, RollupOptions, RollupBuild } from 'rollup'
 /** 编译库 */
 export async function compileLib(packageName: string) {
   await _compile(packageName)
-  // await _generateDts(packageName)
+
+  await _generateDts(packageName)
 }
 
 // 生成类型文件
 async function _generateDts(packageName: string) {
   const pkgRoot = resolvePkgRoot(packageName)
+
+  const isGenTypes = await readBuildConfig(pkgRoot, 'genTypes')
+  if (isGenTypes === false) return
 
   // 生成类型文件
   await generateTypesDefinitions(pkgRoot, {
@@ -137,8 +141,8 @@ async function _writeBundles(
   const outPutDir = resolve(pkgRoot, 'dist')
   const preserveModulesRoot = resolve(pkgRoot, 'src')
 
-  let entryFileName = `${ZPAGE_PKG}-${packageName}`
-  if (ZPAGE_PKG === packageName) entryFileName = packageName
+  let entryFileName = `zpage-${packageName}`
+  if ('zpage' === packageName) entryFileName = packageName
 
   await writeBundles(
     bundle,

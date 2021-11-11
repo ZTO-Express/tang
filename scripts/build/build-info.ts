@@ -2,7 +2,8 @@ import { ZPAGE_PKG } from './utils/constants'
 
 import type { ModuleFormat } from 'rollup'
 
-export const modules = ['esm', 'cjs', 'cjs_prod'] as const
+// export const modules = ['esm', 'cjs', 'cjs_prod'] as const
+export const modules = ['esm', 'cjs'] as const
 export type Module = typeof modules[number]
 export interface BuildInfo {
   module: 'ESNext' | 'CommonJS'

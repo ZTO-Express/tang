@@ -1,17 +1,13 @@
 import path from 'path'
-// import ora from 'ora'
 import rimraf from 'rimraf'
 import { compile } from './compiler'
-
-// const spinner = ora()
-
-debugger
+import * as log from './utils/log'
 
 build()
 
 // 执行构建
 async function build() {
-  console.log('构建开始...')
+  log.cyan('构建开始...')
 
   const argv = process.argv
 
@@ -21,7 +17,7 @@ async function build() {
   const nameStr = nameArg?.substr(nameArgPrefix.length)
 
   if (!nameStr) {
-    // spinner.fail('没有编码名称，请添加--name参数.')
+    log.yellow('没有编码名称，请添加--name参数.')
     return
   }
 
@@ -37,19 +33,17 @@ async function build() {
 async function buildByName(name: string) {
   if (!name) return
 
-  // spinner.succeed(`开始编译 ${name}`)
+  log.cyan(`开始编译 ${name}`)
   const libDir = path.join(__dirname, 'packages', name, '../lib')
-  // spinner.succeed(`删除旧库文件: ${libDir}`)
+  log.cyan(`删除旧库文件: ${libDir}`)
   rimraf.sync(libDir)
 
-  // spinner.succeed(`正在编译 ${name}`)
+  log.cyan(`正在编译 ${name}`)
 
   try {
     await compile(name)
-    // spinner.succeed(`${name} 编译完成`)
+    log.green(`${name} 编译完成`)
   } catch (err) {
-    console.log('构建失败...', err)
-    // spinner.fail(`${name} 编译失败`)
-    // throw err
+    log.errorAndExit(err)
   }
 }

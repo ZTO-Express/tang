@@ -13,6 +13,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "sucrase-node ../../scripts/build --name=ui-element",
+    "clean": "rimraf dist",
     "test": "jest --coverage --runInBand"
   },
   "dependencies": {

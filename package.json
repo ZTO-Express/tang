@@ -12,11 +12,10 @@
     "commit": "git-cz",
     "test": "jest",
     "dev": "pnpm dev --dir site",
-    "build": "pnpm rebuild -r",
+    "build": "pnpm rebuild --filter '@zpage/*' && pnpm rebuild --filter @zto/zpage && pnpm rebuild --filter '@zto/zpage-ui-*'",
     "gen:version": "sucrase-node scripts/version/gen-version.ts",
     "update:version": "sucrase-node scripts/version/update-version.ts",
-    "clean": "pnpm run clean:lib && pnpm run clean -r --stream",
-    "clean:lib": "rimraf dist",
+    "clean": "pnpm run clean -r --stream",
     "format": "prettier --write .",
     "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx --max-warnings 0 && pretty-quick --check --branch dev",
     "lint:fix": "eslint --fix . --ext .vue,.js,.ts,.jsx,.tsx && pretty-quick --branch dev",
@@ -104,7 +103,6 @@
     "ts-jest": "^27.0.7",
     "ts-morph": "^12.2.0",
     "typescript": "^4.4.4",
-    "vite": "^2.6.14",
     "vue": "^3.2.21",
     "vue-jest": "^5.0.0-alpha.10",
     "vue-router": "^4.0.12",
@@ -132,10 +130,6 @@
     "not op_mini all"
   ],
   "description": "",
-  "keywords": [
-    "zpage",
-    "lowcode"
-  ],
   "author": "rayl",
   "homepage": "https://tech.tuxi.com/zpage",
   "bugs": {

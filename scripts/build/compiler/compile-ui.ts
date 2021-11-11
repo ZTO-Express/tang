@@ -30,12 +30,15 @@ import type { OutputOptions, RollupOptions, RollupBuild } from 'rollup'
 /** 编译库 */
 export async function compileUI(packageName: string) {
   await _compile(packageName)
-  // await _generateDts(packageName)
+  await _generateDts(packageName)
 }
 
 // 生成类型文件
 async function _generateDts(packageName: string) {
   const pkgRoot = resolvePkgRoot(packageName)
+
+  const isGenTypes = await readBuildConfig(pkgRoot, 'genTypes')
+  if (isGenTypes === false) return
 
   await generateTypesDefinitions(pkgRoot, {
     compilerOptions: {
@@ -43,7 +46,7 @@ async function _generateDts(packageName: string) {
       outDir: resolve(pkgRoot, 'dist', 'types'),
       paths: {
         '@zpage/*': ['packages/*'],
-        zpage: ['packages/zpage']
+        '@zto/zpage': ['packages/zpage']
       }
     }
   })
@@ -193,7 +196,7 @@ async function _writeBundles(
         preserveModules: false,
         preserveModulesRoot,
         sourcemap: false,
-        entryFileNames: `${ZPAGE_PKG}-${packageName}.${config.ext}`
+        entryFileNames: `zpage-${packageName}.${config.ext}`
       }
     })
   )

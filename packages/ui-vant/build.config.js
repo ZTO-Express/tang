@@ -1,3 +1,5 @@
+export const genTypes = false
+
 export const rollup = {
   plugins: {
     vue: {
