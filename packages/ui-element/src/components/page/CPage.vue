@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
-import { useConfig } from 'zpage'
+import { useConfig } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{

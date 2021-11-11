@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { useWidgetSchema } from 'zpage'
+import { useWidgetSchema } from '@zto/zpage'
 
 const props = defineProps<{
   schema: GenericObject

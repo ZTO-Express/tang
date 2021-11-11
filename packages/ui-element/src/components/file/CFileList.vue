@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { fileUtil } from 'zpage'
+import { fileUtil } from '@zto/zpage'
 import { Close } from '@element-plus/icons'
 
 interface FileListItem {

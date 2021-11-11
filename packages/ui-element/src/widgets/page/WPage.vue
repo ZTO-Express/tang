@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { tpl, useRouter, useAppContext, useWidgetSchema } from 'zpage'
+import { tpl, useRouter, useAppContext, useWidgetSchema } from '@zto/zpage'
 
 const router = useRouter()
 

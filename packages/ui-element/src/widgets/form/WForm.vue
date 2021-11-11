@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { tpl, useApiRequest, useAppContext, useWidgetEmitter, useWidgetSchema } from 'zpage'
+import { tpl, useApiRequest, useAppContext, useWidgetEmitter, useWidgetSchema } from '@zto/zpage'
 
 // 属性
 const props = defineProps<{

@@ -2,7 +2,7 @@ import installElement from './element'
 import installComponents from './components'
 import installWidgets from './widgets'
 
-import type { Runtime, AppOptions } from 'zpage'
+import type { Runtime, AppOptions } from '@zto/zpage'
 
 /** 安装插件 */
 export async function install(instance: Runtime, options?: AppOptions) {

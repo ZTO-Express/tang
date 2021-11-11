@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { tpl, useAppContext, useWidgetSchema } from 'zpage'
+import { tpl, useAppContext, useWidgetSchema } from '@zto/zpage'
 
 const props = defineProps<{
   schema: GenericObject

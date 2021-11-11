@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useStore, useConfig } from 'zpage'
+import { useStore, useConfig } from '@zto/zpage'
 import { Back } from '@element-plus/icons'
 
 import AppHeader from './app-header.vue'

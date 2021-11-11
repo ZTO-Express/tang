@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { _, useWidgetSchema } from 'zpage'
+import { _, useWidgetSchema } from '@zto/zpage'
 
 const props = defineProps<{
   schema: GenericObject

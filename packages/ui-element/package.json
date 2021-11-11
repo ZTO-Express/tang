@@ -1,7 +1,7 @@
 {
-  "name": "@zpage/ui-element",
+  "name": "@zto/zpage-ui-element",
   "version": "0.1.0",
-  "description": "@zpage/ui-element",
+  "description": "@zto/zpage-ui-element",
   "main": "index.js",
   "module": "dist/zpage-ui-element.esm.js",
   "types": "src/index.ts",
@@ -15,15 +15,15 @@
     "build": "sucrase-node ../../scripts/build --name=ui-element",
     "test": "jest --coverage --runInBand"
   },
-  "author": "rayl",
   "dependencies": {
     "@element-plus/icons": "^0.0.11",
+    "@zto/zpage": "workspace:*",
     "element-plus": "1.1.0-beta.8",
     "nprogress": "^0.2.0",
-    "xlsx": "^0.17.3",
-    "zpage": "workspace:*"
+    "xlsx": "^0.17.3"
   },
   "devDependencies": {
     "@types/nprogress": "^0.2.0"
-  }
+  },
+  "author": "rayl"
 }

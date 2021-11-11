@@ -41,7 +41,7 @@ export default { inheritAttrs: false }
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { useConfig, useRescs, useApiRequest, fileUtil } from 'zpage'
+import { useConfig, useRescs, useApiRequest, fileUtil } from '@zto/zpage'
 
 import { useMessage } from '../../composables'
 import * as xlsxUtil from '../../utils/xlsx'

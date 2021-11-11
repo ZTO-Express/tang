@@ -1,6 +1,6 @@
 /** 导出数据 */
 import XLSX from 'xlsx'
-import { fileUtil, dateUtil } from 'zpage'
+import { fileUtil, dateUtil } from '@zto/zpage'
 import type { WritingOptions, WorkBook, WorkSheet, Sheet2JSONOpts } from 'xlsx'
 
 export interface ExportColumn {

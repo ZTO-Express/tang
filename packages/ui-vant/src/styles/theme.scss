@@ -1,0 +1,32 @@
+@use 'sass:math';
+
+@import './variables.scss';
+@import './q.scss';
+
+$font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+$font-size-small: 0.8rem;
+$text-color: #333;
+$primary-color: $primary;
+$border-radius: 3px;
+$title-bg-color: #f7f8fa;
+$title-color: #17233d;
+
+$section-color: white;
+$section-gutter: 10px;
+$section-padding: 10px;
+
+$app-bg-color: #edeff4;
+$app-header-height: 48px;
+$app-nav-height: 36px;
+$app-page-height: calc(100vh - $app-header-height);
+
+@mixin content-header() {
+  padding: 10px 12px;
+}
+
+@mixin border-shadow($borderColor: $border-color) {
+  box-shadow: 0 0 3px $borderColor;
+}
+
+$select-shadow: 0 0 3px lighten($primary, 5%);
+$selected-shadow: 0 0 5px $primary;

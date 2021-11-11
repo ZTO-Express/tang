@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
-import { useConfig } from 'zpage'
+import { useConfig } from '@zto/zpage'
 
 const emit = defineEmits(['fetch', 'update:pageSize', 'update:pageIndex'])
 
