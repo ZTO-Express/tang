@@ -1,6 +1,6 @@
 {
   "name": "@zpage/runtime",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "@zpage/runtime",
   "main": "index.js",
   "module": "dist/zpage-runtime.esm.js",
@@ -17,7 +17,7 @@
     "test": "jest --coverage --runInBand"
   },
   "dependencies": {
-    "@zpage/core": "workspace:*",
+    "@zpage/core": "workspace:^",
     "axios": "^0.24.0",
     "dayjs": "^1.10.7",
     "lodash-es": "^4.17.21",
