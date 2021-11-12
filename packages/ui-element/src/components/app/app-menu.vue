@@ -123,6 +123,7 @@ function _getParentMenuNames(menu: NavMenuItem, allMenus: NavMenuItem[], cached:
   width: 100%;
   height: 100%;
   padding-top: 10px;
+  border-right: 0;
 }
 
 .img-icon {
