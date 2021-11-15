@@ -3,8 +3,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useWidgetEmitter, useWidgetSchema } from '@zpage/zpage'
+import { vue, useWidgetEmitter, useWidgetSchema } from '@zpage/zpage'
+
+const { ref } = vue
 
 // 属性
 const props = defineProps<{

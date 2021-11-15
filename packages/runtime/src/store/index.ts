@@ -21,6 +21,6 @@ export function createAppStore(): AppStore {
 }
 
 // 获取当前store
-export function useStore() {
+export function useAppStore() {
   return createAppStore()
 }

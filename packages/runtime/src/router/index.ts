@@ -1,8 +1,8 @@
-import { createRouter, createWebHashHistory, useRoute } from 'vue-router'
+import { useRoute, createRouter, createWebHashHistory } from 'vue-router'
 import { ROOT_ROUTE_NAME } from '../consts'
 import { getPageKey, tpl, _ } from '../utils'
 import { useConfig } from '../config'
-import { useStore } from '../store'
+import { useAppStore } from '../store'
 import { useAppContext } from '../composables'
 
 import type { Router } from 'vue-router'
@@ -13,7 +13,7 @@ let router: Router | undefined = undefined
 export function createAppRouter(config?: AppRouterConfig) {
   if (router) return router
 
-  const store = useStore()
+  const store = useAppStore()
 
   if (config?.router) {
     router = config.router
@@ -227,8 +227,8 @@ export function createAppRouter(config?: AppRouterConfig) {
 }
 
 // 获取当前router
-export function useRouter() {
+export function useAppRouter() {
   return router as Router
 }
 
-export { useRoute }
+export const useAppRoute = useRoute

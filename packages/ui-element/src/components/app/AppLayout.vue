@@ -43,15 +43,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useStore, useConfig } from '@zpage/zpage'
+import { vue, useAppStore, useConfig } from '@zpage/zpage'
 import { Back } from '@element-plus/icons'
 
 import AppHeader from './app-header.vue'
 import AppMenu from './app-menu.vue'
 import AppNav from './app-nav.vue'
 
-const store = useStore()
+const { computed, ref } = vue
+
+const store = useAppStore()
 
 const asideCollapse = ref(false)
 const menuConfig = useConfig('app.menu', {})

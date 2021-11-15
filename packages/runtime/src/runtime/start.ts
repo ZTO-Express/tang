@@ -1,14 +1,14 @@
-import { warn } from './utils'
-import { setConfig } from './config'
-import { getNormalizedOptions } from './options'
-import { Runtime } from './runtime'
-import { install } from './install'
-import { useAuthLoader } from './loaders'
-import { createAppStore } from './store'
-import { createAppRouter } from './router'
+import { warn } from '../utils'
+import { setConfig } from '../config'
+import { getNormalizedOptions } from '../options'
+import { install } from '../install'
+import { useAuthLoader } from '../loaders'
+import { createAppStore } from '../store'
+import { createAppRouter } from '../router'
+import { Runtime } from './Runtime'
 
 import type { Router } from 'vue-router'
-import type { AppOptions } from './typings'
+import type { AppOptions } from '../typings'
 
 /**
  * 创建应用
@@ -67,7 +67,7 @@ export const startApp = async (options: AppOptions) => {
     await mountApp(opts.el)
   }
 
-  return { instance: runtime }
+  return { runtime }
 }
 
 /**

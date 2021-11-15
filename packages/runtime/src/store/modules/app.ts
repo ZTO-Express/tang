@@ -1,4 +1,4 @@
-import { useRouter } from '../../router'
+import { useAppRouter } from '../../router'
 import { useAuthLoader } from '../../loaders'
 
 import type { ActionTree, GetterTree, MutationTree } from 'vuex'
@@ -78,7 +78,7 @@ const actions: ActionTree<AppState, RootState> = {
 
   // 切换子模块
   changeSubmodule: async ({ commit, state, getters }, payload: any) => {
-    const router = useRouter()
+    const router = useAppRouter()
 
     const navMenu = state.navMenu
 

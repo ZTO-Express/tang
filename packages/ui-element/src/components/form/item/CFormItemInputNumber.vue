@@ -16,8 +16,8 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useConfig } from '@zpage/zpage'
+import { vue, useConfig } from '@zpage/zpage'
+const { computed } = vue
 
 const props = withDefaults(
   defineProps<{

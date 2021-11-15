@@ -19,8 +19,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { vue } from '@zpage/zpage'
 import { CircleClose } from '@element-plus/icons'
+
+const { computed } = vue
 
 const props = defineProps<{
   navItem: GenericObject

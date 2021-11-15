@@ -1,0 +1,43 @@
+{
+  "private": true,
+  "description": "zpage sample项目 webpack-ui-element",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development webpack serve  --progress --hot --config build/webpack.dev.config.js",
+    "build": "cross-env NODE_ENV=production webpack --mode=production --config build/webpack.prod.config.js",
+    "lint": "eslint --fix \"./src/**/*.{ts,tsx,js,vue}\""
+  },
+  "dependencies": {
+    "@zpage/ui-element": "workspace:^",
+    "core-js": "^3.19.1",
+    "element-plus": "1.1.0-beta.8",
+    "nprogress": "^0.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/plugin-transform-runtime": "^7.16.0",
+    "@babel/preset-env": "^7.16.0",
+    "@babel/preset-typescript": "^7.16.0",
+    "@vue/compiler-sfc": "^3.2.21",
+    "babel-loader": "^8.2.3",
+    "babel-plugin-import": "^1.13.3",
+    "clean-webpack-plugin": "^4.0.0",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.5.1",
+    "dotenv-webpack": "^7.0.3",
+    "fork-ts-checker-webpack-plugin": "^6.4.0",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.4.4",
+    "postcss": "^8.3.11",
+    "postcss-loader": "^6.2.0",
+    "progress-bar-webpack-plugin": "^2.1.0",
+    "sass-loader": "^12.3.0",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.2.6",
+    "vue-loader": "^16.8.3",
+    "webpack": "^5.64.0",
+    "webpack-bundle-analyzer": "^4.5.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.5.0"
+  }
+}

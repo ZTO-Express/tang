@@ -13,7 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { vue } from '@zpage/zpage'
+
+const { ref, watch, onMounted } = vue
 
 const props = withDefaults(
   defineProps<{

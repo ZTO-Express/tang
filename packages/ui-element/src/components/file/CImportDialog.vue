@@ -39,12 +39,12 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-
-import { useConfig, useRescs, useApiRequest, fileUtil } from '@zpage/zpage'
+import { vue, useConfig, useRescs, useApiRequest, fileUtil } from '@zpage/zpage'
 
 import { useMessage } from '../../composables'
 import * as xlsxUtil from '../../utils/xlsx'
+
+const { computed, ref } = vue
 
 const props = withDefaults(
   defineProps<{

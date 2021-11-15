@@ -29,7 +29,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, unref } from 'vue'
+import { vue } from '@zpage/zpage'
+const { computed, ref, unref } = vue
 
 const props = withDefaults(
   defineProps<{

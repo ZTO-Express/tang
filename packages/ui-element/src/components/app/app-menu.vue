@@ -34,20 +34,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
-import { onBeforeRouteUpdate } from 'vue-router'
-import { useRoute, useRouter, useStore, useConfig } from '@zpage/zpage'
+import { vue, vueRouter, useAppRoute, useAppRouter, useAppStore, useConfig } from '@zpage/zpage'
 import { useMessage } from '../../composables'
 
 import type { NavMenuItem } from '@zpage/zpage'
+
+const { computed, ref, onMounted } = vue
+const { onBeforeRouteUpdate } = vueRouter
 
 const props = defineProps<{
   collapse?: boolean
 }>()
 
-const store = useStore()
-const router = useRouter()
-const route = useRoute()
+const store = useAppStore()
+const router = useAppRouter()
+const route = useAppRoute()
 
 const navMenu = computed(() => store.getters.navMenu)
 

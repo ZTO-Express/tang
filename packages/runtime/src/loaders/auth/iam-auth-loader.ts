@@ -8,7 +8,7 @@ import {
   reloadUrl
 } from '../../utils'
 import { useApi, useEnv } from '../../config'
-import { useStore } from '../../store'
+import { useAppStore } from '../../store'
 
 import type { AppAuthLoader, NavMenuItem } from '../../typings'
 
@@ -66,7 +66,7 @@ export const IAMAuthLoader: AppAuthLoader = {
 
   // 解析菜单数据
   async getMenuData() {
-    const store = useStore()
+    const store = useAppStore()
 
     const menus = store.getters.user?.menus || []
 

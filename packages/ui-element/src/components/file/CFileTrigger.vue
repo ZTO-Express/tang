@@ -15,7 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { vue } from '@zpage/zpage'
+const { computed, ref } = vue
 
 const props = withDefaults(
   defineProps<{

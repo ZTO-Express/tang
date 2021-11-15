@@ -55,16 +55,20 @@ async function _generateDts(packageName: string) {
 // 打包库
 async function _compile(packageName: string) {
   const pkgRoot = resolvePkgRoot(packageName)
+  const buildRoollupConfig = readBuildConfig(pkgRoot, 'rollup', {})
 
   const input = resolve(pkgRoot, 'src', 'index.ts')
-  const externalOptions = await generateExternal({ full: false, pkgRoot })
+  const externalOptions = await generateExternal({
+    full: false,
+    pkgRoot,
+    internal: buildRoollupConfig.internal || []
+  })
 
   const rollupConfig: RollupOptions = {
     input,
     external: externalOptions
   }
 
-  const buildRoollupConfig = readBuildConfig(pkgRoot, 'rollup')
   // 先清理输出目录
   const outPutDir = resolve(pkgRoot, 'dist')
   await fs.remove(outPutDir)

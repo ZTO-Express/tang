@@ -22,8 +22,9 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { renderHtml } from '@zpage/zpage'
+import { vue, renderHtml } from '@zpage/zpage'
+
+const { computed } = vue
 
 const props = defineProps<{
   type?: string

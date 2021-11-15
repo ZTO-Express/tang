@@ -1,14 +1,14 @@
 import { resetToken, refreshToken, clearTokenData } from '../../utils'
 import { useApi } from '../../config'
-import { useStore } from '../../store'
-import { useRouter } from '../../router'
+import { useAppStore } from '../../store'
+import { useAppRouter } from '../../router'
 import type { AppAuthLoader, NavMenuItem } from '../../typings'
 
 export const LocalAuthLoader: AppAuthLoader = {
   name: 'local',
 
   async checkAuth(config: any) {
-    const router = useRouter()
+    const router = useAppRouter()
 
     const userApi = useApi('user')
 
@@ -40,7 +40,7 @@ export const LocalAuthLoader: AppAuthLoader = {
 
   // 解析菜单数据
   async getMenuData() {
-    const store = useStore()
+    const store = useAppStore()
     const menus: NavMenuItem[] = store.getters.user?.menus || []
     return menus
   },

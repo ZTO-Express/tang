@@ -66,11 +66,11 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance, ref, useAttrs } from 'vue'
-import { onBeforeRouteUpdate } from 'vue-router'
-
-import { tpl, noop, _, useApiRequest, useAppContext } from '@zpage/zpage'
+import { vue, vueRouter, tpl, noop, _, useApiRequest, useAppContext } from '@zpage/zpage'
 import { useMessage } from '../../composables'
+
+const { computed, getCurrentInstance, ref, useAttrs } = vue
+const { onBeforeRouteUpdate } = vueRouter
 
 const props = withDefaults(
   defineProps<{

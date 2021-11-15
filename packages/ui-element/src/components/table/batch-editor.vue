@@ -15,7 +15,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { vue } from '@zpage/zpage'
+
+const { reactive, ref } = vue
 
 const props = withDefaults(
   defineProps<{

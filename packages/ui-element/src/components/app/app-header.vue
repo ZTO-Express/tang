@@ -36,11 +36,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useConfig, useRouter, useStore } from '@zpage/zpage'
+import { vue, useConfig, useAppRouter, useAppStore } from '@zpage/zpage'
 
-const router = useRouter()
-const store = useStore()
+const { computed, ref } = vue
+
+const router = useAppRouter()
+const store = useAppStore()
 
 const config = useConfig('app')
 

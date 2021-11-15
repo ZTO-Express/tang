@@ -15,11 +15,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useAttrs } from 'vue'
-import { _, useRouter, useApiRequest, useAppContext, emitter, tpl } from '@zpage/zpage'
+import { vue, _, useAppRouter, useApiRequest, useAppContext, emitter, tpl } from '@zpage/zpage'
 import { useMessage } from '../../composables'
 
-const router = useRouter()
+const { computed, ref, useAttrs } = vue
+
+const router = useAppRouter()
 
 const props = withDefaults(
   defineProps<{

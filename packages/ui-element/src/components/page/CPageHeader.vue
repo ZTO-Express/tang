@@ -18,10 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute, useRouter } from '@zpage/zpage'
+import { vue, useAppRoute, useAppRouter } from '@zpage/zpage'
 
-const router = useRouter()
+const { computed } = vue
+
+const router = useAppRouter()
 
 const props = withDefaults(
   defineProps<{
@@ -32,7 +33,7 @@ const props = withDefaults(
   {}
 )
 
-const route = useRoute()
+const route = useAppRoute()
 
 const routeMeta = computed(() => {
   return route.meta || {}

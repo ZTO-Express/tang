@@ -10,6 +10,19 @@ export const menus: NavMenuItemConfig[] = [
     ]
   },
   {
+    title: '示例',
+    name: 'demo',
+    children: [
+      {
+        name: 'renderer',
+        title: '渲染',
+        order: 0,
+        icon: '',
+        path: '/demo/renderer'
+      }
+    ]
+  },
+  {
     title: '分析',
     name: 'analysis',
     children: [

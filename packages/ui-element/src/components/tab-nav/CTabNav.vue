@@ -26,11 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, onUpdated, ref } from 'vue'
+import { vue, renderHtml } from '@zpage/zpage'
 import { addResizeListener, removeResizeListener } from '../../utils/resize-event/resize-event'
 
 import NavButton from './nav-button.vue'
 import NavItem from './nav-item.vue'
+
+const { computed, onMounted, onUnmounted, onUpdated, ref } = vue
 
 const props = defineProps<{
   items: Array<GenericObject>

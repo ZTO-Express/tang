@@ -115,12 +115,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, onMounted, nextTick } from 'vue'
+import { vue } from '@zpage/zpage'
 import {
   _,
   tpl,
   emitter,
-  useRouter,
+  useAppRouter,
   useWidgetEmitter,
   useWidgetSchema,
   useApiRequest,
@@ -130,12 +130,14 @@ import {
 import { useMessage } from '../../composables'
 import { DEFAULT_ACTIONS } from './consts'
 
+const { computed, reactive, ref, onMounted, nextTick } = vue
+
 // 属性
 const props = defineProps<{
   schema: GenericObject
 }>()
 
-const router = useRouter()
+const router = useAppRouter()
 
 // api请求
 const apiRequest = useApiRequest()

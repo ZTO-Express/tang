@@ -5,8 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { tpl, useApiRequest, useAppContext, useWidgetEmitter, useWidgetSchema } from '@zpage/zpage'
+import { vue, tpl, useApiRequest, useAppContext, useWidgetEmitter, useWidgetSchema } from '@zpage/zpage'
+
+const { computed, ref } = vue
 
 // 属性
 const props = defineProps<{

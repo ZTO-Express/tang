@@ -26,12 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter, useStore } from '@zpage/zpage'
+import { vue, useAppRoute, useAppRouter, useAppStore } from '@zpage/zpage'
 
-const store = useStore()
-const router = useRouter()
-const route = useRoute()
+const { computed, onMounted, reactive, ref, watch } = vue
+
+const store = useAppStore()
+const router = useAppRouter()
+const route = useAppRoute()
 
 const contextTab = ref<any>()
 

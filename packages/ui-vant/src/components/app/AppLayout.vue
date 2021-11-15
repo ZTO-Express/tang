@@ -19,9 +19,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useStore } from '@zpage/zpage'
+import { useAppStore } from '@zpage/zpage'
 
-const store = useStore()
+const store = useAppStore()
 
 const cachedPageKeys = computed(() => {
   const keys = store?.getters.visitedPages.map((it: any) => it.key)

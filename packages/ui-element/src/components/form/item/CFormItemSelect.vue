@@ -38,7 +38,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { vue } from '@zpage/zpage'
+
+const { computed, ref, watch } = vue
 
 const props = withDefaults(
   defineProps<{

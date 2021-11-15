@@ -33,7 +33,8 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { vue } from '@zpage/zpage'
+const { ref } = vue
 
 const props = withDefaults(
   defineProps<{

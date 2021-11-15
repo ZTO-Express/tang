@@ -1,6 +1,7 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { renderHtml, useAppContext } from '@zpage/zpage'
+import { vue, renderHtml, useAppContext } from '@zpage/zpage'
+
+const { defineComponent } = vue
 
 export default defineComponent({
   inheritAttrs: false,

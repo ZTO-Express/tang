@@ -9,9 +9,9 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useAppRouter } from '@zpage/zpage'
 
-const router = useRouter()
+const router = useAppRouter()
 
 function handleLink() {
   router.goHome()

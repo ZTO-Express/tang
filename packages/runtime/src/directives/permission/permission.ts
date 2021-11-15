@@ -1,9 +1,9 @@
-import { useStore } from '../../store'
+import { useAppStore } from '../../store'
 import type { Directive } from 'vue'
 
 const permission: Directive = {
   mounted(el, binding) {
-    const store = useStore()
+    const store = useAppStore()
 
     const { value } = binding
     const roles: string[] = store.getters.permissions

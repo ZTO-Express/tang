@@ -46,16 +46,19 @@ async function _generateDts(packageName: string) {
 
 async function _compile(packageName: string) {
   const pkgRoot = resolvePkgRoot(packageName)
+  const buildRoollupConfig = readBuildConfig(pkgRoot, 'rollup', {})
 
   const input = resolve(pkgRoot, 'src', 'index.ts')
-  const externalOptions = await generateExternal({ full: false, pkgRoot })
+  const externalOptions = await generateExternal({
+    full: false,
+    pkgRoot,
+    internal: buildRoollupConfig.internal || []
+  })
 
   const rollupConfig: RollupOptions = {
     input,
     external: externalOptions
   }
-
-  const buildRoollupConfig = readBuildConfig(pkgRoot, 'rollup')
 
   // 常用应用
   const entries = buildConfigEntries.filter(it => !it[1]?.minify)

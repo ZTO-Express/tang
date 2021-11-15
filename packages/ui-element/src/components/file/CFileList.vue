@@ -38,9 +38,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { fileUtil } from '@zpage/zpage'
+import { vue, fileUtil } from '@zpage/zpage'
 import { Close } from '@element-plus/icons'
+
+const { ref, watch } = vue
 
 interface FileListItem {
   name: string

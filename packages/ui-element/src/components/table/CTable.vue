@@ -99,8 +99,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { ref, reactive, nextTick, computed, useAttrs } from 'vue'
-import { _, useApiRequest, useConfig } from '@zpage/zpage'
+import { vue, _, useApiRequest, useConfig } from '@zpage/zpage'
 
 import { useMessage } from '../../composables'
 import { xlsxUtil } from '../../utils'
@@ -111,6 +110,8 @@ import Pagination from './pagination.vue'
 
 import type { TableColumn, TablePager, SummaryMethodParams, TableData } from './types'
 import type { ExportColumn } from '../../utils/xlsx'
+
+const { ref, reactive, nextTick, computed, useAttrs } = vue
 
 // 属性
 const props = withDefaults(

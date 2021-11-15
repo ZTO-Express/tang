@@ -6,13 +6,17 @@ import type {
   NavigationHookAfter
 } from 'vue-router'
 import type {
+  Widget,
+  Plugin,
   AppStartOptions,
   AppConfig as CoreAppConfig,
   RuntimeConfig,
   PageSchema,
   AppSchema
 } from '@zpage/core'
+
 import type { TreeItem } from '../utils'
+import type { AppStore } from './store'
 
 /** 菜单选项 */
 export interface NavMenuItem extends TreeItem<NavMenuItem> {
@@ -83,24 +87,38 @@ export interface NormalizedAppOptions extends Required<AppOptions> {
   schema: AppSchema
 }
 
+export interface AppRenderOptions {
+  ui: AppUI
+  config?: AppConfig
+  [prop: string]: any
+}
+
+export interface AppRendererConfig {
+  root: Component
+  store: AppStore
+  plugins?: Plugin[]
+  widgets?: Widget[]
+  [prop: string]: any
+}
+
 /**
  * 用户相关Api
  */
 export interface UserApi {
   // 检查权限, 一般给auth loader用
-  checkAuth?: (config: AppConfig) => Promise
+  checkAuth?: (config: AppConfig) => PromiseObject
 
   // 获取接口调用token
-  getToken?: (payload: any) => Promise
+  getToken?: (payload: any) => PromiseObject
 
   // 交换token
-  exchangeToken?: (payload: any) => Promise
+  exchangeToken?: (payload: any) => PromiseObject
 
   // 获取用户信息
-  getUserInfo: () => Promise
+  getUserInfo: () => PromiseObject
 
   // 登出系统
-  logout?: () => Promise
+  logout?: () => PromiseObject
 }
 
 export interface TokenData {
@@ -141,7 +159,7 @@ export interface AppLoader {
 // 权限加载器
 export interface AppAuthLoader extends AppLoader {
   // 检查应用认证
-  checkAuth: (config: AppConfig) => Promise
+  checkAuth: (config: AppConfig) => PromiseObject
 
   // 获取用户信息
   getUserInfo: () => Promise<any>

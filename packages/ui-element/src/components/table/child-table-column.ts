@@ -1,11 +1,12 @@
-import { defineComponent, ref, useSlots, h, resolveComponent } from 'vue'
+import { vue, renderHtml, tpl, _, useAppContext } from '@zpage/zpage'
 import { ElTableColumn, ElFormItem } from 'element-plus'
-import { renderHtml, tpl, _, useAppContext } from '@zpage/zpage'
 
 import CPoptip from '../poptip/CPoptip.vue'
 import BatchEditor from './batch-editor.vue'
 
 import type { TableColumn } from './types'
+
+const { defineComponent, ref, useSlots, h, resolveComponent } = vue
 
 const ChildTableColumn = defineComponent({
   props: {

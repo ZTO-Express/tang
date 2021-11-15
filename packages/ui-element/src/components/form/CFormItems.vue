@@ -43,14 +43,13 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
-import { tpl, useAppContext, useConfig } from '@zpage/zpage'
+import { vue, tpl, useAppContext, useConfig } from '@zpage/zpage'
 
 import { getFormItemRules } from './util'
 
 import type { FormItemConfig } from './types'
-import type { Component } from 'vue'
 
+const { reactive, ref, computed } = vue
 const formItemsConfig = useConfig('components.formItems', {})
 
 const props = withDefaults(
@@ -133,7 +132,7 @@ const operationSpan = computed(() => {
  * 支持扩展Component itemType传Component对象 - example -  foo: { label:"自定义组件", itemType : ElInput}
  * @param itemType
  */
-function getFormItemComponentType(type: string | Component) {
+function getFormItemComponentType(type: string | any) {
   if (type === 'textarea') type = 'input'
   if (type === 'hidden') type = 'input'
   if (typeof type === 'string') return `c-form-item-${type}`

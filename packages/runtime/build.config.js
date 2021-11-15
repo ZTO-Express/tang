@@ -6,3 +6,7 @@ export const tsconfig = {
     target: 'es2020'
   }
 }
+
+export const rollup = {
+  internal: ['vue', 'vuex', 'vue-router']
+}

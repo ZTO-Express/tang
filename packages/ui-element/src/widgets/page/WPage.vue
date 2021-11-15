@@ -16,10 +16,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { tpl, useRouter, useAppContext, useWidgetSchema } from '@zpage/zpage'
+import { vue, tpl, useAppRouter, useAppContext, useWidgetSchema } from '@zpage/zpage'
 
-const router = useRouter()
+const { computed, ref } = vue
+
+const router = useAppRouter()
 
 const props = defineProps<{
   schema: GenericObject

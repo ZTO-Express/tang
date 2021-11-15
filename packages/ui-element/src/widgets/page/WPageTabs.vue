@@ -7,8 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { tpl, useAppContext, useWidgetSchema } from '@zpage/zpage'
+import { vue, tpl, useAppContext, useWidgetSchema } from '@zpage/zpage'
+const { computed, ref } = vue
 
 const props = defineProps<{
   schema: GenericObject
