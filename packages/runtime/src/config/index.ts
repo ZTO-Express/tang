@@ -53,7 +53,7 @@ export const usePage = (path: string) => {
 }
 
 /** 获取资源 */
-export const useRescs = (path?: string) => {
+export const useRescs = (path?: string, defaultValue?: unknown) => {
   const _path = path ? `.${path}` : ''
-  return useConfig(`rescs${_path}`)
+  return useConfig(`rescs${_path}`, defaultValue)
 }

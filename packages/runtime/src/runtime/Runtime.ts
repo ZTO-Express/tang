@@ -17,7 +17,7 @@ export function getCurrentInstance() {
  */
 export class Runtime {
   private _app?: App<Element>
-  private _el: Element
+  private _el?: Element
   private _root: Component
   private _store: AppStore
   private _router: Router
@@ -26,7 +26,7 @@ export class Runtime {
   private _plugins: Plugin[]
 
   private constructor(options: AppRuntimeConfig) {
-    this._el = queryEl(options.el)
+    this._el = options.el && queryEl(options.el)
     this._root = options.root
     this._widgets = options.widgets || []
     this._schema = options.schema
@@ -201,5 +201,17 @@ export class Runtime {
     const mountEl = el || this._el
     app.mount(mountEl)
     return this
+  }
+
+  unmount() {
+    const app = this.app
+
+    if (!app) {
+      warn('应用未实例化。')
+      return this
+    }
+
+    this.app.unmount()
+    this._app = null
   }
 }

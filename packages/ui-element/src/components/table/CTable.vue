@@ -322,20 +322,6 @@ function doLayout() {
   tableRef.value.doLayout()
 }
 
-// 导出数据
-function exportData(fileName: string) {
-  if (!tableData.data.length) {
-    Message.warning('请先查询出数据')
-    return
-  }
-
-  const exportOpts: any = {
-    fileName,
-    columns: vTableHead
-  }
-  xlsxUtil.exportData(tableData.data, exportOpts)
-}
-
 // ---- 表格编辑相关 ------->
 
 /** 验证 */
@@ -427,6 +413,27 @@ function setData(data: any) {
   if (data[summaryProp]) {
     tableData.summary = data[summaryProp]
     nextTick((tableRef as any).doLayout)
+  }
+}
+
+const exportDataFn = useConfig('components.table.exportData', {})
+
+// 导出数据
+function exportData(fileName: string) {
+  if (!tableData.data.length) {
+    Message.warning('请先查询出数据')
+    return
+  }
+
+  const exportOpts: any = {
+    fileName,
+    columns: vTableHead
+  }
+
+  if (exportDataFn) {
+    exportDataFn(tableData.data, exportOpts)
+  } else {
+    xlsxUtil.exportData(tableData.data, exportOpts)
   }
 }
 

@@ -29,6 +29,7 @@ const props = withDefaults(
     title?: string
     referer?: string
     headerHeight?: string | number
+    noHeader?: boolean
     noBack?: boolean
     noPadding?: boolean
   }>(),
@@ -45,7 +46,7 @@ const slots = useSlots()
 const pageConfig = useConfig('CPage')
 
 // 是否显示页面头部
-const isHeader = computed(() => props.title || !!slots.header)
+const isHeader = computed(() => props.noHeader !== true && (props.title || !!slots.header))
 
 // 页面头部高度
 const headerHeight = computed(() => props.headerHeight || pageConfig?.headerHeight)

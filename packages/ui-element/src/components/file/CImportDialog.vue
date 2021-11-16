@@ -204,7 +204,13 @@ async function innerImportMethod(data: any) {
 
 // 解析文件
 async function doParseFile(file: any) {
-  const data = await xlsxUtil.parseFile(file)
+  let data: any[] = []
+
+  if (fileImportCfg.parseFile) {
+    data = await fileImportCfg.parseFile(file)
+  } else {
+    data = await xlsxUtil.parseFile(file)
+  }
 
   // 移除第一行
   data.shift()

@@ -1,6 +1,6 @@
 <template>
-  <c-page :header-height="headerHeight">
-    <template #header>
+  <c-page :header-height="headerHeight" :no-header="!isHeader">
+    <template v-if="isHeader" #header>
       <c-page-header v-bind="headerAttrs" />
     </template>
     <template v-if="isToolbar" #toolbar>
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, tpl, useAppRouter, useAppContext, useWidgetSchema } from '@zpage/zpage'
+import { vue, tpl, useAppRouter, useAppContext, useWidgetSchema, useConfig } from '@zpage/zpage'
 
 const { computed, ref } = vue
 
@@ -32,10 +32,17 @@ const cTabs = await useWidgetSchema(wSchema.tabs)
 
 const context = useAppContext()
 
+const pageCfg = useConfig('widgets.page')
+
 // ---- header相关 ----->
 
 const isToolbar = computed(() => {
   return isTab.value
+})
+
+const isHeader = computed(() => {
+  if (wSchema.noHeader === false) return false
+  return wSchema.noHeader !== true && pageCfg.noHeader !== true
 })
 
 const headerHeight = computed(() => {

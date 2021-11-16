@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAppRouter } from 'vue-router'
+import { useAppRouter } from '@zpage/zpage'
 
 const router = useAppRouter()
 

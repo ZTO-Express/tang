@@ -1,44 +1,62 @@
 <template>
-  <el-container class="c-app fs">
-    <el-header class="app-header-con">
-      <app-header />
-    </el-header>
-    <el-container class="app-body-con">
-      <el-aside class="app-aside" :class="{ collapse: asideCollapse }">
-        <el-scrollbar max-height="calc(100% - 40px)">
-          <transition name="fade" mode="out-in">
-            <app-menu :collapse="asideCollapse" />
+  <el-container class="c-app fs" :class="{ 'no-frame': !showFrame, 'no-nav': !showNav }">
+    <template v-if="showFrame">
+      <el-header class="app-header-con">
+        <app-header />
+      </el-header>
+      <el-container class="app-body-con">
+        <el-aside class="app-aside" :class="{ collapse: asideCollapse }">
+          <el-scrollbar max-height="calc(100% - 40px)">
+            <transition name="fade" mode="out-in">
+              <app-menu :collapse="asideCollapse" />
+            </transition>
+          </el-scrollbar>
+          <div class="app-aside__footer flex-center">
+            <el-icon @click="handleAsideCollapse">
+              <back v-if="asideCollapse" color="white" />
+              <back v-else color="white" />
+            </el-icon>
+          </div>
+        </el-aside>
+        <div class="app-body fs">
+          <div v-if="showNav" class="app-nav-con">
+            <app-nav />
+          </div>
+          <div class="app-main-con no-padding">
+            <router-view v-slot="{ Component }">
+              <template v-if="Component">
+                <transition mode="out-in">
+                  <keep-alive :include="cachedPageKeys">
+                    <suspense>
+                      <component :is="Component" />
+                      <template #fallback>
+                        <div>加载中...</div>
+                      </template>
+                    </suspense>
+                  </keep-alive>
+                </transition>
+              </template>
+            </router-view>
+          </div>
+        </div>
+      </el-container>
+    </template>
+    <template v-else>
+      <router-view v-slot="{ Component }">
+        <template v-if="Component">
+          <transition mode="out-in">
+            <keep-alive :include="cachedPageKeys">
+              <suspense>
+                <component :is="Component" />
+                <template #fallback>
+                  <div>加载中...</div>
+                </template>
+              </suspense>
+            </keep-alive>
           </transition>
-        </el-scrollbar>
-        <div class="app-aside__footer flex-center">
-          <el-icon @click="handleAsideCollapse">
-            <back v-if="asideCollapse" color="white" />
-            <back v-else color="white" />
-          </el-icon>
-        </div>
-      </el-aside>
-      <div class="app-body fs" :class="{ 'no-nav': !showNav }">
-        <div v-if="showNav" class="app-nav-con">
-          <app-nav />
-        </div>
-        <div class="app-main-con no-padding">
-          <router-view v-slot="{ Component }">
-            <template v-if="Component">
-              <transition mode="out-in">
-                <keep-alive :include="cachedPageKeys">
-                  <suspense>
-                    <component :is="Component" />
-                    <template #fallback>
-                      <div>加载中...</div>
-                    </template>
-                  </suspense>
-                </keep-alive>
-              </transition>
-            </template>
-          </router-view>
-        </div>
-      </div>
-    </el-container>
+        </template>
+      </router-view>
+    </template>
   </el-container>
 </template>
 
@@ -56,12 +74,19 @@ const store = useAppStore()
 
 const asideCollapse = ref(false)
 const menuConfig = useConfig('app.menu', {})
-
-const showNav = menuConfig.showNav
+const frameConfig = useConfig('app.frame')
 
 const cachedPageKeys = computed(() => {
   const keys = store.getters.visitedPages.map((it: any) => it.key)
   return keys
+})
+
+const showFrame = computed(() => {
+  return frameConfig !== false
+})
+
+const showNav = computed(() => {
+  return showFrame.value && !!menuConfig.showNav
 })
 
 function handleAsideCollapse() {
@@ -127,11 +152,20 @@ function handleAsideCollapse() {
   .app-main-con {
     height: calc(100% - $app-nav-height - 20px);
   }
+}
 
+.c-app {
   &.no-nav {
     .app-main-con {
       height: calc(100% - 20px);
     }
   }
+}
+</style>
+
+<style lang="scss">
+.c-app.no-frame > .c-page {
+  min-width: 100%;
+  margin: 0;
 }
 </style>
