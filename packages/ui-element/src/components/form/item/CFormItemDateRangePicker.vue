@@ -7,7 +7,7 @@
       v-bind="$attrs"
       :disabled="disabled"
     />
-    <z-form-item :prop="toProp"></z-form-item>
+    <el-form-item :prop="toProp"></el-form-item>
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 {
   "name": "@zpage/zpage",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "@zpage/zpage",
   "main": "index.js",
   "module": "dist/zpage.esm.js",

@@ -1,6 +1,6 @@
 {
   "name": "@zpage/ui-element",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "@zpage/ui-element",
   "main": "index.js",
   "module": "dist/zpage-ui-element.esm.js",

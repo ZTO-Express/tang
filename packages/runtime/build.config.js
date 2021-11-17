@@ -4,7 +4,7 @@ export const genTypes = true
 export const tsconfig = {
   compilerOptions: {
     module: 'esnext',
-    target: 'es2020'
+    target: 'es2015'
   }
 }
 

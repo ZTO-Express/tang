@@ -4,6 +4,7 @@ import { getPageKey, tpl, _ } from '../../utils'
 import { useConfig } from '../../config'
 import { useAppStore } from '../store'
 import { useAppContext } from '../composables'
+import { pruneCachedPage } from './util'
 
 import type { Router } from 'vue-router'
 import type { AppRouterConfig } from '../../typings'
@@ -43,8 +44,6 @@ export function createAppRouter(config?: AppRouterConfig) {
         window.open(to)
         return
       }
-
-      debugger
 
       if (to.name) {
         const ctx = useAppContext(to.data || {})
@@ -220,6 +219,9 @@ export function createAppRouter(config?: AppRouterConfig) {
 
       // 移除临时路由
       if (keeyAlive === false && from.name && from.meta?.isTemp) {
+        await store.dispatch('pages/removeVisited', {
+          name: from.name
+        })
         router.removeRoute(from.name)
       }
     })
@@ -235,4 +237,14 @@ export function useAppRouter() {
 
 export function useAppRoute() {
   return useRoute()
+}
+
+// 清理当前页面
+export function pruneCurrentPage() {
+  if (!router) return
+
+  const route = router.currentRoute?.value
+  if (!route?.meta) return
+
+  pruneCachedPage(router, route.meta)
 }
