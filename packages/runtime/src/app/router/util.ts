@@ -92,7 +92,6 @@ export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Sub
 function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule) {
   // 有路径的菜单才有路由
   if (menu.path) {
-    debugger
     const pathInfo = _parseMenuPath(menu.path)
     pathInfo.query = Object.assign({}, pathInfo.query, menu.query)
 

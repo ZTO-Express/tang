@@ -25,8 +25,6 @@ export class AppRenderer {
       ...options
     })
 
-    debugger
-
     app.router.push(options.path)
 
     return this

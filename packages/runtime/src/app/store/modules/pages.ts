@@ -245,7 +245,6 @@ const actions: ActionTree<PagesState, RootState> = {
     const router = App.instance?.router
     if (!router) return
 
-    debugger
     const submodule = rootGetters['app/submodule']
     const tmpRoute = createTmpRoute(router, menu, submodule)
     return tmpRoute

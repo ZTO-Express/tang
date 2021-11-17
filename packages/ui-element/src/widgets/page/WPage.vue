@@ -41,7 +41,6 @@ const isToolbar = computed(() => {
 })
 
 const isHeader = computed(() => {
-  debugger
   if (wSchema.noHeader === false) return false
   return wSchema.noHeader !== true && pageCfg.noHeader !== true
 })

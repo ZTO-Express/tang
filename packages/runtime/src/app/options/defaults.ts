@@ -32,8 +32,12 @@ export const defaultOptions = (): Partial<AppOptions> => {
     config: {
       env: {},
       app: {
+        frame: {},
         menu: {
           showNav: false
+        },
+        page: {
+          keepAlive: false
         }
       },
       apis: {},

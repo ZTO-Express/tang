@@ -44,6 +44,8 @@ export function createAppRouter(config?: AppRouterConfig) {
         return
       }
 
+      debugger
+
       if (to.name) {
         const ctx = useAppContext(to.data || {})
 
@@ -70,8 +72,8 @@ export function createAppRouter(config?: AppRouterConfig) {
       // 防止死循环
       if (pageKey === refererKey) return
 
-      const showNav = useConfig('app.menu.showNav')
-      if (!showNav) {
+      const keeyAlive = useConfig('app.page.keeyAlive')
+      if (!keeyAlive) {
         if (!refererKey) {
           // 没有引用页面则直接清空
           await store.dispatch('pages/pruneVisited', 'ALL')
@@ -214,10 +216,10 @@ export function createAppRouter(config?: AppRouterConfig) {
 
       await store.dispatch('pages/setCurrent', to.meta?.pageKey || to.name)
 
-      const showNav = useConfig('app.menu.showNav')
+      const keeyAlive = useConfig('app.page.keeyAlive')
 
       // 移除临时路由
-      if (showNav === false && from.name && from.meta?.isTemp) {
+      if (keeyAlive === false && from.name && from.meta?.isTemp) {
         router.removeRoute(from.name)
       }
     })
