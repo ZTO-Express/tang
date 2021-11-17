@@ -17,8 +17,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useAppRoute, useAppRouter } from '@zpage/zpage'
+import { vue, useAppRoute, useAppRouter } from '@zpage/zpage'
+
+const { computed } = vue
 
 const router = useAppRouter()
 

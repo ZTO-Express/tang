@@ -1,5 +1,9 @@
 <template>
-  <el-container class="c-app fs" :class="{ 'no-frame': !showFrame, 'no-nav': !showNav }">
+  <el-container
+    class="c-app fs"
+    :class="{ 'no-frame': !showFrame, 'no-nav': !showNav }"
+    direction="vertical"
+  >
     <template v-if="showFrame">
       <el-header class="app-header-con">
         <app-header />

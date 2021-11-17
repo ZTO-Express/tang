@@ -32,7 +32,7 @@ const cTabs = await useWidgetSchema(wSchema.tabs)
 
 const context = useAppContext()
 
-const pageCfg = useConfig('widgets.page')
+const pageCfg = useConfig('widgets.page', {})
 
 // ---- header相关 ----->
 
@@ -41,6 +41,7 @@ const isToolbar = computed(() => {
 })
 
 const isHeader = computed(() => {
+  debugger
   if (wSchema.noHeader === false) return false
   return wSchema.noHeader !== true && pageCfg.noHeader !== true
 })

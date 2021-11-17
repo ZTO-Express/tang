@@ -1,33 +1,31 @@
 /** 资源管理相关Api */
 
-import { UserApi, HttpRequest, clearTokenData } from '@zpage/zpage'
+import { clearTokenData, HttpRequest } from '@zpage/zpage'
 import { ENV } from '../config/env'
 import { httpConfig } from '../config/http'
 
-export default new (class extends HttpRequest implements UserApi {
-  constructor() {
-    super(ENV.apiUrl, httpConfig)
-  }
+const request = new HttpRequest(ENV.apiUrl, httpConfig)
 
+export default {
   /** 获取token */
-  async getToken(code: string) {
-    return super.fetch({
+  getToken: async (code: string) => {
+    return request.fetch({
       url: 'tuxi.base.UserService.getToken',
       data: { code }
     })
-  }
+  },
 
   /** 刷新token */
-  async exchangeToken(refreshToken: string) {
-    return super.fetch({
+  exchangeToken: async (refreshToken: string) => {
+    return request.fetch({
       url: 'tuxi.base.UserService.exChangeToken',
       data: { refresh_token: refreshToken }
     })
-  }
+  },
 
   /** 获取用户信息 */
-  async getUserInfo() {
-    const getBasicInfo = super.post('user.login.info')
+  getUserInfo: async () => {
+    const getBasicInfo = request.post('user.login.info')
 
     const results = await Promise.all([getBasicInfo])
 
@@ -43,10 +41,10 @@ export default new (class extends HttpRequest implements UserApi {
         basic
       }
     }
-  }
+  },
 
   /** 登出系统 */
-  async logout() {
+  logout: async () => {
     await clearTokenData()
   }
-})()
+}

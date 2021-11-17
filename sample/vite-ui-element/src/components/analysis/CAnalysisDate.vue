@@ -29,7 +29,7 @@ export default { inheritAttrs: false }
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { dateUtil } from '@zpage/zpage'
+import { dateUtil } from '@zpage/ui-element'
 
 const props = withDefaults(
   defineProps<{

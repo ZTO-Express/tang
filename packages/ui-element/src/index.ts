@@ -1,6 +1,7 @@
 import { ZPage } from '@zpage/zpage'
 import * as ZPageElementUI from './ZPageElementUI'
 
+export * from '@zpage/zpage'
 export * as ElementPlus from 'element-plus'
 export * as ElementPlusIcons from '@element-plus/icons'
 

@@ -1,8 +1,16 @@
 import { createApp } from 'vue'
 import { warn, queryEl } from '../utils'
+import { AppRenderer } from './renderer/AppRenderer'
 
 import type { Widget, Plugin } from '@zpage/core'
-import type { VueApp, VuePlugin, VueComponent, Installable, AppInstanceOptions } from '../typings'
+import type {
+  VueApp,
+  VuePlugin,
+  VueComponent,
+  Installable,
+  AppInstanceOptions,
+  AppRenderPageOptions
+} from '../typings'
 
 /**
  * Vue3运行器
@@ -15,9 +23,13 @@ export class App implements Installable {
   private _widgets: Widget[] = []
   private _plugins: Plugin[] = []
 
+  private _renderer: AppRenderer
+
   private constructor(options: AppInstanceOptions) {
     this._options = options
     this._el = options.el && queryEl(options.el)
+
+    this._renderer = new AppRenderer({})
   }
 
   // 单例
@@ -118,6 +130,11 @@ export class App implements Installable {
 
     this.vueApp.unmount()
     this._vueApp = null
+  }
+
+  // 渲染页面
+  async render(options: AppRenderPageOptions) {
+    return App.instance._renderer.render(options)
   }
 
   /** 应用zpage 插件 */

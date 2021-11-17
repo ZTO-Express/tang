@@ -8,8 +8,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useAppStore, useWidgetSchema } from '@zpage/zpage'
+import { computed, nextTick, onMounted } from 'vue'
+import { App, useAppStore, useWidgetSchema } from '@zpage/ui-element'
 
 const store = useAppStore()
 
@@ -22,6 +22,22 @@ const wSchema = await useWidgetSchema(props.schema)
 
 const currentApp = computed(() => {
   return store.getters.app?.currentApp
+})
+
+onMounted(async () => {
+  debugger
+  setTimeout(async () => {
+    debugger
+    await App.render({
+      el: '#app-renderer',
+      path: '/demo/rendere/x',
+      schema: {
+        type: 'page'
+      }
+    })
+
+    App.instance.router.push('/demo/rendere/x')
+  }, 100)
 })
 </script>
 

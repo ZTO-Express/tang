@@ -21,7 +21,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useSlots } from 'vue'
+import { vue } from '@zpage/zpage'
+
+const { computed, useSlots } = vue
 
 const props = withDefaults(
   defineProps<{

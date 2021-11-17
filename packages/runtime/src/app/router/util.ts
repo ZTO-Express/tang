@@ -85,13 +85,14 @@ export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Sub
 
   menu.name = `${menu.name}__tmp_${uniqId()}`
 
-  _createSubRoute(router, menu, submodule)
+  return _createSubRoute(router, menu, submodule)
 }
 
 /** 根据导航菜单构建路由 */
 function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule) {
   // 有路径的菜单才有路由
   if (menu.path) {
+    debugger
     const pathInfo = _parseMenuPath(menu.path)
     pathInfo.query = Object.assign({}, pathInfo.query, menu.query)
 
@@ -154,6 +155,8 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
       // 添加路由到根路由下
       router.addRoute(ROOT_ROUTE_NAME, route)
     }
+
+    return route
   }
 
   if (menu.children?.length) {

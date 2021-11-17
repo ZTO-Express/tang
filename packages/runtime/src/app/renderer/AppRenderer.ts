@@ -20,7 +20,14 @@ export class AppRenderer {
   async render(options: AppRenderPageOptions) {
     const app = App.instance
 
-    await app.store.dispatch('pages/addTemp', options)
+    await app.store.dispatch('pages/addTemp', {
+      teleportTo: options.el,
+      ...options
+    })
+
+    debugger
+
+    app.router.push(options.path)
 
     return this
   }

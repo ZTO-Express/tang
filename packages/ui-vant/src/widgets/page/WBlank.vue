@@ -5,8 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useWidgetSchema } from '@zpage/zpage'
+import { vue, useWidgetSchema } from '@zpage/zpage'
+
+const { ref } = vue
 
 const props = defineProps<{
   schema: Record<string, any>

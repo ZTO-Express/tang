@@ -18,8 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useAppStore } from '@zpage/zpage'
+import { vue, useAppStore } from '@zpage/zpage'
+
+const { computed, ref } = vue
 
 const store = useAppStore()
 

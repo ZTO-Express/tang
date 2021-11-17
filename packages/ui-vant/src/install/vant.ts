@@ -2,28 +2,27 @@ import { warn } from '@zpage/zpage'
 
 import * as componentsMap from './vant_components'
 
-import type { AppOptions, Runtime } from '@zpage/zpage'
-import type { App } from 'vue'
+import type { VueApp, Installable, InstallableOptions } from '@zpage/zpage'
 
-export default (instance: Runtime, options?: AppOptions): void => {
-  const { app } = instance
+export default (target: Installable, options?: InstallableOptions): void => {
+  const { vueApp } = target
 
-  if (!app) {
+  if (!vueApp) {
     warn('请先实例化再注册组件')
     return
   }
 
-  app.use(componentsMap.Toast)
+  vueApp.use(componentsMap.Toast)
 
   Object.keys(componentsMap).forEach(key => {
-    install(app, componentsMap[key], key)
+    install(vueApp, componentsMap[key], key)
   })
 }
 
-function install(app: App<Element>, cmpt: any, name?: string) {
-  app.use(cmpt)
+function install(vueApp: VueApp, cmpt: any, name?: string) {
+  vueApp.use(cmpt)
 
   if (name) {
-    app.component(name, cmpt)
+    vueApp.component(name, cmpt)
   }
 }

@@ -1,10 +1,10 @@
 import installVant from './vant'
 import installComponents from './components'
 import installWidgets from './widgets'
-import type { Runtime, AppOptions } from '@zpage/zpage'
+import type { Installable } from '@zpage/zpage'
 
 /** 安装插件 */
-export async function install(instance: Runtime, options?: AppOptions) {
+export async function install(instance: Installable, options?: InstallableOptions) {
   // 安装Vant
   await installVant(instance, options)
 

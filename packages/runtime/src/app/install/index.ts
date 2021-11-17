@@ -27,9 +27,4 @@ export async function install(app: App, options?: AppOptions) {
 
   // 安装插件
   await installPlugins(app, options)
-
-  // 安装ui
-  if (app.ui.install) {
-    await app.ui.install(app, options)
-  }
 }

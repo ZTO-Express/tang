@@ -245,8 +245,10 @@ const actions: ActionTree<PagesState, RootState> = {
     const router = App.instance?.router
     if (!router) return
 
+    debugger
     const submodule = rootGetters['app/submodule']
-    createTmpRoute(router, menu, submodule)
+    const tmpRoute = createTmpRoute(router, menu, submodule)
+    return tmpRoute
   },
 
   setPageData: ({ commit }, payload: any) => {

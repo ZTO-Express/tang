@@ -1,19 +1,20 @@
 import { Toast } from 'vant'
-import { HttpRequestConfig, uuid, getAccessToken, useRouter, ZFfb } from '@zpage/zpage'
+import { uuid, getAccessToken, useAppRouter, ZFfb } from '@zpage/zpage'
 
-import { ENV } from './env'
 import ffb from '../config/ffb'
+import { ENV } from './env'
+
+import type { HttpRequestConfig } from '@zpage/zpage'
 
 ZFfb.use(ffb)
 
 function beforeRequest(config: any) {
-  const router = useRouter()
+  const router = useAppRouter()
 
   /** 对请求进行拦截调整 */
   ZFfb.interceptFfbRequest(config)
 
   config.headers['x-zop-ns'] = 'tuxi-cdc'
-  if (ENV.javaLocalUrl) config.headers['x-dubbo-directip'] = ENV.javaLocalUrl
   config.headers['x-request-id'] = uuid()
 
   let token: any = getAccessToken()

@@ -1,7 +1,8 @@
 import type { PageSchema } from '@zpage/core'
-import type { Component as VueComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import type {
+  VueApp,
+  VueComponent,
   Installable,
   InstallableOptions,
   RuntimeUI,
@@ -18,8 +19,8 @@ export * as vue from 'vue'
 export * as vuex from 'vuex'
 export * as vueRouter from 'vue-router'
 
-export type { VueComponent }
 export type { RouteRecordRaw }
+export type { VueApp, VueComponent }
 export type {
   Installable,
   InstallableOptions,

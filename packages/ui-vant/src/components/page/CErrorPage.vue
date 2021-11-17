@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useAppRouter } from '@zpage/zpage'
 
 const props = defineProps<{
   bgPic?: string
@@ -28,7 +28,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['link'])
 
-const router = useRouter()
+const router = useAppRouter()
 
 function handleLink() {
   if (props.link) router.goto(props.link)

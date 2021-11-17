@@ -45,18 +45,23 @@ export async function startApp(options: AppOptions) {
     router
   })
 
-  const { vueApp } = await runtimeApp.start()
+  const app = await runtimeApp.start()
 
-  if (!vueApp) {
+  if (!app.vueApp) {
     warn('创建应用失败，请确认传入了正确的参数。')
     return
   }
 
-  // 安装应用(组件、微件、插件)
-  await install(runtimeApp, opts)
+  // 安装ui
+  if (app.ui.install) {
+    await app.ui.install(app, options)
+  }
 
   // 加载app初始化数据
   await runtimeApp.store.dispatch('app/load', opts)
+
+  // 安装应用(组件、微件、插件)
+  await install(runtimeApp, opts)
 
   // 4. 执行app加载
   const onLoad = config.app?.onLoad

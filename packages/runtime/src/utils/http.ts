@@ -34,11 +34,12 @@ export interface HttpRequestConfig {
  * Http请求类
  */
 export class HttpRequest {
-  private _queue: Record<string, boolean> = {}
+  private _queue: Record<string, boolean>
   protected _baseUrl: string | undefined
   protected _config: HttpRequestConfig | undefined
 
   constructor(baseUrl?: string, config?: HttpRequestConfig) {
+    this._queue = {}
     this._baseUrl = baseUrl
     this._config = config
   }
@@ -87,7 +88,7 @@ export class HttpRequest {
     // 请求拦截
     instance.interceptors.request.use(
       (config: AxiosRequestConfig) => {
-        if (url) this._queue[url] = true
+        // if (url) this._queue[url] = true
 
         const beforeRequest = this._config?.interceptors?.beforeRequest
         if (beforeRequest) return Promise.resolve().then(() => beforeRequest(config))
