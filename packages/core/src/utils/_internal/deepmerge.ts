@@ -3,22 +3,27 @@ export interface DeepmergeOptions {
   arrayMerge?: (target: any[], source: any[], options?: DeepmergeOptions) => any[]
   clone?: boolean
   customMerge?: (key: string, options?: DeepmergeOptions) => ((x: any, y: any) => any) | undefined
-  isMergeableObject?: (value: GenericObject) => boolean
+  isMergeableObject?: (value: Record<string, any>) => boolean
   cloneUnlessOtherwiseSpecified?: (value: any, options?: DeepmergeOptions) => any
 }
 
 /** 默认是否可合并对象 */
 const defaultIsMergeableObject = (value: unknown) => {
   const tag = Object.prototype.toString.call(value)
-  return !!value && typeof value === 'object' && tag !== '[object RegExp]' && tag !== '[object Date]'
+  return (
+    !!value && typeof value === 'object' && tag !== '[object RegExp]' && tag !== '[object Date]'
+  )
 }
 
 function emptyTarget(val: unknown) {
   return Array.isArray(val) ? [] : {}
 }
 
-function cloneUnlessOtherwiseSpecified(value: GenericObject, options?: DeepmergeOptions) {
-  return options && options.clone !== false && options.isMergeableObject && options.isMergeableObject(value)
+function cloneUnlessOtherwiseSpecified(value: Record<string, any>, options?: DeepmergeOptions) {
+  return options &&
+    options.clone !== false &&
+    options.isMergeableObject &&
+    options.isMergeableObject(value)
     ? deepmerge(emptyTarget(value), value, options)
     : value
 }
@@ -37,7 +42,7 @@ function getMergeFunction(key: string, options: any) {
   return typeof customMerge === 'function' ? customMerge : deepmerge
 }
 
-function getEnumerableOwnPropertySymbols(target: GenericObject): any[] {
+function getEnumerableOwnPropertySymbols(target: Record<string, any>): any[] {
   return Object.getOwnPropertySymbols
     ? Object.getOwnPropertySymbols(target).filter(function (symbol) {
         // eslint-disable-next-line no-prototype-builtins
@@ -46,11 +51,11 @@ function getEnumerableOwnPropertySymbols(target: GenericObject): any[] {
     : []
 }
 
-function getKeys(target: GenericObject) {
+function getKeys(target: Record<string, any>) {
   return Object.keys(target).concat(getEnumerableOwnPropertySymbols(target))
 }
 
-function propertyIsOnObject(object: GenericObject, property: string) {
+function propertyIsOnObject(object: Record<string, any>, property: string) {
   try {
     return property in object
   } catch (_) {
@@ -90,8 +95,16 @@ function mergeObject(target: any, source: any, options: any) {
   return destination
 }
 
-export function deepmerge<T1 = any, T2 = any>(x: Partial<T1>, y: Partial<T2>, options?: DeepmergeOptions): T1 & T2
-export function deepmerge<T = any>(target: Partial<T>, source: Partial<T>, options?: DeepmergeOptions): T {
+export function deepmerge<T1 = any, T2 = any>(
+  x: Partial<T1>,
+  y: Partial<T2>,
+  options?: DeepmergeOptions
+): T1 & T2
+export function deepmerge<T = any>(
+  target: Partial<T>,
+  source: Partial<T>,
+  options?: DeepmergeOptions
+): T {
   options = options || {}
   options.arrayMerge = options.arrayMerge || defaultArrayMerge
   options.isMergeableObject = options.isMergeableObject || defaultIsMergeableObject

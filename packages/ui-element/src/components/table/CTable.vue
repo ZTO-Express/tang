@@ -117,7 +117,7 @@ const { ref, reactive, nextTick, computed, useAttrs } = vue
 const props = withDefaults(
   defineProps<{
     api?: string // api请求
-    params?: GenericObject // api请求参数
+    params?: Record<string, any> // api请求参数
     data?: Array<any> // 表格数据
     columns?: Array<any> // 列设置
     showExpand?: boolean // 展开列是否展示
@@ -135,7 +135,7 @@ const props = withDefaults(
     noOperation?: boolean // 是否展示操作列
     operationPosition?: string // 操作列位置
     operationWidth?: string | number // 操作列宽度
-    pagerAttrs?: GenericObject // 内部属性
+    pagerAttrs?: Record<string, any> // 内部属性
     pageSizes?: Array<number> // 可选分页数
     pageSize?: number // 页面大小
     paginationSmall?: boolean // pagination small

@@ -3,15 +3,11 @@ import { HttpRequest } from '@zpage/zpage'
 import { ENV } from '../config/env'
 import { httpConfig } from '../config/http'
 
-import type { UserApi } from '@zpage/zpage'
+import type { AppUserApi } from '@zpage/zpage'
 
-export default new (class extends HttpRequest implements UserApi {
-  constructor() {
-    super(ENV.apiUrl, httpConfig)
-  }
-
+export default {
   /** 获取用户信息 */
   async getUserInfo() {
     return { username: '', nickname: '匿名用户' }
   }
-})()
+}

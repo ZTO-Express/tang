@@ -1,25 +1,32 @@
-import type { Component } from 'vue'
+import type { VueComponent } from './vue'
 import type {
   Router,
   RouteRecordRaw,
   NavigationGuardWithThis,
-  NavigationHookAfter
+  NavigationHookAfter,
+  RouteLocationNormalized,
+  RouteLocationNormalizedLoaded
 } from 'vue-router'
 import type {
   Widget,
   Plugin,
-  AppStartOptions,
-  AppConfig as CoreAppConfig,
-  RuntimeConfig,
+  Schema,
   PageSchema,
-  AppSchema
+  PromiseFunction,
+  PromiseObject
 } from '@zpage/core'
 
-import type { TreeItem } from '../utils'
+import type { InstallableOptions, RuntimeConfig, RuntimeUI } from './runtime'
 import type { AppStore } from './store'
 
+export interface AppSchema extends Schema {
+  type: 'app'
+  name: string
+  logo?: string
+}
+
 /** 菜单选项 */
-export interface NavMenuItem extends TreeItem<NavMenuItem> {
+export interface INavMenuItem<T> {
   name: string
   title: string
   order: number
@@ -27,12 +34,16 @@ export interface NavMenuItem extends TreeItem<NavMenuItem> {
   pageKey?: string
   icon?: string
   path?: string
-  children?: NavMenuItem[]
+  children?: T[]
   data?: any
+  meta?: any
+  [prop: string]: any
 }
 
+export type NavMenuItem = INavMenuItem<NavMenuItem>
+
 /** 菜单配置，便于合并 */
-export interface NavMenuItemConfig extends Partial<NavMenuItem> {
+export interface NavMenuItemConfig extends Partial<INavMenuItem<NavMenuItemConfig>> {
   name: string
   children?: NavMenuItemConfig[]
 }
@@ -49,62 +60,80 @@ export interface AppRouterConfig {
   beforeEach?: NavigationGuardWithThis<undefined>
   afterEach?: NavigationHookAfter
   beforeResolve?: NavigationGuardWithThis<undefined>
-  onError?: (handler: _ErrorHandler) => void
+  onError?: (
+    handler: (error: any, to: RouteLocationNormalized, from: RouteLocationNormalizedLoaded) => any
+  ) => void
 }
 
-export interface AppRuntimeConfig extends RuntimeConfig<Component> {
-  router: Router
-  store: AppStore
-}
-
-/** 应用配置 */
-export interface AppConfig extends CoreAppConfig {
-  env?: GenericObject
-  apis?: GenericObject
-  components?: GenericObject
-}
-
-export interface AppUI {
-  root: Component
-  theme: Component
+export interface AppUI extends RuntimeUI {
+  root: VueComponent
   router?: AppRouterConfig
   install?: PromiseFunction
 
   [prop: string]: any
 }
 
-/** 应用选项 */
-export interface AppOptions extends AppStartOptions<Component> {
+export interface AppConfig extends RuntimeConfig {
+  app?: Record<string, any>
+}
+
+/** 运行时启动选项 */
+export interface AppOptions extends InstallableOptions {
   ui: AppUI
+  el?: Element | string
+  schema?: AppSchema
   config?: AppConfig
 }
 
-/**
- * App启动选项
- *  T 为框架组件类型（vue为Component）
- */
-export interface NormalizedAppOptions extends Required<AppOptions> {
-  schema: AppSchema
-}
+// 运行时配置
 
-export interface AppRenderOptions {
+export interface AppInstanceOptions {
   ui: AppUI
-  config?: AppConfig
-  [prop: string]: any
-}
-
-export interface AppRendererConfig {
-  root: Component
+  router: Router
   store: AppStore
+  el?: Element | string
   plugins?: Plugin[]
   widgets?: Widget[]
   [prop: string]: any
 }
 
 /**
+ * App启动选项
+ *  T 为框架组件类型（vue为Vue）
+ */
+export interface NormalizedAppOptions extends Required<AppOptions> {
+  schema: AppSchema
+}
+
+// 应用加载器
+export interface AppLoader {
+  name: string
+}
+
+// 权限加载器
+export interface AppAuthLoader extends AppLoader {
+  // 检查应用认证
+  checkAuth: (config: AppConfig) => PromiseObject
+
+  // 获取用户信息
+  getUserInfo: (...args: any[]) => Promise<any>
+
+  // 解析获取的菜单数据
+  getMenuData: (...args: any[]) => Promise<NavMenuItem[]>
+
+  // 登出
+  logout: (...args: any[]) => Promise<void>
+}
+
+// 页面加载器
+export interface AppPageLoader extends AppLoader {
+  loadPage: (path: string) => Promise<PageSchema | undefined>
+}
+
+/**
  * 用户相关Api
  */
-export interface UserApi {
+export interface AppUserApi {
   // 检查权限, 一般给auth loader用
   checkAuth?: (config: AppConfig) => PromiseObject
 
@@ -121,57 +150,20 @@ export interface UserApi {
   logout?: () => PromiseObject
 }
 
-export interface TokenData {
-  accessToken: string
-  refreshToken?: string
-  requestTime?: number
-
+export interface AppRendererOptions {
   [prop: string]: any
 }
 
-/** 请求参数 */
-export interface ApiRequestConfig {
-  action: { type?: string; api: string; sourceType?: string } | string
-  params?: GenericObject
-
+/** 应用渲染选项 */
+export interface AppRenderPageOptions {
+  el: string
+  path: string
+  schema: Schema
   [prop: string]: any
 }
 
-/** 请求参数 */
-export interface ApiQueryRequestConfig extends ApiRequestConfig {
-  pageIndex: number
-  pageSize: number
-}
-
-/** 请求适配器 */
-export type ApiRequest = (config: ApiRequestConfig) => Promise<any>
-
-/** api查询适配器 */
-export type ApiQueryRequest = (
-  config: ApiQueryRequestConfig
-) => Promise<{ rows: any; total: number; statistic: any }>
-
-// 应用加载器
-export interface AppLoader {
-  name: string
-}
-
-// 权限加载器
-export interface AppAuthLoader extends AppLoader {
-  // 检查应用认证
-  checkAuth: (config: AppConfig) => PromiseObject
-
-  // 获取用户信息
-  getUserInfo: () => Promise<any>
-
-  // 解析获取的菜单数据
-  getMenuData: () => Promise<NavMenuItem[]>
-
-  // 登出
-  logout: () => Promise<void>
-}
-
-// 页面加载器
-export interface AppPageLoader extends AppLoader {
-  loadPage: (path: string) => Promise<PageSchema | undefined>
+export interface AppRendererPage {
+  key: string
+  schema: Schema
+  [prop: string]: any
 }

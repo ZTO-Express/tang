@@ -1,9 +1,9 @@
-interface OptionItem extends GenericObject {
+interface OptionItem extends Record<string, any> {
   value: number | string | undefined
   label: string
 }
 
-export const commonOptions: GenericObject<OptionItem[]> = {
+export const commonOptions: Record<string, OptionItem[]> = {
   // 是否
   yesOrNo: [
     { label: '是', value: 1 },

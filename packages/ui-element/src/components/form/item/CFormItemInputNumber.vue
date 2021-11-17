@@ -21,7 +21,7 @@ const { computed } = vue
 
 const props = withDefaults(
   defineProps<{
-    model: GenericObject
+    model: Record<string, any>
     prop: string
     controlsPosition: string
     min?: number

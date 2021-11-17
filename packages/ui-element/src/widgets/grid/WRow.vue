@@ -14,7 +14,7 @@ const { computed } = vue
 
 // 属性
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
 const wSchema = await useWidgetSchema(props.schema)

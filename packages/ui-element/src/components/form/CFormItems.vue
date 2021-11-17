@@ -54,7 +54,7 @@ const formItemsConfig = useConfig('components.formItems', {})
 
 const props = withDefaults(
   defineProps<{
-    model: GenericObject // 传进来的共享的model表单值对象
+    model: Record<string, any> // 传进来的共享的model表单值对象
     items?: Array<any> // 列表项文件
     itemWidth?: string // item宽度
     disabled?: boolean // 全部禁用
@@ -81,7 +81,7 @@ const itemSpan = ref(props.span || formItemsConfig.itemSpan || 12)
 const formItems = ref(props.items as FormItemConfig[])
 
 // 所有字段的展开情况
-const itemExpanded = reactive<GenericObject<boolean>>({})
+const itemExpanded = reactive<Record<string, boolean>>({})
 
 // 处理过的formItems
 const innerFormItems = computed<any>(() => {

@@ -5,13 +5,20 @@
 </template>
 
 <script setup lang="ts">
-import { vue, tpl, useApiRequest, useAppContext, useWidgetEmitter, useWidgetSchema } from '@zpage/zpage'
+import {
+  vue,
+  tpl,
+  useApiRequest,
+  useAppContext,
+  useWidgetEmitter,
+  useWidgetSchema
+} from '@zpage/zpage'
 
 const { computed, ref } = vue
 
 // 属性
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
 // api请求

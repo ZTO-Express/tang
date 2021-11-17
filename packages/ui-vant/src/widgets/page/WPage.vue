@@ -8,7 +8,7 @@
 import { useWidgetSchema } from '@zpage/zpage'
 
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
 const wSchema = await useWidgetSchema(props.schema)

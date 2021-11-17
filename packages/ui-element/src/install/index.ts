@@ -2,16 +2,14 @@ import installElement from './element'
 import installComponents from './components'
 import installWidgets from './widgets'
 
-import type { Runtime, AppOptions } from '@zpage/zpage'
+import type { Installable, InstallableOptions } from '@zpage/zpage'
 
 /** 安装插件 */
-export async function install(instance: Runtime, options?: AppOptions) {
+export async function install(target: Installable, options?: InstallableOptions) {
   // 安装Element
-  await installElement(instance, options)
-
+  await installElement(target, options)
   // 安装全局组件，并配置相关变量
-  await installComponents(instance, options)
-
+  await installComponents(target, options)
   // 安装全局微件
-  await installWidgets(instance, options)
+  await installWidgets(target, options)
 }

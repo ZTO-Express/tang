@@ -92,7 +92,10 @@ export function mapObject(value: any, fn: GenericFunction): any {
   if (isObject(value)) {
     let tmpValue = { ...value }
     Object.keys(tmpValue).forEach(key => {
-      ;(tmpValue as GenericObject)[key] = mapObject((tmpValue as GenericObject)[key], fn)
+      ;(tmpValue as Record<string, any>)[key] = mapObject(
+        (tmpValue as Record<string, any>)[key],
+        fn
+      )
     })
     return tmpValue
   }
@@ -100,8 +103,8 @@ export function mapObject(value: any, fn: GenericFunction): any {
 }
 
 /** 清理对象中所有undefined值 */
-export function rmUndefined(obj: GenericObject) {
-  const newObj: GenericObject = {}
+export function rmUndefined(obj: Record<string, any>) {
+  const newObj: Record<string, any> = {}
 
   if (typeof obj !== 'object') {
     return obj

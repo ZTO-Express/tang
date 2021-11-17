@@ -49,7 +49,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import {
-  useStore,
+  useAppStore,
   useWidgetSchema,
   tpl,
   useApiRequest,
@@ -62,10 +62,10 @@ import { ArrowDownBold, InfoFilled } from '@element-plus/icons'
 
 // 属性
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
-const store = useStore()
+const store = useAppStore()
 
 // api请求
 const apiRequest = useApiRequest()

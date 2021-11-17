@@ -23,7 +23,7 @@ const { computed, ref } = vue
 const router = useAppRouter()
 
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
 const wSchema = await useWidgetSchema(props.schema)

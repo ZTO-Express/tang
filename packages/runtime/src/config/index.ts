@@ -1,16 +1,17 @@
 import { _ } from '../utils/util'
-import type { AppConfig, ApiRequest } from '../typings'
+import type { RuntimeConfig, ApiRequest } from '../typings'
 
-let $APP = {} as AppConfig
+let __config = {} as RuntimeConfig
 
 /** 设置配置 */
-export const setConfig = (config: AppConfig): void => {
-  $APP = config
+export const setConfig = (config: RuntimeConfig): void => {
+  __config = _.deepFreeze(config)
 }
 
 /** 获取配置 */
 export const useConfig = (path: string, defaultValue?: unknown): any => {
-  return _.get($APP, path, defaultValue)
+  const cfg = _.get(__config, path, defaultValue)
+  return _.deepClone(cfg)
 }
 
 /** 获取环境信息 */
@@ -35,21 +36,6 @@ export const useApi = (name: string) => {
  */
 export function useApiRequest<T = ApiRequest>() {
   return useConfig('app.api.request') as T
-}
-
-/** 获取pages */
-export const usePages = () => {
-  return useConfig('pages')
-}
-
-/** 获取页面 */
-export const usePage = (path: string) => {
-  const pages = usePages()
-
-  if (!pages?.length) return undefined
-
-  const page = pages.find((it: any) => it?.path === path)
-  return page
 }
 
 /** 获取资源 */

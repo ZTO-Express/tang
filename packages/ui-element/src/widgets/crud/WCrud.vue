@@ -115,8 +115,8 @@
 </template>
 
 <script setup lang="ts">
-import { vue } from '@zpage/zpage'
 import {
+  vue,
   _,
   tpl,
   emitter,
@@ -134,7 +134,7 @@ const { computed, reactive, ref, onMounted, nextTick } = vue
 
 // 属性
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
 const router = useAppRouter()

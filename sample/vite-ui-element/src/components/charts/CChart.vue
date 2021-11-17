@@ -35,8 +35,8 @@ use([
 
 const props = withDefaults(
   defineProps<{
-    options: GenericObject // 图表选项
-    data: GenericObject // 图表数据
+    options: Record<string, any> // 图表选项
+    data: Record<string, any> // 图表数据
   }>(),
   {}
 )

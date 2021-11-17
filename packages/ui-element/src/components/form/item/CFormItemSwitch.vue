@@ -14,7 +14,7 @@ const { computed } = vue
 
 const props = withDefaults(
   defineProps<{
-    model: GenericObject
+    model: Record<string, any>
     prop: string
     disabled?: boolean
     onChange?: GenericFunction

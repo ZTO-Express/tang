@@ -1,7 +1,9 @@
-import { h, ref, resolveComponent } from 'vue'
+import { h, ref, resolveComponent, defineComponent } from 'vue'
 import type { VNode } from 'vue'
 
-export const Widget = {
+export const Widget = defineComponent({
+  name: 'Widget',
+
   props: {
     schema: {
       type: Object,
@@ -72,4 +74,4 @@ export const Widget = {
 
     return () => renderWidgets(schema.value)
   }
-}
+})

@@ -76,11 +76,11 @@ const props = withDefaults(
   defineProps<{
     title?: string
     loading?: boolean
-    actions?: GenericObject
-    innerAttrs?: GenericObject // 内部元素属性
+    actions?: Record<string, any>
+    innerAttrs?: Record<string, any> // 内部元素属性
     labelWidth?: string | number // 表单label宽度
-    formData?: GenericObject // 默认表单数据
-    formItems?: GenericObject // 表单项
+    formData?: Record<string, any> // 默认表单数据
+    formItems?: Record<string, any> // 表单项
     appendToBody?: boolean
     noPadding?: boolean
     bodyStyle?: string

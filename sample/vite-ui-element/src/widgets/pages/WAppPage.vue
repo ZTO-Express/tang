@@ -28,16 +28,16 @@
 
 <script setup lang="ts">
 import { computed, watch, onMounted } from 'vue'
-import { useStore, emitter, useWidgetSchema, useApi } from '@zpage/zpage'
+import { useAppStore, emitter, useWidgetSchema, useApi } from '@zpage/zpage'
 
 import { GLOBAL_EVENTS } from '@/consts'
 
-const store = useStore()
+const store = useAppStore()
 const appApi = useApi('app')
 
 // 属性
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
 const wSchema = await useWidgetSchema(props.schema)

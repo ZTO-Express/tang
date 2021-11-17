@@ -1,8 +1,8 @@
 import * as widgetsMap from '../widgets'
 
-import type { VueComponent, AppOptions, Runtime } from '@zpage/zpage'
+import type { VueComponent, Installable, InstallableOptions } from '@zpage/zpage'
 
-export default (instance: Runtime, options?: AppOptions): void => {
+export default (instance: Installable, options?: InstallableOptions): void => {
   const innerWidgets: VueComponent[] = []
 
   for (const key in widgetsMap) {

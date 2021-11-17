@@ -11,7 +11,7 @@ import { vue, tpl, useAppContext, useWidgetSchema } from '@zpage/zpage'
 const { computed, ref } = vue
 
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
 const wSchema = await useWidgetSchema(props.schema)

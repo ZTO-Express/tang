@@ -1,3 +1,4 @@
+// 生产类型
 export const genTypes = true
 
 export const tsconfig = {

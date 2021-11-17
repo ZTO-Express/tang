@@ -22,7 +22,7 @@ export default { inheritAttrs: false }
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    model: GenericObject
+    model: Record<string, any>
     prop: string
     type?: string
     valueFormat?: string

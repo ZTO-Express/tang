@@ -34,7 +34,7 @@ const { computed, ref, unref } = vue
 
 const props = withDefaults(
   defineProps<{
-    model: GenericObject
+    model: Record<string, any>
     prop: string
     disabled?: boolean
     labelProp?: string

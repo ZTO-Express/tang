@@ -31,16 +31,16 @@ const props = withDefaults(
     beforeTrigger?: GenericFunction
     afterTrigger?: GenericFunction
     api?: string // api 触发
-    payload?: GenericObject // 相关附加参数
+    payload?: Record<string, any> // 相关附加参数
     contextData?: any // 数据上下文
     successMessage?: string // 成功消息
-    dialog?: GenericObject // dialog action
-    form?: GenericObject // form action
-    import?: GenericObject // import action
+    dialog?: Record<string, any> // dialog action
+    form?: Record<string, any> // form action
+    import?: Record<string, any> // import action
     link?: any // link action
     event?: any // event action
     message?: any // message action
-    innerAttrs?: GenericObject // 内部属性 action
+    innerAttrs?: Record<string, any> // 内部属性 action
     visible?: boolean
     visibleOn?: string
     disabled?: boolean

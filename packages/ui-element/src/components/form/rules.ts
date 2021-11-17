@@ -1,5 +1,7 @@
 import { _, validator as v, useConfig } from '@zpage/zpage'
 
+import type { GenericFunction } from '@zpage/core'
+
 /** 外部注册规则 */
 export const outerRules = useConfig('components.form.rules')
 

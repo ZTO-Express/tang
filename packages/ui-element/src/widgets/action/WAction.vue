@@ -9,7 +9,7 @@ const { ref } = vue
 
 // 属性
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
 // schema

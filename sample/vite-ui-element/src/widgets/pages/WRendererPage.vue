@@ -9,15 +9,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useStore, useWidgetSchema, useRenderer } from '@zpage/zpage'
+import { useAppStore, useWidgetSchema } from '@zpage/zpage'
 
-const store = useStore()
-
-const renderer = useRenderer()
+const store = useAppStore()
 
 // 属性
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
 const wSchema = await useWidgetSchema(props.schema)
@@ -34,5 +32,4 @@ const currentApp = computed(() => {
     margin-top: $section-gutter;
   }
 }
-
 </style>

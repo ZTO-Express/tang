@@ -25,7 +25,7 @@ const inputConfig = useConfig('components.formItem.input', {})
 
 const props = withDefaults(
   defineProps<{
-    model: GenericObject
+    model: Record<string, any>
     prop: string
     tpl?: string
     disabled?: boolean

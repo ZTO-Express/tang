@@ -1,16 +1,13 @@
-import { resolve } from 'path'
-import fs from 'fs-extra'
+import path from 'path'
+import fse from 'fs-extra'
 import { rollup } from 'rollup'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import esbuild from 'rollup-plugin-esbuild'
 import filesize from 'rollup-plugin-filesize'
 
-import { ZPAGE_PKG } from '../utils/constants'
-import { resolvePkgRoot } from '../utils/paths'
 import { generateExternal, writeBundles } from '../utils/rollup'
 import { generateTypesDefinitions } from '../utils/dts'
-import { readBuildConfig } from '../utils/config'
 
 import { reporter } from '../plugins/size-reporter'
 import { buildConfigEntries } from '../build-info'
@@ -19,36 +16,46 @@ import type { BuildConfigEntries } from '../build-info'
 import type { OutputOptions, RollupOptions, RollupBuild } from 'rollup'
 
 /** 编译库 */
-export async function compileLib(packageName: string) {
-  await _compile(packageName)
+export async function compileLib(buildConfig: any) {
+  await _compile(buildConfig)
 
-  await _generateDts(packageName)
+  await _generateDts(buildConfig)
 }
 
 // 生成类型文件
-async function _generateDts(packageName: string) {
-  const pkgRoot = resolvePkgRoot(packageName)
+async function _generateDts(buildConfig: any) {
+  if (buildConfig.genTypes === false) return
 
-  const isGenTypes = await readBuildConfig(pkgRoot, 'genTypes')
-  if (isGenTypes === false) return
+  const pkgRoot = buildConfig.pkgRoot
+  const outTypesDir = buildConfig.outTypesDir
+  const inputTypesDir = buildConfig.inputTypesDir
 
   // 生成类型文件
   await generateTypesDefinitions(pkgRoot, {
     compilerOptions: {
       baseUrl: pkgRoot,
-      outDir: resolve(pkgRoot, 'dist', 'types'),
+      outDir: outTypesDir,
       paths: {
         '@zpage/*': ['packages/*']
       }
     }
   })
+
+  if (fse.pathExistsSync(inputTypesDir)) {
+    const outputBaseName = path.basename(inputTypesDir)
+    const outputTypesDir = path.resolve(outTypesDir, outputBaseName)
+
+    console.log(`复制类型文件: ${inputTypesDir} --> ${outputTypesDir}`)
+
+    await fse.copy(inputTypesDir, outputTypesDir)
+  }
 }
 
-async function _compile(packageName: string) {
-  const pkgRoot = resolvePkgRoot(packageName)
-  const buildRoollupConfig = readBuildConfig(pkgRoot, 'rollup', {})
+async function _compile(buildConfig: any) {
+  const pkgRoot = buildConfig.pkgRoot
+  const buildRoollupConfig = buildConfig.rollup || {}
+  const input = buildRoollupConfig.input || buildConfig.input
 
-  const input = resolve(pkgRoot, 'src', 'index.ts')
   const externalOptions = await generateExternal({
     full: false,
     pkgRoot,
@@ -71,10 +78,9 @@ async function _compile(packageName: string) {
     )
 
     // 先清理输出目录
-    const outPutDir = resolve(pkgRoot, 'dist')
-    await fs.remove(outPutDir)
+    await fse.remove(buildConfig.outDir)
 
-    await _writeBundles(bundle, entries, packageName)
+    await _writeBundles(bundle, entries, buildConfig)
   }
 
   // 压缩版应用
@@ -87,7 +93,7 @@ async function _compile(packageName: string) {
         rollup: buildRoollupConfig
       })
     )
-    await _writeBundles(bundle, minifyEntries, packageName)
+    await _writeBundles(bundle, minifyEntries, buildConfig)
   }
 }
 
@@ -134,15 +140,8 @@ function getRollupOptions(
   return rollupConfig
 }
 
-async function _writeBundles(
-  bundle: RollupBuild,
-  entries: BuildConfigEntries,
-  packageName: string
-) {
-  const pkgRoot = resolvePkgRoot(packageName)
-
-  const outPutDir = resolve(pkgRoot, 'dist')
-  const preserveModulesRoot = resolve(pkgRoot, 'src')
+async function _writeBundles(bundle: RollupBuild, entries: BuildConfigEntries, buildConfig: any) {
+  const packageName = buildConfig.packageName
 
   let entryFileName = `zpage-${packageName}`
   if ('zpage' === packageName) entryFileName = packageName
@@ -152,10 +151,10 @@ async function _writeBundles(
     entries.map(([module, config]): OutputOptions => {
       return {
         format: config.format,
-        dir: outPutDir,
+        dir: buildConfig.outDir,
         exports: module === 'cjs' ? 'named' : undefined,
         preserveModules: false,
-        preserveModulesRoot,
+        preserveModulesRoot: buildConfig.inputDir,
         sourcemap: false,
         entryFileNames: `${entryFileName}.${config.ext}`
       }

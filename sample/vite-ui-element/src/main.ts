@@ -1,4 +1,4 @@
-import { startApp, createRenderer } from '@zpage/zpage'
+import { startApp } from '@zpage/zpage'
 import { ZPageElementUI } from '@zpage/ui-element'
 import './styles/app.scss'
 
@@ -14,10 +14,6 @@ import { widgets } from './widgets'
 import { pages } from './pages'
 
 import * as apis from './apis'
-
-createRenderer({
-  ui: { ...ZPageElementUI }
-})
 
 startApp({
   el: '#app',

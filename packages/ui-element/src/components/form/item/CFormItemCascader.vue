@@ -18,10 +18,10 @@ export default {
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    model: GenericObject
+    model: Record<string, any>
     prop: string
     disabled?: boolean
-    options?: GenericObject
+    options?: Record<string, any>
   }>(),
   {
     disabled: false

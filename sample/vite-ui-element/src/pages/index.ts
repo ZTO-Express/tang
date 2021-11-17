@@ -3,7 +3,7 @@ const indexPostfix = '/index.ts'
 const indexFile = `${basePath}${indexPostfix}`
 
 // 导入 pages 目录下面的
-const pageItems: GenericObject = import.meta.globEager(`../pages/**/index.ts`)
+const pageItems: Record<string, any> = import.meta.globEager(`../pages/**/index.ts`)
 
 // 预处理导出页面
 const pages = Object.keys(pageItems)

@@ -1,11 +1,14 @@
-import { ElMessageBox as MessageBox } from 'element-plus'
-import { ZFfb } from '@zpage/ffb'
+import { ZFfb } from '@zpage/zpage'
+import { ElementPlus } from '@zpage/ui-element'
 import { user as userApi } from '../apis'
 
 import { ENV } from './env'
 import ffb from './ffb'
 
 import type { HttpRequestConfig } from '@zpage/zpage'
+
+const { ElMessageBox } = ElementPlus
+const MessageBox = ElMessageBox
 
 ZFfb.use(ffb)
 

@@ -1,151 +1,124 @@
-import { createApp } from 'vue'
-import { emitter, warn, queryEl } from '../utils'
-import { Entry as CEntry, Widget as CWidget } from '../entry'
+import { createApp, defineComponent, h } from 'vue'
+import { warn } from '../utils'
+import { Widget as CWidget } from '../entry'
+import { install } from './install'
 
-import type { App, Plugin as VuePlugin, Component } from 'vue'
-import type { Widget, Plugin } from '@zpage/core'
-import type { AppStore, AppConfig, AppRendererConfig, AppUI } from '../typings'
-
-/** 返回当前渲染器实例 */
-export function getCurrentRenderer() {
-  return Renderer.getInstance()
-}
+import type { Widget } from '@zpage/core'
+import type {
+  VueApp,
+  VueComponent,
+  RendererOptions,
+  Installable,
+  RendererFactoryInstanceOptions
+} from '../typings'
 
 /**
  * Vue3渲染器
  */
-export class Renderer {
-  private _app?: App<Element>
-  private _root: Component
-  private _store: AppStore
-  private _widgets: Widget[]
-  private _plugins: Plugin[]
+export class RendererFactory {
+  private _options: RendererFactoryInstanceOptions
 
-  private constructor(options: AppRendererConfig) {
-    this._widgets = options.widgets || []
-    this._plugins = []
-
-    this._store = options.store
+  private constructor(options: RendererFactoryInstanceOptions) {
+    this._options = options
   }
 
   // 单例
-  private static __renderer: Renderer | null = null
+  private static __instance: RendererFactory | null = null
 
-  static createInstance(options: AppRendererConfig) {
-    Renderer.__renderer = new Renderer(options)
-    return Renderer.__renderer
+  static initialize(options: RendererFactoryInstanceOptions) {
+    RendererFactory.__instance = new RendererFactory(options)
+    return RendererFactory.__instance
   }
 
-  static getInstance() {
-    return Renderer.__renderer
+  static get instance() {
+    return RendererFactory.__instance
   }
 
-  get root() {
-    return this._root
+  get ui() {
+    return this._options.ui
   }
 
-  get app() {
-    return this._app
+  get options() {
+    return this._options
   }
 
-  get store() {
-    return this._store
+  // 渲染页面
+  async render(options: RendererOptions) {
+    const appRenderer = new Renderer(options)
+
+    await appRenderer.render()
+
+    return appRenderer
+  }
+}
+
+/** 渲染实例 */
+export class Renderer implements Installable {
+  private _vueApp: VueApp<Element> // Vue应用
+  private _widgets: Widget[] = []
+
+  private _options: RendererOptions
+
+  constructor(options: RendererOptions) {
+    this._options = options
+  }
+
+  get vueApp() {
+    return this._vueApp
+  }
+
+  get options() {
+    return this._options
   }
 
   get widgets() {
     return this._widgets
   }
 
-  get plugins() {
-    return this._plugins
-  }
+  // 开始渲染
+  async render() {
+    const factory = RendererFactory.instance
+    const options = this.options
 
-  /**
-   * 创建渲染器实例
-   * @param options - 渲染选项
-   */
-  initial(config: AppConfig) {
-    const { root } = this
-
-    const app = createApp(root)
-
-    // 设置APP全局配置
-    app.config.globalProperties.$APP = config
-
-    app.component('Entry', CEntry)
-    app.component('Widget', CWidget)
-
-    app.config.globalProperties.$zpage = this
-
-    // 安装Event Bus
-    app.config.globalProperties.$emitter = emitter
-
-    // 附加到app
-    app.use(this.store)
-
-    this._app = app
-
-    return this
-  }
-
-  /** 应用vue插件 */
-  use(plugin: VuePlugin, ...options: any[]) {
-    const app = this.app
-
-    if (!app) {
-      warn('请先执行实例化再加载插件。')
-      return this
-    }
-
-    app.use(plugin, ...options)
-    return this
-  }
-
-  /** 应用UI */
-  applyUI(ui: AppUI, ...options: any[]) {
-    if (ui?.install) {
-      ui.install(this, ...options)
-    }
-  }
-
-  /** 应用zpage 插件 */
-  apply(plugins: Plugin | Plugin[], ...options: any[]) {
-    const existsNames = this.plugins.map(p => p.name)
-
-    let pItems: Plugin[] = []
-
-    if (Array.isArray(plugins)) {
-      pItems = plugins
-    } else {
-      pItems = [plugins]
-    }
-
-    for (const p of pItems) {
-      if (p.name) {
-        if (existsNames.includes(p.name)) {
-          warn(`插件${p.name}已应用，无法重复应用。`)
-        } else {
-          if (p.install) {
-            p.install(this, ...options)
-          }
-          this.plugins.push(p)
+    const root = defineComponent({
+      setup() {
+        return () => {
+          return h(CWidget, { schema: options.schema })
         }
-      } else {
-        throw new Error('请提供插件名称。')
       }
+    })
+
+    this._vueApp = createApp(root)
+
+    await install(this, factory.options)
+
+    this._vueApp.mount(options.el)
+
+    return this
+  }
+
+  // 卸载
+  async unmount() {
+    const { vueApp } = this
+
+    if (vueApp) {
+      vueApp.unmount()
+      this._vueApp = null
     }
+
+    this._widgets = null
   }
 
   // 注册微件
-  register(widgets: Component | Component[]) {
-    const app = this.app
+  async register(widgets: VueComponent | VueComponent[]) {
+    const vueApp = this.vueApp
 
-    if (!app) {
+    if (!vueApp) {
       warn('请先执行实例化再注册微件。')
-      return this
+      return
     }
 
-    let wItems: Component[] = []
+    let wItems: VueComponent[] = []
 
     if (Array.isArray(widgets)) {
       wItems = widgets
@@ -160,7 +133,7 @@ export class Renderer {
         if (existsWNames.includes(w.name)) {
           warn(`微件${w.name}已注册，无法重复注册。`)
         } else {
-          app.component(w.name, w)
+          vueApp.component(w.name, w)
           this.widgets.push(w as any)
         }
       } else {

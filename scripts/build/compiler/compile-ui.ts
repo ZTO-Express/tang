@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import fs from 'fs-extra'
+import fse from 'fs-extra'
 import { rollup } from 'rollup'
 import vue from 'rollup-plugin-vue'
 import nodeResolve from '@rollup/plugin-node-resolve'
@@ -15,8 +15,7 @@ import nestedcss from 'postcss-nested'
 import postcssUrl from 'postcss-url'
 import autoprefixer from 'autoprefixer'
 
-import { ZPAGE_PKG } from '../utils/constants'
-import { resolvePkgRoot, projRoot } from '../utils/paths'
+import { projRoot } from '../utils/paths'
 import { generateExternal, writeBundles } from '../utils/rollup'
 import { generateTypesDefinitions } from '../utils/dts'
 import { readBuildConfig } from '../utils/config'
@@ -28,36 +27,41 @@ import type { BuildConfigEntries } from '../build-info'
 import type { OutputOptions, RollupOptions, RollupBuild } from 'rollup'
 
 /** 编译库 */
-export async function compileUI(packageName: string) {
-  await _compile(packageName)
-  await _generateDts(packageName)
+export async function compileUI(buildConfig: any) {
+  await _compile(buildConfig)
+  await _generateDts(buildConfig)
 }
 
 // 生成类型文件
-async function _generateDts(packageName: string) {
-  const pkgRoot = resolvePkgRoot(packageName)
+async function _generateDts(buildConfig: any) {
+  if (buildConfig.genTypes === false) return
 
-  const isGenTypes = await readBuildConfig(pkgRoot, 'genTypes')
-  if (isGenTypes === false) return
+  const pkgRoot = buildConfig.pkgRoot
+  const outTypesDir = buildConfig.outTypesDir
+  const inputTypesDir = buildConfig.inputTypesDir
 
   await generateTypesDefinitions(pkgRoot, {
     compilerOptions: {
       baseUrl: pkgRoot,
-      outDir: resolve(pkgRoot, 'dist', 'types'),
+      outDir: outTypesDir,
       paths: {
         '@zpage/*': ['packages/*'],
         '@zpage/zpage': ['packages/zpage']
       }
     }
   })
+
+  if (fse.pathExistsSync(inputTypesDir)) {
+    await fse.copyFile(inputTypesDir, outTypesDir)
+  }
 }
 
 // 打包库
-async function _compile(packageName: string) {
-  const pkgRoot = resolvePkgRoot(packageName)
+async function _compile(buildConfig: any) {
+  const pkgRoot = buildConfig.pkgRoot
   const buildRoollupConfig = readBuildConfig(pkgRoot, 'rollup', {})
 
-  const input = resolve(pkgRoot, 'src', 'index.ts')
+  const input = buildRoollupConfig.input || buildConfig.input
   const externalOptions = await generateExternal({
     full: false,
     pkgRoot,
@@ -70,8 +74,7 @@ async function _compile(packageName: string) {
   }
 
   // 先清理输出目录
-  const outPutDir = resolve(pkgRoot, 'dist')
-  await fs.remove(outPutDir)
+  await fse.remove(buildConfig.outDir)
 
   // 常用应用
   const entries = buildConfigEntries.filter(it => !it[1]?.minify)
@@ -82,7 +85,7 @@ async function _compile(packageName: string) {
         rollup: buildRoollupConfig
       })
     )
-    await _writeBundles(bundle, entries, packageName)
+    await _writeBundles(bundle, entries, buildConfig)
   }
 
   // 压缩版应用
@@ -95,7 +98,7 @@ async function _compile(packageName: string) {
         rollup: buildRoollupConfig
       })
     )
-    await _writeBundles(bundle, minifyEntries, packageName)
+    await _writeBundles(bundle, minifyEntries, buildConfig)
   }
 }
 
@@ -180,25 +183,18 @@ function getRollupOptions(
   return rollupConfig
 }
 
-async function _writeBundles(
-  bundle: RollupBuild,
-  entries: BuildConfigEntries,
-  packageName: string
-) {
-  const pkgRoot = resolvePkgRoot(packageName)
-
-  const outPutDir = resolve(pkgRoot, 'dist')
-  const preserveModulesRoot = resolve(pkgRoot, 'src')
+async function _writeBundles(bundle: RollupBuild, entries: BuildConfigEntries, buildConfig: any) {
+  const packageName = buildConfig.packageName
 
   await writeBundles(
     bundle,
     entries.map(([module, config]): OutputOptions => {
       return {
         format: config.format,
-        dir: outPutDir,
+        dir: buildConfig.outDir,
         exports: module === 'cjs' ? 'named' : undefined,
         preserveModules: false,
-        preserveModulesRoot,
+        preserveModulesRoot: buildConfig.inputDir,
         sourcemap: false,
         entryFileNames: `zpage-${packageName}.${config.ext}`
       }

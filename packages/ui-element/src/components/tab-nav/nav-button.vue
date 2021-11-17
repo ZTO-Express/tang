@@ -17,7 +17,7 @@
 import { ArrowLeft, ArrowRight } from '@element-plus/icons'
 
 const props = defineProps<{
-  scrollable?: GenericObject
+  scrollable?: Record<string, any>
   currentOffset: number
   setOffset: GenericFunction
   navWidth: number

@@ -43,9 +43,9 @@ const { computed, ref } = vue
 const router = useAppRouter()
 const store = useAppStore()
 
-const config = useConfig('app')
+const config = useConfig('app', {})
 
-const logo = config.assets.logo
+const logo = config.assets?.logo
 
 const nickname = store.getters.nickname
 

@@ -21,7 +21,7 @@ const { reactive, ref } = vue
 
 const props = withDefaults(
   defineProps<{
-    item: GenericObject
+    item: Record<string, any>
     editorType: string
   }>(),
   {

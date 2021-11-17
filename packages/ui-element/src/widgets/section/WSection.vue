@@ -9,7 +9,7 @@ import { vue, _, useWidgetSchema } from '@zpage/zpage'
 const { computed } = vue
 
 const props = defineProps<{
-  schema: GenericObject
+  schema: Record<string, any>
 }>()
 
 const wSchema = await useWidgetSchema(props.schema)

@@ -658,7 +658,7 @@ export const tokenize = (str: string, data: object, defaultFilter: string = '| h
   )
 }
 
-export function resolveMapping(value: any, data: GenericObject, defaultFilter = '| raw') {
+export function resolveMapping(value: any, data: Record<string, any>, defaultFilter = '| raw') {
   return typeof value === 'string' && isPureVariable(value)
     ? resolveVariableAndFilter(value, data, defaultFilter, () => '')
     : typeof value === 'string' && ~value.indexOf('$')
@@ -668,7 +668,7 @@ export function resolveMapping(value: any, data: GenericObject, defaultFilter = 
 
 export function dataMapping(
   to: any,
-  from: GenericObject = {},
+  from: Record<string, any> = {},
   ignoreFunction: boolean | ((key: string, value: any) => boolean) = false
 ): any {
   if (Array.isArray(to)) {
@@ -748,7 +748,7 @@ export function dataMapping(
       const arr = Array.isArray(from[keys[0].substring(1)]) ? from[keys[0].substring(1)] : []
       const mapping = value[keys[0]]
 
-      ;(ret as GenericObject)[key] = arr.map((raw: object) =>
+      ;(ret as Record<string, any>)[key] = arr.map((raw: object) =>
         dataMapping(mapping, createObject(from, raw), ignoreFunction)
       )
     } else if (isPlainObject(value)) {

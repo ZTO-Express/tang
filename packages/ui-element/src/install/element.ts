@@ -2,15 +2,15 @@ import { warn } from '@zpage/zpage'
 import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
-import type { Runtime, AppOptions } from '@zpage/zpage'
+import type { Installable, InstallableOptions } from '@zpage/zpage'
 
-export default (instance: Runtime, options?: AppOptions): void => {
-  const { app } = instance
+export default (instance: Installable, options?: InstallableOptions): void => {
+  const { vueApp } = instance
 
-  if (!app) {
+  if (!vueApp) {
     warn('请先实例化再注册组件')
     return
   }
 
-  app.use(ElementPlus, { locale: zhCn, size: 'mini', zIndex: 3000 })
+  vueApp.use(ElementPlus, { locale: zhCn, size: 'mini', zIndex: 3000 })
 }

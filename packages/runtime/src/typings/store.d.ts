@@ -1,5 +1,5 @@
-import { Store } from 'vuex'
-import { Submodule, NavMenuItem } from './app'
+import type { Store } from 'vuex'
+import type { Submodule, NavMenuItem } from './app'
 
 export interface UserState {
   logged: boolean // 是否已登录
@@ -24,7 +24,7 @@ export interface AppState {
     current: string
     collapsed: boolean
   }
-  error: GenericObject | null // 应用错误信息
+  error: Record<string, any> | null // 应用错误信息
   [propName: string]: any
 }
 
@@ -35,13 +35,13 @@ export interface PageInfo {
   label?: string
   refererKey?: string
   closeable?: boolean
-  query?: GenericObject
-  meta?: GenericObject
+  query?: Record<string, any>
+  meta?: Record<string, any>
   [propName: string]: any
 }
 
 export interface PagesState {
-  datas: GenericObject // 维护页面数据
+  datas: Record<string, any> // 维护页面数据
   current: string // 当前打开的页面，切换页面后展示
   defaults: PageInfo[] // 默认打开页面
   visited: PageInfo[] // 所有正在浏览的页面, 不包括默认打开页面

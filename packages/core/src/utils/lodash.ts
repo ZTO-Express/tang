@@ -2,6 +2,7 @@ import { baseGet, baseSet, baseUnset, last } from './_internal'
 import { deepmergeAll } from './_internal/deepmerge'
 
 import type { DeepmergeOptions } from './_internal/deepmerge'
+import type { GenericFunction } from '../global'
 
 /** 获取对象tag */
 export function getTag(value: unknown): string {
@@ -391,7 +392,7 @@ export function pick(source: any, ...keys: string[]): any {
  * @param obj
  * @returns
  */
-export function entries<T>(obj: GenericObject<T>): Array<[string, T]> {
+export function entries<T>(obj: Record<string, T>): Array<[string, T]> {
   return Object.keys(obj).map((key: string) => [key, obj[key]])
 }
 

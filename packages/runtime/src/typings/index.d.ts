@@ -1,3 +1,6 @@
+export * from './vue'
+export * from './shims-ext'
+export * from './runtime'
+export * from './renderer'
 export * from './app'
 export * from './store'
-export * from './shims-ext'

@@ -1,8 +1,10 @@
-import { h } from 'vue'
+import { h, defineComponent } from 'vue'
 
 import { Widget } from './Widget'
 
-export const Entry = {
+export const Entry = defineComponent({
+  name: 'Entry',
+
   components: { Widget },
 
   props: {
@@ -13,8 +15,6 @@ export const Entry = {
   },
 
   setup(props: any) {
-    const { schema } = props
-
     return () => {
       return h(
         'div',
@@ -23,8 +23,8 @@ export const Entry = {
             'w-entry': true
           }
         },
-        h(Widget, { schema })
+        h(Widget, { schema: props.schema })
       )
     }
   }
-}
+})

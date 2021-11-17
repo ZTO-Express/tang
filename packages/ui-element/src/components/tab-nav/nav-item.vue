@@ -25,7 +25,7 @@ import { CircleClose } from '@element-plus/icons'
 const { computed } = vue
 
 const props = defineProps<{
-  navItem: GenericObject
+  navItem: Record<string, any>
   currentKey?: string
   onTabRemove: GenericFunction
   onTabClick: GenericFunction

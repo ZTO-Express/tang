@@ -73,7 +73,7 @@ const props = withDefaults(
   defineProps<{
     modelValue?: any
     modelLabel?: any
-    optionData?: GenericObject
+    optionData?: Record<string, any>
     multiple?: boolean
     filterable?: boolean
 
@@ -88,7 +88,7 @@ const props = withDefaults(
     collapseTags?: boolean
 
     api?: string
-    params?: GenericObject
+    params?: Record<string, any>
     remote?: boolean
     remoteMethod?: GenericFunction
   }>(),

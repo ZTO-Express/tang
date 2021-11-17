@@ -38,7 +38,7 @@ const { ref } = vue
 
 const props = withDefaults(
   defineProps<{
-    model: GenericObject
+    model: Record<string, any>
     prop: string
     options: Array<any>
     buttonType?: string

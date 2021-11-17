@@ -44,7 +44,7 @@ const { computed, ref, watch } = vue
 
 const props = withDefaults(
   defineProps<{
-    model: GenericObject
+    model: Record<string, any>
     prop: string
     disabled?: boolean
     groupName?: string

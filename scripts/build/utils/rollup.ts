@@ -1,5 +1,4 @@
 import path from 'path'
-import { zpagePackage } from './paths'
 import { getPackageDependencies } from './pkg'
 
 import type { OutputOptions, RollupBuild } from 'rollup'
@@ -9,7 +8,7 @@ export const generateExternal = async (options: {
   pkgRoot: string
   internal: string[]
 }) => {
-  const pkgPath = options?.pkgRoot ? path.resolve(options.pkgRoot, 'package.json') : zpagePackage
+  const pkgPath = path.resolve(options.pkgRoot, 'package.json')
   const packages: string[] = ['vue', 'vuex', 'vue-router', 'qs', 'axios']
   if (!options.full) {
     // dependencies

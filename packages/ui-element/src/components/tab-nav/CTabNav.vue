@@ -35,7 +35,7 @@ import NavItem from './nav-item.vue'
 const { computed, onMounted, onUnmounted, onUpdated, ref } = vue
 
 const props = defineProps<{
-  items: Array<GenericObject>
+  items: Array<Record<string, any>>
   currentKey: string
   onTabClick: GenericFunction
   onTabRemove: GenericFunction
