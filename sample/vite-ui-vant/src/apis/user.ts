@@ -6,25 +6,25 @@ import { httpConfig } from '../config/http'
 
 const request = new HttpRequest(ENV.apiUrl, httpConfig)
 
-export default {
+export default new (class extends HttpRequest {
   /** 获取token */
-  getToken: async (code: string) => {
+  async getToken(code: string) {
     return request.fetch({
       url: 'tuxi.base.UserService.getToken',
       data: { code }
     })
-  },
+  }
 
   /** 刷新token */
-  exchangeToken: async (refreshToken: string) => {
+  async exchangeToken(refreshToken: string) {
     return request.fetch({
       url: 'tuxi.base.UserService.exChangeToken',
       data: { refresh_token: refreshToken }
     })
-  },
+  }
 
   /** 获取用户信息 */
-  getUserInfo: async () => {
+  async getUserInfo() {
     const getBasicInfo = request.post('user.login.info')
 
     const results = await Promise.all([getBasicInfo])
@@ -41,10 +41,10 @@ export default {
         basic
       }
     }
-  },
+  }
 
   /** 登出系统 */
-  logout: async () => {
+  async logout() {
     await clearTokenData()
   }
-}
+})()

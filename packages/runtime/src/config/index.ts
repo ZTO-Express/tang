@@ -5,13 +5,13 @@ let __config = {} as RuntimeConfig
 
 /** 设置配置 */
 export const setConfig = (config: RuntimeConfig): void => {
-  __config = _.deepFreeze(config)
+  __config = Object.freeze(config)
 }
 
 /** 获取配置 */
 export const useConfig = (path: string, defaultValue?: unknown): any => {
   const cfg = _.get(__config, path, defaultValue)
-  return _.deepClone(cfg)
+  return cfg
 }
 
 /** 获取环境信息 */

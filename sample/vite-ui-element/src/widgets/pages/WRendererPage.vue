@@ -25,19 +25,16 @@ const currentApp = computed(() => {
 })
 
 onMounted(async () => {
-  debugger
-  setTimeout(async () => {
-    debugger
-    await App.render({
-      el: '#app-renderer',
-      path: '/demo/rendere/x',
-      schema: {
-        type: 'page'
-      }
-    })
-
-    App.instance.router.push('/demo/rendere/x')
-  }, 100)
+  // setTimeout(async () => {
+  //   await App.render({
+  //     el: '#app-renderer',
+  //     path: '/demo/rendere/x',
+  //     schema: {
+  //       type: 'page'
+  //     }
+  //   })
+  //   App.instance.router.push('/demo/rendere/x')
+  // }, 100)
 })
 </script>
 
