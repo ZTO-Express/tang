@@ -2,7 +2,7 @@ import { onUnmounted } from 'vue'
 import { emitter } from '../../utils'
 import { useAppContext } from './useContext'
 
-import type { GenericFunction } from '@zpage/core'
+import type { GenericFunction } from '@zto/zpage-core'
 
 /** 使用schema */
 export async function useWidgetSchema(schema: any, payload?: any) {

@@ -5,15 +5,7 @@ import uniqBy from 'lodash/uniqBy'
 import uniq from 'lodash/uniq'
 import transform from 'lodash/transform'
 
-import {
-  createObject,
-  isObject,
-  setVariable,
-  qsstringify,
-  keyToPath,
-  string2regExp,
-  deleteVariable
-} from './helper'
+import { createObject, isObject, setVariable, qsstringify, keyToPath, string2regExp, deleteVariable } from './helper'
 import type { Enginer } from './tpl'
 
 const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
@@ -108,18 +100,17 @@ const timeUnitMap: {
   millisecond: 'ms'
 }
 
-export const relativeValueRe =
-  /^(.+)?(\+|-)(\d+)(minute|min|hour|day|week|month|year|weekday|second|millisecond)s?$/i
+export const relativeValueRe = /^(.+)?(\+|-)(\d+)(minute|min|hour|day|week|month|year|weekday|second|millisecond)s?$/i
 
 export const filters: {
   [propName: string]: (input: any, ...args: any[]) => any
 } = {
   map: (input: Array<unknown>, fn: string, ...arg: any) =>
-    Array.isArray(input) && filters[fn] ? input.map(item => filters[fn](item, ...arg)) : input,
+    Array.isArray(input) && filters[fn] ? input.map((item) => filters[fn](item, ...arg)) : input,
   html: (input: string) => escapeHtml(input),
   json: (input, tabSize: number | string = 2) =>
     tabSize ? JSON.stringify(input, null, parseInt(tabSize as string, 10)) : JSON.stringify(input),
-  toJson: input => {
+  toJson: (input) => {
     let ret
     try {
       ret = JSON.parse(input)
@@ -128,16 +119,16 @@ export const filters: {
     }
     return ret
   },
-  toInt: input => (typeof input === 'string' ? parseInt(input, 10) : input),
-  toFloat: input => (typeof input === 'string' ? parseFloat(input) : input),
-  raw: input => input,
+  toInt: (input) => (typeof input === 'string' ? parseInt(input, 10) : input),
+  toFloat: (input) => (typeof input === 'string' ? parseFloat(input) : input),
+  raw: (input) => input,
   now: () => new Date(),
-  number: input => {
+  number: (input) => {
     let parts = String(input).split('.')
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     return parts.join('.')
   },
-  trim: input => (typeof input === 'string' ? input.trim() : input),
+  trim: (input) => (typeof input === 'string' ? input.trim() : input),
   percent: (input, decimals = 0) => {
     input = parseFloat(input) || 0
     decimals = parseInt(decimals, 10) || 0
@@ -147,8 +138,8 @@ export const filters: {
 
     return (Math.round(whole * multiplier) / multiplier).toFixed(decimals) + '%'
   },
-  duration: input => (input ? formatDuration(input) : input),
-  bytes: input => (input ? prettyBytes(parseFloat(input)) : input),
+  duration: (input) => (input ? formatDuration(input) : input),
+  bytes: (input) => (input ? prettyBytes(parseFloat(input)) : input),
   round: (input, decimals = 2) => {
     if (isNaN(input)) {
       return 0
@@ -174,8 +165,8 @@ export const filters: {
 
     return input.substring(0, length) + (input.length > length ? end : '')
   },
-  url_encode: input => encodeURIComponent(input),
-  url_decode: input => decodeURIComponent(input),
+  url_encode: (input) => encodeURIComponent(input),
+  url_decode: (input) => decodeURIComponent(input),
   default: (input, defaultValue, strict = false) =>
     (strict ? input : input ? input : undefined) ??
     (() => {
@@ -191,12 +182,8 @@ export const filters: {
     })(),
   join: (input, glue) => (input && input.join ? input.join(glue) : input),
   split: (input, delimiter = ',') => (typeof input === 'string' ? input.split(delimiter) : input),
-  sortBy: (
-    input: any,
-    key: string,
-    method: 'alpha' | 'numerical' = 'alpha',
-    order?: 'asc' | 'desc'
-  ) => (Array.isArray(input) ? input.sort(makeSorter(key, method, order)) : input),
+  sortBy: (input: any, key: string, method: 'alpha' | 'numerical' = 'alpha', order?: 'asc' | 'desc') =>
+    Array.isArray(input) ? input.sort(makeSorter(key, method, order)) : input,
   objectToArray: (input: any, label: string = 'label', value: string = 'value') =>
     transform(
       input,
@@ -208,8 +195,7 @@ export const filters: {
       },
       []
     ),
-  unique: (input: any, key?: string) =>
-    Array.isArray(input) ? (key ? uniqBy(input, key) : uniq(input)) : input,
+  unique: (input: any, key?: string) => (Array.isArray(input) ? (key ? uniqBy(input, key) : uniq(input)) : input),
   topAndOther: (input: any, len: number = 10, labelField: string = 'name', restLabel = '其他') => {
     if (Array.isArray(input) && len) {
       const grouped = groupBy(input, (item: any) => {
@@ -220,7 +206,7 @@ export const filters: {
       return Object.keys(grouped).map((key, index) => {
         const group = grouped[key]
         const obj = group.reduce((obj, item) => {
-          Object.keys(item).forEach(key => {
+          Object.keys(item).forEach((key) => {
             if (!obj.hasOwnProperty(key) || key === 'labelField') {
               obj[key] = item[key]
             } else if (typeof item[key] === 'number' && typeof obj[key] === 'number') {
@@ -249,18 +235,15 @@ export const filters: {
     }
     return input
   },
-  first: input => input && input[0],
+  first: (input) => input && input[0],
   nth: (input, nth = 0) => input && input[nth],
-  last: input => input && (input.length ? input[input.length - 1] : null),
+  last: (input) => input && (input.length ? input[input.length - 1] : null),
   minus: (input, step = 1) => (parseInt(input, 10) || 0) - parseInt(step, 10),
   plus: (input, step = 1) => (parseInt(input, 10) || 0) + parseInt(step, 10),
   count: (input: any) => (Array.isArray(input) || typeof input === 'string' ? input.length : 0),
   sum: (input, field) =>
     Array.isArray(input)
-      ? input.reduce(
-          (sum, item) => sum + (parseFloat(field ? pickValues(field, item) : item) || 0),
-          0
-        )
+      ? input.reduce((sum, item) => sum + (parseFloat(field ? pickValues(field, item) : item) || 0), 0)
       : input,
   abs: (input: any) => (typeof input === 'number' ? Math.abs(input) : input),
   pick: (input, path = '&') =>
@@ -269,13 +252,11 @@ export const filters: {
       : pickValues(path, input),
   pick_if_exist: (input, path = '&') =>
     Array.isArray(input)
-      ? input.map(item => resolveVariable(path, item) || item)
+      ? input.map((item) => resolveVariable(path, item) || item)
       : resolveVariable(path, input) || input,
-  asArray: input => (Array.isArray(input) ? input : input ? [input] : input),
+  asArray: (input) => (Array.isArray(input) ? input : input ? [input] : input),
   concat(input, ...args: any[]) {
-    return Array.isArray(input)
-      ? input.concat(...args.map(arg => getStrOrVariable(arg, this)))
-      : input
+    return Array.isArray(input) ? input.concat(...args.map((arg) => getStrOrVariable(arg, this))) : input
   },
   filter: function (input, keys, expOrDirective, arg1) {
     if (!Array.isArray(input) || !keys || !expOrDirective) {
@@ -286,25 +267,25 @@ export const filters: {
     let fn: (value: any, key: string, item: any) => boolean = () => true
 
     if (directive === 'isTrue') {
-      fn = value => !!value
+      fn = (value) => !!value
     } else if (directive === 'isFalse') {
-      fn = value => !value
+      fn = (value) => !value
     } else if (directive === 'isExists') {
-      fn = value => typeof value !== 'undefined'
+      fn = (value) => typeof value !== 'undefined'
     } else if (directive === 'equals' || directive === 'equal') {
       arg1 = arg1 ? getStrOrVariable(arg1, this) : ''
-      fn = value => arg1 == value
+      fn = (value) => arg1 == value
     } else if (directive === 'isIn') {
       let list: any = arg1 ? getStrOrVariable(arg1, this) : []
 
       list = str2array(list)
       list = Array.isArray(list) ? list : list ? [list] : []
-      fn = value => (list.length ? !!~list.indexOf(value) : true)
+      fn = (value) => (list.length ? !!~list.indexOf(value) : true)
     } else if (directive === 'notIn') {
       let list: Array<any> = arg1 ? getStrOrVariable(arg1, this) : []
       list = str2array(list)
       list = Array.isArray(list) ? list : list ? [list] : []
-      fn = value => !~list.indexOf(value)
+      fn = (value) => !~list.indexOf(value)
     } else {
       if (directive !== 'match') {
         directive = 'match'
@@ -318,7 +299,7 @@ export const filters: {
       }
 
       let reg = string2regExp(`${arg1}`, false)
-      fn = value => reg.test(String(value))
+      fn = (value) => reg.test(String(value))
     }
 
     // 判断keys是否为*
@@ -326,9 +307,7 @@ export const filters: {
     keys = keys.split(/\s*,\s*/)
     return input.filter((item: any) =>
       // 当keys为*时从item中获取key
-      (isAsterisk ? Object.keys(item) : keys).some((key: string) =>
-        fn(resolveVariable(key, item), key, item)
-      )
+      (isAsterisk ? Object.keys(item) : keys).some((key: string) => fn(resolveVariable(key, item), key, item))
     )
   },
   base64Encode(str) {
@@ -350,8 +329,8 @@ export const filters: {
     )
   },
 
-  lowerCase: input => (input && typeof input === 'string' ? input.toLowerCase() : input),
-  upperCase: input => (input && typeof input === 'string' ? input.toUpperCase() : input),
+  lowerCase: (input) => (input && typeof input === 'string' ? input.toLowerCase() : input),
+  upperCase: (input) => (input && typeof input === 'string' ? input.toUpperCase() : input),
 
   isTrue(input, trueValue, falseValue) {
     return getConditionValue(input, !!input, trueValue, falseValue, this)
@@ -380,15 +359,11 @@ export const filters: {
     )
   },
   isEquals(input, equalsValue, trueValue, falseValue) {
-    equalsValue = /^\d+$/.test(equalsValue)
-      ? parseInt(equalsValue, 10)
-      : getStrOrVariable(equalsValue, this as any)
+    equalsValue = /^\d+$/.test(equalsValue) ? parseInt(equalsValue, 10) : getStrOrVariable(equalsValue, this as any)
     return getConditionValue(input, input === equalsValue, trueValue, falseValue, this)
   },
   notEquals(input, equalsValue, trueValue, falseValue) {
-    equalsValue = /^\d+$/.test(equalsValue)
-      ? parseInt(equalsValue, 10)
-      : getStrOrVariable(equalsValue, this as any)
+    equalsValue = /^\d+$/.test(equalsValue) ? parseInt(equalsValue, 10) : getStrOrVariable(equalsValue, this as any)
     return getConditionValue(input, input !== equalsValue, trueValue, falseValue, this)
   }
 }
@@ -411,9 +386,9 @@ function getStrOrVariable(value: string, data: any) {
     ? value
         .substring(1, value.length - 1)
         .split(/\s*,\s*/)
-        .filter(item => item)
+        .filter((item) => item)
     : /,/.test(value)
-    ? value.split(/\s*,\s*/).filter(item => item)
+    ? value.split(/\s*,\s*/).filter((item) => item)
     : resolveVariable(value, data)
 }
 
@@ -423,24 +398,16 @@ function str2array(list: any) {
       return list
         .substring(1, list.length - 1)
         .split(/\s*,\s*/)
-        .filter(item => item)
+        .filter((item) => item)
     } else {
-      return list.split(/\s*,\s*/).filter(item => item)
+      return list.split(/\s*,\s*/).filter((item) => item)
     }
   }
   return list
 }
 
-function getConditionValue(
-  input: string,
-  isTrue: boolean,
-  trueValue: string,
-  falseValue: string,
-  data: any
-) {
-  return isTrue || (!isTrue && falseValue)
-    ? getStrOrVariable(isTrue ? trueValue : falseValue, data)
-    : input
+function getConditionValue(input: string, isTrue: boolean, trueValue: string, falseValue: string, data: any) {
+  return isTrue || (!isTrue && falseValue) ? getStrOrVariable(isTrue ? trueValue : falseValue, data) : input
 }
 
 export function registerFilter(name: string, fn: (input: any, ...args: any[]) => any): void {
@@ -466,7 +433,7 @@ export function pickValues(names: string, data: object) {
   }
 
   let ret: any = {}
-  arr.forEach(name => {
+  arr.forEach((name) => {
     let idx = name.indexOf('~')
     let target = name
 
@@ -559,9 +526,7 @@ export const resolveVariable = (path?: string, data: any = {}): any => {
 }
 
 export function isPureVariable(path?: any): path is string {
-  return typeof path === 'string'
-    ? /^\$(?:((?:\w+\:)?[a-z0-9_.][a-z0-9_.\[\]]*)|{[^}{]+})$/i.test(path)
-    : false
+  return typeof path === 'string' ? /^\$(?:((?:\w+\:)?[a-z0-9_.][a-z0-9_.\[\]]*)|{[^}{]+})$/i.test(path) : false
 }
 export const resolveVariableAndFilter = (
   path?: string,
@@ -589,12 +554,9 @@ export const resolveVariableAndFilter = (
   let finalKey: string = key || key2
 
   // 先只支持一层吧
-  finalKey = finalKey.replace(
-    /(\\|\\\$)?\$(?:([a-zA-Z0-9_.][a-zA-Z0-9_.\[\]]*)|{([^}{]+)})/g,
-    (_, escape) => {
-      return escape ? _.substring(1) : resolveVariableAndFilter(_, data, defaultFilter)
-    }
-  )
+  finalKey = finalKey.replace(/(\\|\\\$)?\$(?:([a-zA-Z0-9_.][a-zA-Z0-9_.\[\]]*)|{([^}{]+)})/g, (_, escape) => {
+    return escape ? _.substring(1) : resolveVariableAndFilter(_, data, defaultFilter)
+  })
 
   // 默认 html 转义
   if (!~finalKey.indexOf('|')) {
@@ -613,14 +575,9 @@ export const resolveVariableAndFilter = (
     ? fallbackValue(ret)
     : paths.reduce((input, filter) => {
         let params = filter
-          .replace(
-            /([^\\])\\([\:\\])/g,
-            (_, affix, content) => `${affix}__${content === ':' ? 'colon' : 'slash'}__`
-          )
+          .replace(/([^\\])\\([\:\\])/g, (_, affix, content) => `${affix}__${content === ':' ? 'colon' : 'slash'}__`)
           .split(':')
-          .map(item =>
-            item.replace(/__(slash|colon)__/g, (_, type) => (type === 'colon' ? ':' : '\\'))
-          )
+          .map((item) => item.replace(/__(slash|colon)__/g, (_, type) => (type === 'colon' ? ':' : '\\')))
         let key = params.shift() as string
 
         if (~['isTrue', 'isFalse', 'isMatch', 'isEquals', 'notMatch', 'notEquals'].indexOf(key)) {
@@ -672,7 +629,7 @@ export function dataMapping(
   ignoreFunction: boolean | ((key: string, value: any) => boolean) = false
 ): any {
   if (Array.isArray(to)) {
-    return to.map(item => dataMapping(item, from, ignoreFunction))
+    return to.map((item) => dataMapping(item, from, ignoreFunction))
   } else if (typeof to === 'string') {
     return resolveMapping(to, from)
   } else if (!isPlainObject(to)) {
@@ -680,7 +637,7 @@ export function dataMapping(
   }
 
   let ret = {}
-  Object.keys(to).forEach(key => {
+  Object.keys(to).forEach((key) => {
     const value = to[key]
     let keys: Array<string>
 
@@ -758,9 +715,7 @@ export function dataMapping(
         ret,
         key,
         value.map((value: any) =>
-          isPlainObject(value)
-            ? dataMapping(value, from, ignoreFunction)
-            : resolveMapping(value, from)
+          isPlainObject(value) ? dataMapping(value, from, ignoreFunction) : resolveMapping(value, from)
         )
       )
     } else if (typeof value == 'string' && ~value.indexOf('$')) {
@@ -813,7 +768,6 @@ export function register(): Enginer & { name: string } {
     name: 'builtin',
     test: (str: string) => typeof str === 'string' && matchSynatax(str),
     removeEscapeToken: (str: string) => (typeof str === 'string' ? str.replace(/\\\$/g, '$') : str),
-    compile: (str: string, data: object, defaultFilter = '| html') =>
-      tokenize(str, data, defaultFilter)
+    compile: (str: string, data: object, defaultFilter = '| html') => tokenize(str, data, defaultFilter)
   }
 }

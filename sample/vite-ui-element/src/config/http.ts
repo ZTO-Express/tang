@@ -1,10 +1,10 @@
-import { ZFfb, ElementPlus } from '@zpage/ui-element'
+import { ZFfb, ElementPlus } from '@zto/zpage-ui-element'
 import { user as userApi } from '../apis'
 
 import { ENV } from './env'
 import ffb from './ffb'
 
-import type { HttpRequestConfig } from '@zpage/ui-element'
+import type { HttpRequestConfig } from '@zto/zpage-ui-element'
 
 const { ElMessageBox } = ElementPlus
 const MessageBox = ElMessageBox

@@ -112,7 +112,7 @@ const mutations: MutationTree<PagesState> = {
 
     const datas = state.datas || {}
 
-    const visitedArr = []
+    const visitedArr: any[] = []
     const pageDatas: any = {}
 
     if (submodule !== 'ALL') {

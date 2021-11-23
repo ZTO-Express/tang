@@ -1,6 +1,8 @@
 import { register as registerBulitin, getFilters } from './tpl-builtin'
 import { register as registerLodash } from './tpl-lodash'
 
+import type { GenericFunction } from '@zto/zpage-core'
+
 export interface Enginer {
   test: (tpl: string) => boolean
   removeEscapeToken?: (tpl: string) => string

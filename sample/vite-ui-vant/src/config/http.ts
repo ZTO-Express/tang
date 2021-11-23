@@ -1,10 +1,10 @@
 import { Toast } from 'vant'
-import { uuid, getAccessToken, useAppRouter, ZFfb } from '@zpage/zpage'
+import { uuid, getAccessToken, useAppRouter, ZFfb } from '@zto/zpage'
 
 import ffb from '../config/ffb'
 import { ENV } from './env'
 
-import type { HttpRequestConfig } from '@zpage/zpage'
+import type { HttpRequestConfig } from '@zto/zpage'
 
 ZFfb.use(ffb)
 

@@ -1,6 +1,6 @@
 import logo from '@/assets/logo.png'
 
-import { useApi } from '@zpage/zpage'
+import { useApi } from '@zto/zpage'
 
 export default {
   title: '兔喜共配',

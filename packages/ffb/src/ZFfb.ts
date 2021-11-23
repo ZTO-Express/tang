@@ -46,7 +46,6 @@ export function interceptFfbRequest(cfg: any) {
 /** 获取Ffb处理器 */
 export function interceptFfbResponse(response: any) {
   const cfg = response.config
-  const api = cfg.url
   const ffbConfig = cfg.ffb_config
 
   if (!ffbConfig) return response

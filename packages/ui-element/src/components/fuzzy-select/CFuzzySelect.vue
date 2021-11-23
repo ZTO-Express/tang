@@ -27,13 +27,7 @@
           :value="getOptionValue(item)"
           v-bind="item"
         >
-          <slot
-            name="option"
-            :data="item"
-            :label="getOptionLabel(item)"
-            :value="getOptionValue(item)"
-            :$index="i"
-          >
+          <slot name="option" :data="item" :label="getOptionLabel(item)" :value="getOptionValue(item)" :$index="i">
             <span>{{ getOptionDisplay(item) }}</span>
           </slot>
         </el-option>
@@ -47,13 +41,7 @@
         :value="getOptionValue(item)"
         v-bind="item"
       >
-        <slot
-          name="option"
-          :data="item"
-          :label="getOptionLabel(item)"
-          :value="getOptionValue(item)"
-          :$index="i"
-        >
+        <slot name="option" :data="item" :label="getOptionLabel(item)" :value="getOptionValue(item)" :$index="i">
           <span>{{ getOptionDisplay(item) }}</span>
         </slot>
       </el-option>
@@ -62,7 +50,9 @@
 </template>
 
 <script setup lang="ts">
-import { vue, _, tpl, useApiRequest, useAppContext, useConfig } from '@zpage/zpage'
+import { vue, _, tpl, useApiRequest, useAppContext, useConfig } from '@zto/zpage'
+
+import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
 import type { FuzzySelectOption, FuzzySelectRemoteMethod, FuzzySelectResponse } from './types'
 
 // import { selectKey as ElSelectKey } from 'element-plus'
@@ -87,8 +77,8 @@ const props = withDefaults(
     triggerFocus?: boolean
     collapseTags?: boolean
 
-    api?: string
-    params?: Record<string, any>
+    api?: ApiRequestAction
+    apiParams?: Record<string, any>
     remote?: boolean
     remoteMethod?: GenericFunction
   }>(),
@@ -150,7 +140,7 @@ watch(
 
 watch(
   () => [props.modelLabel, props.modelValue, props.optionData, remoteFuzzyOptions.value],
-  cur => {
+  (cur) => {
     innerLabel.value = props.modelLabel
     innerValue.value = props.modelValue
 
@@ -160,7 +150,7 @@ watch(
     const options: any[] = remoteFuzzyOptions.value
 
     const pushOption = (label: string, value: any, optionData: any) => {
-      const option = options.find(option => getOptionValue(option) === value)
+      const option = options.find((option) => getOptionValue(option) === value)
 
       if (!option) {
         options.push({
@@ -248,9 +238,7 @@ function handleSelectChange(value: string | Array<string>) {
 
   const valueArr = Array.isArray(value) ? value : [value]
 
-  const options = fuzzyOptions.value.filter((it: any) =>
-    valueArr.includes(it[innerValueProp.value])
-  )
+  const options = fuzzyOptions.value.filter((it: any) => valueArr.includes(it[innerValueProp.value]))
 
   const option: any = props.multiple ? undefined : options[0]
 
@@ -267,14 +255,14 @@ function getOptionsByLabel(groupLabel: string) {
   const groupProp = props.groupProp
   if (!groupProp || !groupLabel) return
 
-  return fuzzyOptions.value.filter(it => it[groupProp] === groupLabel)
+  return fuzzyOptions.value.filter((it) => it[groupProp] === groupLabel)
 }
 
 async function execRemoteMethod(query?: string) {
   loading.value = true
 
   const context = useAppContext()
-  const params = tpl.deepFilter(props.params, context)
+  const params = tpl.deepFilter(props.apiParams, context)
 
   let methodResponse: FuzzySelectResponse = []
 
@@ -323,14 +311,14 @@ function _findLabels(value: string | Array<any>): string | string[] {
       valueByKey.set(option[valProp], option[lblProp])
     }
 
-    const labels = value.map(val => {
+    const labels = value.map((val) => {
       return valueByKey.get(val) || ''
     })
 
     return labels
   }
 
-  const item = cachedOptions.find(option => {
+  const item = cachedOptions.find((option) => {
     return option.value === value
   })
   return item ? item.label : ''
@@ -359,6 +347,7 @@ function getSelected() {
 }
 
 defineExpose({
-  getSelected
+  getSelected,
+  execRemoteMethod
 })
 </script>

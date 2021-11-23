@@ -1,5 +1,5 @@
 <template>
-  <c-form v-bind="formAttrs" :model="formModel">
+  <c-form ref="formRef" v-bind="formAttrs" :model="formModel">
     <c-form-items v-bind="formItemsAttrs" :model="formModel" :items="formItems" />
   </c-form>
 </template>
@@ -12,7 +12,7 @@ import {
   useAppContext,
   useWidgetEmitter,
   useWidgetSchema
-} from '@zpage/zpage'
+} from '@zto/zpage'
 
 const { computed, ref } = vue
 
@@ -24,28 +24,36 @@ const props = defineProps<{
 // api请求
 const apiRequest = useApiRequest()
 
-// 表单模型
-const formModel = ref<any>({})
-
-// 应用上下文
-const context = useAppContext(formModel)
-
 // schema
 const wSchema = await useWidgetSchema(props.schema)
 
+// 加载项
+const loading = ref<any>({})
+
 // 注册微件事件监听
 useWidgetEmitter(wSchema, {
-  fetchOn: doFetch
+  fetchOn: doFetch,
+  resetOn: doReset
 })
 
+const formRef = ref<any>()
+
 // ----- 表单相关 ----->
+
+const sModel = wSchema.model || {}
+
+// 表单模型
+const formModel = ref<any>(sModel)
+
+// 应用上下文
+const context = useAppContext(formModel)
 
 const formItems = wSchema.formItems
 
 const formAttrs = computed(() => {
   const formAttrs = wSchema.innerAttrs?.form || {}
-
-  return { ...formAttrs }
+  const formActions = wSchema.actions || []
+  return { ...formAttrs, actions: formActions }
 })
 
 const formItemsAttrs = computed(() => {
@@ -76,4 +84,18 @@ async function doFetch() {
 
   formModel.value = await apiRequest(payload)
 }
+
+// 重设
+function doReset() {
+  formRef.value.resetFields()
+}
+
+// --------- 操作相关 ------>
 </script>
+
+<style lang="scss" scoped>
+.form-footer {
+  padding: 10px;
+  text-align: center;
+}
+</style>

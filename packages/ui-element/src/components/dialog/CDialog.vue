@@ -8,6 +8,11 @@
     :append-to-body="appendToBody"
     @close="close"
   >
+    <template #title>
+      <div class="dialog-title">
+        <slot name="title">{{ title }}</slot>
+      </div>
+    </template>
     <el-row :gutter="24" :style="`margin: 0 0 0; `">
       <el-col
         ref="contentWrapperRef"
@@ -66,8 +71,10 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, vueRouter, tpl, noop, _, useApiRequest, useAppContext } from '@zpage/zpage'
+import { vue, vueRouter, tpl, noop, _, useApiRequest, useAppContext } from '@zto/zpage'
 import { useMessage } from '../../composables'
+
+import type { GenericFunction } from '@zto/zpage'
 
 const { computed, getCurrentInstance, ref, useAttrs } = vue
 const { onBeforeRouteUpdate } = vueRouter
@@ -79,7 +86,6 @@ const props = withDefaults(
     actions?: Record<string, any>
     innerAttrs?: Record<string, any> // 内部元素属性
     labelWidth?: string | number // 表单label宽度
-    formData?: Record<string, any> // 默认表单数据
     formItems?: Record<string, any> // 表单项
     appendToBody?: boolean
     noPadding?: boolean
@@ -111,7 +117,7 @@ const dataModel = ref<any>({})
 
 const context = useAppContext(dataModel)
 
-let dialogVisible = ref(true)
+const dialogVisible = ref(true)
 
 const dialogFormItems = computed<any>(() => {
   return props.formItems || []
@@ -136,7 +142,7 @@ const actionItems = computed<any[]>(() => {
 })
 
 const dialogAttrs = computed(() => {
-  const dialogAttrs = Object.assign({}, props.innerAttrs?.dialog, { title: props.title })
+  const dialogAttrs = Object.assign({}, props.innerAttrs?.dialog)
   return dialogAttrs
 })
 
@@ -183,7 +189,7 @@ async function submit(options?: any) {
 
   // 校验表单
   if (form.validate) {
-    let valid = await form.validate()
+    const valid = await form.validate()
     if (!valid) return
   }
 
@@ -267,10 +273,7 @@ async function doSubmit(options?: any) {
 
   if (!options?.api) return
 
-  await apiRequest({
-    action: options.api,
-    data: payload
-  })
+  await apiRequest({ action: options.api, data: payload })
 
   Message.success(options?.successMessage || '执行成功！')
 }
@@ -283,6 +286,11 @@ defineExpose({
 
 <style lang="scss">
 .c-dialog {
+  .dialog-title {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
   .dialog-body-con {
     max-height: calc(70vh - 110px); // 防止出现外部滚动条
   }

@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useAppRoute, useAppRouter, useAppStore } from '@zpage/zpage'
+import { vue, useAppRoute, useAppRouter, useAppStore } from '@zto/zpage'
 
 const { computed, onMounted, reactive, ref, watch } = vue
 

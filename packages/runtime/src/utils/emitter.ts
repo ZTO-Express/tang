@@ -25,7 +25,7 @@ export class Emitter {
     if (typeof keys === 'string') keys = [keys]
     if (!Array.isArray(keys) || !handler) return
 
-    keys.forEach(key => {
+    keys.forEach((key) => {
       this.on(key, handler)
     })
   }
@@ -35,7 +35,7 @@ export class Emitter {
     if (typeof keys === 'string') keys = [keys]
     if (!Array.isArray(keys) || !handler) return
 
-    keys.forEach(key => {
+    keys.forEach((key) => {
       this.off(key, handler)
     })
   }
@@ -45,7 +45,7 @@ export class Emitter {
     if (typeof keys === 'string') keys = [keys]
     if (!Array.isArray(keys)) return
 
-    keys.forEach(key => {
+    keys.forEach((key) => {
       this.emit(key, payload)
     })
   }

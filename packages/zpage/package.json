@@ -1,7 +1,7 @@
 {
-  "name": "@zpage/zpage",
+  "name": "@zto/zpage",
   "version": "0.2.0",
-  "description": "@zpage/zpage",
+  "description": "@zto/zpage",
   "main": "index.js",
   "module": "dist/zpage.esm.js",
   "types": "dist/types/index.d.ts",
@@ -11,8 +11,8 @@
     "README.md"
   ],
   "dependencies": {
-    "@zpage/runtime": "workspace:^",
-    "@zpage/ffb": "workspace:^"
+    "@zto/zpage-runtime": "workspace:^",
+    "@zto/zpage-ffb": "workspace:^"
   },
   "scripts": {
     "prepublish": "npm run build",

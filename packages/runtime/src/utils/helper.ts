@@ -9,6 +9,8 @@ import { simpleCompare } from './sort'
 import { evalExpression } from './tpl'
 import { isPureVariable, resolveVariable, resolveVariableAndFilter } from './tpl-builtin'
 
+import type { GenericFunction } from '@zto/zpage-core'
+
 export function isObject(obj: any) {
   const typename = typeof obj
   return (

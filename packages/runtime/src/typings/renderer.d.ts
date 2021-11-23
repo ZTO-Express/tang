@@ -1,4 +1,4 @@
-import type { Schema } from '@zpage/core'
+import type { Schema } from '@zto/zpage-core'
 import type { InstallableOptions, RuntimeConfig, RuntimeUI } from './runtime'
 
 export interface RendererUI extends RuntimeUI {

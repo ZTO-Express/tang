@@ -9,7 +9,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, _, useWidgetSchema } from '@zpage/zpage'
+import { vue, _, useWidgetSchema } from '@zto/zpage'
 
 const { computed } = vue
 

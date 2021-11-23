@@ -34,10 +34,10 @@
 </template>
 
 <script setup lang="ts">
-import { vue, vueRouter, useAppRoute, useAppRouter, useAppStore, useConfig } from '@zpage/zpage'
+import { vue, vueRouter, useAppRoute, useAppRouter, useAppStore, useConfig } from '@zto/zpage'
 import { useMessage } from '../../composables'
 
-import type { NavMenuItem } from '@zpage/zpage'
+import type { NavMenuItem } from '@zto/zpage'
 
 const { computed, ref, onMounted } = vue
 const { onBeforeRouteUpdate } = vueRouter

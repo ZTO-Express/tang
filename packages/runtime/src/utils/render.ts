@@ -44,13 +44,13 @@ export function renderCmpt(options: any, context: any = {}): VNode | string | un
   }
 
   if (options.slots) {
-    Object.keys(options.slots).forEach(key => {
+    Object.keys(options.slots).forEach((key) => {
       const slot = options.slots[key]
 
       children[key] = () => {
         if (!slot) return undefined
         if (Array.isArray(slot)) {
-          return slot.map(it => renderCmpt(it, context))
+          return slot.map((it) => renderCmpt(it, context))
         } else {
           return renderCmpt(it, context)
         }

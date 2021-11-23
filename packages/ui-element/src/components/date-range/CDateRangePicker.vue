@@ -20,7 +20,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, dateUtil } from '@zpage/zpage'
+import { vue, dateUtil } from '@zto/zpage'
 import { useMessage } from '../../composables'
 
 const { computed, ref, watch } = vue

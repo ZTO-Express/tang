@@ -27,7 +27,7 @@ export const Widget = defineComponent({
     // 渲染多个widgets
     function renderWidgets(ss: any[]): VNode | VNode[] {
       if (Array.isArray(ss)) {
-        const ws = ss.map(s => {
+        const ws = ss.map((s) => {
           return renderWidget(s)
         })
         return ws
@@ -53,7 +53,7 @@ export const Widget = defineComponent({
         bodyChild = renderWidgets(s.body)
       }
 
-      const childKeys = Object.keys(s).filter(key => {
+      const childKeys = Object.keys(s).filter((key) => {
         return s[key] && s[key].type && typeof s[key].type === 'string'
       })
 

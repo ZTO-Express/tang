@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useWidgetEmitter, useWidgetSchema } from '@zpage/zpage'
+import { vue, useWidgetEmitter, useWidgetSchema } from '@zto/zpage'
 
 const { ref } = vue
 

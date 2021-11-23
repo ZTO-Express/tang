@@ -1,4 +1,4 @@
-import { startApp, ZPageElementUI } from '@zpage/ui-element'
+import { startApp, ZPageElementUI } from '@zto/zpage-ui-element'
 import './styles/app.scss'
 
 import { ENV } from './config/env'

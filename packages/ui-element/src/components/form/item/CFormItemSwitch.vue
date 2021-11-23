@@ -8,7 +8,9 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zpage/zpage'
+import { vue } from '@zto/zpage'
+
+import type { GenericFunction } from '@zto/zpage'
 
 const { computed } = vue
 

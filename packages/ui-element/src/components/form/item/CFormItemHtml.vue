@@ -1,5 +1,5 @@
 <script lang="ts">
-import { vue, renderHtml, useAppContext } from '@zpage/zpage'
+import { vue, renderHtml, useAppContext } from '@zto/zpage'
 
 const { defineComponent } = vue
 
@@ -7,9 +7,9 @@ export default defineComponent({
   inheritAttrs: false,
 
   props: {
-    model: { type: Object, required: true },
-    prop: { type: String, required: true },
-    html: { type: String, required: true }
+    model: { type: Object },
+    prop: { type: String },
+    html: { type: [String, Object], required: true }
   },
 
   setup(props: any) {

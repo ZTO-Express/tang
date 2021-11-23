@@ -26,11 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import { vue, renderHtml } from '@zpage/zpage'
+import { vue, renderHtml } from '@zto/zpage'
 import { addResizeListener, removeResizeListener } from '../../utils/resize-event/resize-event'
 
 import NavButton from './nav-button.vue'
 import NavItem from './nav-item.vue'
+
+import type { GenericFunction } from '@zto/zpage'
 
 const { computed, onMounted, onUnmounted, onUpdated, ref } = vue
 

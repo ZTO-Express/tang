@@ -38,8 +38,10 @@
 </template>
 
 <script setup lang="ts">
-import { vue, fileUtil } from '@zpage/zpage'
+import { vue, fileUtil } from '@zto/zpage'
 import { Close } from '@element-plus/icons'
+
+import type { GenericFunction } from '@zto/zpage'
 
 const { ref, watch } = vue
 

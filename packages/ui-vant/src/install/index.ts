@@ -1,7 +1,7 @@
 import installVant from './vant'
 import installComponents from './components'
 import installWidgets from './widgets'
-import type { Installable } from '@zpage/zpage'
+import type { Installable } from '@zto/zpage'
 
 /** 安装插件 */
 export async function install(instance: Installable, options?: InstallableOptions) {

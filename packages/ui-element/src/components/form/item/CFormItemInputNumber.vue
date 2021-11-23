@@ -16,7 +16,10 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, useConfig } from '@zpage/zpage'
+import { vue, useConfig } from '@zto/zpage'
+
+import type { GenericFunction } from '@zto/zpage'
+
 const { computed } = vue
 
 const props = withDefaults(

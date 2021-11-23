@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useConfig } from '@zpage/zpage'
+import { vue, useConfig } from '@zto/zpage'
 
 const { ref, nextTick } = vue
 const emit = defineEmits(['fetch', 'update:pageSize', 'update:pageIndex'])

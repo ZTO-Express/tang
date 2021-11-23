@@ -8,7 +8,7 @@
     "lint": "eslint --fix \"./src/**/*.{ts,tsx,js,vue}\""
   },
   "dependencies": {
-    "@zpage/ui-element": "workspace:^",
+    "@zto/zpage-ui-element": "workspace:^",
     "core-js": "^3.19.1",
     "element-plus": "1.1.0-beta.8",
     "nprogress": "^0.2.0"

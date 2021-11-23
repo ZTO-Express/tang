@@ -67,7 +67,5 @@ export function isEmail(s: string) {
 
 /** 身份证号 */
 export function isIdCardNo(s: string) {
-  return /^[1-9]\d{5}(18|19|20|(3\d))\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(
-    s
-  )
+  return /^[1-9]\d{5}(18|19|20|(3\d))\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(s)
 }

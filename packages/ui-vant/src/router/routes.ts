@@ -1,4 +1,4 @@
-import { ROOT_ROUTE_NAME } from '@zpage/zpage'
+import { ROOT_ROUTE_NAME } from '@zto/zpage'
 
 import AppLayout from '../components/app/AppLayout.vue'
 import Page403 from '../views/errors/403.vue'

@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
-import { useWidgetSchema, useApi, dateUtil } from '@zpage/zpage'
+import { useWidgetSchema, useApi, dateUtil } from '@zto/zpage'
 
 import { Calendar, Popup, Picker } from 'vant'
 

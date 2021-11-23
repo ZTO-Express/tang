@@ -1,6 +1,7 @@
 import template from 'lodash/template'
 import { getFilters } from './tpl-builtin'
 
+import type { GenericFunction } from '@zto/zpage-core'
 import type { Enginer } from './tpl'
 
 const imports = {

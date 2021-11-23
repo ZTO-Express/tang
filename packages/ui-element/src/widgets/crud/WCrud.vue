@@ -125,7 +125,7 @@ import {
   useWidgetSchema,
   useApiRequest,
   useAppContext
-} from '@zpage/zpage'
+} from '@zto/zpage'
 
 import { useMessage } from '../../composables'
 import { DEFAULT_ACTIONS } from './consts'
@@ -464,6 +464,7 @@ async function triggerAction(actionCfg: any, data?: any) {
     msgConfig.title = msgConfig.title || '提示'
     msgConfig = Object.assign(
       {
+        showCancelButton: true,
         cancelButtonText: '取消',
         confirmButtonText: '确定'
       },

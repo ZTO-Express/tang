@@ -8,8 +8,6 @@ export type GenericFunction<T = any> = (...args: any[]) => T
 
 export type PromiseFunction<T = any> = GenericFunction<Promise<T>>
 
-export type PromiseObject = Promise<any>
-
 // 特定类型对象
 export interface GenericObject<T = any> {
   [key: string]: T

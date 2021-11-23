@@ -19,6 +19,7 @@
             :clearable="typeof item.clearable !== 'undefined' ? item.clearable : clearable"
             :style="{ width: item.width || itemWidth }"
           />
+
           <span v-else-if="!item.showSlot && item.type === 'text'">
             {{ (item.formatter && item.formatter(model)) || model[item.prop] }}
             <slot v-if="item.prop" :prop="item.prop" name="append" />
@@ -43,7 +44,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, tpl, useAppContext, useConfig } from '@zpage/zpage'
+import { vue, tpl, useAppContext, useConfig } from '@zto/zpage'
 
 import { getFormItemRules } from './util'
 

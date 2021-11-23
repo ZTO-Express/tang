@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useAppStore, useWidgetSchema } from '@zpage/ui-element'
+import { useAppStore, useWidgetSchema } from '@zto/zpage-ui-element'
 
 const store = useAppStore()
 

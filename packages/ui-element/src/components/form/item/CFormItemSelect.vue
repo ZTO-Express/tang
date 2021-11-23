@@ -4,7 +4,8 @@
     v-model="model[prop]"
     v-bind="$attrs"
     :placeholder="$attrs.placeholder || '请选择'"
-    :filterable="$attrs.filterable !== false"
+    :filterable="filterable"
+    :collapseTags="collapseTags"
     :disabled="disabled"
     @change=";(onChange && onChange(model)) || ''"
   >
@@ -38,7 +39,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zpage/zpage'
+import { vue } from '@zto/zpage'
+
+import type { GenericFunction } from '@zto/zpage'
 
 const { computed, ref, watch } = vue
 
@@ -51,9 +54,13 @@ const props = withDefaults(
     options?: Array<any>
     optionLabel?: string
     optionValue?: string
+    collapseTags?: boolean
+    filterable?: boolean
     onChange?: GenericFunction
   }>(),
   {
+    collapseTags: true,
+    filterable: false,
     disabled: false
   }
 )

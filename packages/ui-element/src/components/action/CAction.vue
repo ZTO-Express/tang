@@ -15,8 +15,10 @@
 </template>
 
 <script setup lang="ts">
-import { vue, _, useAppRouter, useApiRequest, useAppContext, emitter, tpl } from '@zpage/zpage'
+import { vue, _, useAppRouter, useApiRequest, useAppContext, emitter, tpl } from '@zto/zpage'
 import { useMessage } from '../../composables'
+
+import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
 
 const { computed, ref, useAttrs } = vue
 
@@ -30,7 +32,7 @@ const props = withDefaults(
     trigger?: GenericFunction // 触发器，覆盖action自身触发
     beforeTrigger?: GenericFunction
     afterTrigger?: GenericFunction
-    api?: string // api 触发
+    api?: ApiRequestAction // api 触发
     payload?: Record<string, any> // 相关附加参数
     contextData?: any // 数据上下文
     successMessage?: string // 成功消息
@@ -109,8 +111,8 @@ const isImport = computed(() => {
 const importAttrs = computed(() => {
   return {
     api: props.api,
-    successMessage: props.successMessage,
     dialog: props.dialog,
+    successMessage: props.successMessage,
     ..._.omit(attrs, ['import']),
     ...(attrs.import as any)
   }
@@ -122,7 +124,7 @@ function handleClick() {
 }
 
 /** 执行提交 */
-async function handleFormDialogSubmit(model: any, options: any, form: any, dialog: any) {
+async function handleFormDialogSubmit(model: any) {
   await doSubmitForm(model)
 }
 
@@ -130,10 +132,7 @@ async function handleFormDialogSubmit(model: any, options: any, form: any, dialo
 async function doSubmitForm(model: any) {
   if (!props.api) return
 
-  await apiRequest({
-    action: props.api,
-    data: model
-  })
+  await apiRequest({ action: props.api, data: model })
 }
 
 /** 触发活动 */

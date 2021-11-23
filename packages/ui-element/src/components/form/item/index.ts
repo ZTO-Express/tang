@@ -6,7 +6,6 @@ import CFormItemFuzzySelect from './CFormItemFuzzySelect.vue'
 import CFormItemHtml from './CFormItemHtml.vue'
 import CFormItemInput from './CFormItemInput.vue'
 import CFormItemInputNumber from './CFormItemInputNumber.vue'
-import CFormItemRadio from './CFormItemRadio.vue'
 import CFormItemSelect from './CFormItemSelect.vue'
 import CFormItemSwitch from './CFormItemSwitch.vue'
 
@@ -19,7 +18,6 @@ export {
   CFormItemHtml,
   CFormItemInput,
   CFormItemInputNumber,
-  CFormItemRadio,
   CFormItemSelect,
   CFormItemSwitch
 }

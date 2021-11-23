@@ -129,10 +129,7 @@ export function findTreeIndex<T extends TreeItem>(
  * @param idx
  * @returns
  */
-export function getTree<T extends TreeItem>(
-  tree: Array<T>,
-  idx: Array<number> | number
-): T | undefined | null {
+export function getTree<T extends TreeItem>(tree: Array<T>, idx: Array<number> | number): T | undefined | null {
   const indexes = Array.isArray(idx) ? idx.concat() : [idx]
   const lastIndex = indexes.pop()!
   let list: Array<T> | null = tree
@@ -161,16 +158,12 @@ export function filterTree<T extends TreeItem>(
 ) {
   if (depthFirst) {
     return tree
-      .map(item => {
+      .map((item) => {
         const children: TreeArray | undefined = item.children
           ? filterTree(item.children as Array<T>, iterator, level + 1, depthFirst)
           : undefined
 
-        if (
-          Array.isArray(children) &&
-          Array.isArray(item.children) &&
-          children.length !== item.children.length
-        ) {
+        if (Array.isArray(children) && Array.isArray(item.children) && children.length !== item.children.length) {
           item = { ...item, children }
         }
 
@@ -181,15 +174,11 @@ export function filterTree<T extends TreeItem>(
 
   return tree
     .filter((item, index) => iterator(item, index, level))
-    .map(item => {
+    .map((item) => {
       if (item.children && item.children.splice) {
         const children = filterTree(item.children as Array<T>, iterator, level + 1, depthFirst)
 
-        if (
-          Array.isArray(children) &&
-          Array.isArray(item.children) &&
-          children.length !== item.children.length
-        ) {
+        if (Array.isArray(children) && Array.isArray(item.children) && children.length !== item.children.length) {
           item = { ...item, children }
         }
       }
@@ -204,13 +193,7 @@ export function filterTree<T extends TreeItem>(
  */
 export function everyTree<T extends TreeItem>(
   tree: Array<T>,
-  iterator: (
-    item: T,
-    key: number,
-    level: number,
-    paths: Array<T>,
-    indexes: Array<number>
-  ) => boolean,
+  iterator: (item: T, key: number, level: number, paths: Array<T>, indexes: Array<number>) => boolean,
   level = 1,
   paths: Array<T> = [],
   indexes: Array<number> = []
@@ -219,13 +202,7 @@ export function everyTree<T extends TreeItem>(
     const value: any = iterator(item, index, level, paths, indexes)
 
     if (value && item.children && item.children.splice) {
-      return everyTree(
-        item.children as Array<T>,
-        iterator,
-        level + 1,
-        paths.concat(item),
-        indexes.concat(index)
-      )
+      return everyTree(item.children as Array<T>, iterator, level + 1, paths.concat(item), indexes.concat(index))
     }
 
     return value
@@ -273,14 +250,8 @@ export function someTree<T extends TreeItem>(
  * @param mapper
  */
 export function flattenTree<T extends TreeItem>(tree: Array<T>): Array<T>
-export function flattenTree<T extends TreeItem, U>(
-  tree: Array<T>,
-  mapper: (value: T, index: number) => U
-): Array<U>
-export function flattenTree<T extends TreeItem, U>(
-  tree: Array<T>,
-  mapper?: (value: T, index: number) => U
-): Array<U> {
+export function flattenTree<T extends TreeItem, U>(tree: Array<T>, mapper: (value: T, index: number) => U): Array<U>
+export function flattenTree<T extends TreeItem, U>(tree: Array<T>, mapper?: (value: T, index: number) => U): Array<U> {
   let flattened: Array<any> = []
   eachTree(tree, (item, index) => flattened.push(mapper ? mapper(item, index) : item))
   return flattened
@@ -330,7 +301,7 @@ export function spliceTree<T extends TreeItem>(
  */
 export function getTreeDepth<T extends TreeItem>(tree: Array<T>): number {
   return Math.max(
-    ...tree.map(item => {
+    ...tree.map((item) => {
       if (Array.isArray(item.children)) {
         return 1 + getTreeDepth(item.children)
       }
@@ -345,11 +316,7 @@ export function getTreeDepth<T extends TreeItem>(tree: Array<T>): number {
  * @param tree
  * @param value
  */
-export function getTreeAncestors<T extends TreeItem>(
-  tree: Array<T>,
-  value: T,
-  includeSelf = false
-): Array<T> | null {
+export function getTreeAncestors<T extends TreeItem>(tree: Array<T>, value: T, includeSelf = false): Array<T> | null {
   let ancestors: Array<T> | null = null
 
   findTree(tree, (item, index, level, paths) => {

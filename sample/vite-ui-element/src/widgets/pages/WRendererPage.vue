@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted } from 'vue'
-import { App, useAppStore, useWidgetSchema } from '@zpage/ui-element'
+import { App, useAppStore, useWidgetSchema } from '@zto/zpage-ui-element'
 
 const store = useAppStore()
 

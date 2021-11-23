@@ -1,5 +1,5 @@
 /** 导出数据 */
-import { useConfig } from '@zpage/zpage'
+import { useConfig } from '@zto/zpage'
 
 export interface ExportColumn {
   prop: string

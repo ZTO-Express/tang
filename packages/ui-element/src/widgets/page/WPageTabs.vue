@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, tpl, useAppContext, useWidgetSchema } from '@zpage/zpage'
+import { vue, tpl, useAppContext, useWidgetSchema } from '@zto/zpage'
 const { computed, ref } = vue
 
 const props = defineProps<{

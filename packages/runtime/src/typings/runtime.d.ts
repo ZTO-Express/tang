@@ -1,4 +1,4 @@
-import type { Widget, Schema, Plugin, PromiseFunction, PromiseObject } from '@zpage/core'
+import type { Widget, Schema, Plugin, PromiseFunction, PromiseObject } from '@zto/zpage-core'
 import type { VueApp, VueComponent } from './vue'
 
 /** 运行时扩展选项 */
@@ -44,9 +44,13 @@ export interface TokenData {
   [prop: string]: any
 }
 
+export type ApiRequestAction =
+  | string
+  | { type?: string; api: string; sourceType?: string; [prop: string]: any }
+
 /** 请求参数 */
 export interface ApiRequestConfig {
-  action: { type?: string; api: string; sourceType?: string } | string
+  action: ApiRequestAction
   params?: Record<string, any>
 
   [prop: string]: any

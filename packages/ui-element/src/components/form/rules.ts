@@ -1,6 +1,6 @@
-import { _, validator as v, useConfig } from '@zpage/zpage'
+import { _, validator as v, useConfig } from '@zto/zpage'
 
-import type { GenericFunction } from '@zpage/core'
+import type { GenericFunction } from '@zto/zpage'
 
 /** 外部注册规则 */
 export const outerRules = useConfig('components.form.rules')
@@ -28,17 +28,13 @@ export const innerRules = Object.freeze({
   minlength: {
     validator: (rule: any, val: string, cb: GenericFunction) => {
       if (!val) return verifyRequired(rule, val, cb)
-      String(val).length >= rule.minlength
-        ? cb()
-        : cb(new Error(`${rule.label}长度不能小于${rule.minlength}`))
+      String(val).length >= rule.minlength ? cb() : cb(new Error(`${rule.label}长度不能小于${rule.minlength}`))
     }
   },
   maxlength: {
     validator: (rule: any, val: string, cb: GenericFunction) => {
       if (!val) return verifyRequired(rule, val, cb)
-      String(val).length <= rule.maxlength
-        ? cb()
-        : cb(new Error(`${rule.label}长度不能大于${rule.maxlength}`))
+      String(val).length <= rule.maxlength ? cb() : cb(new Error(`${rule.label}长度不能大于${rule.maxlength}`))
     }
   },
   fixedLengths: {
@@ -101,29 +97,22 @@ export const innerRules = Object.freeze({
   decimal: {
     validator: (rule: any, val: string, cb: GenericFunction) => {
       if (!val) return rule.required === false
-      const radixMsg =
-        rule.radix.from === rule.radix.to ? rule.radix.from : `${rule.radix.from}至${rule.radix.to}`
+      const radixMsg = rule.radix.from === rule.radix.to ? rule.radix.from : `${rule.radix.from}至${rule.radix.to}`
       v.isDecimal(val, rule.radix) ? cb() : cb(new Error(`${rule.label}必须为${radixMsg}位小数`))
     }
   },
   positiveDecimal: {
     validator: (rule: any, val: string, cb: GenericFunction) => {
       if (!val) return rule.required === false
-      const radixMsg =
-        rule.radix.from === rule.radix.to ? rule.radix.from : `${rule.radix.from}至${rule.radix.to}`
-      v.isPositiveDecimal(val, rule.radix)
-        ? cb()
-        : cb(new Error(`${rule.label}必须为${radixMsg}位正小数`))
+      const radixMsg = rule.radix.from === rule.radix.to ? rule.radix.from : `${rule.radix.from}至${rule.radix.to}`
+      v.isPositiveDecimal(val, rule.radix) ? cb() : cb(new Error(`${rule.label}必须为${radixMsg}位正小数`))
     }
   },
   negativeDecimal: {
     validator: (rule: any, val: string, cb: GenericFunction) => {
       if (!val) return rule.required === false
-      const radixMsg =
-        rule.radix.from === rule.radix.to ? rule.radix.from : `${rule.radix.from}至${rule.radix.to}`
-      v.isNegativeDecimal(val, rule.radix)
-        ? cb()
-        : cb(new Error(`${rule.label}必须为${radixMsg}位负小数`))
+      const radixMsg = rule.radix.from === rule.radix.to ? rule.radix.from : `${rule.radix.from}至${rule.radix.to}`
+      v.isNegativeDecimal(val, rule.radix) ? cb() : cb(new Error(`${rule.label}必须为${radixMsg}位负小数`))
     }
   }
 })

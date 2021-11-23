@@ -10,13 +10,13 @@ const permission: Directive = {
 
     if (value && value instanceof Array && value.length > 0) {
       // 截取空格以容错
-      const permissionRoles = value.map(it => {
+      const permissionRoles = value.map((it) => {
         if (typeof it === 'string') {
           return it.trim()
         }
         return it
       })
-      const hasPermission = roles.some(role => {
+      const hasPermission = roles.some((role) => {
         return permissionRoles.includes(role)
       })
 

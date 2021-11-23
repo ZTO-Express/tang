@@ -1,2 +1,2 @@
-export * from '@zpage/runtime'
-export * from '@zpage/ffb'
+export * from '@zto/zpage-runtime'
+export * from '@zto/zpage-ffb'

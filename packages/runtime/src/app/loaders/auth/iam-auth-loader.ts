@@ -1,12 +1,4 @@
-import {
-  clearTokenData,
-  refreshToken,
-  getAccessToken,
-  resetToken,
-  uniqId,
-  _,
-  reloadUrl
-} from '../../../utils'
+import { clearTokenData, refreshToken, getAccessToken, resetToken, uniqId, _, reloadUrl } from '../../../utils'
 import { useApi, useEnv } from '../../../config'
 import { useAppStore } from '../../store'
 
@@ -87,9 +79,7 @@ export const IAMAuthLoader: AppAuthLoader = {
       await clearTokenData()
 
       const redirectUrl = encodeURIComponent(window.location.origin)
-      const loginUrl = `${ENV.iamUrl}/oauth2?app_id=${
-        ENV.appId
-      }&redirect_url=${redirectUrl}&state=${uniqId()}`
+      const loginUrl = `${ENV.iamUrl}/oauth2?app_id=${ENV.appId}&redirect_url=${redirectUrl}&state=${uniqId()}`
       window.location.href = loginUrl
     }
   }
@@ -97,7 +87,7 @@ export const IAMAuthLoader: AppAuthLoader = {
 
 // 解析单项菜单
 function parseMenuItem(menu: IAMMenuItem): NavMenuItem {
-  const children = (menu.children || []).map(it => {
+  const children = (menu.children || []).map((it) => {
     it.parentName = menu.keyName
     return parseMenuItem(it)
   })

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useWidgetSchema } from '@zpage/zpage'
+import { vue, useWidgetSchema } from '@zto/zpage'
 
 const { ref } = vue
 

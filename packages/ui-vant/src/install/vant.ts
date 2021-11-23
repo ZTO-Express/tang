@@ -1,8 +1,8 @@
-import { warn } from '@zpage/zpage'
+import { warn } from '@zto/zpage'
 
 import * as componentsMap from './vant_components'
 
-import type { VueApp, Installable, InstallableOptions } from '@zpage/zpage'
+import type { VueApp, Installable, InstallableOptions } from '@zto/zpage'
 
 export default (target: Installable, options?: InstallableOptions): void => {
   const { vueApp } = target

@@ -1,4 +1,4 @@
-import type { VueComponent } from '@zpage/zpage'
+import type { VueComponent } from '@zto/zpage'
 
 const componentsMap: Record<string, any> = import.meta.globEager(`../components/**/C*.vue`)
 

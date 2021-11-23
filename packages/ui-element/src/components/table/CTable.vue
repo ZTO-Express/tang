@@ -99,7 +99,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, _, useApiRequest, useConfig } from '@zpage/zpage'
+import { vue, _, useApiRequest, useConfig } from '@zto/zpage'
 
 import { useMessage } from '../../composables'
 import { xlsxUtil } from '../../utils'
@@ -111,13 +111,15 @@ import Pagination from './pagination.vue'
 import type { TableColumn, TablePager, SummaryMethodParams, TableData } from './types'
 import type { ExportColumn } from '../../utils/xlsx'
 
+import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
+
 const { ref, reactive, nextTick, computed, useAttrs } = vue
 
 // 属性
 const props = withDefaults(
   defineProps<{
-    api?: string // api请求
-    params?: Record<string, any> // api请求参数
+    api?: ApiRequestAction // api请求
+    apiParams?: Record<string, any> // api请求参数
     data?: Array<any> // 表格数据
     columns?: Array<any> // 列设置
     showExpand?: boolean // 展开列是否展示
@@ -369,7 +371,7 @@ async function doFetch(isResetPager: boolean) {
       sourceType: 'table'
     },
     ...pager,
-    params: props.params,
+    params: props.apiParams,
     noPager: props.noPager
   }
 

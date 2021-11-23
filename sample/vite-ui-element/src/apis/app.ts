@@ -1,4 +1,4 @@
-import { HttpRequest } from '@zpage/ui-element'
+import { HttpRequest } from '@zto/zpage-ui-element'
 import { ENV } from '../config/env'
 import { httpConfig } from '../config/http'
 

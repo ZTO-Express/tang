@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import type { GenericFunction } from '@zpage/core'
+import type { GenericFunction } from '@zto/zpage-core'
 
 // 请求选项
 export interface HttpRequestOptions extends AxiosRequestConfig {

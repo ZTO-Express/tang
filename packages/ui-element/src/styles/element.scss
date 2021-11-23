@@ -20,6 +20,11 @@ $--font-path: 'element-plus/packages/theme-chalk/src/fonts';
   --el-font-size-extra-small: 12px;
 }
 
+.el-checkbox {
+  --el-checkbox-font-size: 12px;
+  --el-checkbox-font-weight: 12px;
+}
+
 .el-input-group {
   &__append,
   &__prepend {

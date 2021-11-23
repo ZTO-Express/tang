@@ -1,6 +1,6 @@
 import * as widgetsMap from '../widgets'
 
-import type { VueComponent, Installable, InstallableOptions } from '@zpage/zpage'
+import type { VueComponent, Installable, InstallableOptions } from '@zto/zpage'
 
 export default (instance: Installable, options?: InstallableOptions): void => {
   const innerWidgets: VueComponent[] = []

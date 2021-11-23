@@ -1,6 +1,6 @@
 // 当前应用共配请求相关Api
 
-import { HttpRequest } from '@zpage/zpage'
+import { HttpRequest } from '@zto/zpage'
 import { ENV } from '../config/env'
 import { httpConfig } from '../config/http'
 

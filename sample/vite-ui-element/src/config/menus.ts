@@ -1,4 +1,4 @@
-import type { NavMenuItemConfig } from '@zpage/ui-element'
+import type { NavMenuItemConfig } from '@zto/zpage-ui-element'
 
 export const menus: NavMenuItemConfig[] = [
   {

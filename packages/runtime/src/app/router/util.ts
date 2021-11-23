@@ -90,6 +90,8 @@ export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Sub
 
 /** 根据导航菜单构建路由 */
 function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule) {
+  let newRoute: RouteRecordRaw | null = null
+
   // 有路径的菜单才有路由
   if (menu.path) {
     const pathInfo = _parseMenuPath(menu.path)
@@ -127,35 +129,36 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
 
     // 已存在的页面key
     const existsRoute = router.getRouteByPageKey(pageKey)
-    if (existsRoute) return existsRoute
 
-    routeMeta.pageKey = pageKey
+    if (!existsRoute) {
+      routeMeta.pageKey = pageKey
 
-    const route: RouteRecordRaw = {
-      name: menu.name,
-      ...pathInfo,
-      meta: routeMeta
+      const route: RouteRecordRaw = {
+        name: menu.name,
+        ...pathInfo,
+        meta: routeMeta
+      }
+
+      if (menu.redirect) {
+        route.redirect = menu.redirect
+      } else {
+        route.component = _resolvePageComponent(routeMeta)
+      }
+
+      if (menu.path.startsWith(ROOT_MENU_PREFIX)) {
+        // 以ROOT_MENU_PREFIX前缀开头，直接添加路由
+        menu.path = menu.path.substr(ROOT_MENU_PREFIX.length)
+        routeMeta.isRoot = true
+        routeMeta.path = menu.path
+
+        router.addRoute(route)
+      } else {
+        // 添加路由到根路由下
+        router.addRoute(ROOT_ROUTE_NAME, route)
+      }
+
+      newRoute = route
     }
-
-    if (menu.redirect) {
-      route.redirect = menu.redirect
-    } else {
-      route.component = _resolvePageComponent(routeMeta)
-    }
-
-    if (menu.path.startsWith(ROOT_MENU_PREFIX)) {
-      // 以ROOT_MENU_PREFIX前缀开头，直接添加路由
-      menu.path = menu.path.substr(ROOT_MENU_PREFIX.length)
-      routeMeta.isRoot = true
-      routeMeta.path = menu.path
-
-      router.addRoute(route)
-    } else {
-      // 添加路由到根路由下
-      router.addRoute(ROOT_ROUTE_NAME, route)
-    }
-
-    return route
   }
 
   if (menu.children?.length) {
@@ -163,6 +166,8 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
       _createSubRoute(router, it, submodule)
     })
   }
+
+  return newRoute
 }
 
 /** 解析菜单路径 */

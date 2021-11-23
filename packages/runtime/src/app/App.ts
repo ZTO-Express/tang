@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import { warn, queryEl } from '../utils'
 import { AppRenderer } from './renderer/AppRenderer'
 
-import type { Widget, Plugin } from '@zpage/core'
+import type { Widget, Plugin } from '@zto/zpage-core'
 import type {
   VueApp,
   VuePlugin,

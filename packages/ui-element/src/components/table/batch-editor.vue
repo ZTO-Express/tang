@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue } from '@zpage/zpage'
+import { vue } from '@zto/zpage'
 
 const { reactive, ref } = vue
 

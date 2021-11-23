@@ -11,14 +11,11 @@
 </template>
 
 <script lang="ts">
-export default {
-  inheritAttrs: false
-}
+export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, useConfig } from '@zpage/zpage'
-
+import { vue, useConfig } from '@zto/zpage'
 const { ref } = vue
 
 const inputConfig = useConfig('components.formItem.input', {})
@@ -27,7 +24,6 @@ const props = withDefaults(
   defineProps<{
     model: Record<string, any>
     prop: string
-    tpl?: string
     disabled?: boolean
     maxlength?: number
   }>(),

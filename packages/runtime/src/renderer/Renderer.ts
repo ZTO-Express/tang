@@ -3,7 +3,7 @@ import { warn } from '../utils'
 import { Widget as CWidget } from '../entry'
 import { install } from './install'
 
-import type { Widget } from '@zpage/core'
+import type { Widget } from '@zto/zpage-core'
 import type {
   VueApp,
   VueComponent,

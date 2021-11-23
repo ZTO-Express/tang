@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue } from '@zpage/zpage'
+import { vue } from '@zto/zpage'
 const { ref, watch } = vue
 
 const props = withDefaults(
@@ -38,7 +38,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const modelValue = ref<boolean>(props.modelValue)
 
-let isExpanded = ref<boolean>(props.reversed ? !modelValue.value : modelValue.value)
+const isExpanded = ref<boolean>(props.reversed ? !modelValue.value : modelValue.value)
 
 watch(
   () => modelValue,

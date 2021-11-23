@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useAppStore, useConfig } from '@zpage/zpage'
+import { vue, useAppStore, useConfig } from '@zto/zpage'
 import { Back } from '@element-plus/icons'
 
 import AppHeader from './app-header.vue'

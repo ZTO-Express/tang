@@ -1,5 +1,7 @@
-import { vue, renderHtml, tpl, _, useAppContext } from '@zpage/zpage'
+import { vue, renderHtml, tpl, _, useAppContext } from '@zto/zpage'
 import { ElTableColumn, ElFormItem } from 'element-plus'
+
+import type { GenericFunction } from '@zto/zpage'
 
 import CPoptip from '../poptip/CPoptip.vue'
 import BatchEditor from './batch-editor.vue'
@@ -81,7 +83,7 @@ const ChildTableColumn = defineComponent({
           if (config?.tip) {
             const tipProps = config?.tip
             let isTip = tipProps.visibleOn ? tpl.evalExpression(tipProps.visibleOn, context) : true
-            tipSlot = isTip && h(CPoptip, { context, ...tipProps })
+            tipSlot = isTip && h(CPoptip as any, { context, ...tipProps })
           }
 
           /** 编辑模式
@@ -117,9 +119,20 @@ const ChildTableColumn = defineComponent({
             innerText = config.formatter(scope.row, config, scope.row[prop], scope.$index, scope)
           }
 
-          if (tipSlot) return h('div', {}, [innerText, tipSlot])
+          let style = {}
+          if (config.style) {
+            style = tpl.deepFilter(config.style, context)
+          }
 
-          return innerText
+          let _innerSolts = tipSlot ? [innerText, tipSlot] : innerText
+
+          return h(
+            'div',
+            {
+              style
+            },
+            _innerSolts
+          )
         }
 
         scopedSlots.header = (scope: any) => {

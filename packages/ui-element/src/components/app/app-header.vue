@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useConfig, useAppRouter, useAppStore } from '@zpage/zpage'
+import { vue, useConfig, useAppRouter, useAppStore } from '@zto/zpage'
 
 const { computed, ref } = vue
 

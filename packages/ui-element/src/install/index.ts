@@ -2,7 +2,7 @@ import installElement from './element'
 import installComponents from './components'
 import installWidgets from './widgets'
 
-import type { Installable, InstallableOptions } from '@zpage/zpage'
+import type { Installable, InstallableOptions } from '@zto/zpage'
 
 /** 安装插件 */
 export async function install(target: Installable, options?: InstallableOptions) {

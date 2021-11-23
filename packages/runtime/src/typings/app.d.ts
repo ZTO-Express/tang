@@ -14,7 +14,7 @@ import type {
   PageSchema,
   PromiseFunction,
   PromiseObject
-} from '@zpage/core'
+} from '@zto/zpage-core'
 
 import type { InstallableOptions, RuntimeConfig, RuntimeUI } from './runtime'
 import type { AppStore } from './store'

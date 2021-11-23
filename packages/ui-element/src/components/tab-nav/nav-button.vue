@@ -16,6 +16,8 @@
 <script setup lang="ts">
 import { ArrowLeft, ArrowRight } from '@element-plus/icons'
 
+import type { GenericFunction } from '@zto/zpage'
+
 const props = defineProps<{
   scrollable?: Record<string, any>
   currentOffset: number

@@ -1,5 +1,5 @@
-import { startApp } from '@zpage/zpage'
-import { ZPageVantUI } from '@zpage/ui-vant'
+import { startApp } from '@zto/zpage'
+import { ZPageVantUI } from '@zto/zpage-ui-vant'
 
 import { ENV } from './config/env'
 

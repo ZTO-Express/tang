@@ -1,5 +1,5 @@
 <template>
-  <c-dialog class="c-import-dialog" ref="dialogRef" v-bind="dialogAttrs">
+  <c-dialog ref="dialogRef" class="c-import-dialog" v-bind="dialogAttrs">
     <div v-loading="loading" class="import-body-con">
       <div class="trigger-con">
         <c-file-trigger :accept="fileAccept" @file-selected="handleFileSelected">
@@ -39,10 +39,12 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, useConfig, useRescs, useApiRequest, fileUtil } from '@zpage/zpage'
+import { vue, useConfig, useRescs, useApiRequest, fileUtil } from '@zto/zpage'
 
 import { useMessage } from '../../composables'
 import * as xlsxUtil from '../../utils/xlsx'
+
+import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
 
 const { computed, ref } = vue
 
@@ -53,8 +55,8 @@ const props = withDefaults(
     tip?: string
     maxCount?: number
     maxFileSize?: number // 文件大小限制，单位MB
-    api?: string
-    params?: any
+    api?: ApiRequestAction
+    apiParams?: any
     dataProp?: string // 导出数据的属性
     dialog?: any
     successMessage?: string
@@ -192,7 +194,7 @@ async function innerImportMethod(data: any) {
 
   const payload = {
     [props.dataProp]: data,
-    ...props.params
+    ...props.apiParams
   }
 
   if (importMethod) {

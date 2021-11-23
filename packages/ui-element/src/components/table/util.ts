@@ -1,4 +1,4 @@
-import { tpl } from '@zpage/zpage'
+import { tpl } from '@zto/zpage'
 import type { TableColumn } from './types'
 
 /** 扁平化所有子列
@@ -26,7 +26,7 @@ export function flattenChildren(columns: TableColumn[]) {
  */
 export function getChildProps(columns: TableColumn[]) {
   const allColumns = flattenChildren(columns)
-  return allColumns.map(c => c.prop)
+  return allColumns.map((c) => c.prop)
 }
 
 /**
@@ -60,14 +60,11 @@ export function getDefaultColFormatterFn(options?: any) {
     options = Object.assign({ prefix: '', postfix: '' }, options)
     if (!cellValue && typeof cellValue !== 'number') return '--'
 
-    const text = tpl.filter(
-      `${options.prefix || ''}${cellValue || ''}${options.postfix || ''}` || '--',
-      {
-        data: row,
-        column: col,
-        options: options
-      }
-    )
+    const text = tpl.filter(`${options.prefix || ''}${cellValue || ''}${options.postfix || ''}` || '--', {
+      data: row,
+      column: col,
+      options: options
+    })
 
     return text
   }

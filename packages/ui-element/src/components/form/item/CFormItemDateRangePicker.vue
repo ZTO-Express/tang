@@ -1,12 +1,7 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
   <div class="c-form-item-date-range-picker">
-    <c-date-range-picker
-      v-model:from="model[prop]"
-      v-model:to="model[toProp]"
-      v-bind="$attrs"
-      :disabled="disabled"
-    />
+    <c-date-range-picker v-model:from="model[prop]" v-model:to="model[toProp]" v-bind="$attrs" :disabled="disabled" />
     <el-form-item :prop="toProp"></el-form-item>
   </div>
 </template>
@@ -16,7 +11,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zpage/zpage'
+import { vue } from '@zto/zpage'
 const { ref } = vue
 
 const props = withDefaults(

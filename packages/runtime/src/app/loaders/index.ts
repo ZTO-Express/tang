@@ -18,7 +18,7 @@ export function useLoader<T extends AppLoader>(type: keyof typeof __appLoaders, 
   }
 
   const loaders = __appLoaders[type] || []
-  const loader = loaders.find(it => it.name === name)
+  const loader = loaders.find((it) => it.name === name)
   return loader as T | undefined
 }
 

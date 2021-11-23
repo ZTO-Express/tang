@@ -3,7 +3,7 @@
   <div class="c-form-item-fuzzy-select">
     <el-tooltip placement="top-start" trigger="hover" :disabled="!isShowTips" :content="tipContent">
       <c-fuzzy-select
-        ref="fuzzySelectRef"
+        ref="fieldRef"
         v-bind="$attrs"
         v-model="model[prop]"
         :model-label="labelProp && model[labelProp]"
@@ -29,8 +29,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zpage/zpage'
-const { computed, ref, unref } = vue
+import { vue, useWidgetEmitter } from '@zto/zpage'
+
+import type { GenericFunction } from '@zto/zpage'
+
+const { computed, ref, useAttrs } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -53,12 +56,18 @@ const props = withDefaults(
   }
 )
 
-const fuzzySelectRef = ref<any>()
+const attrs = useAttrs()
+const fieldRef = ref<any>()
+
+// 注册微件事件监听
+useWidgetEmitter(attrs, {
+  fetchOn: doFetch
+})
 
 // 仅多选的时候显示tips，可通过showTips关闭该功能
 const isShowTips = computed(() => {
   if (!props.multiple) return false
-  if (!fuzzySelectRef.value) return false
+  if (!fieldRef.value) return false
 
   if (props.multiple && !getSelectedOptions()?.length) return false
   const { showTips } = props
@@ -69,7 +78,7 @@ const isShowTips = computed(() => {
 const tipContent = computed(() => {
   const selectedOptions = getSelectedOptions()
   if (!Array.isArray(selectedOptions)) return ''
-  return selectedOptions.map(option => option.currentLabel).join(',')
+  return selectedOptions.map((option) => option.currentLabel).join(',')
 })
 
 function handleUpdateLabelProps(v: string) {
@@ -85,10 +94,14 @@ function handleChange(payload: any) {
 }
 
 function getSelectedOptions() {
-  const getSelected = fuzzySelectRef.value?.getSelected
+  const getSelected = fieldRef.value?.getSelected
   if (!getSelected) return undefined
 
   const selected = getSelected()
   return selected
+}
+
+async function doFetch() {
+  await fieldRef.value?.execRemoteMethod()
 }
 </script>

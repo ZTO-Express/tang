@@ -70,10 +70,7 @@ const resetTrigger = function (element) {
 
 /* istanbul ignore next */
 const checkTriggers = function (element) {
-  return (
-    element.offsetWidth !== element.__resizeLast__.width ||
-    element.offsetHeight !== element.__resizeLast__.height
-  )
+  return element.offsetWidth !== element.__resizeLast__.width || element.offsetHeight !== element.__resizeLast__.height
 }
 
 /* istanbul ignore next */
@@ -84,7 +81,7 @@ const scrollListener = function (event) {
     if (checkTriggers(this)) {
       this.__resizeLast__.width = this.offsetWidth
       this.__resizeLast__.height = this.offsetHeight
-      this.__resizeListeners__.forEach(fn => {
+      this.__resizeListeners__.forEach((fn) => {
         fn.call(this, event)
       })
     }
@@ -94,9 +91,7 @@ const scrollListener = function (event) {
 /* Detect CSS Animations support to detect element display/re-attach */
 const attachEvent = isServer ? {} : document.attachEvent
 const DOM_PREFIXES = 'Webkit Moz O ms'.split(' ')
-const START_EVENTS = 'webkitAnimationStart animationstart oAnimationStart MSAnimationStart'.split(
-  ' '
-)
+const START_EVENTS = 'webkitAnimationStart animationstart oAnimationStart MSAnimationStart'.split(' ')
 const RESIZE_ANIMATION_NAME = 'resizeanim'
 let animation = false
 let keyFramePrefix = ''
@@ -168,8 +163,7 @@ export const addResizeListener = function (element, fn) {
 
       const resizeTrigger = (element.__resizeTrigger__ = document.createElement('div'))
       resizeTrigger.className = 'resize-triggers'
-      resizeTrigger.innerHTML =
-        '<div class="expand-trigger"><div></div></div><div class="contract-trigger"></div>'
+      resizeTrigger.innerHTML = '<div class="expand-trigger"><div></div></div><div class="contract-trigger"></div>'
       element.appendChild(resizeTrigger)
 
       resetTrigger(element)

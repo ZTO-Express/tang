@@ -22,7 +22,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, renderHtml } from '@zpage/zpage'
+import { vue, renderHtml } from '@zto/zpage'
 
 const { computed } = vue
 

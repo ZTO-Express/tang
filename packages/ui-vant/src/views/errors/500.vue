@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAppRouter } from '@zpage/zpage'
+import { useAppRouter } from '@zto/zpage'
 
 const router = useAppRouter()
 

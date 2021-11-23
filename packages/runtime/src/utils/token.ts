@@ -2,6 +2,7 @@ import { TOKEN_DATA_STORAGE_KEY, TOKEN_REFRESH_DURATION } from '../consts'
 import { useApi } from '../config'
 import { storage } from './storage'
 
+import type { Nil } from '@zto/zpage-core'
 import type { TokenData } from '../typings'
 
 /**
