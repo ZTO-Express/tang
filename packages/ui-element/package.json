@@ -1,0 +1,33 @@
+{
+  "name": "@zto/zpage-ui-element",
+  "version": "0.2.0",
+  "description": "@zto/zpage-ui-element",
+  "main": "index.js",
+  "module": "dist/zpage-ui-element.esm.js",
+  "types": "src/index.ts",
+  "files": [
+    "index.js",
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "sucrase-node ../../scripts/build --name=ui-element",
+    "clean": "rimraf dist",
+    "test": "jest --coverage --runInBand"
+  },
+  "dependencies": {
+    "@element-plus/icons": "^0.0.11",
+    "@zto/zpage": "workspace:^",
+    "element-plus": "1.1.0-beta.8",
+    "nprogress": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/nprogress": "^0.2.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "rayl"
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@zto/zpage-ui-vant",
+  "version": "0.2.0",
+  "description": "@zto/zpage-ui-vant",
+  "main": "index.js",
+  "module": "dist/zpage-ui-vant.esm.js",
+  "types": "src/index.ts",
+  "files": [
+    "index.js",
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "sucrase-node ../../scripts/build --name=ui-vant",
+    "clean": "rimraf dist",
+    "test": "jest --coverage --runInBand"
+  },
+  "dependencies": {
+    "@zto/zpage": "workspace:^",
+    "vant": "^3.2.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "rayl"
+}

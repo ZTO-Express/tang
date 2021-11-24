@@ -1,0 +1,67 @@
+// 参考quasar
+@import './variables.scss';
+
+// 构建space
+@for $index from 1 through length($sizes) {
+  $size: nth($sizes, $index); // 获取数组中第i项的值
+  $space: nth($spaces, $index); // 获取数组中第i项的值
+
+  .q-pa-#{$size} {
+    padding: $space;
+  }
+  .q-pl-#{$size} {
+    padding-left: $space;
+  }
+  .q-pr-#{$size} {
+    padding-right: $space;
+  }
+  .q-pt-#{$size} {
+    padding-top: $space;
+  }
+  .q-pb-#{$size} {
+    padding-bottom: $space;
+  }
+  .q-px-#{$size} {
+    padding-left: $space;
+    padding-right: $space;
+  }
+  .q-py-#{$size} {
+    padding-top: $space;
+    padding-bottom: $space;
+  }
+
+  .q-ma-#{$size} {
+    margin: $space;
+  }
+  .q-ml-#{$size} {
+    margin-left: $space;
+  }
+  .q-mr-#{$size} {
+    margin-right: $space;
+  }
+  .q-mt-#{$size} {
+    margin-top: $space;
+  }
+  .q-mb-#{$size} {
+    margin-bottom: $space;
+  }
+  .q-mx-#{$size} {
+    margin-left: $space;
+    margin-right: $space;
+  }
+  .q-my-#{$size} {
+    margin-top: $space;
+    margin-bottom: $space;
+  }
+}
+
+.q-ml-auto {
+  margin-left: auto;
+}
+.q-mr-auto {
+  margin-right: auto;
+}
+.q-mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}

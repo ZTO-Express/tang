@@ -1,0 +1,23 @@
+{
+  "name": "@zto/zpage-core",
+  "version": "0.2.0",
+  "description": "@zto/zpage-core",
+  "main": "index.js",
+  "module": "dist/zpage-core.esm.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "index.js",
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "sucrase-node ../../scripts/build --name=core",
+    "clean": "rimraf dist",
+    "test": "jest --coverage --runInBand"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "rayl"
+}

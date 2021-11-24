@@ -1,0 +1,53 @@
+# System
+.DS_Store
+
+# Editor
+.idea
+
+# Bundle
+dist
+lib
+coverage
+packages/zpage/version.ts
+
+# local env files
+*.local
+
+# Package Manager
+node_modules/
+.pnpm-debug.log*
+npm-debug.log
+/**/npm-debug.log
+/packages/**/.npmignore
+jspm_packages/
+.npm
+
+# Logs
+logs
+*.log
+
+# Tests
+.nyc_output
+.test_output
+*.lcov
+.test_coverage
+coverage
+
+# Temp
+temp/
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional eslint cache
+.eslintcache
+
