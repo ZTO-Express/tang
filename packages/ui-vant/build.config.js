@@ -7,7 +7,7 @@ export const rollup = {
         scss: {
           additionalData: `
             @use "sass:math";
-            @import "${__dirname}/src/styles/theme.scss";
+            @import "./src/styles/theme.scss";
           `
         }
       }

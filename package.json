@@ -12,7 +12,7 @@
     "commit": "git-cz",
     "test": "jest",
     "dev": "pnpm dev --dir sample/vite-ui-element",
-    "build": "pnpm rebuild --filter core --filter ffb --filter runtime && pnpm rebuild --filter '@zto/zpage' && pnpm rebuild --filter '@zto/zpage-ui-*'",
+    "build": "pnpm rebuild --filter zpage-core --filter zpage-ffb --filter zpage-runtime && pnpm rebuild --filter '@zto/zpage' && pnpm rebuild --filter '@zto/zpage-ui-*'",
     "gen:version": "sucrase-node scripts/version/gen-version.ts",
     "update:version": "sucrase-node scripts/version/update-version.ts",
     "clean": "pnpm run clean -r --stream",

@@ -129,6 +129,7 @@ const ChildTableColumn = defineComponent({
           return h(
             'div',
             {
+              class: 'text-ellipsis',
               style
             },
             _innerSolts

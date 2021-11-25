@@ -26,7 +26,7 @@ const envMap: EnvMap[] = [
 
     ENV: {
       ...TestEnv,
-      apiUrl: 'http://yapi.smart-xwork.cn/mock/109473',
+      apiUrl: 'http://yapi.dev.ztosys.com/mock/2291',
       env: 'dev'
     }
   }

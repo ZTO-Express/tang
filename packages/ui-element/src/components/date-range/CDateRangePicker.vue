@@ -4,7 +4,6 @@
     v-bind="$attrs"
     style="width: 100%"
     type="daterange"
-    unlink-panels
     :clearable="clearable"
     :disabled="disabled"
     :value-format="valueFormat"
