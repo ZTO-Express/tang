@@ -46,6 +46,7 @@ const innerPageIndex = ref<number>(props.pageIndex || props.total > 0 ? 1 : 0)
 function handleSizeChange() {
   innerPageIndex.value = 1
   emit('update:pageSize', innerPageSize.value)
+  emit('update:pageIndex', innerPageIndex.value) // 改变单页大小，默认跳到第一页查询
   execQuery()
 }
 
