@@ -16,6 +16,7 @@
           :data="tableData.data"
           highlight-current-row
           @selection-change="handleSelectionChange"
+          @header-dragend="handleColumnWidth"
         >
           <!-- 全选列-->
           <el-table-column
@@ -229,6 +230,14 @@ const vTableHead = computed<ExportColumn[]>(() => {
 function handleSelectionChange(selection: any[]) {
   selectedRows.value = selection
   emit('selection-change', selection)
+}
+
+/** 改变列的宽度时触发 */
+function handleColumnWidth(newWidth, oldWidth, column, event) {
+  // nextTick(tableRef.value.doLayout())
+  setTimeout(() => {
+    tableRef.value.doLayout()
+  }, 20)
 }
 
 /**批量編輯
