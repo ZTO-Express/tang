@@ -33,9 +33,9 @@
 
     <el-checkbox-group
       v-else
+      v-model="innerValue"
       class="c-checkbox-group"
       v-bind="checkAttrs"
-      v-model="innerValue"
       :disabled="disabled"
       @change="handleChange"
     >
@@ -68,7 +68,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, _, tpl, useApiRequest, useAppContext } from '@zto/zpage'
+import { vue, tpl, useApiRequest, useAppContext } from '@zto/zpage'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
 

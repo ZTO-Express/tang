@@ -117,7 +117,7 @@ const dataModel = ref<any>({})
 
 const context = useAppContext(dataModel)
 
-const dialogVisible = ref(true)
+let dialogVisible = ref(true)
 
 const dialogFormItems = computed<any>(() => {
   return props.formItems || []
@@ -189,7 +189,7 @@ async function submit(options?: any) {
 
   // 校验表单
   if (form.validate) {
-    const valid = await form.validate()
+    let valid = await form.validate()
     if (!valid) return
   }
 
