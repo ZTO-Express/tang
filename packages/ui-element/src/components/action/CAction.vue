@@ -124,7 +124,7 @@ function handleClick() {
 }
 
 /** 执行提交 */
-async function handleFormDialogSubmit(model: any) {
+async function handleFormDialogSubmit(model: any, options: any, form: any, dialog: any) {
   await doSubmitForm(model)
 }
 

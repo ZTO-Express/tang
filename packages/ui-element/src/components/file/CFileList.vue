@@ -85,7 +85,7 @@ watch(
 )
 
 function handleDelete(index: number) {
-  let item = fileItems.value[index]
+  const item = fileItems.value[index]
 
   if (item) {
     if (props.immediateDelete) {

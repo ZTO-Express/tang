@@ -72,12 +72,12 @@ function handleFileSelected() {
 }
 
 function getFiles() {
-  let input = fileRef.value
+  const input = fileRef.value
   return [...input.files]
 }
 
 function reset() {
-  let input = fileRef.value
+  const input = fileRef.value
   input.value = ''
 
   if (!/safari/i.test(navigator.userAgent)) {
