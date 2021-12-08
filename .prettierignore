@@ -4,3 +4,5 @@ coverage
 CHANGELOG.md
 pnpm-lock.yaml
 .test_coverage
+*.cssr.js
+*.cssr.ts

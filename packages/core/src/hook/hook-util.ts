@@ -4,10 +4,7 @@ import { isString } from '../utils/lodash'
 import type { ZPageError } from '../errors'
 
 // 钩子方法
-export type HookFunction<T = any> = (
-  context: T,
-  ...args: any[]
-) => Promise<unknown | void> | unknown | void
+export type HookFunction<T = any> = (context: T, ...args: any[]) => Promise<unknown | void> | unknown | void
 
 // 钩子
 export interface Hook<T = any> {

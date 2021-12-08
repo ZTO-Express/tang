@@ -38,11 +38,11 @@ const emit = defineEmits(['update:modelValue'])
 
 const modelValue = ref<boolean>(props.modelValue)
 
-const isExpanded = ref<boolean>(props.reversed ? !modelValue.value : modelValue.value)
+let isExpanded = ref<boolean>(props.reversed ? !modelValue.value : modelValue.value)
 
 watch(
   () => modelValue,
-  cur => {
+  (cur) => {
     isExpanded.value = cur.value
   }
 )

@@ -95,7 +95,7 @@ export class HttpRequest {
 
         return config
       },
-      error => {
+      (error) => {
         const requestError = this._config?.interceptors?.requestError
         if (requestError) return Promise.resolve().then(() => requestError(error))
         return Promise.reject(error)
@@ -113,7 +113,7 @@ export class HttpRequest {
 
         return data
       },
-      error => {
+      (error) => {
         if (url) this.destroy(url)
 
         const responseError = this._config?.interceptors?.responseError

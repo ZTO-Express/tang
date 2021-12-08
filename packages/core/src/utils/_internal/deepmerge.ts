@@ -10,9 +10,7 @@ export interface DeepmergeOptions {
 /** 默认是否可合并对象 */
 const defaultIsMergeableObject = (value: unknown) => {
   const tag = Object.prototype.toString.call(value)
-  return (
-    !!value && typeof value === 'object' && tag !== '[object RegExp]' && tag !== '[object Date]'
-  )
+  return !!value && typeof value === 'object' && tag !== '[object RegExp]' && tag !== '[object Date]'
 }
 
 function emptyTarget(val: unknown) {
@@ -20,10 +18,7 @@ function emptyTarget(val: unknown) {
 }
 
 function cloneUnlessOtherwiseSpecified(value: Record<string, any>, options?: DeepmergeOptions) {
-  return options &&
-    options.clone !== false &&
-    options.isMergeableObject &&
-    options.isMergeableObject(value)
+  return options && options.clone !== false && options.isMergeableObject && options.isMergeableObject(value)
     ? deepmerge(emptyTarget(value), value, options)
     : value
 }
@@ -95,16 +90,8 @@ function mergeObject(target: any, source: any, options: any) {
   return destination
 }
 
-export function deepmerge<T1 = any, T2 = any>(
-  x: Partial<T1>,
-  y: Partial<T2>,
-  options?: DeepmergeOptions
-): T1 & T2
-export function deepmerge<T = any>(
-  target: Partial<T>,
-  source: Partial<T>,
-  options?: DeepmergeOptions
-): T {
+export function deepmerge<T1 = any, T2 = any>(x: Partial<T1>, y: Partial<T2>, options?: DeepmergeOptions): T1 & T2
+export function deepmerge<T = any>(target: Partial<T>, source: Partial<T>, options?: DeepmergeOptions): T {
   options = options || {}
   options.arrayMerge = options.arrayMerge || defaultArrayMerge
   options.isMergeableObject = options.isMergeableObject || defaultIsMergeableObject

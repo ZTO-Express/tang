@@ -4,12 +4,7 @@
       <!-- 搜索区域 -->
       <el-collapse-transition v-if="!!sSearch">
         <div v-show="expandedSearch && sSearch?.hidden !== true" class="w-crud__search">
-          <c-form
-            ref="searchFormRef"
-            v-bind="searchFormAttrs"
-            :model="searchModel"
-            @keyup="handleKeyup"
-          >
+          <c-form ref="searchFormRef" v-bind="searchFormAttrs" :model="searchModel" @keyup="handleKeyup">
             <slot name="search" />
             <c-form-items v-bind="searchItemsAttrs" :model="searchModel">
               <template #operation>
@@ -22,9 +17,7 @@
                 >
                   查询
                 </el-button>
-                <el-button v-else :loading="searchLoading" type="primary" @click="handleSearch">
-                  查询
-                </el-button>
+                <el-button v-else :loading="searchLoading" type="primary" @click="handleSearch">查询</el-button>
                 <el-button @click="handleSearchReset">重置</el-button>
               </template>
             </c-form-items>
@@ -39,11 +32,7 @@
             <div class="toolbar__line"></div>
             <div class="toolbar__actions">
               <template v-for="(it, index) in sToolbar?.items || []" :key="`tool_${String(index)}`">
-                <c-action
-                  v-if="it.action"
-                  v-bind="getToolbarActionAttrs(it)"
-                  class="q-ml-md"
-                ></c-action>
+                <c-action v-if="it.action" v-bind="getToolbarActionAttrs(it)" class="q-ml-md"></c-action>
                 <widget v-else-if="it.type" class="q-ml-md" :schema="it" />
               </template>
             </div>
@@ -85,15 +74,8 @@
               @fetch="handleTableFetch"
             >
               <template #operation="scope">
-                <template
-                  v-for="(it, index) in sTable?.operation?.items || []"
-                  :key="`operation_${String(index)}`"
-                >
-                  <c-action
-                    v-if="it.action"
-                    v-bind="getOperationActionAttrs(it, scope)"
-                    class="q-ml-sm"
-                  ></c-action>
+                <template v-for="(it, index) in sTable?.operation?.items || []" :key="`operation_${String(index)}`">
+                  <c-action v-if="it.action" v-bind="getOperationActionAttrs(it, scope)" class="q-ml-sm"></c-action>
                   <widget v-else-if="it.type" :schema="it" />
                 </template>
               </template>
@@ -243,17 +225,17 @@ const searchItemsAttrs = computed(() => {
 // 执行查询
 async function handleSearch() {
   await searchFormRef.value.validate()
-  await doSearch()
+  await doSearch(true)
 }
 
 // 按键查询
 function handleKeyup(event: KeyboardEvent) {
-  if (event.code == 'Enter') doSearch()
+  if (event.code == 'Enter') doSearch(true)
 }
 
 // 执行重设
 function handleSearchReset() {
-  searchFormRef.value.resetFields()
+  searchFormRef.value.resetFields(true)
 }
 
 function toggleExpandSearch() {
@@ -542,7 +524,11 @@ async function doAction(action: any, payload: any, options?: any) {
 }
 
 // 执行查询
-async function doSearch() {
+async function doSearch(resetPager = false) {
+  if (resetPager === true) {
+    tableRef.value?.resetPager()
+  }
+
   const queryAction = sActions.query || {}
 
   if (!queryAction.api) {

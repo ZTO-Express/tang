@@ -39,13 +39,13 @@ export function createAppRoutes(router: Router, submodules: Submodule[]) {
 
   // 获取所有子模块菜单的name
   const allMenus = flattenTree(submodules)
-  const allMenuNames = allMenus.map(it => it.name)
+  const allMenuNames = allMenus.map((it) => it.name)
 
   // 检查是否存在重复的key
   const repeatedNames = findRepeats(allMenuNames)
   if (repeatedNames.length) throw new Error(`存在重复的菜单名"${repeatedNames.join()}"`)
 
-  submodules.forEach(it => {
+  submodules.forEach((it) => {
     _createSubRoute(router, it, it)
   })
 }
@@ -90,8 +90,6 @@ export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Sub
 
 /** 根据导航菜单构建路由 */
 function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule) {
-  let newRoute: RouteRecordRaw | null = null
-
   // 有路径的菜单才有路由
   if (menu.path) {
     const pathInfo = _parseMenuPath(menu.path)
@@ -129,45 +127,42 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
 
     // 已存在的页面key
     const existsRoute = router.getRouteByPageKey(pageKey)
+    if (existsRoute) return existsRoute
 
-    if (!existsRoute) {
-      routeMeta.pageKey = pageKey
+    routeMeta.pageKey = pageKey
 
-      const route: RouteRecordRaw = {
-        name: menu.name,
-        ...pathInfo,
-        meta: routeMeta
-      }
-
-      if (menu.redirect) {
-        route.redirect = menu.redirect
-      } else {
-        route.component = _resolvePageComponent(routeMeta)
-      }
-
-      if (menu.path.startsWith(ROOT_MENU_PREFIX)) {
-        // 以ROOT_MENU_PREFIX前缀开头，直接添加路由
-        menu.path = menu.path.substr(ROOT_MENU_PREFIX.length)
-        routeMeta.isRoot = true
-        routeMeta.path = menu.path
-
-        router.addRoute(route)
-      } else {
-        // 添加路由到根路由下
-        router.addRoute(ROOT_ROUTE_NAME, route)
-      }
-
-      newRoute = route
+    const route: RouteRecordRaw = {
+      name: menu.name,
+      ...pathInfo,
+      meta: routeMeta
     }
+
+    if (menu.redirect) {
+      route.redirect = menu.redirect
+    } else {
+      route.component = _resolvePageComponent(routeMeta)
+    }
+
+    if (menu.path.startsWith(ROOT_MENU_PREFIX)) {
+      // 以ROOT_MENU_PREFIX前缀开头，直接添加路由
+      menu.path = menu.path.substr(ROOT_MENU_PREFIX.length)
+      routeMeta.isRoot = true
+      routeMeta.path = menu.path
+
+      router.addRoute(route)
+    } else {
+      // 添加路由到根路由下
+      router.addRoute(ROOT_ROUTE_NAME, route)
+    }
+
+    return route
   }
 
   if (menu.children?.length) {
-    menu.children.forEach(it => {
+    menu.children.forEach((it) => {
       _createSubRoute(router, it, submodule)
     })
   }
-
-  return newRoute
 }
 
 /** 解析菜单路径 */
@@ -204,7 +199,7 @@ function _normalizeMenus(exMenus: NavMenuItemConfig[]) {
 
     // 设置子菜单的parentName
     if (it.children?.length) {
-      it.children.forEach(_it => {
+      it.children.forEach((_it) => {
         _it.parentName = it.name
 
         if (it.meta?.isSingle) {
@@ -236,7 +231,7 @@ function _tmpMenuName() {
  * 6. 合并时，所有菜单的子菜单合并到父级菜单，若子菜单key与其他菜单有冲突，则报错
  */
 function _mergeMenus(menus: NavMenuItemConfig[], exMenus: NavMenuItemConfig[]) {
-  exMenus.forEach(it => {
+  exMenus.forEach((it) => {
     _mergeMenu(menus, it)
   })
 }
@@ -247,7 +242,7 @@ function _mergeMenu(menus: NavMenuItemConfig[], exMenu: NavMenuItemConfig) {
   if (!exMenu?.name) return
 
   // 查找指定的菜单
-  const menuIndex = menus.findIndex(it => it.name === exMenu.name)
+  const menuIndex = menus.findIndex((it) => it.name === exMenu.name)
 
   // 没有找到指定的菜单，则查找相关
   if (menuIndex < 0) {
@@ -292,7 +287,7 @@ function _sortMenus(menus: NavMenuItem[]) {
     else return 0
   })
 
-  menus.forEach(menu => {
+  menus.forEach((menu) => {
     menu.children?.length && _sortMenus(menu.children as NavMenuItem[])
   })
 
@@ -306,14 +301,10 @@ function _sortMenus(menus: NavMenuItem[]) {
  * @param recursive 是否递归查询（默认false）
  * @returns
  */
-function _findMenuByName(
-  menus: NavMenuItemConfig[],
-  name: string,
-  recursive = false
-): NavMenuItemConfig | undefined {
+function _findMenuByName(menus: NavMenuItemConfig[], name: string, recursive = false): NavMenuItemConfig | undefined {
   if (!name || !menus?.length) return undefined
 
-  let menu = menus.find(it => it.name === name)
+  let menu = menus.find((it) => it.name === name)
   if (menu) return menu
 
   if (recursive) {

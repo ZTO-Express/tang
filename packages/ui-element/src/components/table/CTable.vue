@@ -16,7 +16,6 @@
           :data="tableData.data"
           highlight-current-row
           @selection-change="handleSelectionChange"
-          @header-dragend="handleColumnWidth"
         >
           <!-- 全选列-->
           <el-table-column
@@ -232,14 +231,6 @@ function handleSelectionChange(selection: any[]) {
   emit('selection-change', selection)
 }
 
-/** 改变列的宽度时触发 */
-function handleColumnWidth(newWidth, oldWidth, column, event) {
-  // nextTick(tableRef.value.doLayout())
-  setTimeout(() => {
-    tableRef.value.doLayout()
-  }, 20)
-}
-
 /**批量編輯
  * @param data
  */
@@ -324,7 +315,7 @@ function getColumnByProp(prop: string, cols: any[]): any {
 /** 重新layout */
 function doLayout() {
   // 多级表头筛选有问题，暂时这样解决
-  if (columnItems.value.find(column => column.children && column.children.length)) {
+  if (columnItems.value.find((column) => column.children && column.children.length)) {
     isShowTable.value = false
     nextTick(() => (isShowTable.value = true))
     return
@@ -387,7 +378,7 @@ async function doFetch(isResetPager: boolean) {
   if (props.api) {
     tableLoading.value = true
     await apiRequest(payload)
-      .then(res => {
+      .then((res) => {
         setData(res)
       })
       .finally(() => {

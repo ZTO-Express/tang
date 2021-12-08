@@ -95,7 +95,7 @@ function _onRouteChange(route: any) {
   activedMenuName.value = menuName
 
   const allMenus = navMenu.value.menus as NavMenuItem[]
-  const currentMenu = allMenus.find(it => it.name === menuName)
+  const currentMenu = allMenus.find((it) => it.name === menuName)
 
   if (currentMenu) {
     openedMenuNames.value = _getParentMenuNames(currentMenu, allMenus, [])
@@ -108,7 +108,7 @@ function _onRouteChange(route: any) {
 function _getParentMenuNames(menu: NavMenuItem, allMenus: NavMenuItem[], cached: string[]) {
   if (!menu.parentId) return cached
 
-  const parentMenu = allMenus.find(it => it.id === menu.parentId)
+  const parentMenu = allMenus.find((it) => it.id === menu.parentId)
   if (!parentMenu) return cached
 
   cached.push(parentMenu.name)

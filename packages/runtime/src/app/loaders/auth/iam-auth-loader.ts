@@ -39,12 +39,12 @@ export const IAMAuthLoader: AppAuthLoader = {
       }
 
       if (!getAccessToken()) {
-        IAMAuthLoader.logout()
+        await IAMAuthLoader.logout()
       } else if (code) {
         reloadUrl()
       }
     } catch (ex) {
-      IAMAuthLoader.logout()
+      await IAMAuthLoader.logout()
     }
   },
 

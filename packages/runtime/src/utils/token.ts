@@ -1,9 +1,31 @@
 import { TOKEN_DATA_STORAGE_KEY, TOKEN_REFRESH_DURATION } from '../consts'
-import { useApi } from '../config'
+import { useApi, useConfig } from '../config'
 import { storage } from './storage'
 
 import type { Nil } from '@zto/zpage-core'
 import type { TokenData } from '../typings'
+
+/** 获取token刷新间隔 */
+export function getRefreshDuration() {
+  const seconds = useConfig('app.auth.token.refreshDuration', TOKEN_REFRESH_DURATION)
+  return seconds * 1000
+}
+
+/** 启动定时刷新 */
+let __tokenRefreshTimer: any = null
+export function checkStartAutoRefresh(flag = true) {
+  // 自否自动刷新token
+  const autoRefresh = useConfig('app.auth.token.autoRefresh')
+
+  if (flag === false || autoRefresh) {
+    __tokenRefreshTimer && clearTimeout(__tokenRefreshTimer)
+  }
+
+  if (autoRefresh) {
+    const duration = getRefreshDuration()
+    __tokenRefreshTimer = setInterval(refreshToken, duration)
+  }
+}
 
 /**
  * 刷新token，如果提供了code，则通过code刷新，否则通过
@@ -21,14 +43,14 @@ export async function refreshToken(code?: string) {
     if (userApi.getToken) {
       tokenData = await userApi.getToken(code)
     } else {
-      tokenData = {
-        accessToken: code
-      }
+      tokenData = { accessToken: code }
     }
   } else {
     if (userApi.exchangeToken) {
       const refreshToken = getLocalRefreshToken()
-      tokenData = await userApi.exchangeToken(refreshToken)
+      if (refreshToken) {
+        tokenData = await userApi.exchangeToken(refreshToken)
+      }
     }
   }
 
@@ -50,15 +72,14 @@ export function resetToken() {
  * 检查token，并根据刷新间隔刷新token，防止token过期
  * @returns
  */
-export async function checkRereshToken() {
+export async function checkRefreshToken() {
   const tokenData = getTokenData()
 
   const requestTime = tokenData?.requestTime
-
   if (!requestTime) return
 
-  if (new Date().getTime() - requestTime > TOKEN_REFRESH_DURATION) {
-    refreshToken()
+  if (new Date().getTime() - requestTime > getRefreshDuration()) {
+    await refreshToken()
   }
 }
 
@@ -67,8 +88,12 @@ export async function checkRereshToken() {
  * @param tokenData
  */
 export function saveTokenData(tokenData: TokenData) {
+  if (!tokenData) return
+
   storage.local.set(TOKEN_DATA_STORAGE_KEY, tokenData)
   storage.page.set(TOKEN_DATA_STORAGE_KEY, tokenData)
+
+  checkStartAutoRefresh()
 }
 
 /**
@@ -77,6 +102,8 @@ export function saveTokenData(tokenData: TokenData) {
 export function clearTokenData() {
   storage.local.remove(TOKEN_DATA_STORAGE_KEY)
   storage.page.remove(TOKEN_DATA_STORAGE_KEY)
+
+  checkStartAutoRefresh(false)
 }
 
 /**

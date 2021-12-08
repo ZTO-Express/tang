@@ -3,14 +3,7 @@ import { warn, queryEl } from '../utils'
 import { AppRenderer } from './renderer/AppRenderer'
 
 import type { Widget, Plugin } from '@zto/zpage-core'
-import type {
-  VueApp,
-  VuePlugin,
-  VueComponent,
-  Installable,
-  AppInstanceOptions,
-  AppRenderPageOptions
-} from '../typings'
+import type { VueApp, VuePlugin, VueComponent, Installable, AppInstanceOptions, AppRenderPageOptions } from '../typings'
 
 /**
  * Vue3运行器
@@ -139,7 +132,7 @@ export class App implements Installable {
 
   /** 应用zpage 插件 */
   async apply(plugins: Plugin | Plugin[], ...options: any[]) {
-    const existsNames = this.plugins.map(p => p.name)
+    const existsNames = this.plugins.map((p) => p.name)
 
     let pItems: Plugin[] = []
 
@@ -182,7 +175,7 @@ export class App implements Installable {
       wItems = [widgets]
     }
 
-    const existsWNames = this.widgets.map(w => w.name)
+    const existsWNames = this.widgets.map((w) => w.name)
 
     for (const w of wItems) {
       if (w.name) {

@@ -4,6 +4,7 @@
     v-bind="$attrs"
     style="width: 100%"
     type="daterange"
+    unlink-panels
     :clearable="clearable"
     :disabled="disabled"
     :value-format="valueFormat"
@@ -182,10 +183,7 @@ function setFrom(from: Date | string) {
     return
   }
 
-  innerModelValue.value = [
-    dateUtil.format(fromDate, props.valueFormat),
-    dateUtil.format(toDate, props.valueFormat)
-  ]
+  innerModelValue.value = [dateUtil.format(fromDate, props.valueFormat), dateUtil.format(toDate, props.valueFormat)]
 }
 
 function setTo(to: Date | string) {
@@ -208,10 +206,7 @@ function setTo(to: Date | string) {
     return
   }
 
-  innerModelValue.value = [
-    dateUtil.format(fromDate, props.valueFormat),
-    dateUtil.format(toDate, props.valueFormat)
-  ]
+  innerModelValue.value = [dateUtil.format(fromDate, props.valueFormat), dateUtil.format(toDate, props.valueFormat)]
 }
 
 function validateRange(val: Array<string | Date>, notice = false) {

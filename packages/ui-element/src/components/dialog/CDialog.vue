@@ -28,11 +28,7 @@
           v-loading="loading"
           :model="dataModel"
         >
-          <c-form-items
-            v-bind="dialogFormItemsAttrs"
-            :model="dataModel"
-            :items="dialogFormItems"
-          ></c-form-items>
+          <c-form-items v-bind="dialogFormItemsAttrs" :model="dataModel" :items="dialogFormItems"></c-form-items>
         </c-form>
       </el-col>
     </el-row>
@@ -117,7 +113,7 @@ const dataModel = ref<any>({})
 
 const context = useAppContext(dataModel)
 
-let dialogVisible = ref(true)
+const dialogVisible = ref(true)
 
 const dialogFormItems = computed<any>(() => {
   return props.formItems || []
@@ -125,7 +121,7 @@ const dialogFormItems = computed<any>(() => {
 
 const actionItems = computed<any[]>(() => {
   const actions = props.actions || {}
-  const items = Object.keys(actions).map(key => {
+  const items = Object.keys(actions).map((key) => {
     const item = actions[key]
 
     return {
@@ -181,7 +177,6 @@ function handleActionAfterTrigger(options?: any) {
 async function submit(options?: any) {
   if (!formRef.value) {
     await doSubmit(options)
-
     return
   }
 

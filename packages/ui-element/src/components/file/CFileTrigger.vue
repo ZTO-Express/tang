@@ -10,7 +10,7 @@
         @change="handleFileSelected()"
       />
     </form>
-    <slot></slot>
+    <slot> </slot>
   </div>
 </template>
 
@@ -72,12 +72,12 @@ function handleFileSelected() {
 }
 
 function getFiles() {
-  const input = fileRef.value
+  let input = fileRef.value
   return [...input.files]
 }
 
 function reset() {
-  const input = fileRef.value
+  let input = fileRef.value
   input.value = ''
 
   if (!/safari/i.test(navigator.userAgent)) {

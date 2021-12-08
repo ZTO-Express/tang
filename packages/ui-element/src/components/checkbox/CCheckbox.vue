@@ -3,9 +3,9 @@
   <div class="c-checkbox">
     <el-radio-group
       v-if="checkType === 'radio'"
-      v-model="innerValue"
       class="c-radio-group"
       v-bind="checkAttrs"
+      v-model="innerValue"
       :disabled="disabled"
       @change="handleChange"
     >
@@ -33,9 +33,9 @@
 
     <el-checkbox-group
       v-else
-      v-model="innerValue"
       class="c-checkbox-group"
       v-bind="checkAttrs"
+      v-model="innerValue"
       :disabled="disabled"
       @change="handleChange"
     >
@@ -68,7 +68,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, tpl, useApiRequest, useAppContext } from '@zto/zpage'
+import { vue, _, tpl, useApiRequest, useAppContext } from '@zto/zpage'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
 
@@ -180,7 +180,7 @@ async function fetchOptions() {
   const valueProp = props.valueProp
   const optionValueProp = props.optionValueProp
   if (valueProp) {
-    const vals = innerOptions.value.filter(v => !!v[valueProp]).map(it => it[optionValueProp])
+    const vals = innerOptions.value.filter((v) => !!v[valueProp]).map((it) => it[optionValueProp])
 
     if (props.checkType === 'radio') {
       innerValue.value = vals[0] || ''

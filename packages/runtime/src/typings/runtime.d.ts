@@ -44,9 +44,7 @@ export interface TokenData {
   [prop: string]: any
 }
 
-export type ApiRequestAction =
-  | string
-  | { type?: string; api: string; sourceType?: string; [prop: string]: any }
+export type ApiRequestAction = string | { type?: string; api: string; sourceType?: string; [prop: string]: any }
 
 /** 请求参数 */
 export interface ApiRequestConfig {
@@ -66,6 +64,4 @@ export interface ApiQueryRequestConfig extends ApiRequestConfig {
 export type ApiRequest = (config: ApiRequestConfig) => Promise<any>
 
 /** api查询适配器 */
-export type ApiQueryRequest = (
-  config: ApiQueryRequestConfig
-) => Promise<{ rows: any; total: number; statistic: any }>
+export type ApiQueryRequest = (config: ApiQueryRequestConfig) => Promise<{ rows: any; total: number; statistic: any }>

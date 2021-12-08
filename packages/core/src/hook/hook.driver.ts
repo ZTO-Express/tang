@@ -41,12 +41,7 @@ export class HookDriver<T> {
    * @param hookIndex `this.hooks[]`中钩子的索引位置.
    * @param permitValues 如果为true，运行传入值作为钩子
    */
-  private runHook(
-    hookName: string,
-    context: T,
-    args: any[] | undefined,
-    hookIndex: number
-  ): Promise<any> {
+  private runHook(hookName: string, context: T, args: any[] | undefined, hookIndex: number): Promise<any> {
     const hook = this.hooks[hookIndex]
 
     if (!this.testHook(hookName, hook)) return undefined as any
@@ -57,7 +52,7 @@ export class HookDriver<T> {
       .then(() => {
         return hookFn.call(this, context, ...(args || []).slice(1))
       })
-      .catch(err => throwHookError(err, hookName))
+      .catch((err) => throwHookError(err, hookName))
   }
 
   /** 判断钩子是否满足执行条件 */

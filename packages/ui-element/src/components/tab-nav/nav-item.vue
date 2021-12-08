@@ -7,11 +7,7 @@
   >
     <div class="subitem">
       <span>{{ navItem.label || navItem.name }}</span>
-      <el-icon
-        v-if="navItem.closeable !== false"
-        class="icon-close"
-        @click="onTabRemove(navItem, $event)"
-      >
+      <el-icon v-if="navItem.closeable !== false" class="icon-close" @click="onTabRemove(navItem, $event)">
         <circle-close />
       </el-icon>
     </div>

@@ -1,8 +1,8 @@
 <template>
   <el-select
+    class="c-fuzzy-select"
     ref="selectRef"
     v-bind="$attrs"
-    style="width: 100%"
     :model-value="innerValue"
     :multiple="multiple"
     :filterable="filterable"
@@ -351,3 +351,9 @@ defineExpose({
   execRemoteMethod
 })
 </script>
+
+<style lang="scss" scoped>
+.c-fuzzy-select {
+  width: 100%;
+}
+</style>

@@ -7,14 +7,7 @@ import type {
   RouteLocationNormalized,
   RouteLocationNormalizedLoaded
 } from 'vue-router'
-import type {
-  Widget,
-  Plugin,
-  Schema,
-  PageSchema,
-  PromiseFunction,
-  PromiseObject
-} from '@zto/zpage-core'
+import type { Widget, Plugin, Schema, PageSchema, PromiseFunction, PromiseObject } from '@zto/zpage-core'
 
 import type { InstallableOptions, RuntimeConfig, RuntimeUI } from './runtime'
 import type { AppStore } from './store'
@@ -60,9 +53,7 @@ export interface AppRouterConfig {
   beforeEach?: NavigationGuardWithThis<undefined>
   afterEach?: NavigationHookAfter
   beforeResolve?: NavigationGuardWithThis<undefined>
-  onError?: (
-    handler: (error: any, to: RouteLocationNormalized, from: RouteLocationNormalizedLoaded) => any
-  ) => void
+  onError?: (handler: (error: any, to: RouteLocationNormalized, from: RouteLocationNormalizedLoaded) => any) => void
 }
 
 export interface AppUI extends RuntimeUI {
@@ -138,16 +129,30 @@ export interface AppUserApi {
   checkAuth?: (config: AppConfig) => PromiseObject
 
   // 获取接口调用token
-  getToken?: (payload: any) => PromiseObject
+  getToken?: PromiseFunction
 
   // 交换token
-  exchangeToken?: (payload: any) => PromiseObject
+  exchangeToken?: PromiseFunction
 
   // 获取用户信息
-  getUserInfo: () => PromiseObject
+  getUserInfo: PromiseFunction
 
   // 登出系统
-  logout?: () => PromiseObject
+  logout?: PromiseFunction
+}
+
+/**
+ * 文件系统相关Api
+ */
+export interface AppFsApi {
+  // 根据文件名称获取文件地址
+  getUrlsByPaths?: PromiseFunction
+
+  // 获取上传token
+  getUploadToken?: PromiseFunction
+
+  // 下载文件
+  downloadFile?: (fileName: string, options?: any) => Promise<void>
 }
 
 export interface AppRendererOptions {

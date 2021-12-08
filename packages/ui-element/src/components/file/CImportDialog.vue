@@ -1,5 +1,5 @@
 <template>
-  <c-dialog ref="dialogRef" class="c-import-dialog" v-bind="dialogAttrs">
+  <c-dialog class="c-import-dialog" ref="dialogRef" v-bind="dialogAttrs">
     <div v-loading="loading" class="import-body-con">
       <div class="trigger-con">
         <c-file-trigger :accept="fileAccept" @file-selected="handleFileSelected">
@@ -16,10 +16,7 @@
 
       <div class="tip-con">
         <slot name="tip">
-          {{
-            props.tip ||
-            `请先下载模板，数据不能超过${maxCount}条。文件大小不能超过${maxFileSize}MB。`
-          }}
+          {{ props.tip || `请先下载模板，数据不能超过${maxCount}条。文件大小不能超过${maxFileSize}MB。` }}
         </slot>
       </div>
 

@@ -53,7 +53,7 @@ export function createObject(
       })
     : Object.create(Object.prototype, properties)
 
-  props && isObject(props) && Object.keys(props).forEach(key => (obj[key] = props[key]))
+  props && isObject(props) && Object.keys(props).forEach((key) => (obj[key] = props[key]))
 
   return obj
 }
@@ -69,7 +69,7 @@ export function cloneObject(target: any, persistOwnProps = true) {
           }
         })
       : Object.create(Object.prototype)
-  persistOwnProps && target && Object.keys(target).forEach(key => (obj[key] = target[key]))
+  persistOwnProps && target && Object.keys(target).forEach((key) => (obj[key] = target[key]))
   return obj
 }
 
@@ -82,22 +82,19 @@ export function cloneObject(target: any, persistOwnProps = true) {
  */
 export function extendObject(target: any, src?: any, persistOwnProps = true) {
   const obj = cloneObject(target, persistOwnProps)
-  src && Object.keys(src).forEach(key => (obj[key] = src[key]))
+  src && Object.keys(src).forEach((key) => (obj[key] = src[key]))
   return obj
 }
 
 /** 遍历并返回处理所有对象下的值 */
 export function mapObject(value: any, fn: GenericFunction): any {
   if (Array.isArray(value)) {
-    return value.map(item => mapObject(item, fn))
+    return value.map((item) => mapObject(item, fn))
   }
   if (isObject(value)) {
     let tmpValue = { ...value }
-    Object.keys(tmpValue).forEach(key => {
-      ;(tmpValue as Record<string, any>)[key] = mapObject(
-        (tmpValue as Record<string, any>)[key],
-        fn
-      )
+    Object.keys(tmpValue).forEach((key) => {
+      ;(tmpValue as Record<string, any>)[key] = mapObject((tmpValue as Record<string, any>)[key], fn)
     })
     return tmpValue
   }
@@ -113,7 +110,7 @@ export function rmUndefined(obj: Record<string, any>) {
   }
 
   const keys = Object.keys(obj)
-  keys.forEach(key => {
+  keys.forEach((key) => {
     if (obj[key] !== undefined) {
       newObj[key] = obj[key]
     }
@@ -150,10 +147,7 @@ export function findIndex(arr: Array<any>, detect: (item?: any, index?: number) 
 }
 
 /** 从数组中找到重复的对象 */
-export function findRepeats(
-  arr: Array<any>,
-  compare: (item1?: any, item2?: any) => number = simpleCompare
-) {
+export function findRepeats(arr: Array<any>, compare: (item1?: any, item2?: any) => number = simpleCompare) {
   const sortedArr = arr.sort(compare)
 
   const repeats: any[] = []
@@ -237,16 +231,17 @@ export function until(
  * @param  {Object} base   Object to compare with
  * @return {Object}        Return a new object who represent the diff
  */
-export function difference<
-  T extends { [propName: string]: any },
-  U extends { [propName: string]: any }
->(object: T, base: U, keepProps?: Array<string>): { [propName: string]: any } {
+export function difference<T extends { [propName: string]: any }, U extends { [propName: string]: any }>(
+  object: T,
+  base: U,
+  keepProps?: Array<string>
+): { [propName: string]: any } {
   function changes(object: T, base: U) {
     if (isObject(object) && isObject(base)) {
       const keys: Array<keyof T & keyof U> = uniq(Object.keys(object).concat(Object.keys(base)))
       let result: any = {}
 
-      keys.forEach(key => {
+      keys.forEach((key) => {
         const a: any = object[key as keyof T]
         const b: any = base[key as keyof U]
 
@@ -289,7 +284,7 @@ export function anyChanged(
   to: { [propName: string]: any },
   strictMode = true
 ): boolean {
-  return (typeof attrs === 'string' ? attrs.split(/\s*,\s*/) : attrs).some(key =>
+  return (typeof attrs === 'string' ? attrs.split(/\s*,\s*/) : attrs).some((key) =>
     strictMode ? from[key] !== to[key] : from[key] != to[key]
   )
 }
@@ -326,9 +321,9 @@ export function isArrayChildrenModified(prev: Array<any>, next: Array<any>, stri
  */
 export function injectPropsToObject(target: any, props: any) {
   const sup = Object.create(target.__super || null)
-  Object.keys(props).forEach(key => (sup[key] = props[key]))
+  Object.keys(props).forEach((key) => (sup[key] = props[key]))
   const result = Object.create(sup)
-  Object.keys(target).forEach(key => (result[key] = target[key]))
+  Object.keys(target).forEach((key) => (result[key] = target[key]))
   return result
 }
 
@@ -340,7 +335,7 @@ export function immutableExtends(to: any, from: any, deep = false) {
 
   let ret = to
 
-  Object.keys(from).forEach(key => {
+  Object.keys(from).forEach((key) => {
     const origin = to[key]
     const value = from[key]
 
@@ -361,7 +356,7 @@ export const bulkBindFunctions = function <
     [propName: string]: any
   }
 >(context: T, funNames: Array<FunctionPropertyNames<T>>) {
-  funNames.forEach(key => (context[key] = context[key].bind(context)))
+  funNames.forEach((key) => (context[key] = context[key].bind(context)))
 }
 
 /**
@@ -414,11 +409,7 @@ function internalFindObjectsWithKey(obj: any, key: string) {
 }
 
 /** 根据路径获取数据值 */
-export function getVariable(
-  data: { [propName: string]: any },
-  key: string | undefined,
-  canAccessSuper = true
-): any {
+export function getVariable(data: { [propName: string]: any }, key: string | undefined, canAccessSuper = true): any {
   if (!data || !key) {
     return undefined
   } else if (canAccessSuper ? key in data : data.hasOwnProperty(key)) {
@@ -427,9 +418,7 @@ export function getVariable(
 
   return keyToPath(key).reduce(
     (obj, key) =>
-      obj && typeof obj === 'object' && (canAccessSuper ? key in obj : obj.hasOwnProperty(key))
-        ? obj[key]
-        : undefined,
+      obj && typeof obj === 'object' && (canAccessSuper ? key in obj : obj.hasOwnProperty(key)) ? obj[key] : undefined,
     data
   )
 }
@@ -598,10 +587,7 @@ export function string2regExp(value: string, caseSensitive = false) {
     throw new TypeError('Expected a string')
   }
 
-  return new RegExp(
-    value.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&').replace(/-/g, '\\x2d'),
-    !caseSensitive ? 'i' : ''
-  )
+  return new RegExp(value.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&').replace(/-/g, '\\x2d'), !caseSensitive ? 'i' : '')
 }
 
 /**
@@ -784,12 +770,7 @@ export function isDisabled(
 }
 
 /** 计算schema是否处于特定状态，比如显示、隐藏、disable等 */
-export function hasAbility(
-  schema: any,
-  ability: string,
-  data?: object,
-  defaultValue = true
-): boolean {
+export function hasAbility(schema: any, ability: string, data?: object, defaultValue = true): boolean {
   return schema.hasOwnProperty(ability)
     ? schema[ability]
     : schema.hasOwnProperty(`${ability}On`)
@@ -845,9 +826,7 @@ export function getScrollParent(node: HTMLElement): HTMLElement | null {
   }
 
   const text =
-    style.getPropertyValue('overflow') +
-    style.getPropertyValue('overflow-x') +
-    style.getPropertyValue('overflow-y')
+    style.getPropertyValue('overflow') + style.getPropertyValue('overflow-x') + style.getPropertyValue('overflow-y')
 
   if (/auto|scroll/.test(text) || node.nodeName === 'BODY') {
     return node
@@ -857,13 +836,10 @@ export function getScrollParent(node: HTMLElement): HTMLElement | null {
 }
 
 /** 合并多个方法为一个串行方法 */
-export function chainFunctions(
-  ...fns: Array<(...args: Array<any>) => void>
-): (...args: Array<any>) => void {
+export function chainFunctions(...fns: Array<(...args: Array<any>) => void>): (...args: Array<any>) => void {
   return (...args: Array<any>) =>
     fns.reduce(
-      (ret: any, fn: any) =>
-        ret === false ? false : typeof fn == 'function' ? fn(...args) : undefined,
+      (ret: any, fn: any) => (ret === false ? false : typeof fn == 'function' ? fn(...args) : undefined),
       undefined
     )
 }
@@ -872,7 +848,7 @@ export function chainFunctions(
 export function chainEvents(props: any, schema: any) {
   const ret: any = {}
 
-  Object.keys(props).forEach(key => {
+  Object.keys(props).forEach((key) => {
     if (
       key.substr(0, 2) === 'on' &&
       typeof props[key] === 'function' &&
@@ -906,19 +882,17 @@ export function isBreakpoint(str: string): boolean {
 
   if ((window as any).matchMedia) {
     return breaks.some(
-      item =>
+      (item) =>
         item === '*' ||
         (item === 'xs' && matchMedia(`screen and (max-width: 767px)`).matches) ||
-        (item === 'sm' &&
-          matchMedia(`screen and (min-width: 768px) and (max-width: 991px)`).matches) ||
-        (item === 'md' &&
-          matchMedia(`screen and (min-width: 992px) and (max-width: 1199px)`).matches) ||
+        (item === 'sm' && matchMedia(`screen and (min-width: 768px) and (max-width: 991px)`).matches) ||
+        (item === 'md' && matchMedia(`screen and (min-width: 992px) and (max-width: 1199px)`).matches) ||
         (item === 'lg' && matchMedia(`screen and (min-width: 1200px)`).matches)
     )
   } else {
     const width = window.innerWidth
     return breaks.some(
-      item =>
+      (item) =>
         item === '*' ||
         (item === 'xs' && width < 768) ||
         (item === 'sm' && width >= 768 && width < 992) ||
@@ -938,9 +912,7 @@ export function getWidthRate(value: any, strictMode = false): number {
 }
 
 export function getLevelFromClassName(value: string, defaultValue = 'default') {
-  if (
-    /\b(?:btn|text)-(link|primary|secondary|info|success|warning|danger|light|dark)\b/.test(value)
-  ) {
+  if (/\b(?:btn|text)-(link|primary|secondary|info|success|warning|danger|light|dark)\b/.test(value)) {
     return RegExp.$1
   }
 
@@ -949,12 +921,10 @@ export function getLevelFromClassName(value: string, defaultValue = 'default') {
 
 // 只判断一层, 如果层级很深，form-data 也不好表达。
 export function hasFile(object: any): boolean {
-  return Object.keys(object).some(key => {
+  return Object.keys(object).some((key) => {
     let value = object[key]
 
-    return (
-      value instanceof File || (Array.isArray(value) && value.length && value[0] instanceof File)
-    )
+    return value instanceof File || (Array.isArray(value) && value.length && value[0] instanceof File)
   })
 }
 
@@ -970,13 +940,13 @@ export function object2formData(
   let fileObjects: any = []
   let others: any = {}
 
-  Object.keys(data).forEach(key => {
+  Object.keys(data).forEach((key) => {
     const value = data[key]
 
     if (value instanceof File) {
       fileObjects.push([key, value])
     } else if (Array.isArray(value) && value.length && value[0] instanceof File) {
-      value.forEach(value => fileObjects.push([`${key}[]`, value]))
+      value.forEach((value) => fileObjects.push([`${key}[]`, value]))
     } else {
       others[key] = value
     }
@@ -985,16 +955,14 @@ export function object2formData(
   // 因为 key 的格式太多了，偷个懒，用 qs 来处理吧。
   qsstringify(others, options)
     .split('&')
-    .forEach(item => {
+    .forEach((item) => {
       let parts = item.split('=')
       // form-data/multipart 是不需要 encode 值的。
       parts[0] && fd.append(parts[0], decodeURIComponent(parts[1]))
     })
 
   // Note: File类型字段放在后面，可以支持第三方云存储鉴权
-  fileObjects.forEach((fileObject: any[]) =>
-    fd.append(fileObject[0], fileObject[1], fileObject[1].name)
-  )
+  fileObjects.forEach((fileObject: any[]) => fd.append(fileObject[0], fileObject[1], fileObject[1].name))
 
   return fd
 }
@@ -1003,7 +971,7 @@ export function object2formData(
 export function loadScript(src: string) {
   return new Promise<void>((ok, fail) => {
     const script = document.createElement('script')
-    script.onerror = reason => fail(reason)
+    script.onerror = (reason) => fail(reason)
 
     if (~src.indexOf('{{callback}}')) {
       const callbackFn = `loadscriptcallback_${uuid()}`
@@ -1085,10 +1053,7 @@ export function detectPropValueChanged<
     props.value !== prevProps.value && onChange(props.value)
   } else if ((nextValue = getter?.(props)) !== undefined) {
     nextValue !== getter!(prevProps) && onChange(nextValue)
-  } else if (
-    typeof props.name === 'string' &&
-    (nextValue = resolveValueByName(props.data, props.name)) !== undefined
-  ) {
+  } else if (typeof props.name === 'string' && (nextValue = resolveValueByName(props.data, props.name)) !== undefined) {
     nextValue !== resolveValueByName(prevProps.data, prevProps.name) && onChange(nextValue)
   } else if (props.defaultValue !== prevProps.defaultValue) {
     onChange(props.defaultValue)
@@ -1097,7 +1062,7 @@ export function detectPropValueChanged<
 
 export function pickEventsProps(props: any) {
   const ret: any = {}
-  props && Object.keys(props).forEach(key => /^on/.test(key) && (ret[key] = props[key]))
+  props && Object.keys(props).forEach((key) => /^on/.test(key) && (ret[key] = props[key]))
   return ret
 }
 
@@ -1111,7 +1076,7 @@ export function __uri(id: string) {
 }
 
 export function omitControls(controls: Array<any>, omitItems: Array<string>): Array<any> {
-  return controls.filter(control => !~omitItems.indexOf(control.name || control._name))
+  return controls.filter((control) => !~omitItems.indexOf(control.name || control._name))
 }
 
 export const padArr = (arr: Array<any>, size = 4): Array<Array<any>> => {

@@ -4,13 +4,7 @@ import { Widget as CWidget } from '../entry'
 import { install } from './install'
 
 import type { Widget } from '@zto/zpage-core'
-import type {
-  VueApp,
-  VueComponent,
-  RendererOptions,
-  Installable,
-  RendererFactoryInstanceOptions
-} from '../typings'
+import type { VueApp, VueComponent, RendererOptions, Installable, RendererFactoryInstanceOptions } from '../typings'
 
 /**
  * Vue3渲染器
@@ -54,7 +48,7 @@ export class RendererFactory {
 
 /** 渲染实例 */
 export class Renderer implements Installable {
-  private _vueApp: VueApp<Element> // Vue应用
+  private _vueApp: VueApp<Element> | null = null // Vue应用
   private _widgets: Widget[] = []
 
   private _options: RendererOptions
@@ -64,7 +58,7 @@ export class Renderer implements Installable {
   }
 
   get vueApp() {
-    return this._vueApp
+    return this._vueApp as VueApp<Element>
   }
 
   get options() {
@@ -90,7 +84,7 @@ export class Renderer implements Installable {
 
     this._vueApp = createApp(root)
 
-    await install(this, factory.options)
+    await install(this, factory?.options)
 
     this._vueApp.mount(options.el)
 
@@ -106,7 +100,7 @@ export class Renderer implements Installable {
       this._vueApp = null
     }
 
-    this._widgets = null
+    this._widgets = []
   }
 
   // 注册微件

@@ -36,7 +36,7 @@ export function useWidgetProps() {
 export function useWidgetEmitter(schema: any, handlerMap: Record<string, GenericFunction>) {
   if (!handlerMap) return
 
-  Object.keys(handlerMap).forEach(key => {
+  Object.keys(handlerMap).forEach((key) => {
     if (!isWidgetEventKey(key)) return
 
     const evtTypes = schema[key] as any
@@ -46,7 +46,7 @@ export function useWidgetEmitter(schema: any, handlerMap: Record<string, Generic
   })
 
   onUnmounted(() => {
-    Object.keys(handlerMap).forEach(key => {
+    Object.keys(handlerMap).forEach((key) => {
       if (!isWidgetEventKey(key)) return
 
       const evtTypes = schema[key] as any

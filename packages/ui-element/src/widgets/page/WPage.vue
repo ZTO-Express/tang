@@ -4,12 +4,7 @@
       <c-page-header v-bind="headerAttrs" />
     </template>
     <template v-if="isToolbar" #toolbar>
-      <c-page-tabs
-        v-if="isTab"
-        :model-value="innerTabValue"
-        :tab-items="tabItems"
-        @change="handlePageTabChange"
-      />
+      <c-page-tabs v-if="isTab" :model-value="innerTabValue" :tab-items="tabItems" @change="handlePageTabChange" />
     </template>
     <slot />
   </c-page>

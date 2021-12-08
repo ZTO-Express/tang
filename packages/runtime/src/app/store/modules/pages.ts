@@ -36,7 +36,7 @@ const mutations: MutationTree<PagesState> = {
     if (!page.key) page.key = page.pageKey
 
     // 已存在于visited的 如果是详情页，详情id也存在的。不添加
-    if (state.visited.some(v => isSamePage(v, page))) return
+    if (state.visited.some((v) => isSamePage(v, page))) return
 
     const newPage: PageInfo = _.deepClone(page)
 
@@ -47,7 +47,7 @@ const mutations: MutationTree<PagesState> = {
 
     // 打开详情时放在最新主页面后
     if (refererKey) {
-      index = state.visited.findIndex(item => item.key === refererKey) + 1
+      index = state.visited.findIndex((item) => item.key === refererKey) + 1
     } else {
       index = state.visited.length
     }
@@ -112,7 +112,7 @@ const mutations: MutationTree<PagesState> = {
 
     const datas = state.datas || {}
 
-    const visitedArr: any[] = []
+    const visitedArr = []
     const pageDatas: any = {}
 
     if (submodule !== 'ALL') {
@@ -169,7 +169,7 @@ const actions: ActionTree<PagesState, RootState> = {
 
   async setDefaults({ commit, dispatch }, pages: PageInfo[]) {
     commit('setDefaults', pages)
-    const promises = pages.map(it => dispatch('addVisited', it))
+    const promises = pages.map((it) => dispatch('addVisited', it))
     await Promise.all(promises)
   },
 
@@ -183,7 +183,7 @@ const actions: ActionTree<PagesState, RootState> = {
     if (!page.key) page.key = page.pageKey
 
     // 已存在于visited的 如果是详情页，详情id也存在的。不添加
-    if (state.visited.some(v => isSamePage(v, page))) return
+    if (state.visited.some((v) => isSamePage(v, page))) return
 
     commit('addVisited', page)
     await router.goto({ name: page.name, query: page.query })

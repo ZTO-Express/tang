@@ -8,6 +8,7 @@ import CFormItemInput from './CFormItemInput.vue'
 import CFormItemInputNumber from './CFormItemInputNumber.vue'
 import CFormItemSelect from './CFormItemSelect.vue'
 import CFormItemSwitch from './CFormItemSwitch.vue'
+import CFormItemUpload from './CFormItemUpload.vue'
 
 export {
   CFormItemCascader,
@@ -19,5 +20,6 @@ export {
   CFormItemInput,
   CFormItemInputNumber,
   CFormItemSelect,
-  CFormItemSwitch
+  CFormItemSwitch,
+  CFormItemUpload
 }

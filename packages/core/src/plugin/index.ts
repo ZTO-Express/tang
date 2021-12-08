@@ -1,4 +1,4 @@
-import type { PromiseFunction } from '../global'
+import { PromiseFunction } from '../global'
 
 export interface Plugin {
   name: string

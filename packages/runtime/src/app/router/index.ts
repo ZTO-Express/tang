@@ -127,7 +127,7 @@ export function createAppRouter(config?: AppRouterConfig) {
       if (!router) return
 
       const routes = router.getRoutes()
-      const route = routes.find(it => it.name === name)
+      const route = routes.find((it) => it.name === name)
       return route
     }
   }
@@ -138,7 +138,7 @@ export function createAppRouter(config?: AppRouterConfig) {
       if (!key || !router) return undefined
 
       const routes = router.getRoutes()
-      const route = routes.find(it => it.meta?.pageKey === key)
+      const route = routes.find((it) => it.meta?.pageKey === key)
       return route
     }
   }
@@ -149,7 +149,7 @@ export function createAppRouter(config?: AppRouterConfig) {
       if (!menuPath || !router) return undefined
 
       const routes = router.getRoutes()
-      const route = routes.find(it => it.meta?.menuPath === menuPath)
+      const route = routes.find((it) => it.meta?.menuPath === menuPath)
       return route
     }
   }

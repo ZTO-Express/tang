@@ -5,14 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  vue,
-  tpl,
-  useApiRequest,
-  useAppContext,
-  useWidgetEmitter,
-  useWidgetSchema
-} from '@zto/zpage'
+import { vue, tpl, useApiRequest, useAppContext, useWidgetEmitter, useWidgetSchema } from '@zto/zpage'
 
 const { computed, ref } = vue
 
@@ -26,6 +19,9 @@ const apiRequest = useApiRequest()
 
 // schema
 const wSchema = await useWidgetSchema(props.schema)
+
+// 加载项
+const loading = ref<any>({})
 
 // 注册微件事件监听
 useWidgetEmitter(wSchema, {

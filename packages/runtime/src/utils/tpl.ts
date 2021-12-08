@@ -1,8 +1,6 @@
 import { register as registerBulitin, getFilters } from './tpl-builtin'
 import { register as registerLodash } from './tpl-lodash'
 
-import type { GenericFunction } from '@zto/zpage-core'
-
 export interface Enginer {
   test: (tpl: string) => boolean
   removeEscapeToken?: (tpl: string) => string
@@ -37,12 +35,7 @@ export function filter(tpl?: any, data: object = {}, ...rest: Array<any>): strin
 }
 
 // 深度处理
-export function deepFilter(
-  obj?: any,
-  data: object = {},
-  defaultFilter = '| raw',
-  cache: any[] = []
-) {
+export function deepFilter(obj?: any, data: object = {}, defaultFilter = '| raw', cache: any[] = []) {
   if (obj && typeof obj === 'string') return filter(obj, data, defaultFilter)
   if (!obj || typeof obj !== 'object') return obj
 
@@ -54,7 +47,7 @@ export function deepFilter(
   }
 
   // 如果obj命中，则当前为循环引用
-  const hit = cache.find(c => c.original === obj)
+  const hit = cache.find((c) => c.original === obj)
   if (hit) return hit.copy
 
   const copy: any = Array.isArray(obj) ? [] : {}
@@ -62,7 +55,7 @@ export function deepFilter(
   // 将copy放入缓存以备后续检查循环引用
   cache.push({ original: obj, copy })
 
-  Object.keys(obj).forEach(key => {
+  Object.keys(obj).forEach((key) => {
     copy[key] = deepFilter(obj[key], data, defaultFilter, cache)
   })
 
@@ -101,11 +94,7 @@ export function evalExpression(expression: string, data?: object): boolean {
     if (expression in EVAL_CACHE) {
       fn = EVAL_CACHE[expression]
     } else {
-      fn = new Function(
-        'data',
-        'utils',
-        `with(data) {${debug ? 'debugger;' : ''}return !!(${expression});}`
-      )
+      fn = new Function('data', 'utils', `with(data) {${debug ? 'debugger;' : ''}return !!(${expression});}`)
       EVAL_CACHE[expression] = fn
     }
 
@@ -131,11 +120,7 @@ export function evalJS(js: string, data: object): any {
 
   /* jshint evil:true */
   try {
-    const fn = new Function(
-      'data',
-      'utils',
-      `with(data) {${/^\s*return\b/.test(js) ? '' : 'return '}${js};}`
-    )
+    const fn = new Function('data', 'utils', `with(data) {${/^\s*return\b/.test(js) ? '' : 'return '}${js};}`)
     data = data || {}
     return fn.call(data, data, getFilters())
   } catch (e) {
@@ -144,7 +129,7 @@ export function evalJS(js: string, data: object): any {
   }
 }
 
-;[registerBulitin, registerLodash].forEach(fn => {
+;[registerBulitin, registerLodash].forEach((fn) => {
   const info = fn()
 
   registerTplEnginer(info.name, {

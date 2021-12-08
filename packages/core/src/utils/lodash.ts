@@ -31,8 +31,7 @@ export const isObject = (fn: unknown): boolean => !isNil(fn) && typeof fn === 'o
 export const isEmptyArray = (o: unknown): boolean => Array.isArray(o) && !o.length
 
 // 是否为空对象 如：{}, new Object()
-export const isEmptyObject = (o: any): boolean =>
-  isObject(o) && Object.keys(o).length === 0 && o.constructor === Object
+export const isEmptyObject = (o: any): boolean => isObject(o) && Object.keys(o).length === 0 && o.constructor === Object
 
 /**
  * 判断目标是否为空
@@ -123,14 +122,10 @@ export function ensureArray<T>(items: Array<T | null | undefined> | T | null | u
 /**
  * 查找目标key
  */
-export function findBy<T = unknown>(
-  items: T[] | undefined | null,
-  key: string,
-  val: unknown
-): T | undefined {
+export function findBy<T = unknown>(items: T[] | undefined | null, key: string, val: unknown): T | undefined {
   if (!items || !items.length) return undefined
 
-  const result = items.find(item => {
+  const result = items.find((item) => {
     if (!item) return false
     return (item as any)[key] === val
   })
@@ -241,7 +236,7 @@ export function deepClone(obj: any, cache: any[] = []): any {
   }
 
   // 如果obj命中，则当前为循环引用
-  const hit = cache.find(c => c.original === obj)
+  const hit = cache.find((c) => c.original === obj)
   if (hit) return hit.copy
 
   const copy: any = Array.isArray(obj) ? [] : {}
@@ -249,7 +244,7 @@ export function deepClone(obj: any, cache: any[] = []): any {
   // 将copy放入缓存以备后续检查循环引用
   cache.push({ original: obj, copy })
 
-  Object.keys(obj).forEach(key => {
+  Object.keys(obj).forEach((key) => {
     copy[key] = deepClone(obj[key], cache)
   })
 
@@ -261,7 +256,7 @@ export function deepClone(obj: any, cache: any[] = []): any {
  * @param args 被和并的对象
  */
 export function deepMerge(...args: any[]): any {
-  const items = args.filter(it => !isNil(it))
+  const items = args.filter((it) => !isNil(it))
   return deepmergeAll(items, {
     isMergeableObject: isPlainObject
   })
@@ -273,7 +268,7 @@ export function deepMerge(...args: any[]): any {
  * @param options 支持合并选项
  */
 export function deepMerge2(args: any[], options?: DeepmergeOptions): any {
-  const items = args.filter(it => !isNil(it))
+  const items = args.filter((it) => !isNil(it))
 
   const opts = Object.assign(
     {
@@ -304,12 +299,7 @@ export function get(object: unknown, path: string | string[], defaultValue?: unk
 }
 
 /** 设置指定对象路径值 */
-export function set(
-  object: unknown,
-  path: string | string[],
-  value: unknown,
-  customizer?: GenericFunction
-) {
+export function set(object: unknown, path: string | string[], value: unknown, customizer?: GenericFunction) {
   customizer = typeof customizer === 'function' ? customizer : undefined
   return object == null ? object : baseSet(object, path, value, customizer)
 }
@@ -326,11 +316,7 @@ export type OmitFilterFn = (val: any, key: string, object: unknown) => boolean
  * @param props 需要移除的属性
  * @param filter 过滤方法，返回true则保留，否则排除
  */
-export function omit(
-  object: any,
-  props?: string | string[] | OmitFilterFn,
-  filter?: OmitFilterFn
-): any {
+export function omit(object: any, props?: string | string[] | OmitFilterFn, filter?: OmitFilterFn): any {
   if (typeof props === 'string') {
     props = [props]
   } else if (typeof props === 'function') {
@@ -360,7 +346,7 @@ export function omit(
  * @param object 需要移除属性的对象
  */
 export function omitNil(object: unknown): any {
-  return omit(object, val => !isNil(val))
+  return omit(object, (val) => !isNil(val))
 }
 
 /**
@@ -368,7 +354,7 @@ export function omitNil(object: unknown): any {
  * @param object 需要移除属性的对象
  */
 export function omitEmpty(object: unknown): any {
-  return omit(object, val => !isEmpty(val))
+  return omit(object, (val) => !isEmpty(val))
 }
 
 /**
@@ -409,10 +395,10 @@ export async function delay<T>(fn: GenericFunction, seconds = 1): Promise<T> {
           // eslint-disable-next-line no-useless-call
           return fn.call(undefined)
         })
-        .then(result => {
+        .then((result) => {
           resolve(result as T)
         })
-        .catch(err => {
+        .catch((err) => {
           reject(err)
         })
     }, seconds)

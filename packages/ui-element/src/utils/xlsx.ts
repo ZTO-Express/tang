@@ -20,7 +20,7 @@ interface ParseFileOptions {
 }
 
 export function exportData(data: any[], e2eOptions?: Export2ExcelOptions) {
-  const exportDataFn = useConfig('components.xlsx.exportDataFn')
+  const exportDataFn = useConfig('components.xlsx.exportData')
   return exportDataFn(data, e2eOptions)
 }
 

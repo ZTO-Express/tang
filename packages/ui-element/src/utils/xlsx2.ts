@@ -130,11 +130,7 @@ export function saveAs(obj: any, fileName?: string, extName?: string) {
   }, 100)
 }
 
-export function parseWorkbook(
-  workbook: WorkBook,
-  sheetIndex?: number | Sheet2JSONOpts,
-  options?: Sheet2JSONOpts
-) {
+export function parseWorkbook(workbook: WorkBook, sheetIndex?: number | Sheet2JSONOpts, options?: Sheet2JSONOpts) {
   if (sheetIndex && typeof sheetIndex === 'object') {
     options = sheetIndex as Sheet2JSONOpts
     sheetIndex = undefined

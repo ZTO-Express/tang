@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useApi } from '@zto/zpage'
 import { filesize } from './filesize'
 
 interface FileNameParseResult {
@@ -126,6 +127,20 @@ export function getFileMimeType(filename: string) {
   }
 
   return filetype
+}
+
+export async function getUrlByPath(name: string) {
+  const fsApi = useApi('fs')
+
+  const urls = await fsApi.getUrlsByPaths([name])
+  return urls[0]
+}
+
+export async function getUrlsByPaths(names: string[]) {
+  const fsApi = useApi('fs')
+
+  const urls = await fsApi.getUrlsByPaths(names)
+  return urls
 }
 
 // 导入模板文件下载（返回文件流）

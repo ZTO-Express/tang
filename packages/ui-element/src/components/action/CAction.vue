@@ -1,14 +1,10 @@
 <template>
   <div v-if="isVisible" class="c-action">
-    <el-button v-bind="buttonAttrs" :disabled="isDisabled" @click="handleClick">
+    <c-upload v-if="isUpload" v-bind="uploadAttrs" :disabled="isDisabled"></c-upload>
+    <el-button v-else v-bind="buttonAttrs" :disabled="isDisabled" @click="handleClick">
       {{ buttonAttrs.label }}
     </el-button>
-    <c-dialog
-      v-if="form"
-      ref="formDialogRef"
-      v-bind="formDialogAttrs"
-      :on-submit="handleFormDialogSubmit"
-    />
+    <c-dialog v-if="form" ref="formDialogRef" v-bind="formDialogAttrs" :on-submit="handleFormDialogSubmit" />
     <c-dialog v-else-if="dialog" ref="dialogRef" v-bind="dialogAttrs" />
     <c-import-dialog v-else-if="isImport" ref="importRef" v-bind="importAttrs" />
   </div>
@@ -39,6 +35,7 @@ const props = withDefaults(
     dialog?: Record<string, any> // dialog action
     form?: Record<string, any> // form action
     import?: Record<string, any> // import action
+    upload?: Record<string, any> // upload action
     link?: any // link action
     event?: any // event action
     message?: any // message action
@@ -74,7 +71,6 @@ const buttonAttrs = computed(() => {
   const label = tpl.filter(attrs.label || actionName, context)
 
   const btnAttrs = { type, ...props.innerAttrs?.button, label }
-
   return { ...btnAttrs }
 })
 
@@ -108,6 +104,10 @@ const isImport = computed(() => {
   return !!props.import || props.actionType === 'import'
 })
 
+const isUpload = computed(() => {
+  return !!props.upload || props.actionType === 'upload'
+})
+
 const importAttrs = computed(() => {
   return {
     api: props.api,
@@ -115,6 +115,13 @@ const importAttrs = computed(() => {
     successMessage: props.successMessage,
     ..._.omit(attrs, ['import']),
     ...(attrs.import as any)
+  }
+})
+
+const uploadAttrs = computed(() => {
+  return {
+    ..._.omit(attrs, ['upload']),
+    ...(attrs.upload as any)
   }
 })
 

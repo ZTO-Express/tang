@@ -29,7 +29,7 @@ const mutations: MutationTree<AppState> = {
     const submodules: Submodule[] = payload.submodules || []
 
     // 顶级菜单作为子模块
-    submodules.forEach(it => (it.isSubmodule = true))
+    submodules.forEach((it) => (it.isSubmodule = true))
 
     state.submodules = submodules
 
@@ -57,7 +57,7 @@ const mutations: MutationTree<AppState> = {
 
 const actions: ActionTree<AppState, RootState> = {
   // 加载应用基本信息
-  load: async context => {
+  load: async (context) => {
     const { commit, dispatch } = context
 
     // 1. 加载用户信息
@@ -110,10 +110,10 @@ export default {
 
 // 获取指定的子模块
 function _getSubmodule(name?: string) {
-  const submodules = state.submodules.filter(it => !it.meta?.hidden)
+  const submodules = state.submodules.filter((it) => !it.meta?.hidden)
 
   let submodule: Submodule | undefined = submodules[0]
-  if (name) submodule = submodules.find(it => it.name === name)
+  if (name) submodule = submodules.find((it) => it.name === name)
 
   return submodule
 }

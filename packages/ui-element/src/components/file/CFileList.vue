@@ -1,33 +1,39 @@
 <template>
   <div class="c-file-list">
-    <slot v-if="!fileItems || !fileItems.length" name="empty">
-      <div class="no-data" :class="{ 'no-padding': noPadding }">
+    <slot v-if="!listState.items?.length" name="empty">
+      <div v-if="showNoData" class="no-data" :class="{ 'no-padding': noPadding }">
         <slot name="no-data">暂无文件</slot>
       </div>
     </slot>
     <div v-else class="file-items">
-      <template v-for="(it, index) in fileItems">
+      <template v-for="(it, index) in listState.items">
         <slot name="item" v-bind="{ _index: index, ...it }">
           <div :key="index" class="file-item" :title="it.name">
-            <el-button v-if="downloadable" type="text" @click="handleLink(it)">
-              <div class="label text-ellipsis" :style="{ maxWidth: maxItemWidth }">
-                {{ it.label || it.name }}
+            <div v-if="listType === 'image'" class="image-item" :class="{ isDownloadable }">
+              <c-image v-bind="imageAttrs" class="image" :src="srcType === 'url' ? it.url : it.path" />
+              <div v-if="isDownloadable" class="action-mask flex-center">
+                <el-button
+                  v-if="!readonly"
+                  class="btn-image-download"
+                  type="text"
+                  icon="el-icon-bottom"
+                  @click="handleLink(it)"
+                />
               </div>
-            </el-button>
-            <el-button
-              v-else
-              class="label text-ellipsis disabled"
-              type="text"
-              :style="{ maxWidth: maxItemWidth }"
-            >
-              {{ it.label || it.name }}
-            </el-button>
+            </div>
+            <div v-else class="text-item">
+              <div v-if="isDownloadable" class="file-list-item-btn" @click="handleLink(it)">
+                <div class="label text-ellipsis" :style="{ maxWidth: maxItemWidth }">{{ it.name }}</div>
+              </div>
+              <div v-else class="label text-ellipsis" :style="{ maxWidth: maxItemWidth }">{{ it.name }}</div>
+            </div>
+
             <el-button
               v-if="!readonly"
               class="btn-delete"
               type="info"
-              circle
               icon="el-icon-close"
+              circle
               @click="handleDelete(index)"
             />
           </div>
@@ -39,17 +45,15 @@
 
 <script setup lang="ts">
 import { vue, fileUtil } from '@zto/zpage'
-import { Close } from '@element-plus/icons'
 
 import type { GenericFunction } from '@zto/zpage'
 
-const { ref, watch } = vue
+const { ref, watch, reactive, computed } = vue
 
 interface FileListItem {
   name: string
-  url: string
-  label?: string
-  fileSource?: number
+  path: string
+  url?: string
 }
 
 const props = withDefaults(
@@ -58,26 +62,48 @@ const props = withDefaults(
     readonly?: boolean
     downloadable?: boolean
     noPadding?: boolean
+    showNoData?: boolean
     withoutPostfix?: boolean
     maxItemWidth?: string
+    srcType?: string // 'path' | 'url'
+    listType?: string // image/file
+    imageOptions?: Record<string, any> // 图片选项
     downloadMethod?: GenericFunction
     immediateDelete?: boolean // 删除操作时，直接删除指定项
     params?: string // 额外的参数
   }>(),
   {
+    srcType: 'path',
+    showNoData: false,
     maxItemWidth: '200px',
-    immediateDelete: false
+    immediateDelete: false,
+    listType: 'file'
   }
 )
 
 const emit = defineEmits(['update:modelValue', 'delete', 'deleted'])
 
-const fileItems = ref<FileListItem[]>([])
+const listState = reactive<{
+  items: FileListItem[]
+}>({
+  items: []
+})
+
+const imageAttrs = computed(() => {
+  const _attrs = { ...props.imageOptions }
+  return _attrs
+})
+
+const isDownloadable = computed(() => {
+  if (typeof props.downloadable === 'boolean') return props.downloadable
+  if (props.listType === 'image') return false
+  return true
+})
 
 watch(
   () => props.modelValue,
   () => {
-    resetFileItems()
+    resetFileItems(props.modelValue)
   },
   {
     immediate: true
@@ -85,13 +111,10 @@ watch(
 )
 
 function handleDelete(index: number) {
-  const item = fileItems.value[index]
+  let item = listState.items[index]
 
   if (item) {
-    if (props.immediateDelete) {
-      deleteItem(item)
-    }
-
+    if (props.immediateDelete) deleteItem(item)
     emit('delete', item, index, props.params)
   }
 }
@@ -100,82 +123,92 @@ function handleLink(it: FileListItem) {
   innerDownloadMethod(it)
 }
 
-function innerDownloadMethod(it: FileListItem) {
+async function innerDownloadMethod(it: FileListItem) {
   const options = {
-    fname: it.name,
+    filename: it.name,
     withoutPostfix: props.withoutPostfix
   }
 
   if (props.downloadMethod) {
     props.downloadMethod(it, options)
   } else {
-    fileUtil.download(it.url, options)
+    let url = it.url
+    if (props.srcType === 'path') {
+      url = await fileUtil.getUrlByPath(it.path)
+    }
+
+    if (url) {
+      await fileUtil.download(url, options)
+    }
   }
 }
 
 function deleteItem(item: FileListItem | number) {
   let index: any = undefined
 
-  const items = fileItems.value
-
   if (typeof item === 'number') {
     index = item
-    item = items[index]
+    item = listState.items[index]
   } else {
-    index = items.indexOf(item)
+    index = listState.items.indexOf(item)
   }
 
   if (item && index >= 0) {
-    items.splice(index, 1)
+    listState.items.splice(index, 1)
     emit('deleted', item)
-    emit('update:modelValue', items)
+    emit('update:modelValue', listState.items)
   }
 }
 
-function resetFileItems() {
-  if (!props.modelValue?.length) {
-    fileItems.value = []
+function resetFileItems(items: any[] | undefined) {
+  if (!items?.length) {
+    listState.items = []
     return
   }
 
-  fileItems.value = props.modelValue
-    .filter(it => !!it)
+  listState.items = items
+    .filter((it) => !!it)
     .map((it: any) => {
       const id = it.id
       const url = it.url
-      const fileSource = it.fileSource || 0
 
       let name = it.name
+      let path = it.path
       if (!name && it.url) {
-        const { fname } = fileUtil.parseFileName(it.url)
+        const { fname, fullpath } = fileUtil.parseFileName(it.url)
         name = fname
+        path = fullpath
       }
 
       return {
-        name,
-        url,
         id,
-        fileSource
+        name,
+        path,
+        url
       }
     })
 }
 </script>
 
 <style lang="scss" scoped>
+$image-size: 80px;
+
 .c-file-list {
   display: inline-block;
   border-radius: 3px;
 
   .file-items {
-    padding: 5px;
+    padding: 5px 10px 5px 0;
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .file-item {
+    position: relative;
     display: inline-block;
-    padding: 0 10px;
     border-radius: 5px;
-    margin-right: 5px;
-    margin-bottom: 5px;
+    margin-right: 10px;
+    margin-bottom: 10px;
     background-color: #ccc;
 
     :deep(.el-button.disabled) {
@@ -187,6 +220,58 @@ function resetFileItems() {
       border: 0;
       min-height: 10px;
     }
+
+    .image-item {
+      position: relative;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+
+      .btn-image-download {
+        color: white;
+      }
+
+      :deep(.c-image) {
+        width: $image-size;
+        height: $image-size;
+
+        .el-image {
+          width: $image-size;
+          height: $image-size;
+          cursor: pointer;
+        }
+      }
+
+      &:hover {
+        .action-mask {
+          visibility: visible;
+        }
+      }
+
+      .action-mask {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        visibility: hidden;
+        font-size: 18px;
+        cursor: pointer;
+        background: rgba($color: #000000, $alpha: 0.3);
+        color: white;
+      }
+    }
+
+    .text-item {
+      padding: 0 10px;
+    }
+
+    .btn-delete {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      padding: 0;
+      width: 18px;
+      height: 18px;
+    }
   }
 }
 
@@ -197,5 +282,11 @@ function resetFileItems() {
     padding: 0;
     display: inline-block;
   }
+}
+
+.file-list-item-btn {
+  color: #3693ff;
+  cursor: pointer;
+  font-weight: 700;
 }
 </style>
