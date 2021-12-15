@@ -1,43 +1,45 @@
-import Toast from 'vant/es/toast'
-import 'vant/es/toast/style'
+/** import index需要加入，否则npm解析import会出错 */
+
+import Toast from 'vant/es/toast/index'
+import 'vant/es/toast/style/index'
 export { Toast }
 
-import Dialog from 'vant/es/dialog'
-import 'vant/es/dialog/style'
+import Dialog from 'vant/es/dialog/index'
+import 'vant/es/dialog/style/index'
 export { Dialog }
 
-import Loading from 'vant/es/loading'
-import 'vant/es/loading/style'
+import Loading from 'vant/es/loading/index'
+import 'vant/es/loading/style/index'
 export { Loading }
 
-import Icon from 'vant/es/icon'
-import 'vant/es/icon/style'
+import Icon from 'vant/es/icon/index'
+import 'vant/es/icon/style/index'
 export { Icon }
 
-import Col from 'vant/es/col'
-import 'vant/es/col/style'
+import Col from 'vant/es/col/index'
+import 'vant/es/col/style/index'
 export { Col }
 
-import Row from 'vant/es/row'
-import 'vant/es/row/style'
+import Row from 'vant/es/row/index'
+import 'vant/es/row/style/index'
 export { Row }
 
-import Cell from 'vant/es/cell'
-import 'vant/es/cell/style'
+import Cell from 'vant/es/cell/index'
+import 'vant/es/cell/style/index'
 export { Cell }
 
-import Button from 'vant/es/button'
-import 'vant/es/button/style'
+import Button from 'vant/es/button/index'
+import 'vant/es/button/style/index'
 export { Button }
 
-import CellGroup from 'vant/es/cell-group'
-import 'vant/es/cell-group/style'
+import CellGroup from 'vant/es/cell-group/index'
+import 'vant/es/cell-group/style/index'
 export { CellGroup }
 
-import List from 'vant/es/list'
-import 'vant/es/list/style'
+import List from 'vant/es/list/index'
+import 'vant/es/list/style/index'
 export { List }
 
-import Empty from 'vant/es/empty'
-import 'vant/es/empty/style'
+import Empty from 'vant/es/empty/index'
+import 'vant/es/empty/style/index'
 export { Empty }

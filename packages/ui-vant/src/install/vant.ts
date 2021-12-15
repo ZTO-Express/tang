@@ -21,8 +21,5 @@ export default (target: Installable, options?: InstallableOptions): void => {
 
 function install(vueApp: VueApp, cmpt: any, name?: string) {
   vueApp.use(cmpt)
-
-  if (name) {
-    vueApp.component(name, cmpt)
-  }
+  if (name) vueApp.component(name, cmpt)
 }
