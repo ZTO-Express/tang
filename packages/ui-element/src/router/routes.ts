@@ -10,7 +10,7 @@ export const routes: RouteRecordRaw[] = [
     name: ROOT_ROUTE_NAME,
     path: '/',
     component: AppLayout,
-    redirect: '/operate/list',
+    redirect: '/welcome',
     children: []
   },
   {
