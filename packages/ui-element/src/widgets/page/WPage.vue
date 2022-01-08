@@ -21,9 +21,9 @@ const props = defineProps<{
   schema: Record<string, any>
 }>()
 
-const wSchema = await useWidgetSchema(props.schema)
+const wSchema = useWidgetSchema(props.schema)
 
-const cTabs = await useWidgetSchema(wSchema.tabs)
+const cTabs = useWidgetSchema(wSchema.tabs)
 
 const context = useAppContext()
 

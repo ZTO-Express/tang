@@ -12,7 +12,6 @@ export default { inheritAttrs: false }
 <script setup lang="ts">
 import { vue, useWidgetEmitter } from '@zto/zpage'
 const { ref, useAttrs } = vue
-
 const props = withDefaults(
   defineProps<{
     model: Record<string, any>

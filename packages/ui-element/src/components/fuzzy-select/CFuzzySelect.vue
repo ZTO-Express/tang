@@ -15,8 +15,10 @@
     @change="handleSelectChange"
     @focus="handleFocusChange"
   >
-    <template #prefix>
-      <slot name="prefix"><i v-if="!multiple" class="el-icon-search"></i></slot>
+    <template v-if="isPrefix" #prefix>
+      <slot name="prefix">
+        <i v-if="filterable" class="el-icon-search"></i>
+      </slot>
     </template>
     <template v-if="groupLabels && groupLabels.length">
       <el-option-group v-for="label in groupLabels" :key="label" :label="label">
@@ -25,10 +27,14 @@
           :key="getValueByPath(item, modelValueKey)"
           :label="getOptionLabel(item)"
           :value="getOptionValue(item)"
+          :style="optionStyle"
           v-bind="item"
         >
           <slot name="option" :data="item" :label="getOptionLabel(item)" :value="getOptionValue(item)" :$index="i">
-            <span>{{ getOptionDisplay(item) }}</span>
+            <div v-if="htmlTpl">
+              <c-html :html="htmlTpl" :context-data="item" />
+            </div>
+            <span v-else>{{ getOptionDisplay(item) }}</span>
           </slot>
         </el-option>
       </el-option-group>
@@ -39,10 +45,14 @@
         :key="getValueByPath(item, modelValueKey)"
         :label="getOptionLabel(item)"
         :value="getOptionValue(item)"
+        :style="optionStyle"
         v-bind="item"
       >
         <slot name="option" :data="item" :label="getOptionLabel(item)" :value="getOptionValue(item)" :$index="i">
-          <span>{{ getOptionDisplay(item) }}</span>
+          <div v-if="htmlTpl">
+            <c-html :html="htmlTpl" :context-data="item" />
+          </div>
+          <span v-else>{{ getOptionDisplay(item) }}</span>
         </slot>
       </el-option>
     </template>
@@ -57,7 +67,7 @@ import type { FuzzySelectOption, FuzzySelectRemoteMethod, FuzzySelectResponse } 
 
 // import { selectKey as ElSelectKey } from 'element-plus'
 
-const { computed, ref, useAttrs, watch, nextTick } = vue
+const { computed, ref, useAttrs, useSlots, watch, nextTick } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -66,12 +76,13 @@ const props = withDefaults(
     optionData?: Record<string, any>
     multiple?: boolean
     filterable?: boolean
+    optionStyle?: any
 
     modelValueKey?: string
     groupProp?: string
     labelProp?: string
     valueProp?: string
-    tpl?: string
+    tpl?: string | Record<string, any>
 
     returnLabel?: boolean
     triggerFocus?: boolean
@@ -79,8 +90,13 @@ const props = withDefaults(
 
     api?: ApiRequestAction
     apiParams?: Record<string, any>
+    pageSize?: number
     remote?: boolean
     remoteMethod?: GenericFunction
+    preventRemote?: boolean // 阻止远程请求
+
+    localFilter?: boolean // 是否本地过滤
+    localFilterMethod?: GenericFunction // 是否本地过滤方法
   }>(),
   {
     modelValue: '',
@@ -88,9 +104,6 @@ const props = withDefaults(
     multiple: false,
     filterable: true,
     modelValueKey: '',
-    groupProp: '',
-    labelProp: '',
-    valueProp: '',
     returnLabel: false,
     triggerFocus: false,
     collapseTags: true,
@@ -99,17 +112,14 @@ const props = withDefaults(
   }
 )
 
-const config = useConfig('components.fuzzySelect', {})
+const fuzzySelectConfig = useConfig('components.fuzzySelect', {})
 
 // const innerSelect = inject<any>(ElSelectKey)
-
-const innerRemoteMethod = computed<FuzzySelectRemoteMethod>(() => {
-  return (props.remoteMethod || config.remoteMethod) as any
-})
 
 const emit = defineEmits(['change', 'update:label', 'update:modelValue'])
 
 const attrs = useAttrs()
+const slots = useSlots()
 
 const apiRequest = useApiRequest()
 
@@ -117,8 +127,8 @@ const selectRef = ref<any>()
 
 const loading = ref(false)
 
-const innerLabelProp = ref(props.labelProp || 'name')
-const innerValueProp = ref(props.valueProp || 'code')
+const innerLabelProp = computed(() => props.labelProp || 'name')
+const innerValueProp = computed(() => props.valueProp || 'code')
 
 // 远程查询出来的选项
 const remoteFuzzyOptions = ref<FuzzySelectOption[]>([])
@@ -127,6 +137,18 @@ const groupLabels = ref<any[]>([])
 
 const innerLabel: any = ref(props.modelLabel)
 const innerValue: any = ref(props.modelValue)
+
+const innerRemoteMethod = computed<FuzzySelectRemoteMethod>(() => {
+  return (props.remoteMethod || fuzzySelectConfig.remoteMethod) as any
+})
+
+const isPrefix = computed(() => {
+  return props.filterable || slots.prefix
+})
+
+const htmlTpl = computed(() => {
+  return _.isObject(props.tpl) ? props.tpl : null
+})
 
 watch(
   () => innerValue.value,
@@ -140,7 +162,7 @@ watch(
 
 watch(
   () => [props.modelLabel, props.modelValue, props.optionData, remoteFuzzyOptions.value],
-  (cur) => {
+  cur => {
     innerLabel.value = props.modelLabel
     innerValue.value = props.modelValue
 
@@ -150,7 +172,7 @@ watch(
     const options: any[] = remoteFuzzyOptions.value
 
     const pushOption = (label: string, value: any, optionData: any) => {
-      const option = options.find((option) => getOptionValue(option) === value)
+      const option = options.find(option => getOptionValue(option) === value)
 
       if (!option) {
         options.push({
@@ -212,11 +234,6 @@ function getValueByPath(option: FuzzySelectOption, modelValueKey?: string) {
   return val
 }
 
-function setLabel(v: string | string[]) {
-  innerLabel.value = v
-  props.returnLabel && emit('update:label', v)
-}
-
 function handleFocusChange() {
   // 远程搜索 如果没有options 则请求
   if (!props.triggerFocus) return
@@ -250,15 +267,22 @@ function handleSelectChange(value: string | Array<string>) {
   })
 }
 
+function setLabel(v: string | string[]) {
+  innerLabel.value = v
+  props.returnLabel && emit('update:label', v)
+}
+
 /** 根据label获取options */
 function getOptionsByLabel(groupLabel: string) {
   const groupProp = props.groupProp
   if (!groupProp || !groupLabel) return
 
-  return fuzzyOptions.value.filter((it) => it[groupProp] === groupLabel)
+  return fuzzyOptions.value.filter(it => it[groupProp] === groupLabel)
 }
 
 async function execRemoteMethod(query?: string) {
+  if (props.preventRemote) return
+
   loading.value = true
 
   const context = useAppContext()
@@ -275,9 +299,16 @@ async function execRemoteMethod(query?: string) {
       })
       .finally(() => (loading.value = false))
   } else if (apiRequest && props.api) {
+    const pageSize = props.pageSize || fuzzySelectConfig.pageSize || 40
+
+    const queryAction: any = typeof props.api === 'string' ? { url: props.api } : props.api || {}
+    queryAction.type = 'fuzzy-select'
+
     methodResponse = await apiRequest({
-      action: props.api,
-      params: { keyword: query as string, ...params }
+      action: queryAction,
+      params: { keyword: query as string, ...params },
+      pageIndex: 1,
+      pageSize
     }).finally(() => (loading.value = false))
   }
 
@@ -311,14 +342,14 @@ function _findLabels(value: string | Array<any>): string | string[] {
       valueByKey.set(option[valProp], option[lblProp])
     }
 
-    const labels = value.map((val) => {
+    const labels = value.map(val => {
       return valueByKey.get(val) || ''
     })
 
     return labels
   }
 
-  const item = cachedOptions.find((option) => {
+  const item = cachedOptions.find(option => {
     return option.value === value
   })
   return item ? item.label : ''

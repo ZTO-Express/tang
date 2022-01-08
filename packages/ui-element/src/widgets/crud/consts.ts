@@ -18,9 +18,17 @@ export const DEFAULT_ACTIONS = {
       message: '确认要删除当前记录吗，删除后将无法恢复？'
     }
   },
+  download: {
+    label: '下载',
+    actionType: 'download'
+  },
   import: {
     label: '导入',
     actionType: 'import',
     trigger: false
+  },
+  export: {
+    label: '导出全部',
+    actionType: 'export'
   }
 }

@@ -169,7 +169,7 @@ async function addFiles(files: File[] | undefined) {
 
 async function addFile(items: UploadDataItems, file: File, key: string, params: any) {
   let itemsArr = Object.values(items)
-  let exists = itemsArr.some((it) => {
+  let exists = itemsArr.some(it => {
     return isSameFile(it.file, file)
   })
 
@@ -199,7 +199,7 @@ async function addFile(items: UploadDataItems, file: File, key: string, params: 
 }
 
 async function startUpload() {
-  let uploadOps = uploadItemVals.value.map((it) => {
+  let uploadOps = uploadItemVals.value.map(it => {
     return upload(it)
   })
   await Promise.all(uploadOps)
@@ -273,7 +273,6 @@ function onUploadStart(item: UploadData) {
 
 function onUploadCompleted(item: UploadData, result?: any) {
   emit('completed', item, result)
-
   item.completed = true
   resetItem(item)
 }
@@ -295,7 +294,7 @@ function reset() {
 }
 
 function cancelAllUploads() {
-  uploadItemVals.value.forEach((it) => {
+  uploadItemVals.value.forEach(it => {
     cancelUpload(it)
   })
 }

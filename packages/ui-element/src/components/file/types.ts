@@ -43,6 +43,13 @@ export interface UploadOpenOptions {
 /** 存储组，公有文件上传为“public”，私有文件上传为“private”。公有文件指可通过文件路径直接访问 */
 export type UploadStoreGroup = 'private' | 'public'
 
+export interface UploadFileItem {
+  name?: string
+  path?: string
+  url?: string
+  [prop: string]: any
+}
+
 /** 上传时打开上传窗口需要传递的参数 */
 export interface UploadOpenParams {
   files?: File[] // 需要上传的文件

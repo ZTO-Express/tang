@@ -43,12 +43,16 @@
                   <template v-if="sSearch">
                     <el-divider direction="vertical" class="content__divider" />
                     <div class="inline">
-                      <el-button type="text" class="q-ml-md" @click="doSearch">
+                      <el-button v-if="!sToolbar.noRefresh" type="text" class="q-ml-md" @click="doSearch">
                         刷新
                         <i class="el-icon-refresh-right"></i>
                       </el-button>
-
+                      <el-button v-if="!sToolbar.noExport" type="text" class="q-ml-md" @click="doExport">
+                        导出
+                        <i class="el-icon-download"></i>
+                      </el-button>
                       <el-button
+                        v-if="!sToolbar.noSearchHide"
                         v-show="sSearch.hidden !== true"
                         type="text"
                         class="q-ml-md"
@@ -102,6 +106,7 @@ import {
   _,
   tpl,
   emitter,
+  useApi,
   useAppRouter,
   useWidgetEmitter,
   useWidgetSchema,
@@ -111,6 +116,8 @@ import {
 
 import { useMessage } from '../../composables'
 import { DEFAULT_ACTIONS } from './consts'
+
+import { appUtil } from '../../utils'
 
 const { computed, reactive, ref, onMounted, nextTick } = vue
 
@@ -127,7 +134,7 @@ const apiRequest = useApiRequest()
 // 请求
 const { MessageBox, Message } = useMessage()
 
-const wSchema = await useWidgetSchema(props.schema)
+const wSchema = useWidgetSchema(props.schema)
 
 // 注册微件事件监听
 useWidgetEmitter(wSchema, {
@@ -135,19 +142,19 @@ useWidgetEmitter(wSchema, {
 })
 
 // 活动 schema
-const sSection = await useWidgetSchema(wSchema.section || {})
+const sSection = useWidgetSchema(wSchema.section || {})
 
 // 活动 schema
-const sActions = await useWidgetSchema(wSchema.actions || {})
+const sActions = useWidgetSchema(wSchema.actions || {})
 
 // 查询 schema
-const sSearch = await useWidgetSchema(wSchema.search || {})
+const sSearch = useWidgetSchema(wSchema.search || {})
 
 // 工具栏 schema
-const sToolbar = await useWidgetSchema(wSchema.toolbar || {})
+const sToolbar = useWidgetSchema(wSchema.toolbar || {})
 
 // 表格 schema
-const sTable = await useWidgetSchema(wSchema.table || {})
+const sTable = useWidgetSchema(wSchema.table || {})
 const innerColumns = ref<any[]>([])
 
 innerColumns.value = Array.isArray(sTable.columns) ? sTable.columns : []
@@ -224,7 +231,7 @@ const searchItemsAttrs = computed(() => {
 
 // 执行查询
 async function handleSearch() {
-  await searchFormRef.value.validate()
+  const valid = await searchFormRef.value.validate()
   await doSearch(true)
 }
 
@@ -335,13 +342,6 @@ function getOperationActionAttrs(options: any, scope: any) {
     optConfig?.innerAttrs
   )
 
-  const payload = _.deepMerge(
-    {},
-    actConfig.payload || optConfig.payload || scope.row,
-    actConfig.defaults,
-    optConfig.defaults
-  )
-
   const actionAttrs = Object.assign(
     {
       contextData: scope,
@@ -354,9 +354,15 @@ function getOperationActionAttrs(options: any, scope: any) {
     { innerAttrs }
   )
 
-  actionAttrs.payload = payload
+  const configPayload = actConfig.payload || optConfig.payload
+  if (typeof configPayload === 'function') {
+    actionAttrs.payload = configPayload
+  } else {
+    actionAttrs.payload = _.deepMerge({}, configPayload, actConfig.defaults, optConfig.defaults)
+  }
+
   actionAttrs.trigger = () => {
-    triggerAction(actionAttrs, scope)
+    triggerAction(actionAttrs)
   }
 
   return actionAttrs
@@ -393,7 +399,9 @@ async function handleDialogSubmit(model: any) {
   if (!actionCfg) return
 
   const context = useAppContext(model)
-  const payload = _.deepMerge({}, tpl.deepFilter(dialogAttrs.value?.extData, context), model)
+
+  const extData = tpl.deepFilter(dialogAttrs.value?.extData, context)
+  const payload = _.deepMerge({}, extData, model)
 
   await doAction(actionCfg.api, payload, actionCfg)
 }
@@ -406,28 +414,38 @@ function handleDialogClose() {
 // ----- 通用代码 ----->
 
 // 触发活动
-async function triggerAction(actionCfg: any, data?: any) {
+async function triggerAction(actionCfg: any) {
   activeAction.value = actionCfg
   if (!actionCfg) return
 
-  const ctx = useAppContext(data)
+  const context = useAppContext(actionCfg.contextData)
 
-  const payload = buildActionPlayload(actionCfg, data)
+  const actionData = buildActionData(actionCfg, context)
 
   actionCfg.label = actionCfg.label || '操作'
 
-  if (actionCfg.link) {
-    const link = tpl.deepFilter(actionCfg.link, ctx)
+  if (actionCfg.actionType === 'export') {
+    await doAsyncExport(actionCfg.api, actionData)
+  } else if (actionCfg.actionType === 'download') {
+    if (!actionCfg.link) return
+    const link = tpl.deepFilter(actionCfg.link, context)
+    const fsApi = useApi('fs')
+    await fsApi.downloadFile(link, actionCfg)
+  } else if (actionCfg.link) {
+    const link = tpl.deepFilter(actionCfg.link, context)
     await router.goto(link)
   } else if (actionCfg.event) {
-    emitter.emits(actionCfg.event, payload)
+    emitter.emits(actionCfg.event, actionData)
   } else if (actionCfg.dialog) {
     dialogClose.value = false
     nextTick(() => {
-      dialogRef.value?.show(payload)
+      dialogRef.value?.show(actionData)
     })
   } else {
-    const messageCfg = actionCfg.message || `确认${actionCfg.label}选中的记录？`
+    const messageCfg: any =
+      tpl.filter(actionCfg.message, {
+        selectedCount: selectedRows.value?.length
+      }) || `确认${actionCfg.label}选中的记录？`
 
     let msgConfig: any = _.isString(messageCfg)
       ? {
@@ -453,18 +471,24 @@ async function triggerAction(actionCfg: any, data?: any) {
       msgConfig
     )
 
-    msgConfig = tpl.deepFilter(msgConfig, ctx)
+    msgConfig = tpl.deepFilter(msgConfig, context)
     await MessageBox(msgConfig).then(() => {
-      return doAction(actionCfg.api, payload, actionCfg)
+      return doAction(actionCfg.api, actionData, actionCfg)
     })
   }
 }
 
 // 构建活动参数
-function buildActionPlayload(actionCfg: any, data?: any) {
-  const ctx = useAppContext(data)
+function buildActionData(actionCfg: any, context: any) {
+  let actionData: any = {}
 
-  let payload = tpl.deepFilter(actionCfg.payload, ctx)
+  if (typeof actionCfg.payload === 'function') {
+    actionData = actionCfg.payload(context, { selection: selectedRows.value })
+  } else if (actionCfg.payload && !_.isEmptyObject(actionCfg.payload)) {
+    actionData = tpl.deepFilter(actionCfg.payload, context)
+  } else {
+    actionData = _.deepMerge({}, actionCfg.scope?.row)
+  }
 
   // 处理选中项
   if (actionCfg.targetType === 'selected') {
@@ -483,25 +507,25 @@ function buildActionPlayload(actionCfg: any, data?: any) {
 
       Object.keys(batchPayloadTmpl).forEach(key => {
         if (!Array.isArray(batchPayloadTmpl[key])) {
-          batchPayload[key] = tpl.deepFilter(batchPayloadTmpl[key], ctx)
+          batchPayload[key] = tpl.deepFilter(batchPayloadTmpl[key], context)
         } else if (batchPayloadTmpl[key][0]) {
           const batchTmpl = batchPayloadTmpl[key][0]
           batchPayload[key] = []
 
           selectedRows.value.forEach((row: any) => {
-            const _data = Object.assign({}, data, { row })
-            const _ctx = useAppContext(_data)
+            const _data = Object.assign({}, context?.data, { row })
+            const _context = useAppContext(_data)
 
-            batchPayload[key].push(tpl.deepFilter(batchTmpl, _ctx))
+            batchPayload[key].push(tpl.deepFilter(batchTmpl, _context))
           })
         }
       })
 
-      payload = Object.assign({}, payload, batchPayload)
+      actionData = Object.assign({}, actionData, batchPayload)
     }
   }
 
-  return payload
+  return actionData
 }
 
 // 执行活动
@@ -525,28 +549,30 @@ async function doAction(action: any, payload: any, options?: any) {
 
 // 执行查询
 async function doSearch(resetPager = false) {
+  if (!tableRef.value) return
+
   if (resetPager === true) {
-    tableRef.value?.resetPager()
+    tableRef.value.resetPager()
   }
 
   const queryAction = sActions.query || {}
 
   if (!queryAction.api) {
-    tableRef.value?.setData(queryAction.data || [])
+    tableRef.value.setData(queryAction.data || [])
     return
   }
 
   const pager = tableRef.value.pager
   searchLoading.value = true
-  // 当前微件上下文件
-  const context = useAppContext(searchModel)
-  const searchParms = _.deepMerge({}, tpl.deepFilter(sSearch?.extData, context), searchModel)
+
+  const searchParams = getSearchParams()
+
   await apiRequest({
     pageIndex: pager.pageIndex,
     pageSize: pager.pageSize,
     noPager: sTable.noPager,
     action: { ...queryAction, type: 'query' },
-    params: searchParms
+    params: searchParams
   })
     .then(res => {
       tableRef.value?.setData(res)
@@ -554,6 +580,45 @@ async function doSearch(resetPager = false) {
     .finally(() => {
       searchLoading.value = false
     })
+}
+
+// 异步导出
+async function doAsyncExport(api: string, options?: any) {
+  if (!tableRef.value) return
+
+  const data = tableRef.value.getData()
+  if (!data?.length) {
+    Message.warning('请先查询出数据')
+    return
+  }
+
+  const queryAction = sActions.query || {}
+  const searchParams = getSearchParams()
+
+  await apiRequest({
+    action: { ...queryAction, api, type: 'export' },
+    params: searchParams
+  })
+
+  appUtil.openDownloadsDialog()
+
+  setTimeout(() => {
+    Message.success(options?.successMessage || '导出成功！')
+  }, 100)
+}
+
+function getSearchParams() {
+  const context = useAppContext(searchModel)
+  const searchParms = _.deepMerge({}, tpl.deepFilter(sSearch?.extData, context), searchModel)
+
+  return searchParms
+}
+
+// 导出
+async function doExport() {
+  if (!tableRef.value) return
+
+  tableRef.value.exportData()
 }
 </script>
 

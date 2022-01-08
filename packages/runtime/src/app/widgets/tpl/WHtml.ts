@@ -1,6 +1,7 @@
-import { defineComponent } from 'vue'
-import { renderHtml, tpl } from '../../../utils'
-import { useAppContext } from '../../composables'
+import { h, defineComponent } from 'vue'
+
+import { _ } from '../../../utils'
+import { CHtml } from '../../components'
 
 export default defineComponent({
   props: {
@@ -8,13 +9,9 @@ export default defineComponent({
   },
 
   setup(props: any) {
-    const context = useAppContext()
-
     return () => {
-      const sHtml = props.schema.html
-      if (!sHtml) return ''
-      const html = tpl.deepFilter(sHtml, context)
-      return renderHtml(html)
+      const htmlProps = _.omit(props.schema, ['type'])
+      return h(CHtml, { ...htmlProps })
     }
   }
 })

@@ -12,5 +12,5 @@ const props = defineProps<{
 }>()
 
 // schema
-const wSchema = await useWidgetSchema(props.schema)
+const wSchema = useWidgetSchema(props.schema)
 </script>

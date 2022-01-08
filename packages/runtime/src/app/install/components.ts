@@ -2,6 +2,7 @@ import { warn } from '../../utils'
 
 import * as entryMap from '../../entry'
 import * as directivesMap from '../directives'
+import * as componentsMap from '../components'
 
 import type { Component } from 'vue'
 import type { Installable, InstallableOptions } from '../../typings'
@@ -22,6 +23,13 @@ export default async (target: Installable, options: InstallableOptions) => {
   // 安装入口组件
   for (const key in entryMap) {
     const cmpt = (entryMap as any)[key]
+    const cmptName = cmpt.name || key
+    vueApp.component(cmptName, cmpt)
+  }
+
+  // 安装内部组件
+  for (const key in componentsMap) {
+    const cmpt = (componentsMap as any)[key]
     const cmptName = cmpt.name || key
     vueApp.component(cmptName, cmpt)
   }

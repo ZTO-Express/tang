@@ -36,7 +36,7 @@ const props = withDefaults(
   }>(),
   {
     type: 'date',
-    valueFormat: 'YYYY-MM-DD',
+    valueFormat: 'YYYY-MM-DD HH:mm:ss',
     disabled: false
   }
 )

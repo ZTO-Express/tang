@@ -129,18 +129,24 @@ export function getFileMimeType(filename: string) {
   return filetype
 }
 
-export async function getUrlByPath(name: string) {
+export async function getUrlsByPaths(names: string[]) {
   const fsApi = useApi('fs')
+  const urls = await fsApi.getUrlsByPaths(names)
+  return urls
+}
 
-  const urls = await fsApi.getUrlsByPaths([name])
+// 根据文件路径获取Url
+export async function getUrlByPath(name: string) {
+  const urls = await getUrlsByPaths([name])
   return urls[0]
 }
 
-export async function getUrlsByPaths(names: string[]) {
+// 删除文件
+export async function deleteFile(name: string) {
   const fsApi = useApi('fs')
 
-  const urls = await fsApi.getUrlsByPaths(names)
-  return urls
+  if (!name || !fsApi.deleteFile) return false
+  return fsApi.deleteFile(name)
 }
 
 // 导入模板文件下载（返回文件流）
@@ -154,7 +160,7 @@ export async function download(url: string, options?: any) {
     if (lastPathIndex < 0) {
       filename = url
     } else {
-      filename = url.substr(lastPathIndex + 1)
+      filename = url.substring(lastPathIndex + 1)
     }
   }
 

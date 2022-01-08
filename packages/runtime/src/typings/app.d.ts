@@ -151,6 +151,9 @@ export interface AppFsApi {
   // 获取上传token
   getUploadToken?: PromiseFunction
 
+  // 删除文件
+  deleteFile?: PromiseFunction
+
   // 下载文件
   downloadFile?: (fileName: string, options?: any) => Promise<void>
 }

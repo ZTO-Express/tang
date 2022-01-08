@@ -12,7 +12,7 @@ const props = defineProps<{
   schema: Record<string, any>
 }>()
 
-const wSchema = await useWidgetSchema(props.schema)
+const wSchema = useWidgetSchema(props.schema)
 
 const sectionAttrs = computed(() => {
   const _attrs = _.omit(wSchema, ['type', 'body'])

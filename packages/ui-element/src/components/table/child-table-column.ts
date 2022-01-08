@@ -114,6 +114,7 @@ const ChildTableColumn = defineComponent({
           }
 
           let innerText = scope.row[prop]
+
           /** 直接返回字段 */
           if (config.formatter) {
             innerText = config.formatter(scope.row, config, scope.row[prop], scope.$index, scope)
@@ -145,7 +146,7 @@ const ChildTableColumn = defineComponent({
 
           /** 批量编辑 */
           if (props.batchEditable && config.batchEditable) {
-            return h(BatchEditor, {
+            return h(BatchEditor as any, {
               editorType: `c-form-item-${editor.itemType}`,
               item: config,
               onOk: (data: Record<string, string>) => {

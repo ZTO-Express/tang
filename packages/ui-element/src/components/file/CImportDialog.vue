@@ -56,17 +56,20 @@ const props = withDefaults(
     apiParams?: any
     dataProp?: string // 导出数据的属性
     dialog?: any
+    filterEmpty?: boolean
     successMessage?: string
     closeAfterSuccess?: boolean
     parseMethod?: GenericFunction
     importMethod?: GenericFunction
+    transformMethod?: GenericFunction
     onSubmit?: GenericFunction
   }>(),
   {
     closeAfterSuccess: true,
     dataProp: 'data',
     maxCount: 3000,
-    maxFileSize: 10
+    maxFileSize: 10,
+    filterEmpty: true
   }
 )
 
@@ -143,7 +146,9 @@ async function handleDialogSubmit() {
   try {
     loading.value = true
 
-    const data = await innerParseMethod(file)
+    let data = await innerParseMethod(file, {
+      filterEmpty: props.filterEmpty
+    })
 
     if (!data?.length) {
       throw new Error('没有需要上传的数据。')
@@ -177,20 +182,24 @@ async function handleDialogSubmit() {
   }
 }
 
-async function innerParseMethod(file: any) {
+async function innerParseMethod(file: any, options: any) {
   const parseMethod = props.parseMethod || fileImportCfg.parseMethod
   if (parseMethod) {
-    return parseMethod(file, templateData.value)
+    return parseMethod(file, { ...options, template: templateData.value })
   }
-
-  return doParseFile(file)
+  return doParseFile(file, options)
 }
 
 async function innerImportMethod(data: any) {
   const importMethod = props.importMethod || fileImportCfg.importMethod
 
+  let importData = data
+  if (props.transformMethod) {
+    importData = await props.transformMethod(data)
+  }
+
   const payload = {
-    [props.dataProp]: data,
+    [props.dataProp]: importData,
     ...props.apiParams
   }
 
@@ -202,7 +211,7 @@ async function innerImportMethod(data: any) {
 }
 
 // 解析文件
-async function doParseFile(file: any) {
+async function doParseFile(file: any, options?: any) {
   let data: any[] = []
 
   if (fileImportCfg.parseFile) {
@@ -216,15 +225,18 @@ async function doParseFile(file: any) {
 
   if (!data || !data.length) return
 
-  const columns = templateData.value?.columns as any[]
+  let result = data
 
-  if (!columns?.length) return data
-
-  const rtnData = data
-    .filter((dt: any) => {
+  if (options.filterEmpty) {
+    result = data.filter((dt: any) => {
       return !!dt.length
     })
-    .map((dt: any) => {
+  }
+
+  const columns = templateData.value?.columns as any[]
+
+  if (columns?.length) {
+    result = result.map((dt: any) => {
       const it: any = {}
 
       columns.forEach((col, idx) => {
@@ -257,11 +269,10 @@ async function doParseFile(file: any) {
           it[col.prop] = val
         }
       })
-
       return it
     })
-
-  return rtnData
+  }
+  return result
 }
 
 // 执行导入

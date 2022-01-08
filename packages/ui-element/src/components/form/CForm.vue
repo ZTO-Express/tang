@@ -1,7 +1,6 @@
 <template>
   <el-form ref="formRef" v-bind="$attrs" :model="dataModel" :label-width="innerLabelWidth">
     <slot />
-
     <div v-if="innerActions.length" class="form-footer">
       <template v-for="it in innerActions" :key="it.name">
         <el-button
@@ -90,6 +89,7 @@ async function handleSubmit(action: any) {
   }
 
   const form = formRef.value
+
   // 校验表单
   if (form.validate) {
     let valid = await form.validate()
@@ -138,8 +138,8 @@ async function doSubmit(action?: any) {
 // ----- 导出方法 ----->
 
 defineExpose({
-  setData,
   innerForm: formRef.value,
+  setData,
   resetFields,
   validate,
   doSubmit

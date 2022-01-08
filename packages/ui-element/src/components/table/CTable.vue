@@ -315,7 +315,7 @@ function getColumnByProp(prop: string, cols: any[]): any {
 /** 重新layout */
 function doLayout() {
   // 多级表头筛选有问题，暂时这样解决
-  if (columnItems.value.find((column) => column.children && column.children.length)) {
+  if (columnItems.value.find(column => column.children && column.children.length)) {
     isShowTable.value = false
     nextTick(() => (isShowTable.value = true))
     return
@@ -378,7 +378,7 @@ async function doFetch(isResetPager: boolean) {
   if (props.api) {
     tableLoading.value = true
     await apiRequest(payload)
-      .then((res) => {
+      .then(res => {
         setData(res)
       })
       .finally(() => {
@@ -418,7 +418,11 @@ function setData(data: any) {
   }
 }
 
-const exportDataFn = useConfig('components.table.exportData', {})
+function getData() {
+  return tableData.data
+}
+
+const exportDataFn = useConfig('components.table.exportData')
 
 // 导出数据
 function exportData(fileName: string) {
@@ -426,10 +430,9 @@ function exportData(fileName: string) {
     Message.warning('请先查询出数据')
     return
   }
-
   const exportOpts: any = {
     fileName,
-    columns: vTableHead
+    columns: vTableHead.value
   }
 
   if (exportDataFn) {
@@ -445,6 +448,7 @@ defineExpose({
   pager,
   resetPager,
   setData,
+  getData,
   doFetch,
   doLayout,
   validate,

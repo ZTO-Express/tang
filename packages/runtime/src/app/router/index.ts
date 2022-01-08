@@ -127,7 +127,7 @@ export function createAppRouter(config?: AppRouterConfig) {
       if (!router) return
 
       const routes = router.getRoutes()
-      const route = routes.find((it) => it.name === name)
+      const route = routes.find(it => it.name === name)
       return route
     }
   }
@@ -138,7 +138,7 @@ export function createAppRouter(config?: AppRouterConfig) {
       if (!key || !router) return undefined
 
       const routes = router.getRoutes()
-      const route = routes.find((it) => it.meta?.pageKey === key)
+      const route = routes.find(it => it.meta?.pageKey === key)
       return route
     }
   }
@@ -149,7 +149,7 @@ export function createAppRouter(config?: AppRouterConfig) {
       if (!menuPath || !router) return undefined
 
       const routes = router.getRoutes()
-      const route = routes.find((it) => it.meta?.menuPath === menuPath)
+      const route = routes.find(it => it.meta?.menuPath === menuPath)
       return route
     }
   }
@@ -178,7 +178,7 @@ export function createAppRouter(config?: AppRouterConfig) {
           return
         } else if (!to.meta?.redirectQuery) {
           // vue router的match只关注path，这里通过path和query进行匹配
-          const menuPath = location.hash.substr(1)
+          const menuPath = location.hash.substring(1)
           const route = router.getRouteByMenuPath(menuPath)
           if (route?.name && route.name !== to.name) {
             next({ name: route.name, query: to.query, replace: true })

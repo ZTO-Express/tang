@@ -11,3 +11,4 @@ export const theme = AppTheme
 export const router = AppRouter
 
 export * from './composables'
+export * from './utils'

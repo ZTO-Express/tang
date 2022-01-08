@@ -101,7 +101,7 @@ const props = withDefaults(
   }
 )
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'change'])
 
 const attrs = useAttrs()
 const apiRequest = useApiRequest()
@@ -154,6 +154,7 @@ await fetchOptions()
 // 变化时触发
 function handleChange(val: any) {
   innerValue.value = val
+  emit('change', val)
 }
 
 // 获取options数据
@@ -170,7 +171,6 @@ async function fetchOptions() {
       params: { ...params }
     })
   }
-
   if (optionsData && props.optionsDataProp) {
     innerOptions.value = optionsData[props.optionsDataProp]
   } else {
@@ -180,7 +180,7 @@ async function fetchOptions() {
   const valueProp = props.valueProp
   const optionValueProp = props.optionValueProp
   if (valueProp) {
-    const vals = innerOptions.value.filter((v) => !!v[valueProp]).map((it) => it[optionValueProp])
+    const vals = innerOptions.value.filter(v => !!v[valueProp]).map(it => it[optionValueProp])
 
     if (props.checkType === 'radio') {
       innerValue.value = vals[0] || ''

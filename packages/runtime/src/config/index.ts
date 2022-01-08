@@ -14,6 +14,23 @@ export const useConfig = (path: string, defaultValue?: unknown): any => {
   return cfg
 }
 
+/**
+ * 获取api请求方法
+ * @returns
+ */
+export function useAppConfig(path: string, defaultValue?: unknown) {
+  const _path = path ? `.${path}` : ''
+  return useConfig(`app${_path}`, defaultValue)
+}
+
+/**
+ * 获取api请求方法
+ * @returns
+ */
+export function useApiRequest<T = ApiRequest>() {
+  return useAppConfig('api.request') as T
+}
+
 /** 获取环境信息 */
 export const useEnv = (name?: string) => {
   const section = name ? `env.${name}` : 'env'
@@ -28,14 +45,6 @@ export const useApis = () => {
 /** 获取api */
 export const useApi = (name: string) => {
   return useConfig(`apis.${name}`)
-}
-
-/**
- * 获取api请求方法
- * @returns
- */
-export function useApiRequest<T = ApiRequest>() {
-  return useConfig('app.api.request') as T
 }
 
 /** 获取资源 */

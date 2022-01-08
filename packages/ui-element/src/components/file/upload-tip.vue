@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
+import { _, vue } from '@zto/zpage'
 import { InfoFilled } from '@element-plus/icons'
 
 const { computed } = vue
@@ -28,9 +28,7 @@ const { computed } = vue
 const props = withDefaults(
   defineProps<{
     type?: 'text' | 'popover'
-    accept?: string
-    sizeLimit?: number
-    countLimit?: number
+    uploadProps?: Record<string, any>
     content?: string
   }>(),
   {
@@ -39,11 +37,15 @@ const props = withDefaults(
 )
 
 const tipText = computed(() => {
+  if (props.content) return props.content
+
   const texts: string[] = []
 
-  if (props.accept) texts.push(`可上传${props.accept}`)
-  if (props.sizeLimit) texts.push(`大小不超过${props.sizeLimit}MB`)
-  if (typeof props.countLimit !== 'undefined') texts.push(`还可以上传${props.countLimit}张照片`)
+  const { accept, sizeLimit, countLimit } = props.uploadProps || {}
+
+  if (accept) texts.push(`可上传${accept}`)
+  if (sizeLimit) texts.push(`大小不超过${sizeLimit}MB`)
+  if (!_.isNil(countLimit)) texts.push(`还可以上传${countLimit}张照片`)
 
   if (!texts.length) return ''
 

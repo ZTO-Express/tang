@@ -42,7 +42,7 @@ function handleTabClick(tab: any) {
   if (tabName !== props.modelValue) {
     emit('update:modelValue', tabName)
 
-    const item = props.tabItems.find((it) => it.value === tabName)
+    const item = props.tabItems.find(it => it.value === tabName)
     emit('change', item)
   }
 }

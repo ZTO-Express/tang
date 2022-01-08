@@ -5,14 +5,12 @@ import { useAppContext } from './useContext'
 import type { GenericFunction } from '@zto/zpage-core'
 
 /** 使用schema */
-export async function useWidgetSchema(schema: any, payload?: any) {
-  // 应用上下文
-  const context = useAppContext()
-
+export function useWidgetSchema(schema: any, payload?: any) {
   if (typeof schema === 'function') {
-    return Promise.resolve().then(() => {
-      return schema.call(null, context, payload)
-    })
+    // 应用上下文
+    const context = useAppContext()
+
+    return schema.call(null, context, payload)
   }
 
   return schema
@@ -36,7 +34,7 @@ export function useWidgetProps() {
 export function useWidgetEmitter(schema: any, handlerMap: Record<string, GenericFunction>) {
   if (!handlerMap) return
 
-  Object.keys(handlerMap).forEach((key) => {
+  Object.keys(handlerMap).forEach(key => {
     if (!isWidgetEventKey(key)) return
 
     const evtTypes = schema[key] as any
@@ -46,7 +44,7 @@ export function useWidgetEmitter(schema: any, handlerMap: Record<string, Generic
   })
 
   onUnmounted(() => {
-    Object.keys(handlerMap).forEach((key) => {
+    Object.keys(handlerMap).forEach(key => {
       if (!isWidgetEventKey(key)) return
 
       const evtTypes = schema[key] as any

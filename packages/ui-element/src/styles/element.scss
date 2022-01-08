@@ -64,6 +64,16 @@ $--font-path: 'element-plus/packages/theme-chalk/src/fonts';
     font-size: 12px;
     height: 28px;
   }
+
+  &.auto-height &__content {
+    height: auto;
+  }
+
+  &.props-required &__label::before {
+    content: '*';
+    color: var(--el-color-danger);
+    margin-right: 4px;
+  }
 }
 
 .el-overlay-dialog {

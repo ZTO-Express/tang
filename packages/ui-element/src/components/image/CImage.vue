@@ -71,7 +71,7 @@ const showImage = computed(() => {
 })
 
 watch(
-  () => showPreview.value,
+  () => [showPreview.value, innerSrcs.value, props.srcType],
   async () => {
     await loadImageUrls()
   }

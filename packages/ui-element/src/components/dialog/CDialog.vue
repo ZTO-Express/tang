@@ -120,10 +120,10 @@ const dialogFormItems = computed<any>(() => {
 })
 
 const actionItems = computed<any[]>(() => {
+  
   const actions = props.actions || {}
-  const items = Object.keys(actions).map((key) => {
+  const items = Object.keys(actions).map(key => {
     const item = actions[key]
-
     return {
       name: item.name || key,
       ...item
@@ -133,7 +133,6 @@ const actionItems = computed<any[]>(() => {
   if (!items.length) {
     return [{ name: 'close' }, { name: 'submit' }]
   }
-
   return items
 })
 
@@ -258,7 +257,8 @@ function close(options?: any) {
 
 /** 提交表单 */
 async function doSubmit(options?: any) {
-  const payload = tpl.deepFilter(Object.assign({}, options.extData, dataModel.value), context)
+  const extData = tpl.deepFilter(options.extData, context)
+  const payload = Object.assign({}, extData, dataModel.value)
 
   if (props.onSubmit) {
     return await Promise.resolve().then(() => {

@@ -101,14 +101,16 @@ const openUploadOptions = ref<UploadOpenOptions>({})
 const tipAttrs = computed(() => {
   if (props.tip === false) return {}
 
-  let tip = {}
+  let tip = props.tip
   if (typeof tip === 'string') {
     tip = { content: tip }
   } else if (typeof tip === 'object') {
     tip = { ...tip }
+  } else {
+    tip = {}
   }
 
-  tip = { ...props, ...tip }
+  tip = { ...tip, uploadProps: props }
 
   return tip
 })

@@ -1,4 +1,4 @@
-import template from 'lodash/template'
+import template from 'lodash-es/template'
 import { getFilters } from './tpl-builtin'
 
 import type { Enginer } from './tpl'

@@ -1,6 +1,8 @@
 import { register as registerBulitin, getFilters } from './tpl-builtin'
 import { register as registerLodash } from './tpl-lodash'
 
+import type { GenericFunction } from '@zto/zpage-core'
+
 export interface Enginer {
   test: (tpl: string) => boolean
   removeEscapeToken?: (tpl: string) => string
@@ -47,7 +49,7 @@ export function deepFilter(obj?: any, data: object = {}, defaultFilter = '| raw'
   }
 
   // 如果obj命中，则当前为循环引用
-  const hit = cache.find((c) => c.original === obj)
+  const hit = cache.find(c => c.original === obj)
   if (hit) return hit.copy
 
   const copy: any = Array.isArray(obj) ? [] : {}
@@ -55,7 +57,7 @@ export function deepFilter(obj?: any, data: object = {}, defaultFilter = '| raw'
   // 将copy放入缓存以备后续检查循环引用
   cache.push({ original: obj, copy })
 
-  Object.keys(obj).forEach((key) => {
+  Object.keys(obj).forEach(key => {
     copy[key] = deepFilter(obj[key], data, defaultFilter, cache)
   })
 
@@ -129,7 +131,7 @@ export function evalJS(js: string, data: object): any {
   }
 }
 
-;[registerBulitin, registerLodash].forEach((fn) => {
+;[registerBulitin, registerLodash].forEach(fn => {
   const info = fn()
 
   registerTplEnginer(info.name, {

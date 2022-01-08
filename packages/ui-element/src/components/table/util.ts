@@ -26,7 +26,7 @@ export function flattenChildren(columns: TableColumn[]) {
  */
 export function getChildProps(columns: TableColumn[]) {
   const allColumns = flattenChildren(columns)
-  return allColumns.map((c) => c.prop)
+  return allColumns.map(c => c.prop)
 }
 
 /**
@@ -60,11 +60,16 @@ export function getDefaultColFormatterFn(options?: any) {
     options = Object.assign({ prefix: '', postfix: '' }, options)
     if (!cellValue && typeof cellValue !== 'number') return '--'
 
-    const text = tpl.filter(`${options.prefix || ''}${cellValue || ''}${options.postfix || ''}` || '--', {
+    const context = {
       data: row,
       column: col,
       options: options
-    })
+    }
+
+    const prefix = tpl.filter(`${options.prefix || ''}`, context)
+    const postfix = tpl.filter(`${options.postfix || ''}`, context)
+
+    const text = `${prefix}${cellValue || ''}${postfix}` || '--'
 
     return text
   }

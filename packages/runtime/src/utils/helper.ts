@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable indent */
 /* eslint-disable no-prototype-builtins */
-import isPlainObject from 'lodash/isPlainObject'
-import isEqual from 'lodash/isEqual'
-import uniq from 'lodash/uniq'
+import isPlainObject from 'lodash-es/isPlainObject'
+import isEqual from 'lodash-es/isEqual'
+import uniq from 'lodash-es/uniq'
 import qs from 'qs'
 import { simpleCompare } from './sort'
 import { evalExpression } from './tpl'
@@ -53,7 +53,7 @@ export function createObject(
       })
     : Object.create(Object.prototype, properties)
 
-  props && isObject(props) && Object.keys(props).forEach((key) => (obj[key] = props[key]))
+  props && isObject(props) && Object.keys(props).forEach(key => (obj[key] = props[key]))
 
   return obj
 }
@@ -69,7 +69,7 @@ export function cloneObject(target: any, persistOwnProps = true) {
           }
         })
       : Object.create(Object.prototype)
-  persistOwnProps && target && Object.keys(target).forEach((key) => (obj[key] = target[key]))
+  persistOwnProps && target && Object.keys(target).forEach(key => (obj[key] = target[key]))
   return obj
 }
 
@@ -82,18 +82,18 @@ export function cloneObject(target: any, persistOwnProps = true) {
  */
 export function extendObject(target: any, src?: any, persistOwnProps = true) {
   const obj = cloneObject(target, persistOwnProps)
-  src && Object.keys(src).forEach((key) => (obj[key] = src[key]))
+  src && Object.keys(src).forEach(key => (obj[key] = src[key]))
   return obj
 }
 
 /** 遍历并返回处理所有对象下的值 */
 export function mapObject(value: any, fn: GenericFunction): any {
   if (Array.isArray(value)) {
-    return value.map((item) => mapObject(item, fn))
+    return value.map(item => mapObject(item, fn))
   }
   if (isObject(value)) {
     let tmpValue = { ...value }
-    Object.keys(tmpValue).forEach((key) => {
+    Object.keys(tmpValue).forEach(key => {
       ;(tmpValue as Record<string, any>)[key] = mapObject((tmpValue as Record<string, any>)[key], fn)
     })
     return tmpValue
@@ -110,7 +110,7 @@ export function rmUndefined(obj: Record<string, any>) {
   }
 
   const keys = Object.keys(obj)
-  keys.forEach((key) => {
+  keys.forEach(key => {
     if (obj[key] !== undefined) {
       newObj[key] = obj[key]
     }
@@ -241,7 +241,7 @@ export function difference<T extends { [propName: string]: any }, U extends { [p
       const keys: Array<keyof T & keyof U> = uniq(Object.keys(object).concat(Object.keys(base)))
       let result: any = {}
 
-      keys.forEach((key) => {
+      keys.forEach(key => {
         const a: any = object[key as keyof T]
         const b: any = base[key as keyof U]
 
@@ -284,7 +284,7 @@ export function anyChanged(
   to: { [propName: string]: any },
   strictMode = true
 ): boolean {
-  return (typeof attrs === 'string' ? attrs.split(/\s*,\s*/) : attrs).some((key) =>
+  return (typeof attrs === 'string' ? attrs.split(/\s*,\s*/) : attrs).some(key =>
     strictMode ? from[key] !== to[key] : from[key] != to[key]
   )
 }
@@ -321,9 +321,9 @@ export function isArrayChildrenModified(prev: Array<any>, next: Array<any>, stri
  */
 export function injectPropsToObject(target: any, props: any) {
   const sup = Object.create(target.__super || null)
-  Object.keys(props).forEach((key) => (sup[key] = props[key]))
+  Object.keys(props).forEach(key => (sup[key] = props[key]))
   const result = Object.create(sup)
-  Object.keys(target).forEach((key) => (result[key] = target[key]))
+  Object.keys(target).forEach(key => (result[key] = target[key]))
   return result
 }
 
@@ -335,7 +335,7 @@ export function immutableExtends(to: any, from: any, deep = false) {
 
   let ret = to
 
-  Object.keys(from).forEach((key) => {
+  Object.keys(from).forEach(key => {
     const origin = to[key]
     const value = from[key]
 
@@ -356,7 +356,7 @@ export const bulkBindFunctions = function <
     [propName: string]: any
   }
 >(context: T, funNames: Array<FunctionPropertyNames<T>>) {
-  funNames.forEach((key) => (context[key] = context[key].bind(context)))
+  funNames.forEach(key => (context[key] = context[key].bind(context)))
 }
 
 /**
@@ -659,8 +659,8 @@ export function parsePagePath(path: string): { path: string; query?: any; queryS
 
   const pathQueryIndex = path.indexOf('?')
   if (pathQueryIndex >= 0) {
-    qryPath = path.substr(0, pathQueryIndex)
-    qryStr = path.substr(pathQueryIndex + 1)
+    qryPath = path.substring(0, pathQueryIndex)
+    qryStr = path.substring(pathQueryIndex + 1)
 
     if (qryStr) {
       qryData = qs.parse(qryStr)
@@ -848,9 +848,9 @@ export function chainFunctions(...fns: Array<(...args: Array<any>) => void>): (.
 export function chainEvents(props: any, schema: any) {
   const ret: any = {}
 
-  Object.keys(props).forEach((key) => {
+  Object.keys(props).forEach(key => {
     if (
-      key.substr(0, 2) === 'on' &&
+      key.substring(0, 2) === 'on' &&
       typeof props[key] === 'function' &&
       typeof schema[key] === 'function' &&
       schema[key] !== props[key]
@@ -882,7 +882,7 @@ export function isBreakpoint(str: string): boolean {
 
   if ((window as any).matchMedia) {
     return breaks.some(
-      (item) =>
+      item =>
         item === '*' ||
         (item === 'xs' && matchMedia(`screen and (max-width: 767px)`).matches) ||
         (item === 'sm' && matchMedia(`screen and (min-width: 768px) and (max-width: 991px)`).matches) ||
@@ -892,7 +892,7 @@ export function isBreakpoint(str: string): boolean {
   } else {
     const width = window.innerWidth
     return breaks.some(
-      (item) =>
+      item =>
         item === '*' ||
         (item === 'xs' && width < 768) ||
         (item === 'sm' && width >= 768 && width < 992) ||
@@ -921,7 +921,7 @@ export function getLevelFromClassName(value: string, defaultValue = 'default') {
 
 // 只判断一层, 如果层级很深，form-data 也不好表达。
 export function hasFile(object: any): boolean {
-  return Object.keys(object).some((key) => {
+  return Object.keys(object).some(key => {
     let value = object[key]
 
     return value instanceof File || (Array.isArray(value) && value.length && value[0] instanceof File)
@@ -940,13 +940,13 @@ export function object2formData(
   let fileObjects: any = []
   let others: any = {}
 
-  Object.keys(data).forEach((key) => {
+  Object.keys(data).forEach(key => {
     const value = data[key]
 
     if (value instanceof File) {
       fileObjects.push([key, value])
     } else if (Array.isArray(value) && value.length && value[0] instanceof File) {
-      value.forEach((value) => fileObjects.push([`${key}[]`, value]))
+      value.forEach(value => fileObjects.push([`${key}[]`, value]))
     } else {
       others[key] = value
     }
@@ -955,7 +955,7 @@ export function object2formData(
   // 因为 key 的格式太多了，偷个懒，用 qs 来处理吧。
   qsstringify(others, options)
     .split('&')
-    .forEach((item) => {
+    .forEach(item => {
       let parts = item.split('=')
       // form-data/multipart 是不需要 encode 值的。
       parts[0] && fd.append(parts[0], decodeURIComponent(parts[1]))
@@ -971,7 +971,7 @@ export function object2formData(
 export function loadScript(src: string) {
   return new Promise<void>((ok, fail) => {
     const script = document.createElement('script')
-    script.onerror = (reason) => fail(reason)
+    script.onerror = reason => fail(reason)
 
     if (~src.indexOf('{{callback}}')) {
       const callbackFn = `loadscriptcallback_${uuid()}`
@@ -1062,7 +1062,7 @@ export function detectPropValueChanged<
 
 export function pickEventsProps(props: any) {
   const ret: any = {}
-  props && Object.keys(props).forEach((key) => /^on/.test(key) && (ret[key] = props[key]))
+  props && Object.keys(props).forEach(key => /^on/.test(key) && (ret[key] = props[key]))
   return ret
 }
 
@@ -1076,7 +1076,7 @@ export function __uri(id: string) {
 }
 
 export function omitControls(controls: Array<any>, omitItems: Array<string>): Array<any> {
-  return controls.filter((control) => !~omitItems.indexOf(control.name || control._name))
+  return controls.filter(control => !~omitItems.indexOf(control.name || control._name))
 }
 
 export const padArr = (arr: Array<any>, size = 4): Array<Array<any>> => {

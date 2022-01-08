@@ -78,7 +78,7 @@ const isShowTips = computed(() => {
 const tipContent = computed(() => {
   const selectedOptions = getSelectedOptions()
   if (!Array.isArray(selectedOptions)) return ''
-  return selectedOptions.map((option) => option.currentLabel).join(',')
+  return selectedOptions.map(option => option.currentLabel).join(',')
 })
 
 function handleUpdateLabelProps(v: string) {

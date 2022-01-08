@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 
 import type { OpUnitType, QUnitType } from 'dayjs'
+import type { DateValue } from '@zto/zpage-core'
 
 type DateFormatType = 'date' | 'full' | 'normal' | 'simple' | 'normal_simple'
 

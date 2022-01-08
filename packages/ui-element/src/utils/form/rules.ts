@@ -8,7 +8,6 @@ export const outerRules = useConfig('components.form.rules')
 export const innerRules = Object.freeze({
   required: {
     required: true,
-    message: '请输入',
     validator: (rule: any, val: string, cb: GenericFunction) => {
       return verifyRequired(rule, val, cb)
     }
@@ -120,9 +119,12 @@ export const innerRules = Object.freeze({
 export const allRules = { ...innerRules, ...outerRules }
 
 /** 验证必填 */
-export function verifyRequired(rule: any, val: string, cb: GenericFunction) {
+export function verifyRequired(rule: any, val: any, cb: GenericFunction) {
   if (!rule.required) cb()
-  !_.isNil(val) ? cb() : cb(new Error(`${rule.message || '请输入'}`))
+  const isEmpty = _.isNil(val) || val === '' || (Array.isArray(val) && !val.length)
+
+  const message = rule.message || `${(rule.messagePrefix || '请输入') + rule.label || ''}`
+  !isEmpty ? cb() : cb(new Error(message))
 }
 
 /** 判断编码是否是有效的，数字 字符 -_ 组合 */

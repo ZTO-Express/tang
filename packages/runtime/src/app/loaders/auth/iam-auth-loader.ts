@@ -28,23 +28,19 @@ export const IAMAuthLoader: AppAuthLoader = {
     const searchParams = new URL(window.location.href).searchParams
     const code = searchParams.get('code')
 
-    try {
-      // 刷新token
-      if (code) {
-        // 刷新并设置token
-        await refreshToken(code)
-      } else {
-        // 重设token
-        await resetToken()
-      }
+    // 刷新token
+    if (code) {
+      // 刷新并设置token
+      await refreshToken(code)
+    } else {
+      // 重设token
+      await resetToken()
+    }
 
-      if (!getAccessToken()) {
-        await IAMAuthLoader.logout()
-      } else if (code) {
-        reloadUrl()
-      }
-    } catch (ex) {
+    if (!getAccessToken()) {
       await IAMAuthLoader.logout()
+    } else if (code) {
+      reloadUrl()
     }
   },
 
@@ -87,7 +83,7 @@ export const IAMAuthLoader: AppAuthLoader = {
 
 // 解析单项菜单
 function parseMenuItem(menu: IAMMenuItem): NavMenuItem {
-  const children = (menu.children || []).map((it) => {
+  const children = (menu.children || []).map(it => {
     it.parentName = menu.keyName
     return parseMenuItem(it)
   })

@@ -18,7 +18,7 @@ const props = defineProps<{
 const apiRequest = useApiRequest()
 
 // schema
-const wSchema = await useWidgetSchema(props.schema)
+const wSchema = useWidgetSchema(props.schema)
 
 // 加载项
 const loading = ref<any>({})

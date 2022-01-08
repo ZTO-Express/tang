@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isVisible" class="c-action">
+  <div v-if="isVisible" v-perm="$attrs.perms" class="c-action">
     <c-upload v-if="isUpload" v-bind="uploadAttrs" :disabled="isDisabled"></c-upload>
     <el-button v-else v-bind="buttonAttrs" :disabled="isDisabled" @click="handleClick">
       {{ buttonAttrs.label }}
@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, _, useAppRouter, useApiRequest, useAppContext, emitter, tpl } from '@zto/zpage'
+import { vue, _, useAppRouter, useApiRequest, useAppContext, useApi, emitter, tpl } from '@zto/zpage'
 import { useMessage } from '../../composables'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
@@ -55,6 +55,7 @@ const props = withDefaults(
 const attrs = useAttrs()
 const { MessageBox, Message } = useMessage()
 const apiRequest = useApiRequest()
+const fsApi = useApi('fs')
 
 const formDialogRef = ref<any>()
 const dialogRef = ref<any>()
@@ -155,11 +156,14 @@ async function trigger() {
     // 执行表单活动
     formDialogRef.value.show(formModel)
   } else if (isImport.value) {
-    // 执行弹框活动
+    // 打开导入弹框
     importRef.value.show()
   } else if (actionType === 'dialog' || props.dialog) {
     // 执行弹框活动
     dialogRef.value.show()
+  } else if (actionType === 'download' || props.link) {
+    // 执行下载
+    await fsApi.downloadFile(props.link, attrs)
   } else if (actionType === 'link' || props.link) {
     // 执行弹框活动
     await router.goto(props.link)

@@ -2,14 +2,20 @@
   <el-row class="c-form-items" :gutter="$attrs.gutter || 10">
     <!-- 配置item -->
     <template v-for="(item, index) in innerFormItems" :key="'form-item' + index">
-      <el-col v-show="item.isShow" class="form-item__con" :span="item.realSpan">
-        <el-form-item :label-width="item.labelWidth" :prop="item.prop" :rules="item.rules">
+      <el-col v-show="item.isVisible" class="form-item__con" :span="item.realSpan">
+        <el-form-item
+          v-bind="item.itemAttrs"
+          :class="{ 'auto-height': item.autoHeight, 'props-required': item.propsRequired }"
+          :label-width="item.labelWidth"
+          :prop="item.prop"
+          :required="item.isRequired"
+          :rules="item.rules"
+        >
           <template #label>
             <slot v-if="item.showLabelSlot" v-bind="item" :name="item.prop + 'Label'" />
             <span v-else-if="item.label">{{ item.label + ':' }}</span>
             <span v-else></span>
           </template>
-
           <component
             :is="item.componentType"
             v-if="!item.showSlot && item.type !== 'text'"
@@ -44,11 +50,11 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, tpl, useAppContext, useConfig } from '@zto/zpage'
+import { vue, tpl, _, useAppContext, useConfig, isWidgetEventKey } from '@zto/zpage'
 
-import { getFormItemRules } from './util'
+import { getFormItemRules } from '../../utils/form'
 
-import type { FormItemConfig } from './types'
+import type { FormItemConfig } from '../../utils/form'
 
 const { reactive, ref, computed } = vue
 const formItemsConfig = useConfig('components.formItems', {})
@@ -56,7 +62,7 @@ const formItemsConfig = useConfig('components.formItems', {})
 const props = withDefaults(
   defineProps<{
     model: Record<string, any> // 传进来的共享的model表单值对象
-    items?: Array<any> // 列表项文件
+    items?: Array<any> | Function // 列表项文件
     itemWidth?: string // item宽度
     disabled?: boolean // 全部禁用
     clearable?: boolean // 全部可删除
@@ -79,29 +85,67 @@ const context = useAppContext(props.model)
 
 const itemSpan = ref(props.span || formItemsConfig.itemSpan || 12)
 
-const formItems = ref(props.items as FormItemConfig[])
-
 // 所有字段的展开情况
 const itemExpanded = reactive<Record<string, boolean>>({})
 
 // 处理过的formItems
 const innerFormItems = computed<any>(() => {
-  const items = formItems.value.map((item: any) => {
-    const rules = getFormItemRules(item) || []
-    const isShow = isShowItem(item)
-    const realSpan = isShow ? item.span || itemSpan.value : 0
-    const componentType = getFormItemComponentType(item.type)
-    const isDisabled = isDisabledItem(item)
+  let formItems: FormItemConfig[] = []
+
+  if (typeof props.items === 'function') {
+    formItems = props.items(context)
+  } else {
+    formItems = props.items || []
+  }
+
+  const items = formItems.map((item: any) => {
+    let formItem = item
+    if (typeof item === 'function') formItem = item(context)
+    if (typeof formItem.dynamicAttrs === 'function') {
+      const dynamicAttrs = formItem.dynamicAttrs(context)
+      formItem = _.omit(formItem, ['dynamicAttrs'])
+      formItem = _.deepMerge(formItem, dynamicAttrs)
+    }
+
+    const componentType = getFormItemComponentType(formItem.type)
+
+    const isVisible = isVisibleItem(formItem)
+    const realSpan = isVisible ? formItem.span || itemSpan.value : 0
+    const isDisabled = isDisabledItem(formItem)
+    const isRequired = isRequiredItem(formItem)
+
+    const itemRules = typeof formItem.rules === 'function' ? formItem.rules(context) : formItem.rules
+    let rules =
+      getFormItemRules({
+        ...formItem,
+        rules: itemRules,
+        context: {
+          data: props.model
+        }
+      }) || []
+    if (!isRequired) {
+      rules = rules.filter((r: any) => r.ruleName !== 'required')
+    }
+
+    const it: any = {}
+    // 移除微件事件Key，防止重复计算事件
+    Object.keys(formItem).forEach(key => {
+      if (!isWidgetEventKey(key)) it[key] = formItem[key]
+    })
 
     return {
-      ...item,
+      ...it,
       rules,
-      isShow,
       realSpan,
       componentType,
-      isDisabled
+      isDisabled,
+      isVisible,
+      isRequired
     }
   })
+
+  // Warning: 这里可能会影响item的属性模板，暂时先去掉
+  // const result = tpl.deepFilter(items, context)
 
   return items
 })
@@ -141,7 +185,7 @@ function getFormItemComponentType(type: string | any) {
 }
 
 /** 是否展示表单 */
-function isShowItem(item: FormItemConfig) {
+function isVisibleItem(item: FormItemConfig) {
   if (item.hidden === true || item.span === 0 || item.type === 'hidden') return false
   if (item.visibleOn) {
     return tpl.evalExpression(item.visibleOn, context) !== false
@@ -152,9 +196,18 @@ function isShowItem(item: FormItemConfig) {
 
 /** 是否disabled */
 function isDisabledItem(item: FormItemConfig) {
-  if (item.disabled === true) return true
   if (item.disabledOn) {
     return tpl.evalExpression(item.disabledOn, context)
+  }
+
+  return item.disabled === true
+}
+
+/** 是否required */
+function isRequiredItem(item: FormItemConfig) {
+  if (item.required === true) return true
+  if (item.requiredOn) {
+    return tpl.evalExpression(item.requiredOn, context)
   } else {
     return false
   }
@@ -162,7 +215,7 @@ function isDisabledItem(item: FormItemConfig) {
 
 /** 表单展示变化 */
 function toggleExpanded(isExpanded: boolean) {
-  for (let item of formItems.value) {
+  for (let item of innerFormItems.value) {
     if (item.collapse) {
       itemExpanded[item.prop] = isExpanded
       continue
@@ -180,7 +233,7 @@ defineExpose({
 <style lang="scss">
 .c-form-items {
   justify-items: stretch;
-  justify-content: space-between;
+  // justify-content: space-between;
 
   @for $i from 1 to 24 {
     &.col-#{$i} {

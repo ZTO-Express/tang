@@ -1,6 +1,7 @@
-import { defineComponent } from 'vue'
-import { tpl } from '../../../utils'
-import { useAppContext } from '../../composables'
+import { h, defineComponent } from 'vue'
+
+import { _ } from '../../../utils'
+import { CTpl } from '../../components'
 
 export default defineComponent({
   props: {
@@ -8,13 +9,9 @@ export default defineComponent({
   },
 
   setup(props: any) {
-    const context = useAppContext()
-
     return () => {
-      const sTpl = props.schema.tpl
-      if (!sTpl) return ''
-      const text = tpl.filter(sTpl, context)
-      return text
+      const tplProps = _.omit(props.schema, ['type'])
+      return h(CTpl, { ...tplProps })
     }
   }
 })

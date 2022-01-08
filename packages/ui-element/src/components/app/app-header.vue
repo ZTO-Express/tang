@@ -1,7 +1,7 @@
 <template>
   <div class="app-header fw">
     <div class="header-logo" @click="handleLogoClick">
-      <img :src="logo" />
+      <img :src="appLogo" />
       <!-- <div class="title">{{ title }}</div> -->
     </div>
     <div class="header-body">
@@ -18,34 +18,32 @@
         </el-tabs>
       </div>
       <div class="header-extra">
-        <div class="header-links">
-          <el-dropdown class="link-item" size="medium" @command="handleDropdownCommand">
-            <span class="dropdown-link">{{ nickname }}</span>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item class="dropdown-link__item" command="logout"> 退出登录 </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </div>
+        <component v-if="headerExtraComponent" :is="headerExtraComponent" />
+        <app-header-extra v-else />
       </div>
     </div>
+
+    <c-downloads-dialog ref="downloadsDialogRef" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { vue, useConfig, useAppRouter, useAppStore } from '@zto/zpage'
+import { _, vue, useAppConfig, useAppRouter, useAppStore, emitter } from '@zto/zpage'
+
+import { UI_GLOBAL_EVENTS } from '../../consts'
+
+import CDownloadsDialog from '../file/CDownloadsDialog.vue'
+import AppHeaderExtra from './AppHeaderExtra.vue'
 
 const { computed, ref } = vue
 
 const router = useAppRouter()
 const store = useAppStore()
 
-const config = useConfig('app', {})
+const appConfig = useAppConfig('', {})
 
-const logo = config.assets?.logo
-
-const nickname = store.getters.nickname
+const appLogo = appConfig.assets?.logo
+const headerExtraComponent = appConfig.header?.extra?.component
 
 const tabItems = computed(() => {
   return store.getters.submodules.map((it: any) => {
@@ -56,26 +54,23 @@ const tabItems = computed(() => {
   })
 })
 
-// 当前激活按钮
-const activeTabName = ref(store.getters.navMenu.submodule)
+const downloadsDialogRef = ref<any>()
+
+emitter.on(UI_GLOBAL_EVENTS.OPEN_DOWNLOADS, () => {
+  downloadsDialogRef.value.show()
+})
 
 // 单击logo，返回首页
 function handleLogoClick() {
   router.goHome()
 }
 
+// 当前激活按钮
+const activeTabName = ref(store.getters.navMenu.submodule)
+
 // 菜单选中
 function handleTabClick() {
   store.dispatch('app/changeSubmodule', { name: activeTabName.value })
-}
-
-// 下拉菜单命令
-function handleDropdownCommand(command: string) {
-  switch (command) {
-    case 'logout':
-      store.dispatch('user/logout')
-      break
-  }
 }
 </script>
 
@@ -160,25 +155,5 @@ $app-header-inner-height: ($app-header-height - $app-header-padding * 2);
 
 .header-extra {
   padding: 0 20px;
-}
-
-.header-links {
-  line-height: $app-header-height;
-
-  .link-item {
-    display: inline-block;
-    &.plain {
-      cursor: default;
-    }
-
-    .dropdown-link {
-      cursor: pointer;
-      color: white;
-    }
-  }
-
-  .link-item + .link-item {
-    margin-left: 30px;
-  }
 }
 </style>

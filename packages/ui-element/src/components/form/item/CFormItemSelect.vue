@@ -14,8 +14,8 @@
         <el-option
           v-for="(item, index) in getOptionsByLabel(label)"
           :key="'select' + index"
-          :label="item[optionLabel || 'label']"
-          :value="item[optionValue || 'value']"
+          :label="item[optionLabelProp || 'label']"
+          :value="item[optionValueProp || 'value']"
           :disbaled="item.disabled"
         />
       </el-option-group>
@@ -24,8 +24,8 @@
       <el-option
         v-for="(item, index) in selectOptions"
         :key="'select' + index"
-        :label="item[optionLabel || 'label']"
-        :value="item[optionValue || 'value']"
+        :label="item[optionLabelProp || 'label']"
+        :value="item[optionValueProp || 'value']"
         :disbaled="item.disabled"
       />
     </template>
@@ -39,9 +39,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
+import { tpl, vue } from '@zto/zpage'
 
 import type { GenericFunction } from '@zto/zpage'
+import { useAppContext } from '@zto/zpage-runtime'
 
 const { computed, ref, watch } = vue
 
@@ -51,9 +52,9 @@ const props = withDefaults(
     prop: string
     disabled?: boolean
     groupName?: string
-    options?: Array<any>
-    optionLabel?: string
-    optionValue?: string
+    options?: Array<any> | GenericFunction | string
+    optionLabelProp?: string
+    optionValueProp?: string
     collapseTags?: boolean
     filterable?: boolean
     onChange?: GenericFunction
@@ -65,10 +66,22 @@ const props = withDefaults(
   }
 )
 
+const context = useAppContext(props.model)
+
 const groupLabels = ref<any[]>([])
 
 const selectGroupName = computed(() => props.groupName)
-const selectOptions = computed<any[]>(() => props.options || [])
+
+const selectOptions = computed(() => {
+  let options = props.options || []
+  if (typeof props.options === 'function') {
+    options = props.options(context)
+  } else if (typeof props.options === 'string') {
+    options = tpl.evalJS(props.options, context) || []
+  }
+
+  return (options || []) as any[]
+})
 
 watch(
   () => selectOptions.value,

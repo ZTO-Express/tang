@@ -19,7 +19,7 @@ export function pad(v: string, length = 2, char = '0'): string {
  */
 export function truncate(v: string, length: number, postfix = '...'): string {
   const val = String(v)
-  return val.length < length ? val : val.substr(0, length) + postfix
+  return val.length < length ? val : val.substring(0, length) + postfix
 }
 
 /**
@@ -101,7 +101,7 @@ export function startsWith(str: string, exprStr: string): boolean {
     return false
   }
 
-  return str.substr(0, exprStr.length) === exprStr
+  return str.substring(0, exprStr.length) === exprStr
 }
 
 /**

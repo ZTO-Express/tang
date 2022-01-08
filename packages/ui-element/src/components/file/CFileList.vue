@@ -47,14 +47,9 @@
 import { vue, fileUtil } from '@zto/zpage'
 
 import type { GenericFunction } from '@zto/zpage'
+import type { UploadFileItem } from './types'
 
 const { ref, watch, reactive, computed } = vue
-
-interface FileListItem {
-  name: string
-  path: string
-  url?: string
-}
 
 const props = withDefaults(
   defineProps<{
@@ -66,9 +61,10 @@ const props = withDefaults(
     withoutPostfix?: boolean
     maxItemWidth?: string
     srcType?: string // 'path' | 'url'
-    listType?: string // image/file
+    listType?: string // 'image' | 'file'
     imageOptions?: Record<string, any> // 图片选项
     downloadMethod?: GenericFunction
+    remoteDelete?: boolean // 远程删除
     immediateDelete?: boolean // 删除操作时，直接删除指定项
     params?: string // 额外的参数
   }>(),
@@ -76,6 +72,7 @@ const props = withDefaults(
     srcType: 'path',
     showNoData: false,
     maxItemWidth: '200px',
+    remoteDelete: true,
     immediateDelete: false,
     listType: 'file'
   }
@@ -84,7 +81,7 @@ const props = withDefaults(
 const emit = defineEmits(['update:modelValue', 'delete', 'deleted'])
 
 const listState = reactive<{
-  items: FileListItem[]
+  items: UploadFileItem[]
 }>({
   items: []
 })
@@ -110,20 +107,20 @@ watch(
   }
 )
 
-function handleDelete(index: number) {
-  let item = listState.items[index]
+async function handleDelete(index: number) {
+  const item = listState.items[index]
 
   if (item) {
-    if (props.immediateDelete) deleteItem(item)
+    if (props.immediateDelete) await deleteItem(item)
     emit('delete', item, index, props.params)
   }
 }
 
-function handleLink(it: FileListItem) {
+function handleLink(it: UploadFileItem) {
   innerDownloadMethod(it)
 }
 
-async function innerDownloadMethod(it: FileListItem) {
+async function innerDownloadMethod(it: UploadFileItem) {
   const options = {
     filename: it.name,
     withoutPostfix: props.withoutPostfix
@@ -133,7 +130,7 @@ async function innerDownloadMethod(it: FileListItem) {
     props.downloadMethod(it, options)
   } else {
     let url = it.url
-    if (props.srcType === 'path') {
+    if (props.srcType === 'path' && it.path) {
       url = await fileUtil.getUrlByPath(it.path)
     }
 
@@ -143,7 +140,7 @@ async function innerDownloadMethod(it: FileListItem) {
   }
 }
 
-function deleteItem(item: FileListItem | number) {
+async function deleteItem(item: UploadFileItem | number) {
   let index: any = undefined
 
   if (typeof item === 'number') {
@@ -154,6 +151,10 @@ function deleteItem(item: FileListItem | number) {
   }
 
   if (item && index >= 0) {
+    if (props.remoteDelete && item.path) {
+      await fileUtil.deleteFile(item.path)
+    }
+
     listState.items.splice(index, 1)
     emit('deleted', item)
     emit('update:modelValue', listState.items)
@@ -167,25 +168,20 @@ function resetFileItems(items: any[] | undefined) {
   }
 
   listState.items = items
-    .filter((it) => !!it)
+    .filter(it => !!it)
     .map((it: any) => {
-      const id = it.id
       const url = it.url
 
       let name = it.name
       let path = it.path
-      if (!name && it.url) {
-        const { fname, fullpath } = fileUtil.parseFileName(it.url)
+
+      if (!name) {
+        let fileName = props.srcType === 'url' ? it.url : it.path
+        const { fname } = fileUtil.parseFileName(fileName)
         name = fname
-        path = fullpath
       }
 
-      return {
-        id,
-        name,
-        path,
-        url
-      }
+      return { name, path, url }
     })
 }
 </script>

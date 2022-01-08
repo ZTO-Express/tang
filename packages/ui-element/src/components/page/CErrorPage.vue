@@ -1,42 +1,94 @@
 <template>
   <div class="c-error-page">
-    <div v-if="bgPic" class="c-error-page__bg">
-      <img :src="bgPic" alt="错误背景图" />
+    <div v-if="background" class="c-error-page__bg">
+      <img :src="background" alt="错误背景图" />
     </div>
     <div class="c-error-page__body">
-      <img :src="errorPic || defaultErrorPic" alt="错误图" />
+      <img :src="picture || defaultErrorPic" alt="错误图" />
     </div>
     <div class="c-error-page__footer">
-      <div class="c-error-page__title">{{ errorTitle }}</div>
-      <div class="c-error-page__tip">{{ errorMsg }}</div>
-      <div v-if="linkMsg" class="c-error-page__action">
-        <el-button type="primary" size="medium" @click="handleLink">{{ linkMsg }}</el-button>
+      <div class="c-error-page__title">{{ errorInfo.description }}</div>
+      <div class="c-error-page__tip">{{ errorInfo.message }}</div>
+      <div class="c-error-page__action">
+        <el-button v-if="linkLabel" type="primary" size="small" @click="handleLink">{{ linkLabel }}</el-button>
+        <el-button v-if="isLogged" size="small" @click="handleLogout">{{ logoutLabel }}</el-button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useAppRouter } from '@zto/zpage'
+import { vue, useAppRouter, useAuthLoader, useAppStore } from '@zto/zpage'
 
-const props = defineProps<{
-  bgPic?: string
-  errorPic?: string
-  errorTitle?: string
-  errorMsg?: string
-  link?: string
-  linkMsg?: string
-}>()
+const { computed } = vue
 
-const emit = defineEmits(['link'])
+const props = withDefaults(
+  defineProps<{
+    description?: string
+    message?: string
+    picture?: string
+    background?: string
+    link?: string
+    linkLabel?: string
+    logoutLabel?: string
+  }>(),
+  {
+    link: 'home',
+    linkLabel: '返回首页',
+    logoutLabel: '重新登录'
+  }
+)
+
+const DefaultErrorInfos: Record<string, any> = {
+  '403': {
+    description: '权限不足',
+    message: '您可能没有权限访问当前系统，如有疑问请联系管理员'
+  },
+  '500': {
+    description: '抱歉，您要访问的页面正在维护中',
+    message: '有可能我们的网页正在维护，如有疑问请联系管理员'
+  },
+  '404': {
+    description: '抱歉，您要访问的页面不存在',
+    message: '有可能我们的网页正在维护或者您输入的网址不正确'
+  }
+}
+
+const emit = defineEmits(['link', 'logout'])
 
 const defaultErrorPic = 'https://fscdn.zto.com/fs21/M01/F6/77/CgRRhGGLgYWAXrUCAAA4nWZTAXY302.png'
 
 const router = useAppRouter()
+const store = useAppStore()
+
+const isLogged = computed(() => {
+  return store.getters.isLogged
+})
+
+const errorInfo = computed(() => {
+  const currentRoute = router.currentRoute.value
+
+  const defErrInfo = DefaultErrorInfos[currentRoute.name as string] || DefaultErrorInfos['500']
+  const errParams = currentRoute.params
+
+  return {
+    description: props.description || errParams?.description || defErrInfo.description,
+    message: props.message || errParams?.message || defErrInfo.message
+  }
+})
 
 function handleLink() {
-  if (props.link) router.goto(props.link)
+  if (props.link === 'home') router.goHome()
+  else if (props.link) router.goto(props.link)
+
   emit('link')
+}
+
+function handleLogout() {
+  const authLoader = useAuthLoader()
+
+  if (authLoader) authLoader.logout()
+  else emit('logout')
 }
 </script>
 

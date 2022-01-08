@@ -1,29 +1,27 @@
 import { isString, isObject } from '../utils/lodash'
 
 export class ZPageError extends Error {
-  constructor(private readonly body: string | Record<string, any>, private readonly code: string) {
+  constructor(readonly body: any, readonly description: string, readonly code: string) {
     super()
 
     this.name = 'ZPageError'
-    this.initMessage()
+    this._initMessage()
   }
 
-  initMessage() {
-    if (isString(this.body)) {
-      this.message = this.body
-    } else if (isObject(this.body) && isString((this.body as Record<string, any>).message)) {
-      this.message = (this.body as Record<string, any>).message
-    } else if (this.constructor) {
-      this.message = (this.constructor.name.match(/[A-Z][a-z]+|[0-9]+/g) || []).join(' ')
-    }
+  private _initMessage() {
+    this.message = this.getBodyText()
   }
 
-  getCode(): string {
-    return this.code
-  }
+  getBodyText() {
+    const errorBody = this.body
 
-  getBody(): string | object {
-    return this.body
+    const defaultText = '未知错误'
+
+    if (!errorBody) return defaultText
+
+    if (isString(errorBody)) return errorBody
+
+    return errorBody?.message || errorBody?.text || errorBody?.description || defaultText
   }
 
   static createBody(objectOrError: object | string, message?: string, code?: string) {
@@ -32,6 +30,6 @@ export class ZPageError extends Error {
     }
     return isObject(objectOrError) && !Array.isArray(objectOrError)
       ? objectOrError
-      : { code, message: objectOrError, error: message }
+      : { code, message, error: objectOrError }
   }
 }

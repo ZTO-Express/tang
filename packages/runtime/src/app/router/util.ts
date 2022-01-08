@@ -17,8 +17,7 @@ const __cachedNodes: Record<string, VNode> = {}
 
 /** 根据根据应用导航菜单配置构建路由 */
 export function createAppRoutes(router: Router, submodules: Submodule[]) {
-  // 外部配置菜单
-  const exMenus: NavMenuItemConfig[] = useConfig('menus', [])
+  const exMenus = useConfig('menus', [])
 
   // 规范化外部配置菜单
   _normalizeMenus(exMenus)
@@ -31,21 +30,32 @@ export function createAppRoutes(router: Router, submodules: Submodule[]) {
   // 合并外部配置路由到默认路由
   _mergeMenus(defMenus, exMenus)
 
+  // 外部配置菜单
+  const appendedMenus: NavMenuItemConfig[] = defMenus.filter((it: any) => {
+    // 需要根据是否权限配置确定是否显示
+    if (it.isAuth && it.name) {
+      const authMenu = _findMenuByName(submodules, it.name, true)
+      return !!authMenu
+    }
+
+    return true
+  })
+
   // 合并外部配置路由及默认路由到子模块
-  _mergeMenus(submodules, defMenus)
+  _mergeMenus(submodules, appendedMenus)
 
   // 创建路由之前，先对子模块及其下菜单进行排序
   _sortMenus(submodules)
 
   // 获取所有子模块菜单的name
   const allMenus = flattenTree(submodules)
-  const allMenuNames = allMenus.map((it) => it.name)
+  const allMenuNames = allMenus.map(it => it.name)
 
   // 检查是否存在重复的key
   const repeatedNames = findRepeats(allMenuNames)
   if (repeatedNames.length) throw new Error(`存在重复的菜单名"${repeatedNames.join()}"`)
 
-  submodules.forEach((it) => {
+  submodules.forEach(it => {
     _createSubRoute(router, it, it)
   })
 }
@@ -145,7 +155,7 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
 
     if (menu.path.startsWith(ROOT_MENU_PREFIX)) {
       // 以ROOT_MENU_PREFIX前缀开头，直接添加路由
-      menu.path = menu.path.substr(ROOT_MENU_PREFIX.length)
+      menu.path = menu.path.substring(ROOT_MENU_PREFIX.length)
       routeMeta.isRoot = true
       routeMeta.path = menu.path
 
@@ -159,7 +169,7 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
   }
 
   if (menu.children?.length) {
-    menu.children.forEach((it) => {
+    menu.children.forEach(it => {
       _createSubRoute(router, it, submodule)
     })
   }
@@ -169,8 +179,8 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
 function _parseMenuPath(path: string) {
   const result: any = { path }
   if (path.indexOf('?') > 0) {
-    const pathStr = path.substr(0, path.indexOf('?'))
-    const queryStr = path.substr(pathStr.length + 1)
+    const pathStr = path.substring(0, path.indexOf('?'))
+    const queryStr = path.substring(pathStr.length + 1)
 
     result.path = pathStr
     result.query = qs.parse(queryStr)
@@ -199,7 +209,7 @@ function _normalizeMenus(exMenus: NavMenuItemConfig[]) {
 
     // 设置子菜单的parentName
     if (it.children?.length) {
-      it.children.forEach((_it) => {
+      it.children.forEach(_it => {
         _it.parentName = it.name
 
         if (it.meta?.isSingle) {
@@ -231,7 +241,7 @@ function _tmpMenuName() {
  * 6. 合并时，所有菜单的子菜单合并到父级菜单，若子菜单key与其他菜单有冲突，则报错
  */
 function _mergeMenus(menus: NavMenuItemConfig[], exMenus: NavMenuItemConfig[]) {
-  exMenus.forEach((it) => {
+  exMenus.forEach(it => {
     _mergeMenu(menus, it)
   })
 }
@@ -242,7 +252,7 @@ function _mergeMenu(menus: NavMenuItemConfig[], exMenu: NavMenuItemConfig) {
   if (!exMenu?.name) return
 
   // 查找指定的菜单
-  const menuIndex = menus.findIndex((it) => it.name === exMenu.name)
+  const menuIndex = menus.findIndex(it => it.name === exMenu.name)
 
   // 没有找到指定的菜单，则查找相关
   if (menuIndex < 0) {
@@ -287,7 +297,7 @@ function _sortMenus(menus: NavMenuItem[]) {
     else return 0
   })
 
-  menus.forEach((menu) => {
+  menus.forEach(menu => {
     menu.children?.length && _sortMenus(menu.children as NavMenuItem[])
   })
 
@@ -304,7 +314,7 @@ function _sortMenus(menus: NavMenuItem[]) {
 function _findMenuByName(menus: NavMenuItemConfig[], name: string, recursive = false): NavMenuItemConfig | undefined {
   if (!name || !menus?.length) return undefined
 
-  let menu = menus.find((it) => it.name === name)
+  let menu = menus.find(it => it.name === name)
   if (menu) return menu
 
   if (recursive) {

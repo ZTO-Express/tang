@@ -177,6 +177,7 @@ function handleUploadCompleted(item: UploadData, res: any) {
 
     //如果用随机 可能result返回的那个会有多个不能去重复没有处理
     if (item.file) result.fname = item.file.name
+
     // 用于upload组件接收
     emit('completed', result, item, uploadState.items, uploadProps.params)
 
