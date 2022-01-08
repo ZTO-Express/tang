@@ -76,6 +76,9 @@ export async function startApp(options: AppOptions) {
     __appError = new AppLoadError(ex)
   }
 
+  // 显示应用错误
+  if (__appError) warn('应用启动错误', __appError)
+
   // 载入应用页面
   if (opts.el) await mountApp(opts.el)
 

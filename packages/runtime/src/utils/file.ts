@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useApi } from '@zto/zpage'
+import { useApi } from '../config'
 import { filesize } from './filesize'
 
 interface FileNameParseResult {
