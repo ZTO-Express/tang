@@ -20,6 +20,9 @@ $app-header-height: 48px;
 $app-nav-height: 36px;
 $app-page-height: calc(100vh - $app-header-height);
 
+$select-shadow: 0 0 3px lighten($primary, 5%);
+$selected-shadow: 0 0 5px $primary;
+
 @mixin content-header() {
   padding: 10px 12px;
 }
@@ -28,5 +31,8 @@ $app-page-height: calc(100vh - $app-header-height);
   box-shadow: 0 0 3px $borderColor;
 }
 
-$select-shadow: 0 0 3px lighten($primary, 5%);
-$selected-shadow: 0 0 5px $primary;
+@mixin text-ellipsis() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

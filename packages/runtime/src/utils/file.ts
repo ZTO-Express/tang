@@ -129,15 +129,15 @@ export function getFileMimeType(filename: string) {
   return filetype
 }
 
-export async function getUrlsByPaths(names: string[]) {
+export async function getFileUrls(names: string[]) {
   const fsApi = useApi('fs')
-  const urls = await fsApi.getUrlsByPaths(names)
+  const urls = await fsApi.getFileUrls(names)
   return urls
 }
 
 // 根据文件路径获取Url
 export async function getUrlByPath(name: string) {
-  const urls = await getUrlsByPaths([name])
+  const urls = await getFileUrls([name])
   return urls[0]
 }
 

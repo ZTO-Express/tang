@@ -7,7 +7,7 @@
     :filterable="filterable"
     :collapseTags="collapseTags"
     :disabled="disabled"
-    @change=";(onChange && onChange(model)) || ''"
+    @change="handleChange"
   >
     <template v-if="groupLabels?.length">
       <el-option-group v-for="label in groupLabels" :key="label" :label="label">
@@ -50,6 +50,7 @@ const props = withDefaults(
   defineProps<{
     model: Record<string, any>
     prop: string
+    labelProp?: string // TODO: 返回label时使用，暂不支持
     disabled?: boolean
     groupName?: string
     options?: Array<any> | GenericFunction | string
@@ -58,11 +59,13 @@ const props = withDefaults(
     collapseTags?: boolean
     filterable?: boolean
     onChange?: GenericFunction
+    noWriteback?: boolean
   }>(),
   {
     collapseTags: true,
     filterable: false,
-    disabled: false
+    disabled: false,
+    noWriteback: false
   }
 )
 
@@ -116,5 +119,10 @@ function getOptionsByLabel(groupLabel: string) {
 
   const options: any[] = selectOptions.value.filter((it: any) => it[groupNameVal] === groupLabel)
   return options
+}
+
+function handleChange(payload: any) {
+  if (!props.onChange) return
+  props.onChange(props.model, payload)
 }
 </script>

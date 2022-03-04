@@ -20,7 +20,10 @@ export class App implements Installable {
 
   private constructor(options: AppInstanceOptions) {
     this._options = options
-    this._el = options.el && queryEl(options.el)
+
+    if (options.el) {
+      this._el = queryEl(options.el)
+    }
 
     this._renderer = new AppRenderer({})
   }
@@ -62,7 +65,7 @@ export class App implements Installable {
   }
 
   get vueApp() {
-    return this._vueApp
+    return this._vueApp as VueApp
   }
 
   /** 应用vue插件 */
@@ -122,17 +125,17 @@ export class App implements Installable {
     }
 
     this.vueApp.unmount()
-    this._vueApp = null
+    this._vueApp = undefined
   }
 
   // 渲染页面
   async render(options: AppRenderPageOptions) {
-    return App.instance._renderer.render(options)
+    return App.instance!._renderer.render(options)
   }
 
   /** 应用zpage 插件 */
   async apply(plugins: Plugin | Plugin[], ...options: any[]) {
-    const existsNames = this.plugins.map((p) => p.name)
+    const existsNames = this.plugins.map(p => p.name)
 
     let pItems: Plugin[] = []
 
@@ -175,7 +178,7 @@ export class App implements Installable {
       wItems = [widgets]
     }
 
-    const existsWNames = this.widgets.map((w) => w.name)
+    const existsWNames = this.widgets.map(w => w.name)
 
     for (const w of wItems) {
       if (w.name) {

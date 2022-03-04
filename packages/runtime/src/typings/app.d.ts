@@ -146,7 +146,7 @@ export interface AppUserApi {
  */
 export interface AppFsApi {
   // 根据文件名称获取文件地址
-  getUrlsByPaths?: PromiseFunction
+  getFileUrls?: PromiseFunction
 
   // 获取上传token
   getUploadToken?: PromiseFunction

@@ -72,7 +72,7 @@ const props = withDefaults(
   }
 )
 
-const emit = defineEmits(['update:modelValue', 'update:name', 'change', 'compeleted', 'deleted'])
+const emit = defineEmits(['update:modelValue', 'update:name', 'change', 'completed', 'deleted'])
 
 const uploadConfig = useConfig('components.file.upload', {})
 
@@ -91,8 +91,8 @@ const isDisabled = computed(() => {
 })
 
 const innerRemoteDelete = computed(() => {
-  if (_.isBoolean(props.remotedDelete)) return props.remotedDelete
-  if (_.isBoolean(uploadConfig.remotedDelete)) return uploadConfig.remotedDelete
+  if (_.isBoolean(props.remoteDelete)) return props.remoteDelete
+  if (_.isBoolean(uploadConfig.remoteDelete)) return uploadConfig.remoteDelete
 
   return true
 })
@@ -141,10 +141,10 @@ async function handleUploadCompleted(e: any) {
   fileList.push(targetFile)
 
   if (props.onCompleted) {
-    await Promise.resolve().then(() => props.onCompleted(targetFile))
+    await Promise.resolve().then(() => props.onCompleted!(targetFile))
   }
 
-  emit('compeleted', targetFile)
+  emit('completed', targetFile)
 
   uploadState.fileList = [...fileList]
 }
@@ -156,7 +156,7 @@ async function handleFileDelete(item: any, index: number) {
   }
 
   if (props.onDelete) {
-    await Promise.resolve().then(() => props.onDelete(item, index))
+    await Promise.resolve().then(() => props.onDelete!(item, index))
   }
 
   const fileList = uploadState.fileList || []

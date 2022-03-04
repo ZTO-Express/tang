@@ -2,6 +2,7 @@ import qs from 'qs'
 import { _, noop } from '@zto/zpage-core'
 import { getPageKey, uniqId, guid, uuid } from './helper'
 import { warn } from './debug'
+import * as formatter from './formatter'
 
 export { _, noop, getPageKey, warn, qs, uniqId, guid, uuid }
 
@@ -9,4 +10,13 @@ export { _, noop, getPageKey, warn, qs, uniqId, guid, uuid }
 export function filterEmpty(val: any, replaceText = '--') {
   if (!val && val !== 0) return replaceText
   return val
+}
+
+/** 通过内置格式化方法进行格式化 */
+export function formatText(val: any, name: string, options?: any) {
+  const f = (formatter as any)[name]
+
+  let valText = String(val)
+  if (typeof f === 'function') valText = f(val, options)
+  return valText
 }

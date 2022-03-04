@@ -25,10 +25,10 @@
         <el-option
           v-for="(item, i) in getOptionsByLabel(label)"
           :key="getValueByPath(item, modelValueKey)"
+          v-bind="item"
           :label="getOptionLabel(item)"
           :value="getOptionValue(item)"
           :style="optionStyle"
-          v-bind="item"
         >
           <slot name="option" :data="item" :label="getOptionLabel(item)" :value="getOptionValue(item)" :$index="i">
             <div v-if="htmlTpl">
@@ -43,10 +43,10 @@
       <el-option
         v-for="(item, i) in fuzzyOptions"
         :key="getValueByPath(item, modelValueKey)"
+        v-bind="item"
         :label="getOptionLabel(item)"
         :value="getOptionValue(item)"
         :style="optionStyle"
-        v-bind="item"
       >
         <slot name="option" :data="item" :label="getOptionLabel(item)" :value="getOptionValue(item)" :$index="i">
           <div v-if="htmlTpl">
@@ -79,6 +79,7 @@ const props = withDefaults(
     optionStyle?: any
 
     modelValueKey?: string
+    keywordProp?: string
     groupProp?: string
     labelProp?: string
     valueProp?: string
@@ -95,6 +96,8 @@ const props = withDefaults(
     remoteMethod?: GenericFunction
     preventRemote?: boolean // 阻止远程请求
 
+    dataOptionsProp?: string
+
     localFilter?: boolean // 是否本地过滤
     localFilterMethod?: GenericFunction // 是否本地过滤方法
   }>(),
@@ -104,6 +107,7 @@ const props = withDefaults(
     multiple: false,
     filterable: true,
     modelValueKey: '',
+    keywordProp: 'keyword',
     returnLabel: false,
     triggerFocus: false,
     collapseTags: true,
@@ -306,7 +310,7 @@ async function execRemoteMethod(query?: string) {
 
     methodResponse = await apiRequest({
       action: queryAction,
-      params: { keyword: query as string, ...params },
+      params: { [props.keywordProp]: query as string, ...params },
       pageIndex: 1,
       pageSize
     }).finally(() => (loading.value = false))
@@ -314,6 +318,8 @@ async function execRemoteMethod(query?: string) {
 
   if (!methodResponse) {
     remoteFuzzyOptions.value = []
+  } else if (props.dataOptionsProp) {
+    remoteFuzzyOptions.value = (methodResponse as any)[props.dataOptionsProp]
   } else if (Array.isArray(methodResponse)) {
     remoteFuzzyOptions.value = methodResponse
   } else if (Array.isArray(methodResponse.list || methodResponse.data)) {
@@ -331,12 +337,13 @@ async function execRemoteMethod(query?: string) {
 function _findLabels(value: string | Array<any>): string | string[] {
   const cachedOptions = fuzzyOptions.value
 
+  const valProp = innerValueProp.value
+  const lblProp = innerLabelProp.value
+
   if (Array.isArray(value) && props.multiple) {
     if (!value.length) return []
 
     const valueByKey: Map<string, any> = new Map()
-    const valProp = innerValueProp.value
-    const lblProp = innerLabelProp.value
 
     for (const option of cachedOptions) {
       valueByKey.set(option[valProp], option[lblProp])
@@ -350,9 +357,9 @@ function _findLabels(value: string | Array<any>): string | string[] {
   }
 
   const item = cachedOptions.find(option => {
-    return option.value === value
+    return option[valProp] === value
   })
-  return item ? item.label : ''
+  return item ? item[lblProp] : ''
 }
 
 /** 如果分组，计算分组信息 */

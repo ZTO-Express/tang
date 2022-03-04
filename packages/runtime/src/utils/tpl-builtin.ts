@@ -7,6 +7,7 @@ import transform from 'lodash-es/transform'
 
 import { createObject, isObject, setVariable, qsstringify, keyToPath, string2regExp, deleteVariable } from './helper'
 import type { Enginer } from './tpl'
+import { formatText } from './util'
 
 const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
@@ -365,7 +366,8 @@ export const filters: {
   notEquals(input, equalsValue, trueValue, falseValue) {
     equalsValue = /^\d+$/.test(equalsValue) ? parseInt(equalsValue, 10) : getStrOrVariable(equalsValue, this as any)
     return getConditionValue(input, input !== equalsValue, trueValue, falseValue, this)
-  }
+  },
+  formatText: (input, name) => formatText(input, name)
 }
 
 /**

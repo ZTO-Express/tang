@@ -1,6 +1,6 @@
 import { useRoute, createRouter, createWebHashHistory } from 'vue-router'
-import { ROOT_ROUTE_NAME } from '../../consts'
-import { getPageKey, tpl, _ } from '../../utils'
+import { ROOT_ROUTE_NAME, RUNTIME_GLOBAL_EVENTS } from '../../consts'
+import { emitter, getPageKey, tpl, _ } from '../../utils'
 import { useConfig } from '../../config'
 import { useAppStore } from '../store'
 import { useAppContext } from '../composables'
@@ -75,10 +75,16 @@ export function createAppRouter(config?: AppRouterConfig) {
       if (!keeyAlive) {
         if (!refererKey) {
           // 没有引用页面则直接清空
-          await store.dispatch('pages/pruneVisited', 'ALL')
+          await store.dispatch('pages/pruneVisited', {
+            submodule: 'ALL',
+            redirect: false
+          })
         } else if (currentRoute.value?.meta) {
           // 将当前页加入缓存页
-          await store.dispatch('pages/addVisited', currentRoute.value)
+          await store.dispatch('pages/addVisited', {
+            route: currentRoute.value,
+            redirect: false
+          })
         }
       }
 
@@ -118,6 +124,23 @@ export function createAppRouter(config?: AppRouterConfig) {
       }
 
       return router.go(-1)
+    }
+  }
+
+  if (!router.close) {
+    router.close = async (pageKey?: string) => {
+      const showNav = useConfig('app.menu.showNav')
+
+      if (!showNav) {
+        router?.goBack()
+      } else {
+        const route = router!.currentRoute.value
+        pageKey = (pageKey || route?.meta?.pageKey) as string
+
+        if (!pageKey) return
+
+        store.dispatch('pages/removeVisited', { key: pageKey })
+      }
     }
   }
 
@@ -169,11 +192,16 @@ export function createAppRouter(config?: AppRouterConfig) {
       if (!router) return
 
       if (!from.name) {
+        if (to.name === '404') {
+          next({ name: ROOT_ROUTE_NAME, replace: true })
+          return
+        }
+
         if (to.meta?.isTemp) {
           if (to.meta?.parentName) {
             next({ name: to.meta.parentName as string, replace: true })
           } else {
-            await router.goHome()
+            next({ name: ROOT_ROUTE_NAME, replace: true })
           }
           return
         } else if (!to.meta?.redirectQuery) {

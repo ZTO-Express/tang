@@ -1,4 +1,4 @@
-@import './variables.scss';
+@import './theme.scss';
 
 html,
 body {
@@ -94,9 +94,7 @@ hr.separator {
   font-style: italic;
 }
 .text-ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @include text-ellipsis();
 }
 
 .bg-white {
@@ -212,4 +210,11 @@ hr.separator {
     opacity: 0.8;
     padding-bottom: 1rem;
   }
+}
+
+.form-title {
+  margin: 0;
+  padding: 2rem 1.2rem 1.2rem;
+  color: rgba(69, 90, 100, 0.6);
+  line-height: 1.2rem;
 }

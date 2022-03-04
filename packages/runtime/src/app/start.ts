@@ -72,6 +72,9 @@ export async function startApp(options: AppOptions) {
     // 执行app加载
     const onLoad = config.app?.onLoad
     if (onLoad) await Promise.resolve().then(() => onLoad(runtimeApp, opts))
+
+    // 设置应用加载成功
+    store.commit('app/setAppLoaded')
   } catch (ex) {
     __appError = new AppLoadError(ex)
   }

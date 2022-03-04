@@ -1,4 +1,5 @@
-import { tpl } from '@zto/zpage'
+import { _, tpl, formatText } from '@zto/zpage'
+
 import type { TableColumn } from './types'
 
 /** 扁平化所有子列
@@ -35,9 +36,7 @@ export function getChildProps(columns: TableColumn[]) {
  */
 export function getColFormatter(column: TableColumn) {
   let formatter: any = column.formatter || {}
-  if (typeof formatter === 'function') {
-    return formatter
-  }
+  if (typeof formatter === 'function') return formatter
 
   // @ts-ignore 这里formatter可能为对象
   const formatterType = formatter.type || 'default'
@@ -57,20 +56,37 @@ export function getColFormatter(column: TableColumn) {
 /** 默认表格行格式化函数 */
 export function getDefaultColFormatterFn(options?: any) {
   return (row: any, col: any, cellValue: any) => {
-    options = Object.assign({ prefix: '', postfix: '' }, options)
-    if (!cellValue && typeof cellValue !== 'number') return '--'
-
     const context = {
       data: row,
       column: col,
-      options: options
+      options
     }
 
-    const prefix = tpl.filter(`${options.prefix || ''}`, context)
-    const postfix = tpl.filter(`${options.postfix || ''}`, context)
-
-    const text = `${prefix}${cellValue || ''}${postfix}` || '--'
+    const text = formatValue(cellValue, options, context)
 
     return text
   }
+}
+
+/** 格式化值 */
+export function formatValue(val: any, options?: any, context?: any) {
+  if (typeof options === 'string') options = { name: options }
+
+  options = { prefix: '', postfix: '', ...options }
+
+  if (_.isEmpty(val)) return options.emptyText || '--'
+
+  let valText = String(val)
+
+  if (options.name) {
+    valText = formatText(val, options.name, options)
+  }
+
+  const prefix = options.prefix || ''
+  const postfix = options.postfix || ''
+
+  let text = `${prefix}${valText}${postfix}` || '--'
+  if (context) text = tpl.filter(text, context)
+
+  return text
 }

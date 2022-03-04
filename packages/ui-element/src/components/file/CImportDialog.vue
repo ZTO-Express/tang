@@ -59,6 +59,7 @@ const props = withDefaults(
     filterEmpty?: boolean
     successMessage?: string
     closeAfterSuccess?: boolean
+    dataValidate?: boolean | Function
     parseMethod?: GenericFunction
     importMethod?: GenericFunction
     transformMethod?: GenericFunction
@@ -69,7 +70,8 @@ const props = withDefaults(
     dataProp: 'data',
     maxCount: 3000,
     maxFileSize: 10,
-    filterEmpty: true
+    filterEmpty: true,
+    dataValidate: true
   }
 )
 
@@ -145,29 +147,29 @@ async function handleDialogSubmit() {
 
   try {
     loading.value = true
-
     let data = await innerParseMethod(file, {
       filterEmpty: props.filterEmpty
     })
 
-    if (!data?.length) {
-      throw new Error('没有需要上传的数据。')
-    }
+    if (props.dataValidate !== false) {
+      if (typeof props.dataValidate === 'function') {
+        const flag = await Promise.resolve().then(() => {
+          return (props.dataValidate as Function)(data)
+        })
 
-    if (data.length >= props.maxCount) {
-      throw new Error(`数据不能超过${props.maxCount}条`)
+        if (flag === false) return
+      } else {
+        if (!data?.length) throw new Error('没有需要上传的数据。')
+        if (data.length >= props.maxCount) throw new Error(`数据不能超过${props.maxCount}条`)
+      }
     }
 
     await innerImportMethod(data)
 
-    if (props.successMessage) {
-      Message.success(props.successMessage)
-    }
+    if (props.successMessage) Message.success(props.successMessage)
 
     await Promise.resolve().then(() => {
-      if (props.onSubmit) {
-        return props.onSubmit(data)
-      }
+      if (props.onSubmit) return props.onSubmit(data)
     })
 
     if (props.closeAfterSuccess) {
@@ -194,9 +196,7 @@ async function innerImportMethod(data: any) {
   const importMethod = props.importMethod || fileImportCfg.importMethod
 
   let importData = data
-  if (props.transformMethod) {
-    importData = await props.transformMethod(data)
-  }
+  if (props.transformMethod) importData = await props.transformMethod(data)
 
   const payload = {
     [props.dataProp]: importData,
@@ -213,7 +213,6 @@ async function innerImportMethod(data: any) {
 // 解析文件
 async function doParseFile(file: any, options?: any) {
   let data: any[] = []
-
   if (fileImportCfg.parseFile) {
     data = await fileImportCfg.parseFile(file)
   } else {

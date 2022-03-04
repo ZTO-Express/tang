@@ -4,9 +4,16 @@
       <span>{{ label }}</span>
       <span v-if="showCount && innerSrcs?.length">({{ innerSrcs?.length }})</span>
     </el-button>
-    <el-image v-else v-bind="$attrs" :src="innerUrl" :fit="fit" @click="handleLabelClick">
+    <el-image
+      v-else-if="innerUrl"
+      :class="{ 'is-preview': preview }"
+      v-bind="$attrs"
+      :src="innerUrl"
+      :fit="fit"
+      @click="handleLabelClick"
+    >
       <template #error>
-        <div class="load-error-con flex-center">
+        <div class="error flex-center">
           <el-button v-if="srcType === 'path'" class="error-button" type="text" @click="handleReload">
             重新加载
           </el-button>
@@ -14,6 +21,7 @@
         </div>
       </template>
     </el-image>
+    <div v-else class="empty flex-center" v-bind="$attrs">暂无图片</div>
     <el-image-viewer
       v-if="showPreview"
       :url-list="innerUrls"
@@ -48,6 +56,7 @@ const props = withDefaults(
     srcType: 'path',
     fit: 'contain',
     initialIndex: 0,
+    preview: true,
     hideOnClickModal: true
   }
 )
@@ -57,7 +66,9 @@ const showPreview = ref<boolean>(false)
 
 const innerSrcs = computed(() => {
   if (!props.src) return []
-  if (typeof props.src === 'string') return [props.src]
+  if (typeof props.src === 'string') {
+    return props.src.split(',')
+  }
   return props.src || []
 })
 
@@ -82,6 +93,7 @@ onMounted(async () => {
 })
 
 function handleLabelClick() {
+  if (props.preview === false) return
   showPreview.value = true
 }
 
@@ -102,7 +114,7 @@ async function loadImageUrls() {
     innerUrls.value = innerSrcs.value
   } else {
     if (!innerSrcs.value?.length) return []
-    const urls = await fileUtil.getUrlsByPaths(innerSrcs.value)
+    const urls = await fileUtil.getFileUrls(innerSrcs.value)
     innerUrls.value = urls
   }
 }
@@ -114,7 +126,11 @@ async function loadImageUrls() {
   max-width: 100%;
 }
 
-.load-error-con {
+.is-preview {
+  cursor: pointer;
+}
+
+.error {
   background: #f5f7fa;
   color: var(--el-text-color-placeholder);
   height: 100%;
@@ -122,5 +138,10 @@ async function loadImageUrls() {
   .error-button {
     opacity: 0.8;
   }
+}
+.empty {
+  background: #f5f7fa;
+  color: var(--el-text-color-placeholder);
+  height: 100%;
 }
 </style>

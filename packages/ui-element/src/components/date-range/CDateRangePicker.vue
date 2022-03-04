@@ -4,8 +4,8 @@
     v-bind="$attrs"
     style="width: 100%"
     type="daterange"
-    unlink-panels
-    :clearable="clearable"
+    :unlink-panels="unlinkPanels"
+    :clearable="innerClearable"
     :disabled="disabled"
     :value-format="valueFormat"
     :disabled-date="innerDisabledDateFn"
@@ -20,7 +20,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, dateUtil } from '@zto/zpage'
+import { _, vue, dateUtil } from '@zto/zpage'
 import { useMessage } from '../../composables'
 
 const { computed, ref, watch } = vue
@@ -38,10 +38,11 @@ const props = withDefaults(
     maxRange?: number // 默认最大时间范围(天)，0为无限制
     from?: string
     to?: string
+    unlinkPanels?: boolean
     appendTime?: boolean // 同步时附加时分秒（如：2019-01-01, 2019-01-01；将会附加为：2019-01-01 00:00:00, 2019-01-01 23:59:59）
   }>(),
   {
-    clearable: false,
+    clearable: undefined,
     disabled: false,
     readonly: false,
     valueFormat: 'YYYY-MM-DD',
@@ -52,6 +53,7 @@ const props = withDefaults(
     maxRange: 0,
     from: '',
     to: '',
+    unlinkPanels: false,
     appendTime: true
   }
 )
@@ -63,6 +65,12 @@ const { Message } = useMessage()
 const innerModelValue = ref<string[]>([])
 const innerRangeValue = ref<string[]>([])
 const boundaryDate = ref<string[]>([]) // 时间边界，根据maxRange
+
+const innerClearable = computed(() => {
+  if (props.maxRange) return false
+  if (_.isBoolean(props.clearable)) return props.clearable
+  return true
+})
 
 const innerFromDate = computed(() => {
   if (!innerModelValue.value[0]) return ''
@@ -133,11 +141,10 @@ watch(
   () => {
     const val = innerModelValue.value
     innerRangeValue.value = val
-
     let valFrom = val[0]
     let valTo = val[1]
 
-    if (props.appendTime) {
+    if (props.appendTime && valFrom && valTo) {
       valFrom += ' 00:00:00'
       valTo += ' 23:59:59'
     }
@@ -149,7 +156,7 @@ watch(
   { immediate: true }
 )
 
-function handleChange(val: string[]) {
+function handleChange(val: any) {
   if (props.clearable && !val) {
     val = []
   } else if (!validateRange(val, true)) {
@@ -212,12 +219,15 @@ function setTo(to: Date | string) {
 function validateRange(val: Array<string | Date>, notice = false) {
   const maxRange = props.maxRange
 
+  if (!maxRange && !val[0] && !val[1]) return
+
   const fromDate = new Date(val[0])
   const toDate = new Date(val[1])
 
   let errorMessage = ''
 
   if (!dateUtil.isValid(fromDate)) {
+    debugger
     errorMessage = '无效开始时间'
   } else if (!dateUtil.isValid(toDate)) {
     errorMessage = '无效结束时间'

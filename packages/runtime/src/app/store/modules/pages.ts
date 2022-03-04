@@ -36,7 +36,7 @@ const mutations: MutationTree<PagesState> = {
     if (!page.key) page.key = page.pageKey
 
     // 已存在于visited的 如果是详情页，详情id也存在的。不添加
-    if (state.visited.some((v) => isSamePage(v, page))) return
+    if (state.visited.some(v => isSamePage(v, page))) return
 
     const newPage: PageInfo = _.deepClone(page)
 
@@ -47,7 +47,7 @@ const mutations: MutationTree<PagesState> = {
 
     // 打开详情时放在最新主页面后
     if (refererKey) {
-      index = state.visited.findIndex((item) => item.key === refererKey) + 1
+      index = state.visited.findIndex(item => item.key === refererKey) + 1
     } else {
       index = state.visited.length
     }
@@ -169,46 +169,50 @@ const actions: ActionTree<PagesState, RootState> = {
 
   async setDefaults({ commit, dispatch }, pages: PageInfo[]) {
     commit('setDefaults', pages)
-    const promises = pages.map((it) => dispatch('addVisited', it))
+    const promises = pages.map(it => dispatch('addVisited', it))
     await Promise.all(promises)
   },
 
-  async addVisited({ commit }, route: any) {
+  async addVisited(
+    { commit },
+    payload: {
+      route?: any
+      redirect?: boolean
+    } = { redirect: true }
+  ) {
     const router = App.instance?.router
     if (!router) return
 
-    const page = route?.meta
+    const page = payload?.route?.meta
 
     if (!page?.pageKey || page.noCache) return
     if (!page.key) page.key = page.pageKey
 
     // 已存在于visited的 如果是详情页，详情id也存在的。不添加
-    if (state.visited.some((v) => isSamePage(v, page))) return
+    if (state.visited.some(v => isSamePage(v, page))) return
 
     commit('addVisited', page)
-    await router.goto({ name: page.name, query: page.query })
+
+    if (payload?.redirect !== false) {
+      await router.goto({ name: page.name, query: page.query })
+    }
   },
 
   async removeVisited({ commit, rootGetters }, page: PageInfo) {
     const router = App.instance?.router
-    if (!router) return
+    if (!page || !router) return
 
     const navItems = rootGetters.navPages
 
-    let currentIndex = navItems.findIndex((it: any) => it.key === page.key)
-
-    commit('removeVisited', page)
-
-    if (navItems.length === 0) {
+    if (!navItems.length) {
       await router.goHome()
       return
     }
 
-    if (currentIndex <= 0) {
-      currentIndex = 0
-    } else {
-      currentIndex--
-    }
+    let currentIndex = navItems.findIndex((it: any) => it.key === page.key)
+    if (currentIndex < 0) return
+
+    if (currentIndex > 0) currentIndex--
 
     let currentPage = navItems[currentIndex]
     if (page.refererKey) {
@@ -216,9 +220,12 @@ const actions: ActionTree<PagesState, RootState> = {
       if (refererPage) currentPage = refererPage
     }
 
-    if (currentPage) {
+    // 存在当前页，并且菜单项大于1
+    if (currentPage && navItems.length > 1) {
       await router.goto({ name: currentPage.name, query: currentPage.query })
+      commit('removeVisited', page)
     } else {
+      commit('removeVisited', page)
       await router.goHome()
     }
   },
@@ -231,13 +238,20 @@ const actions: ActionTree<PagesState, RootState> = {
     })
   },
 
-  async pruneVisited({ commit, rootGetters }, submodule?: string) {
+  async pruneVisited(
+    { commit, rootGetters },
+    payload: {
+      submodule?: string
+      redirect?: boolean
+    } = { redirect: true }
+  ) {
     const router = App.instance?.router
     if (!router) return
 
-    submodule = submodule || rootGetters.navMenu?.submodule
+    const submodule = payload?.submodule || rootGetters.navMenu?.submodule
     commit('pruneVisited', submodule)
-    await router.goHome()
+
+    if (payload?.redirect !== false) await router.goHome()
   },
 
   // 新增临时页面

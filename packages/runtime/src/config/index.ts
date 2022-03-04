@@ -24,6 +24,26 @@ export function useAppConfig(path: string, defaultValue?: unknown) {
 }
 
 /**
+ * 获取微件配置
+ * @param path
+ * @param defaultValue
+ */
+export function useWidgetsConfig(path: string, defaultValue?: unknown) {
+  const _path = path ? `.${path}` : ''
+  return useConfig(`widgets${_path}`, defaultValue)
+}
+
+/**
+ * 获取微件配置
+ * @param path
+ * @param defaultValue
+ */
+export function useComponentsConfig(path: string, defaultValue?: unknown) {
+  const _path = path ? `.${path}` : ''
+  return useConfig(`components${_path}`, defaultValue)
+}
+
+/**
  * 获取api请求方法
  * @returns
  */

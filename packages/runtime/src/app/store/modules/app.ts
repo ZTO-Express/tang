@@ -39,6 +39,11 @@ const mutations: MutationTree<AppState> = {
     })
   },
 
+  // 设置应用加载
+  setAppLoaded(state, loaded: boolean = true) {
+    state.loaded = loaded
+  },
+
   // 设置导航菜单
   setNavMenu(state, payload: any) {
     _setSubmodule(state, payload)

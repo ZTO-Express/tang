@@ -18,7 +18,7 @@
         @change="handleChange"
       />
     </el-tooltip>
-    <el-form-item :prop="labelProp"></el-form-item>
+    <el-form-item v-show="false" :prop="labelProp"></el-form-item>
   </div>
 </template>
 

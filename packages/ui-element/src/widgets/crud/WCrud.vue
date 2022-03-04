@@ -32,7 +32,23 @@
             <div class="toolbar__line"></div>
             <div class="toolbar__actions">
               <template v-for="(it, index) in sToolbar?.items || []" :key="`tool_${String(index)}`">
-                <c-action v-if="it.action" v-bind="getToolbarActionAttrs(it)" class="q-ml-md"></c-action>
+                <el-button
+                  v-if="it.action === 'toggle-expand'"
+                  type="primary"
+                  v-bind="getToolbarActionAttrs(it)"
+                  class="q-ml-md"
+                  @click="doToggleExpand"
+                >
+                  {{ expandToggleFlag ? '展开所有' : '收起所有' }}
+                </el-button>
+                <c-action v-else-if="it.action" v-bind="getToolbarActionAttrs(it)" class="q-ml-md"></c-action>
+                <component
+                  v-else-if="it.componentType"
+                  :is="it.componentType"
+                  class="q-ml-md"
+                  v-bind="{ onSubmit: doSearch, ...it }"
+                  :context-data="innerContextData"
+                />
                 <widget v-else-if="it.type" class="q-ml-md" :schema="it" />
               </template>
             </div>
@@ -80,6 +96,13 @@
               <template #operation="scope">
                 <template v-for="(it, index) in sTable?.operation?.items || []" :key="`operation_${String(index)}`">
                   <c-action v-if="it.action" v-bind="getOperationActionAttrs(it, scope)" class="q-ml-sm"></c-action>
+                  <component
+                    v-else-if="it.componentType"
+                    :is="it.componentType"
+                    :model="scope.row"
+                    v-bind="{ onSubmit: doSearch, ...it }"
+                    :context-data="scope"
+                  />
                   <widget v-else-if="it.type" :schema="it" />
                 </template>
               </template>
@@ -111,7 +134,9 @@ import {
   useWidgetEmitter,
   useWidgetSchema,
   useApiRequest,
-  useAppContext
+  useAppContext,
+  useConfig,
+  useWidgetsConfig
 } from '@zto/zpage'
 
 import { useMessage } from '../../composables'
@@ -133,6 +158,12 @@ const apiRequest = useApiRequest()
 
 // 请求
 const { MessageBox, Message } = useMessage()
+
+const crudConfig = useWidgetsConfig('crud', {})
+const tableConfig = useConfig('components.table.data', {})
+
+// 数据属性
+const dataProp = tableConfig?.data?.dataProp || 'data'
 
 const wSchema = useWidgetSchema(props.schema)
 
@@ -156,11 +187,13 @@ const sToolbar = useWidgetSchema(wSchema.toolbar || {})
 // 表格 schema
 const sTable = useWidgetSchema(wSchema.table || {})
 const innerColumns = ref<any[]>([])
-
 innerColumns.value = Array.isArray(sTable.columns) ? sTable.columns : []
 
 // 查询数据模型
 const searchModel = reactive(sSearch?.model || {})
+
+// 查询数据结果
+const searchResult = ref<any>()
 
 // 当前激活的活动
 const activeAction = ref<any>({})
@@ -169,6 +202,13 @@ const activeAction = ref<any>({})
 const tableRef = ref<any>() // 表格组件
 const dialogRef = ref<any>() // 弹出框
 const searchFormRef = ref<any>() // 查询框
+
+// 组件上下文数据
+const innerContextData = computed(() => {
+  return {
+    searchResult: searchResult.value
+  }
+})
 
 // ----- 生命周期相关 ----->
 onMounted(async () => {
@@ -200,14 +240,6 @@ const searchLoading = ref(false)
 
 // 收起查询
 const expandedSearch = ref<boolean>(!!sSearch)
-
-if (sSearch?.items?.length) {
-  sSearch?.items.forEach((it: any) => {
-    if (_.isUndefined(searchModel[it.prop])) {
-      searchModel[it.prop] = it.default || null
-    }
-  })
-}
 
 const searchFormAttrs = computed(() => {
   return {
@@ -302,9 +334,11 @@ const tableAttrs = computed(() => {
     noOperation: sTable.noOperation,
     showFixed: sTable.showFixed !== false,
     showCheckbox: sTable.showCheckbox,
+    selectableFn: sTable.checkboxSelectable,
     showSummary: sTable.showSummary,
     summaryText: sTable.summaryText || sTable.sumText,
     data: sActions.query?.data,
+    loadMethod: tableLoadFn,
     ...sTable.innerAttrs
   }
 })
@@ -388,7 +422,12 @@ const dialogAttrs = computed(() => {
   if (!actionCfg || !actionCfg.dialog) return
 
   const title = actionCfg.title || actionCfg.label
-  const dialogAttrs = actionCfg.dialog || {}
+
+  let dialogAttrs = actionCfg.dialog || {}
+
+  if (typeof actionCfg.dialog === 'function') {
+    dialogAttrs = actionCfg.dialog(actionCfg.contextData, actionCfg)
+  }
 
   return { title, ...dialogAttrs }
 })
@@ -425,7 +464,7 @@ async function triggerAction(actionCfg: any) {
   actionCfg.label = actionCfg.label || '操作'
 
   if (actionCfg.actionType === 'export') {
-    await doAsyncExport(actionCfg.api, actionData)
+    await doAsyncExport(actionCfg.api, actionCfg, context)
   } else if (actionCfg.actionType === 'download') {
     if (!actionCfg.link) return
     const link = tpl.deepFilter(actionCfg.link, context)
@@ -444,6 +483,7 @@ async function triggerAction(actionCfg: any) {
   } else {
     const messageCfg: any =
       tpl.filter(actionCfg.message, {
+        data: actionCfg.contextData,
         selectedCount: selectedRows.value?.length
       }) || `确认${actionCfg.label}选中的记录？`
 
@@ -530,6 +570,14 @@ function buildActionData(actionCfg: any, context: any) {
 
 // 执行活动
 async function doAction(action: any, payload: any, options?: any) {
+  if (options?.onAction) {
+    return await Promise.resolve().then(() => {
+      return options.onAction!(payload, options)
+    })
+  }
+
+  if (!action) return
+
   dialogLoading.value = true
 
   await apiRequest({
@@ -575,7 +623,8 @@ async function doSearch(resetPager = false) {
     params: searchParams
   })
     .then(res => {
-      tableRef.value?.setData(res)
+      searchResult.value = res
+      tableRef.value?.setData(searchResult.value)
     })
     .finally(() => {
       searchLoading.value = false
@@ -583,7 +632,7 @@ async function doSearch(resetPager = false) {
 }
 
 // 异步导出
-async function doAsyncExport(api: string, options?: any) {
+async function doAsyncExport(api: string, options: any, context: any) {
   if (!tableRef.value) return
 
   const data = tableRef.value.getData()
@@ -593,11 +642,31 @@ async function doAsyncExport(api: string, options?: any) {
   }
 
   const queryAction = sActions.query || {}
-  const searchParams = getSearchParams()
+  let searchParams = getSearchParams()
+
+  if (options?.beforeExport) {
+    const flag = await Promise.resolve().then(() =>
+      options?.beforeExport(
+        {
+          ...options,
+          searchParams
+        },
+        context
+      )
+    )
+    if (flag === false) return
+  }
+
+  if (options?.exSearchParams) {
+    searchParams = { ...searchParams, ...options?.exSearchParams }
+  }
+
+  const searchParamProp = options.searchParamProp || crudConfig.export?.searchParamProp || 'search'
+  const reqParams = { ...options.apiParams, [searchParamProp]: searchParams }
 
   await apiRequest({
     action: { ...queryAction, api, type: 'export' },
-    params: searchParams
+    params: reqParams
   })
 
   appUtil.openDownloadsDialog()
@@ -617,8 +686,39 @@ function getSearchParams() {
 // 导出
 async function doExport() {
   if (!tableRef.value) return
-
   tableRef.value.exportData()
+}
+
+// 展开所有树形节点
+const expandToggleFlag = ref<boolean>(true)
+
+async function doToggleExpand() {
+  if (!tableRef.value) return
+  tableRef.value.expandAll(expandToggleFlag.value)
+  expandToggleFlag.value = !expandToggleFlag.value
+}
+
+async function tableLoadFn(row: any, node: any, resolve: Function) {
+  const parentProp = tableAttrs.value.parentProp
+  const rowKey = tableAttrs.value.rowKey
+  if (!parentProp || !rowKey) return
+
+  const queryAction = sActions.query || {}
+  if (!queryAction.api) return
+
+  await apiRequest({
+    pageIndex: 1,
+    pageSize: 1000,
+    noPager: sTable.noPager,
+    action: { ...queryAction, type: 'query' },
+    params: { [parentProp]: row[rowKey] }
+  })
+    .then(res => {
+      resolve(res[dataProp])
+    })
+    .finally(() => {
+      searchLoading.value = false
+    })
 }
 </script>
 

@@ -65,6 +65,10 @@ const isLogged = computed(() => {
   return store.getters.isLogged
 })
 
+const isAppLoaded = computed(() => {
+  return store.getters.isAppLoaded
+})
+
 const errorInfo = computed(() => {
   const currentRoute = router.currentRoute.value
 
@@ -78,6 +82,11 @@ const errorInfo = computed(() => {
 })
 
 function handleLink() {
+  if (!isAppLoaded.value) {
+    window.location.href = window.location.origin
+    return
+  }
+
   if (props.link === 'home') router.goHome()
   else if (props.link) router.goto(props.link)
 

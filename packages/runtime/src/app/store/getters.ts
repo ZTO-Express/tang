@@ -3,6 +3,7 @@ import type { RootState } from '../../typings/store'
 
 export const getters: GetterTree<RootState, RootState> = {
   app: state => state.app,
+  isAppLoaded: state => state.app.loaded,
   submodules: state => {
     return (state.app.submodules || []).filter(it => !it.meta?.hidden)
   },

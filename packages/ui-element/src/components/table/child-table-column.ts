@@ -66,6 +66,23 @@ const ChildTableColumn = defineComponent({
             )
           })
         }
+
+        scopedSlots.header = (scope: any) => {
+          let headerLabel = config.label
+
+          if (config.headerTpl) {
+            const context = useAppContext(scope)
+            headerLabel = tpl.filter(config.headerTpl, context)
+          }
+
+          return h(
+            'div',
+            {
+              ...config.header
+            },
+            headerLabel
+          )
+        }
       } else {
         // 编辑列
         scopedSlots.default = (scope: any) => {
@@ -120,26 +137,29 @@ const ChildTableColumn = defineComponent({
             innerText = config.formatter(scope.row, config, scope.row[prop], scope.$index, scope)
           }
 
-          let style = {}
+          let innerStyle = {}
           if (config.style) {
-            style = tpl.deepFilter(config.style, context)
+            innerStyle = tpl.deepFilter(config.style, context)
           }
 
-          let _innerSolts = tipSlot ? [innerText, tipSlot] : innerText
+          const _innerSolts = tipSlot ? [innerText, tipSlot] : innerText
 
           return h(
             'div',
             {
-              style
+              style: innerStyle,
+              ...config.cell
             },
             _innerSolts
           )
         }
 
         scopedSlots.header = (scope: any) => {
+          let headerLabel = config.label
+
           if (config.headerTpl) {
             const context = useAppContext(scope)
-            return tpl.filter(config.headerTpl, context)
+            headerLabel = tpl.filter(config.headerTpl, context)
           }
 
           const editor = config.editor
@@ -161,20 +181,28 @@ const ChildTableColumn = defineComponent({
             return slot && slot(scope)
           }
 
+          let isRequired = false
+
           /** 必填项 */
           if (editor && (editor.required || config.rules)) {
             if (editor.required || (config.rules || []).some((it: any) => it.required)) {
-              return h(
-                'div',
-                {
-                  class: 'c-table-col-text-required'
-                },
-                [h('span', {}, config.label), h('span', { class: 'tag' }, '*')]
-              )
+              isRequired = true
             }
           }
 
-          return config.label
+          let headerClass = config.header?.class
+          if (isRequired && _.isObject(headerClass)) {
+            headerClass['c-table-col-text-required'] = true
+          }
+
+          return h(
+            'div',
+            {
+              ...config.header,
+              class: headerClass
+            },
+            headerLabel
+          )
         }
       }
 

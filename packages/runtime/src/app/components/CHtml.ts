@@ -9,9 +9,9 @@ export default defineComponent({
   },
 
   setup(props: any) {
-    const context = useAppContext(props.contextData || {})
-
     return () => {
+      const context = useAppContext(props.contextData || {})
+
       if (!props.html) return ''
       const html = tpl.deepFilter(props.html, context)
       return renderHtml(html)

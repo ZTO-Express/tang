@@ -14,6 +14,8 @@
           :summary-method="innerSummaryMethod"
           :use-virtual="showVirtual"
           :data="tableData.data"
+          :load="innerLoadMethod"
+          :row-key="rowKey"
           highlight-current-row
           @selection-change="handleSelectionChange"
         >
@@ -112,6 +114,7 @@ import type { TableColumn, TablePager, SummaryMethodParams, TableData } from './
 import type { ExportColumn } from '../../utils/xlsx'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
+import { watch } from 'vue'
 
 const { ref, reactive, nextTick, computed, useAttrs } = vue
 
@@ -120,7 +123,12 @@ const props = withDefaults(
   defineProps<{
     api?: ApiRequestAction // api请求
     apiParams?: Record<string, any> // api请求参数
+
     data?: Array<any> // 表格数据
+    dataListProp?: string // 列表数据属性
+    dataTotalProp?: string // 总数属性
+    dataSummaryProp?: string // 汇总属性
+
     columns?: Array<any> // 列设置
     showExpand?: boolean // 展开列是否展示
     noPager?: boolean // 是否隐藏分页
@@ -133,6 +141,9 @@ const props = withDefaults(
     summaryMethod?: GenericFunction // 统计方法
     summaryDataProp?: string // 统计数据属性
     summaryText?: string // 合计行第一列的文本
+    loadMethod?: GenericFunction // 加载方法（树形节点，懒加载情况下）
+    parentProp?: string // 父节点属性
+    rowKey?: string
     noIndex?: boolean // 是否展示序号列
     noOperation?: boolean // 是否展示操作列
     operationPosition?: string // 操作列位置
@@ -187,13 +198,17 @@ const selectedRows = ref<any[]>([])
 const tableLoading = ref(false)
 
 const tableData = reactive<TableData>({
-  data: props.data || [],
+  data: [],
   total: 0,
   summary: {}
 })
 
 const innerSummaryMethod = computed(() => {
   return props.summaryMethod || tableSummaryFn
+})
+
+const innerLoadMethod = computed(() => {
+  return props.loadMethod || tableLoadFn
 })
 
 // 可见表格头, 加入多级表头
@@ -224,6 +239,16 @@ const vTableHead = computed<ExportColumn[]>(() => {
   columnFinder(tableHead, 0)
   return result
 })
+
+watch(
+  () => props.data,
+  () => {
+    tableData.data = props.data || []
+  },
+  {
+    immediate: true
+  }
+)
 
 /** 选中行发生变化 */
 function handleSelectionChange(selection: any[]) {
@@ -275,21 +300,45 @@ function tableSummaryFn(params: SummaryMethodParams) {
 
   const summaryData = tableData.summary || {}
 
-  return columns.map((col: any, i) => {
+  const result = columns.map((col: any, i) => {
     if (i === 0) return props.summaryText || '汇总'
 
     const _col = getColumnByProp(col.property, props.columns)
 
-    if (!_col || _col.summaryProp === false) return ''
-    const summaryProp = _col.summaryProp || _col.prop
-    if (!summaryProp) return ''
+    if (!_col || !_col.summaryProp) return ''
 
-    if (_.isUndefined(summaryData[summaryProp])) {
-      return _col.summaryEmptyText || '--'
-    } else {
-      return summaryData[summaryProp]
+    const summaryProp = _col.summaryProp == true ? _col.prop : _col.summaryProp
+    const summaryVal = summaryData[summaryProp]
+
+    let summaryText = summaryVal
+    if (_.isEmpty(summaryVal)) {
+      summaryText = _col.summaryEmptyText || '--'
+    } else if (_col.summaryFormatter) {
+      summaryText = tableUtil.formatValue(summaryVal, _col.summaryFormatter, { data: tableData })
     }
+
+    return summaryText
   })
+
+  return result
+}
+
+/** 父子节点加载方法 */
+async function tableLoadFn(row: any, node: any, resolve: Function) {
+  if (props.api && props.parentProp && props.rowKey) {
+    tableLoading.value = true
+
+    const payload: any = {
+      [props.parentProp]: row[props.rowKey]
+    }
+    await apiRequest(payload)
+      .then(res => {
+        resolve(res)
+      })
+      .finally(() => {
+        tableLoading.value = false
+      })
+  }
 }
 
 function childProps(children?: TableColumn[]) {
@@ -393,9 +442,9 @@ async function doFetch(isResetPager: boolean) {
 function setData(data: any) {
   if (!data) return
 
-  const dataProp = dataCfg.dataProp || 'data'
-  const totalProp = dataCfg.totalProp || 'total'
-  const summaryProp = dataCfg.summaryProp || 'summary'
+  const listProp = props.dataListProp || dataCfg.listProp || 'data'
+  const totalProp = props.dataTotalProp || dataCfg.totalProp || 'total'
+  const summaryProp = props.dataSummaryProp || dataCfg.summaryProp || 'summary'
 
   let list: any[] = []
   let total = 0
@@ -405,7 +454,7 @@ function setData(data: any) {
     list = parserRes.list
     total = parserRes.totalRows
   } else {
-    list = data[dataProp]
+    list = data[listProp]
     total = data[totalProp] || 0
   }
 
@@ -442,6 +491,24 @@ function exportData(fileName: string) {
   }
 }
 
+// 树形菜单展开所有（不包括懒加载项）
+function expandAll(expanded: boolean = true) {
+  const data = tableData.data || []
+  expandRows(data, expanded, true)
+}
+
+// 获取所有有子节点的key
+function expandRows(rows: any[], expanded: boolean = true, recursive: boolean = true) {
+  if (!tableRef.value) return
+
+  rows.forEach(it => {
+    if (it.children?.length) {
+      tableRef.value.toggleRowExpansion(it, expanded)
+      if (recursive) expandRows(it.children, expanded, recursive)
+    }
+  })
+}
+
 /** 导出组件方法 */
 defineExpose({
   selectedRows,
@@ -452,7 +519,9 @@ defineExpose({
   doFetch,
   doLayout,
   validate,
-  exportData
+  exportData,
+  expandAll,
+  expandRows
 })
 </script>
 

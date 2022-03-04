@@ -13,10 +13,10 @@
         <slot name="title">{{ title }}</slot>
       </div>
     </template>
-    <el-row :gutter="24" :style="`margin: 0 0 0; `">
+    <el-row :gutter="24" :style="`margin: 0 0 0; height: ${bodyHeight};`">
       <el-col
         ref="contentWrapperRef"
-        class="dialog-body-con"
+        :class="`dialog-body-con ${size}`"
         :span="24"
         :style="`overflow-y: auto; padding: 12px; ${bodyStyle}`"
       >
@@ -32,15 +32,16 @@
         </c-form>
       </el-col>
     </el-row>
-    <template #footer>
+    <template #[footer]>
       <div class="dialog-footer">
         <slot name="footer">
           <template v-for="it in actionItems" :key="it.name">
-            <el-button v-if="it.name === 'close'" class="q-mr-md" @click="close(it)">
+            <el-button v-if="it.name === 'close'" v-bind="it" class="q-mr-md" @click="close(it)">
               {{ it.label || '取消' }}
             </el-button>
             <el-button
               v-else-if="it.name === 'submit' || it.actionType === 'submit'"
+              v-bind="it"
               class="q-mr-md"
               :loading="loading"
               type="primary"
@@ -72,29 +73,45 @@ import { useMessage } from '../../composables'
 
 import type { GenericFunction } from '@zto/zpage'
 
-const { computed, getCurrentInstance, ref, useAttrs } = vue
+const { computed, getCurrentInstance, ref, useAttrs, watch } = vue
 const { onBeforeRouteUpdate } = vueRouter
 
 const props = withDefaults(
   defineProps<{
     title?: string
     loading?: boolean
+    size?: string // 对话框大小 large, full
     actions?: Record<string, any>
     innerAttrs?: Record<string, any> // 内部元素属性
     labelWidth?: string | number // 表单label宽度
+    formItemSpan?: number // 表单span
     formItems?: Record<string, any> // 表单项
     appendToBody?: boolean
+    noSubmit?: boolean // 没有提交按钮（只有关闭）
     noPadding?: boolean
+    noFooter?: boolean
     bodyStyle?: string
+    bodyHeight?: string
     onSubmit?: GenericFunction
   }>(),
   {
     appendToBody: true,
-    noPadding: false
+    noSubmit: false,
+    noPadding: false,
+    noFooter: false,
+    bodyHeight: 'auto'
   }
 )
 
-const emit = defineEmits(['close', 'submit'])
+// 通过动态插槽，控制footer的显示隐藏
+const footer = ref()
+if (props.noFooter) {
+  footer.value = ''
+} else {
+  footer.value = 'footer'
+}
+
+const emit = defineEmits(['close', 'submitted'])
 
 // 获取当前组件实例
 const instance = getCurrentInstance()
@@ -111,16 +128,14 @@ let __callbacks__: GenericFunction[] = []
 
 const dataModel = ref<any>({})
 
-const context = useAppContext(dataModel)
-
 const dialogVisible = ref(true)
 
 const dialogFormItems = computed<any>(() => {
+  if (typeof props.formItems === 'function') return props.formItems(dataModel.value)
   return props.formItems || []
 })
 
 const actionItems = computed<any[]>(() => {
-  
   const actions = props.actions || {}
   const items = Object.keys(actions).map(key => {
     const item = actions[key]
@@ -131,33 +146,41 @@ const actionItems = computed<any[]>(() => {
   })
 
   if (!items.length) {
+    if (props.noSubmit) return [{ name: 'close', label: '关闭' }]
     return [{ name: 'close' }, { name: 'submit' }]
   }
+
   return items
 })
 
 const dialogAttrs = computed(() => {
-  const dialogAttrs = Object.assign({}, props.innerAttrs?.dialog)
-  return dialogAttrs
+  let dialogAttrs = { ...props.innerAttrs?.dialog }
+
+  let sizeAttrs = {}
+
+  if (props.size === 'large') {
+    sizeAttrs = { top: '20px', width: '1000px' }
+  } else if (props.size === 'full') {
+    sizeAttrs = { top: '5px', width: '99vw' }
+  }
+
+  return { ...sizeAttrs, ...dialogAttrs }
 })
 
 const dialogFormAttrs = computed(() => {
-  const formAttrs = Object.assign(
-    {
-      labelWidth: props.labelWidth
-    },
-    props.innerAttrs?.form
-  )
+  const formAttrs = {
+    labelWidth: props.labelWidth,
+    ...props.innerAttrs?.form
+  }
   return formAttrs
 })
 
 const dialogFormItemsAttrs = computed(() => {
-  const formItemsAttrs = Object.assign(
-    {
-      showOperation: false
-    },
-    props.innerAttrs?.formItems
-  )
+  const formItemsAttrs = {
+    showOperation: false,
+    span: props.formItemSpan,
+    ...props.innerAttrs?.formItems
+  }
   return formItemsAttrs
 })
 
@@ -211,7 +234,7 @@ async function submit(options?: any) {
 
     // 没传过callback 调用全局
     if (!__callbacks__ || !__callbacks__.length) {
-      emit('submit', dataModel.value, attrs, form, instance)
+      emit('submitted', dataModel.value, attrs, form, instance)
     }
 
     while (__callbacks__ && __callbacks__.length) {
@@ -257,12 +280,14 @@ function close(options?: any) {
 
 /** 提交表单 */
 async function doSubmit(options?: any) {
+  const context = useAppContext(dataModel.value)
+
   const extData = tpl.deepFilter(options.extData, context)
   const payload = Object.assign({}, extData, dataModel.value)
 
   if (props.onSubmit) {
     return await Promise.resolve().then(() => {
-      return props.onSubmit && props.onSubmit(payload, options)
+      return props.onSubmit!(payload, options)
     })
   }
 
@@ -287,7 +312,15 @@ defineExpose({
   }
 
   .dialog-body-con {
-    max-height: calc(70vh - 110px); // 防止出现外部滚动条
+    max-height: calc(95vh - 110px); // 防止出现外部滚动条
+
+    &.large {
+      max-height: calc(95vh - 140px); // 防止出现外部滚动条
+    }
+
+    &.full {
+      max-height: calc(95vh - 140px); // 防止出现外部滚动条
+    }
   }
 
   &.no-padding {
@@ -295,5 +328,9 @@ defineExpose({
       padding: 0;
     }
   }
+}
+
+.el-select-dropdown__item {
+  height: auto;
 }
 </style>

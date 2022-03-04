@@ -18,6 +18,7 @@ declare module 'vue-router' {
     goHome: () => Promise<void | NavigationFailure>
     goBack: () => Promise<void | NavigationFailure>
     goto: (to: any) => Promise<void | NavigationFailure>
+    close: (pageKey?: string) => Promise<void>
     getRouteByName: (name: string) => RouteRecordNormalized | undefined
     getRouteByPageKey: (key: string) => RouteRecordNormalized | undefined
     getRouteByMenuPath: (menuPath: string) => RouteRecordNormalized | undefined

@@ -2,10 +2,24 @@
   <el-row class="c-form-items" :gutter="$attrs.gutter || 10">
     <!-- 配置item -->
     <template v-for="(item, index) in innerFormItems" :key="'form-item' + index">
-      <el-col v-show="item.isVisible" class="form-item__con" :span="item.realSpan">
+      <el-col
+        v-show="item.isVisible"
+        class="form-item__con"
+        :class="{ invisible: item.invisible }"
+        :span="item.realSpan"
+      >
+        <!-- 表单项关联属性，清空时同步清空 -->
+        <template v-if="item.relatedProps">
+          <el-form-item v-for="p in item.relatedProps" v-show="false" :prop="p" :key="p"></el-form-item>
+        </template>
+
         <el-form-item
           v-bind="item.itemAttrs"
-          :class="{ 'auto-height': item.autoHeight, 'props-required': item.propsRequired }"
+          :class="{
+            'form-item': true,
+            'auto-height': item.autoHeight,
+            'props-required': item.propsRequired
+          }"
           :label-width="item.labelWidth"
           :prop="item.prop"
           :required="item.isRequired"
@@ -13,23 +27,18 @@
         >
           <template #label>
             <slot v-if="item.showLabelSlot" v-bind="item" :name="item.prop + 'Label'" />
-            <span v-else-if="item.label">{{ item.label + ':' }}</span>
+            <span v-else-if="item.label && item.labelWidth !== 0">{{ item.label + ':' }}</span>
             <span v-else></span>
           </template>
           <component
             :is="item.componentType"
-            v-if="!item.showSlot && item.type !== 'text'"
-            v-bind="{ ...item }"
+            v-if="!item.showSlot"
+            v-bind="item.componentAttrs"
             :model="model"
             :disabled="item.isDisabled"
             :clearable="typeof item.clearable !== 'undefined' ? item.clearable : clearable"
             :style="{ width: item.width || itemWidth }"
           />
-
-          <span v-else-if="!item.showSlot && item.type === 'text'">
-            {{ (item.formatter && item.formatter(model)) || model[item.prop] }}
-            <slot v-if="item.prop" :prop="item.prop" name="append" />
-          </span>
           <slot v-else v-bind="item" :name="item.prop" />
         </el-form-item>
       </el-col>
@@ -56,7 +65,7 @@ import { getFormItemRules } from '../../utils/form'
 
 import type { FormItemConfig } from '../../utils/form'
 
-const { reactive, ref, computed } = vue
+const { reactive, ref, computed, onMounted } = vue
 const formItemsConfig = useConfig('components.formItems', {})
 
 const props = withDefaults(
@@ -107,7 +116,7 @@ const innerFormItems = computed<any>(() => {
       formItem = _.deepMerge(formItem, dynamicAttrs)
     }
 
-    const componentType = getFormItemComponentType(formItem.type)
+    normalizeFormItem(formItem)
 
     const isVisible = isVisibleItem(formItem)
     const realSpan = isVisible ? formItem.span || itemSpan.value : 0
@@ -133,8 +142,12 @@ const innerFormItems = computed<any>(() => {
       if (!isWidgetEventKey(key)) it[key] = formItem[key]
     })
 
+    const componentType = formItem.componentType
+    const componentAttrs = _.omit(it, ['type', 'relatedProps', 'label', 'componentType', 'span'])
+
     return {
       ...it,
+      componentAttrs,
       rules,
       realSpan,
       componentType,
@@ -171,17 +184,48 @@ const operationSpan = computed(() => {
   return 24 - (fieldSpan.value % 24)
 })
 
+onMounted(() => {
+  const items = innerFormItems.value
+
+  // 设置默认值
+  if (items?.length) {
+    items.forEach((it: any) => {
+      if (_.isUndefined(props.model[it.prop]) && !_.isUndefined(it.default)) {
+        props.model[it.prop] = it.default
+      }
+    })
+  }
+})
+
 /**
- * 获取组件类型
+ * 整理formItem属性
  * 内置组件 已注册过组件 传string类型即可
  * 支持扩展Component itemType传Component对象 - example -  foo: { label:"自定义组件", itemType : ElInput}
  * @param itemType
  */
-function getFormItemComponentType(type: string | any) {
-  if (type === 'textarea') type = 'input'
-  if (type === 'hidden') type = 'input'
-  if (typeof type === 'string') return `c-form-item-${type}`
-  return type
+function normalizeFormItem(formItem: any) {
+  if (formItem.componentType) return formItem
+
+  let type = formItem.type
+
+  switch (formItem.type) {
+    case 'textarea':
+      type = 'input'
+      formItem.inputType = 'textarea'
+      break
+    case 'hidden':
+      type = 'input'
+      formItem.inputType = 'hidden'
+      break
+  }
+
+  if (typeof type === 'string') {
+    formItem.componentType = `c-form-item-${type}`
+  } else {
+    formItem.componentType = type
+  }
+
+  return formItem
 }
 
 /** 是否展示表单 */
@@ -244,5 +288,10 @@ defineExpose({
 
 .form-item__con {
   padding: 0px;
+
+  // 一般用于跨多行的查询form排版
+  &.invisible {
+    visibility: hidden;
+  }
 }
 </style>

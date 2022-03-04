@@ -2,7 +2,7 @@ import { warn } from '@zto/zpage'
 
 import * as componentsMap from './vant_components'
 
-import type { VueApp, Installable, InstallableOptions } from '@zto/zpage'
+import type { VueApp, VueComponent, Installable, InstallableOptions } from '@zto/zpage'
 
 export default (target: Installable, options?: InstallableOptions): void => {
   const { vueApp } = target
@@ -12,10 +12,8 @@ export default (target: Installable, options?: InstallableOptions): void => {
     return
   }
 
-  vueApp.use(componentsMap.Toast)
-
-  Object.keys(componentsMap).forEach(key => {
-    install(vueApp, componentsMap[key], key)
+  Object.keys(componentsMap).forEach((key) => {
+    install(vueApp, (componentsMap as any)[key] as VueComponent, key)
   })
 }
 

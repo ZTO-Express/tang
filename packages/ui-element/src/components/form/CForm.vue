@@ -28,8 +28,11 @@
 <script setup lang="ts">
 import { vue, tpl, useConfig, useAppContext, useApiRequest } from '@zto/zpage'
 import { useMessage } from '../../composables'
+import { C_FORM_KEY } from '../../consts'
 
-const { computed, ref } = vue
+import type { PromiseFunction, GenericFunction } from '@zto/zpage'
+
+const { computed, ref, provide, reactive } = vue
 
 const formConfig = useConfig('components.form', {})
 
@@ -57,12 +60,45 @@ function setData(data: any) {
 
 // ----- 表单相关 ----->
 
+interface ValidatorItem {
+  validate?: PromiseFunction<boolean> | GenericFunction<boolean>
+}
+
+// 额外验证项
+const validatorItems: ValidatorItem[] = []
+
+// 添加额外验证项
+const addValidatorItem = (target: ValidatorItem) => {
+  if (target.validate) {
+    validatorItems.push(target)
+  }
+}
+
+// 移除额外验证项
+const removeValidatorItem = (target: ValidatorItem) => {
+  if (target.validate) {
+    validatorItems.splice(validatorItems.indexOf(target), 1)
+  }
+}
+
 const innerLabelWidth = computed(() => {
   return props.labelWidth || formConfig.labelWidth || 80
 })
 
-function validate(...args: any[]) {
-  return formRef.value.validate(...args)
+// 执行验证
+async function validate(...args: any[]) {
+  const ops = validatorItems.map(it => {
+    return Promise.resolve().then(() => {
+      return it.validate!(context)
+    })
+  })
+
+  const flags = await Promise.all(ops)
+
+  const valid1 = !flags.some(f => f === false)
+  const valid2 = await formRef.value.validate(...args)
+
+  return valid1 && valid2
 }
 
 function resetFields() {
@@ -134,6 +170,14 @@ async function doSubmit(action?: any) {
 
   Message.success(action?.successMessage || '执行成功！')
 }
+
+// ----- provide方法 ----->
+const cForm = reactive({
+  addValidatorItem,
+  removeValidatorItem
+})
+
+provide(C_FORM_KEY, cForm)
 
 // ----- 导出方法 ----->
 

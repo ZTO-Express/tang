@@ -43,3 +43,19 @@ export { List }
 import Empty from 'vant/es/empty/index'
 import 'vant/es/empty/style/index'
 export { Empty }
+
+import Form from 'vant/es/form/index'
+import 'vant/es/form/style/index'
+export { Form }
+
+import Field from 'vant/es/field/index'
+import 'vant/es/field/style/index'
+export { Field }
+
+import Popover from 'vant/es/popover/index'
+import 'vant/es/popover/style/index'
+export { Popover }
+
+import Popup from 'vant/es/popup/index'
+import 'vant/es/popup/style/index'
+export { Popup }

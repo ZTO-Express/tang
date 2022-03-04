@@ -31,15 +31,7 @@ export function createAppRoutes(router: Router, submodules: Submodule[]) {
   _mergeMenus(defMenus, exMenus)
 
   // 外部配置菜单
-  const appendedMenus: NavMenuItemConfig[] = defMenus.filter((it: any) => {
-    // 需要根据是否权限配置确定是否显示
-    if (it.isAuth && it.name) {
-      const authMenu = _findMenuByName(submodules, it.name, true)
-      return !!authMenu
-    }
-
-    return true
-  })
+  const appendedMenus: NavMenuItemConfig[] = _filterAuthMenus(defMenus, submodules)
 
   // 合并外部配置路由及默认路由到子模块
   _mergeMenus(submodules, appendedMenus)
@@ -100,6 +92,8 @@ export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Sub
 
 /** 根据导航菜单构建路由 */
 function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule) {
+  let route: RouteRecordRaw | undefined = undefined
+
   // 有路径的菜单才有路由
   if (menu.path) {
     const pathInfo = _parseMenuPath(menu.path)
@@ -141,16 +135,16 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
 
     routeMeta.pageKey = pageKey
 
-    const route: RouteRecordRaw = {
+    route = {
       name: menu.name,
       ...pathInfo,
       meta: routeMeta
     }
 
     if (menu.redirect) {
-      route.redirect = menu.redirect
+      route!.redirect = menu.redirect
     } else {
-      route.component = _resolvePageComponent(routeMeta)
+      route!.component = _resolvePageComponent(routeMeta)
     }
 
     if (menu.path.startsWith(ROOT_MENU_PREFIX)) {
@@ -159,13 +153,11 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
       routeMeta.isRoot = true
       routeMeta.path = menu.path
 
-      router.addRoute(route)
+      router.addRoute(route!)
     } else {
       // 添加路由到根路由下
-      router.addRoute(ROOT_ROUTE_NAME, route)
+      router.addRoute(ROOT_ROUTE_NAME, route!)
     }
-
-    return route
   }
 
   if (menu.children?.length) {
@@ -173,6 +165,8 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
       _createSubRoute(router, it, submodule)
     })
   }
+
+  return route
 }
 
 /** 解析菜单路径 */
@@ -304,6 +298,29 @@ function _sortMenus(menus: NavMenuItem[]) {
   return menus
 }
 
+/** 过去掉没有权限的菜单 */
+function _filterAuthMenus(menus: NavMenuItemConfig[], authMenus: NavMenuItem[]) {
+  if (!menus?.length) return []
+
+  const filteredMenus = menus.filter((it: any) => {
+    // 需要根据是否权限配置确定是否过滤
+    if (it.isAuth && it.name) {
+      const authMenu = _findMenuByName(authMenus, it.name, true)
+      return !!authMenu
+    }
+
+    return true
+  })
+
+  filteredMenus.forEach(it => {
+    if (it.children?.length) {
+      it.children = _filterAuthMenus(it.children, authMenus)
+    }
+  })
+
+  return filteredMenus
+}
+
 /**
  * 通过key查找指定的菜单
  * @param menus 目标菜单
@@ -314,14 +331,14 @@ function _sortMenus(menus: NavMenuItem[]) {
 function _findMenuByName(menus: NavMenuItemConfig[], name: string, recursive = false): NavMenuItemConfig | undefined {
   if (!name || !menus?.length) return undefined
 
-  let menu = menus.find(it => it.name === name)
+  const menu = menus.find(it => it.name === name)
   if (menu) return menu
 
   if (recursive) {
     for (const it of menus) {
       if (it.children) {
-        menu = _findMenuByName(it.children as NavMenuItem[], name, recursive)
-        if (menu) return menu
+        const m = _findMenuByName(it.children as NavMenuItem[], name, recursive)
+        if (m) return m
       }
     }
   }

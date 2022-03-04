@@ -125,7 +125,7 @@ export function ensureArray<T>(items: Array<T | null | undefined> | T | null | u
 export function findBy<T = unknown>(items: T[] | undefined | null, key: string, val: unknown): T | undefined {
   if (!items || !items.length) return undefined
 
-  const result = items.find((item) => {
+  const result = items.find(item => {
     if (!item) return false
     return (item as any)[key] === val
   })
@@ -224,19 +224,19 @@ export function deepEqual(obj1: any, obj2: any): boolean {
   return true
 }
 
-/** 深度克隆，并支持循环应用 */
-export function deepClone(obj: any, cache: any[] = []): any {
-  if (!obj || typeof obj !== 'object') return obj
+/** 深度处理目标对象，支持循环引用，返回处理结果（新的对象） */
+export function deepProcess(obj: any, fn: GenericFunction, cache: any[] = []): any {
+  if (!obj || typeof obj !== 'object') return fn(obj)
 
   // 处理日期
   if (obj instanceof Date) {
     const dt = new Date()
     dt.setTime(obj.getTime())
-    return dt
+    return fn(dt)
   }
 
   // 如果obj命中，则当前为循环引用
-  const hit = cache.find((c) => c.original === obj)
+  const hit = cache.find(c => c.original === obj)
   if (hit) return hit.copy
 
   const copy: any = Array.isArray(obj) ? [] : {}
@@ -244,11 +244,26 @@ export function deepClone(obj: any, cache: any[] = []): any {
   // 将copy放入缓存以备后续检查循环引用
   cache.push({ original: obj, copy })
 
-  Object.keys(obj).forEach((key) => {
-    copy[key] = deepClone(obj[key], cache)
+  Object.keys(obj).forEach(key => {
+    copy[key] = deepProcess(obj[key], fn, cache)
   })
 
   return copy
+}
+
+/** 深度克隆，并支持循环引用 */
+export function deepClone(obj: any): any {
+  return deepProcess(obj, (val: any) => {
+    return val
+  })
+}
+
+/** 深度trim，并支持循环引用 */
+export function deepTrim(obj: any): any {
+  return deepProcess(obj, (val: any) => {
+    if (isString(val)) return val.trim()
+    return val
+  })
 }
 
 /**
@@ -256,7 +271,7 @@ export function deepClone(obj: any, cache: any[] = []): any {
  * @param args 被和并的对象
  */
 export function deepMerge(...args: any[]): any {
-  const items = args.filter((it) => !isNil(it))
+  const items = args.filter(it => !isNil(it))
   return deepmergeAll(items, {
     isMergeableObject: isPlainObject
   })
@@ -268,7 +283,7 @@ export function deepMerge(...args: any[]): any {
  * @param options 支持合并选项
  */
 export function deepMerge2(args: any[], options?: DeepmergeOptions): any {
-  const items = args.filter((it) => !isNil(it))
+  const items = args.filter(it => !isNil(it))
 
   const opts = Object.assign(
     {
@@ -346,7 +361,7 @@ export function omit(object: any, props?: string | string[] | OmitFilterFn, filt
  * @param object 需要移除属性的对象
  */
 export function omitNil(object: unknown): any {
-  return omit(object, (val) => !isNil(val))
+  return omit(object, val => !isNil(val))
 }
 
 /**
@@ -354,7 +369,7 @@ export function omitNil(object: unknown): any {
  * @param object 需要移除属性的对象
  */
 export function omitEmpty(object: unknown): any {
-  return omit(object, (val) => !isEmpty(val))
+  return omit(object, val => !isEmpty(val))
 }
 
 /**
@@ -395,10 +410,10 @@ export async function delay<T>(fn: GenericFunction, seconds = 1): Promise<T> {
           // eslint-disable-next-line no-useless-call
           return fn.call(undefined)
         })
-        .then((result) => {
+        .then(result => {
           resolve(result as T)
         })
-        .catch((err) => {
+        .catch(err => {
           reject(err)
         })
     }, seconds)

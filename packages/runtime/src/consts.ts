@@ -9,3 +9,8 @@ export const DEFAULT_MOUNT_EL = '#app' // 默认菜单名
 export const DEFAULT_MENU_NAME = 'default' // 默认菜单名
 export const DEFAULT_PAGE_NAME = 'welcome' // 默认页名
 export const DEFAULT_PAGE_PATH = `/${DEFAULT_PAGE_NAME}` // 默认页名
+
+// 全局事件运行时
+export const RUNTIME_GLOBAL_EVENTS = Object.freeze({
+  CLOSE_APP_NAV: 'CLOSE_APP_NAV' // 关闭应用菜单
+})

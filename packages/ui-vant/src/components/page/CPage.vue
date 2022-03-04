@@ -58,7 +58,7 @@ const bodyStyle = computed(() => {
   position: relative;
   box-sizing: border-box;
   overflow: auto;
-  margin: 10px;
+  padding: 10px;
   border-radius: 3px;
 
   & > .page-body-con {

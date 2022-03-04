@@ -82,13 +82,4 @@ async function doFetch() {
 function doReset() {
   formRef.value.resetFields()
 }
-
-// --------- 操作相关 ------>
 </script>
-
-<style lang="scss" scoped>
-.form-footer {
-  padding: 10px;
-  text-align: center;
-}
-</style>

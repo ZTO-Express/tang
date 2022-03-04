@@ -44,7 +44,9 @@ export interface TokenData {
   [prop: string]: any
 }
 
-export type ApiRequestAction = string | { type?: string; api: string; sourceType?: string; [prop: string]: any }
+export type ApiRequestAction =
+  | string
+  | { type?: string; api?: string; url?: string; sourceType?: string; [prop: string]: any }
 
 /** 请求参数 */
 export interface ApiRequestConfig {

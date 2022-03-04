@@ -19,17 +19,14 @@ const dialogConfig = downloadsConfig.dialog || {}
 const listConfig = downloadsConfig.list || {}
 
 const dialogAttrs = computed(() => {
-  const innerDialogAttrs = Object.assign(
-    {
-      width: '900px'
-    },
-    downloadsConfig?.dialog
-  )
+  const innerDialogAttrs = { width: '900px', top: '5vh', ...downloadsConfig?.dialog }
 
   return {
     title: dialogConfig.title || '下载列表',
-    bodyStyle: dialogConfig.bodyStyle || 'height:80vh;',
+    bodyStyle: dialogConfig.bodyStyle,
+    bodyHeight: dialogConfig.bodyHeight || '80vh',
     noPadding: true,
+    noFooter: dialogConfig.noFooter,
     innerAttrs: {
       dialog: _.omit(innerDialogAttrs, 'title')
     }

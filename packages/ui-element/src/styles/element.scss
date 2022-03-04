@@ -46,6 +46,10 @@ $--font-path: 'element-plus/packages/theme-chalk/src/fonts';
     border-bottom: solid 1px $light-border-color;
   }
 
+  &__body {
+    padding: 10px 20px;
+  }
+
   &__title {
     font-weight: bold;
   }
@@ -67,6 +71,7 @@ $--font-path: 'element-plus/packages/theme-chalk/src/fonts';
 
   &.auto-height &__content {
     height: auto;
+    line-height: auto;
   }
 
   &.props-required &__label::before {

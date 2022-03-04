@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, fileUtil } from '@zto/zpage'
+import { _, vue, fileUtil } from '@zto/zpage'
 
 import type { GenericFunction } from '@zto/zpage'
 import type { UploadFileItem } from './types'
@@ -53,7 +53,7 @@ const { ref, watch, reactive, computed } = vue
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: Array<any>
+    modelValue?: Array<any> | string
     readonly?: boolean
     downloadable?: boolean
     noPadding?: boolean
@@ -157,11 +157,21 @@ async function deleteItem(item: UploadFileItem | number) {
 
     listState.items.splice(index, 1)
     emit('deleted', item)
-    emit('update:modelValue', listState.items)
+
+    const val = getModelValue()
+    emit('update:modelValue', val)
   }
 }
 
-function resetFileItems(items: any[] | undefined) {
+function resetFileItems(val: any[] | string | undefined) {
+  let items: any[] = []
+
+  if (_.isString(val)) {
+    items = val.split(',')
+  } else if (val) {
+    items = val
+  }
+
   if (!items?.length) {
     listState.items = []
     return
@@ -170,19 +180,40 @@ function resetFileItems(items: any[] | undefined) {
   listState.items = items
     .filter(it => !!it)
     .map((it: any) => {
-      const url = it.url
+      let item: any = it
 
-      let name = it.name
-      let path = it.path
+      if (_.isString(it)) {
+        if (props.srcType === 'url') {
+          item = { url: it }
+        } else {
+          item = { path: it }
+        }
+      }
+
+      const url = item.url
+
+      let name = item.name
+      let path = item.path
 
       if (!name) {
-        let fileName = props.srcType === 'url' ? it.url : it.path
+        let fileName = props.srcType === 'url' ? item.url : item.path
         const { fname } = fileUtil.parseFileName(fileName)
         name = fname
       }
 
       return { name, path, url }
     })
+}
+
+function getModelValue() {
+  if (_.isString(props.modelValue)) {
+    const items = (listState.items || []).map(it => {
+      return props.srcType === 'url' ? it.url : it.path
+    })
+
+    return items.join()
+  }
+  return [...listState.items]
 }
 </script>
 

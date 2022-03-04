@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useAppRoute, useAppRouter, useAppStore } from '@zto/zpage'
+import { vue, useAppRoute, useAppRouter, useAppStore, emitter, RUNTIME_GLOBAL_EVENTS } from '@zto/zpage'
 
 const { computed, onMounted, reactive, ref, watch } = vue
 
@@ -54,7 +54,7 @@ const currentKey = computed(() => {
 watch(
   () => route.meta?.pageKey,
   async () => {
-    await store.dispatch('pages/addVisited', route)
+    await store.dispatch('pages/addVisited', { route })
   },
   { immediate: true }
 )
@@ -64,6 +64,8 @@ onMounted(() => {
   document.addEventListener('click', () => {
     popoverState.isShow = false
   })
+
+  emitter.on(RUNTIME_GLOBAL_EVENTS.CLOSE_APP_NAV, () => {})
 })
 
 function handleTabClick(tab: any) {

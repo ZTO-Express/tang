@@ -2,9 +2,11 @@
   <div v-if="isVisible" v-perm="$attrs.perms" class="c-action">
     <c-upload v-if="isUpload" v-bind="uploadAttrs" :disabled="isDisabled"></c-upload>
     <el-button v-else v-bind="buttonAttrs" :disabled="isDisabled" @click="handleClick">
-      {{ buttonAttrs.label }}
+      <slot>
+        {{ buttonAttrs.label }}
+      </slot>
     </el-button>
-    <c-dialog v-if="form" ref="formDialogRef" v-bind="formDialogAttrs" :on-submit="handleFormDialogSubmit" />
+    <c-dialog v-if="form" ref="formDialogRef" v-bind="formDialogAttrs" />
     <c-dialog v-else-if="dialog" ref="dialogRef" v-bind="dialogAttrs" />
     <c-import-dialog v-else-if="isImport" ref="importRef" v-bind="importAttrs" />
   </div>
@@ -23,16 +25,18 @@ const router = useAppRouter()
 const props = withDefaults(
   defineProps<{
     actionType?: string // 行为类型 （fetch, ajax）
-    name: string // 活动名称
+    name?: string // 活动名称
     buttonType?: string // 按钮类型
     trigger?: GenericFunction // 触发器，覆盖action自身触发
     beforeTrigger?: GenericFunction
     afterTrigger?: GenericFunction
     api?: ApiRequestAction // api 触发
-    payload?: Record<string, any> // 相关附加参数
+    apiParams?: Record<string, any> // API参数
+    payload?: any // 相关附加参数
+    extData?: Record<string, any> // API参数
     contextData?: any // 数据上下文
     successMessage?: string // 成功消息
-    dialog?: Record<string, any> // dialog action
+    dialog?: any // dialog action
     form?: Record<string, any> // form action
     import?: Record<string, any> // import action
     upload?: Record<string, any> // upload action
@@ -93,12 +97,16 @@ const formDialogAttrs = computed(() => {
   const form = props.form
   return {
     form,
+    onSubmit: dialogSubmitMethod,
     ...props.innerAttrs?.dialog
   }
 })
 
 const dialogAttrs = computed(() => {
-  return props.dialog
+  return {
+    onSubmit: dialogSubmitMethod,
+    ...props.dialog
+  }
 })
 
 const isImport = computed(() => {
@@ -114,15 +122,16 @@ const importAttrs = computed(() => {
     api: props.api,
     dialog: props.dialog,
     successMessage: props.successMessage,
-    ..._.omit(attrs, ['import']),
-    ...(attrs.import as any)
+    onSubmit: dialogSubmitMethod,
+    ...attrs,
+    ...(props.import as any)
   }
 })
 
 const uploadAttrs = computed(() => {
   return {
-    ..._.omit(attrs, ['upload']),
-    ...(attrs.upload as any)
+    ...attrs,
+    ...(props.upload as any)
   }
 })
 
@@ -131,16 +140,13 @@ function handleClick() {
   trigger()
 }
 
-/** 执行提交 */
-async function handleFormDialogSubmit(model: any, options: any, form: any, dialog: any) {
-  await doSubmitForm(model)
-}
-
 /** 提交表单 */
-async function doSubmitForm(model: any) {
-  if (!props.api) return
+async function dialogSubmitMethod(payload: any) {
+  if (props.api) {
+    await doApiRequest(payload)
+  }
 
-  await apiRequest({ action: props.api, data: model })
+  await doAfterTrigger()
 }
 
 /** 触发活动 */
@@ -161,15 +167,18 @@ async function trigger() {
   } else if (actionType === 'dialog' || props.dialog) {
     // 执行弹框活动
     dialogRef.value.show()
-  } else if (actionType === 'download' || props.link) {
+  } else if (actionType === 'download') {
     // 执行下载
     await fsApi.downloadFile(props.link, attrs)
+    await doAfterTrigger()
   } else if (actionType === 'link' || props.link) {
     // 执行弹框活动
     await router.goto(props.link)
+    await doAfterTrigger()
   } else if (actionType === 'event' || props.event) {
     // 发送事件
     emitter.emits(props.event as any, props.payload)
+    await doAfterTrigger()
   } else if (props.message) {
     // 默认执行消息活动
     const messageProp = props.message
@@ -188,26 +197,24 @@ async function trigger() {
           message: messageProp.message
         }
 
-    msgConfig.title = msgConfig.title || '提示'
-
-    msgConfig = Object.assign(
-      {
-        cancelButtonText: '取消',
-        confirmButtonText: '确定'
-      },
-      msgConfig
-    )
-
-    if (props.api) {
-      return MessageBox(msgConfig).then(async () => {
-        await doApiRequest(props.payload)
-      })
+    msgConfig = {
+      title: '提示',
+      cancelButtonText: '取消',
+      confirmButtonText: '确定',
+      ...msgConfig
     }
+
+    return MessageBox(msgConfig).then(async () => {
+      if (props.api) {
+        await doApiRequest(props.payload)
+      }
+
+      await doAfterTrigger()
+    })
   } else if (props.api) {
     await doApiRequest(props.payload)
+    await doAfterTrigger()
   }
-
-  await doAfterTrigger()
 }
 
 function doBeforeTrigger() {
@@ -229,11 +236,17 @@ function doAfterTrigger() {
 async function doApiRequest(payload: any) {
   let params: any = undefined
 
-  if (payload) {
-    const context = useAppContext(props.contextData)
-    params = tpl.deepFilter(payload, context)
-  } else {
-    params = props.contextData
+  const context = useAppContext(props.contextData)
+
+  if (payload) params = tpl.deepFilter(payload, context)
+
+  if (props.apiParams) {
+    const apiParams = tpl.deepFilter(props.apiParams, context)
+    params = { ...params, ...apiParams }
+  }
+
+  if (props.extData) {
+    params = { ...params, ...props.extData }
   }
 
   await apiRequest({

@@ -49,6 +49,12 @@ function scrollNext() {
 
 <style lang="scss" scoped>
 .tab-nav-button {
+  position: absolute;
+  line-height: 34px;
+  width: 100%;
+  left: 0;
+  top: 0;
+
   .icon-arrow {
     border: 1px solid $primary;
     border-radius: 50%;
@@ -59,10 +65,14 @@ function scrollNext() {
 
   .nav-prev {
     padding: 0 5px 0 15px;
+    float: left;
+    cursor: pointer;
   }
 
   .nav-next {
     padding: 0 15px 0 5px;
+    float: right;
+    cursor: pointer;
   }
 }
 </style>

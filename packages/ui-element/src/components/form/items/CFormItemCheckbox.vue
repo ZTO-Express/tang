@@ -2,7 +2,7 @@
 <template>
   <c-checkbox ref="fieldRef" v-model="model[prop]" v-bind="$attrs" :disabled="disabled" />
   <!-- 下面代码，防止初始化时报错 -->
-  <div style="display: none">{{ model }}</div>
+  <div style="display: none">{{ model[prop] }}</div>
 </template>
 
 <script lang="ts">
