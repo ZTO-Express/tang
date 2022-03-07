@@ -5,7 +5,7 @@
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "skipLibCheck": true,
@@ -20,12 +20,15 @@
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
   "include": [
-    "../typings/*.ts",
+    "./typings/*.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
     "test/**/*.ts",
     "test/**/*.tsx",
+    "prjs/**/*.ts",
+    "prjs/**/*.tsx",
+    "prjs/**/*.vue",
     "mock"
   ],
   "exclude": ["./node_modules"]

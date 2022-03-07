@@ -15,7 +15,7 @@ async function build() {
   const nameArgPrefix = '--name='
   const nameArg = argv.find(arg => arg.startsWith(nameArgPrefix))
 
-  const nameStr = nameArg?.substr(nameArgPrefix.length)
+  const nameStr = nameArg?.substring(nameArgPrefix.length)
 
   if (!nameStr) {
     log.yellow('没有编码名称，请添加--name参数.')
@@ -61,7 +61,7 @@ async function buildByName(name: string) {
     await compile(buildConfig)
 
     log.green(`${name} 编译完成`)
-  } catch (err) {
+  } catch (err: any) {
     log.errorAndExit(err)
   }
 }

@@ -3,12 +3,12 @@ import { ZPAGE_PKG } from './utils/constants'
 import type { ModuleFormat } from 'rollup'
 
 // export const modules = ['esm', 'cjs', 'cjs_prod'] as const
-export const modules = ['esm', 'cjs'] as const
+export const modules = ['esm', 'cjs', 'global'] as const
 export type Module = typeof modules[number]
 export interface BuildInfo {
   module: 'ESNext' | 'CommonJS'
   format: ModuleFormat
-  ext: 'mjs' | 'js' | 'esm.js' | 'cjs.js' | 'cjs.prod.js'
+  ext: 'mjs' | 'js' | 'esm.js' | 'cjs.js' | 'global.js' | 'cjs.prod.js'
   minify?: boolean
   output: {
     /** e.g: `es` */
@@ -42,6 +42,18 @@ export const buildConfig: Record<Module, BuildInfo> = {
     },
     bundle: {
       path: `${ZPAGE_PKG}/lib`
+    }
+  },
+  global: {
+    minify: true,
+    module: 'CommonJS',
+    format: `iife`,
+    ext: 'global.js',
+    output: {
+      name: 'lib'
+    },
+    bundle: {
+      path: `${ZPAGE_PKG}/iife`
     }
   }
   // 暂不考虑压缩

@@ -5,7 +5,7 @@ import Page403 from '../views/errors/403.vue'
 import Page404 from '../views/errors/404.vue'
 import Page500 from '../views/errors/500.vue'
 
-import type { RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from '@zto/zpage'
 
 export const routes: RouteRecordRaw[] = [
   {

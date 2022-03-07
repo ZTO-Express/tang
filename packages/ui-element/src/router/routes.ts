@@ -3,7 +3,7 @@ import { ROOT_ROUTE_NAME } from '@zto/zpage'
 import AppLayout from '../components/app/AppLayout.vue'
 import CErrorPage from '../components/page/CErrorPage.vue'
 
-import type { RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from '@zto/zpage'
 
 export const routes: RouteRecordRaw[] = [
   {

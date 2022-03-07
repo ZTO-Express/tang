@@ -114,9 +114,8 @@ import type { TableColumn, TablePager, SummaryMethodParams, TableData } from './
 import type { ExportColumn } from '../../utils/xlsx'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
-import { watch } from 'vue'
 
-const { ref, reactive, nextTick, computed, useAttrs } = vue
+const { ref, reactive, nextTick, computed, watch, useAttrs } = vue
 
 // 属性
 const props = withDefaults(

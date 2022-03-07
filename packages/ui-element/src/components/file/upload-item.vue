@@ -61,9 +61,8 @@ import { vue, fileUtil } from '@zto/zpage'
 import { Warning, Ticket, Camera, Minus, Check, Close } from '@element-plus/icons'
 
 import type { UploadData } from './types'
-import { reactive } from 'vue'
 
-const { computed, watch, ref } = vue
+const { reactive, computed, watch, ref } = vue
 
 const props = withDefaults(
   defineProps<{

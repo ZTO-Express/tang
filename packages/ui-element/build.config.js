@@ -1,7 +1,7 @@
 export const genTypes = false
 
 export const rollup = {
-  internal: ['vue', '@element-plus/icons', 'element-plus'],
+  internal: ['vue', '@element-plus/icons', '@element-plus/tokens', 'element-plus'],
   plugins: {
     vue: {
       preprocessOptions: {

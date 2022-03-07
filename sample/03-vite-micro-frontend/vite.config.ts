@@ -4,8 +4,6 @@ import createVuePlugin from '@vitejs/plugin-vue'
 
 const vuePlugin = createVuePlugin({ include: [/\.vue$/] })
 
-const projRoot = resolve(__dirname, '..', '..')
-
 export default defineConfig(async () => {
   return {
     root: __dirname,
@@ -27,7 +25,9 @@ export default defineConfig(async () => {
       emptyOutDir: true,
       rollupOptions: {
         input: {
-          main: resolve(__dirname, 'index.html')
+          main: resolve(__dirname, 'index.html'),
+          project01: resolve(__dirname, 'project01/index.html'),
+          project02: resolve(__dirname, 'project02/index.html')
         }
       }
     },
@@ -38,15 +38,12 @@ export default defineConfig(async () => {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: `
-            @use "sass:math";
-            @import "./src/styles/theme.scss";
-          `
+          // additionalData: `
+          //   @use "sass:math";
+          //   @import "./src/styles/theme.scss";
+          // `
         }
       }
-    },
-    optimizeDeps: {
-      include: ['vue', 'vue-router', 'vuex', 'element-plus']
     },
     esbuild: {
       jsxFactory: 'h',
