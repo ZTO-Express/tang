@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "description": "zpage sample项目 vite-micro-frontend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint --fix \"./src/**/*.{ts,tsx,js,vue}\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vite": "^2.6.14"
+  }
+}

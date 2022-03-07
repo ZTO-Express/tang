@@ -8,7 +8,21 @@ export default {
     type: 'crud',
 
     actions: {
-      query: { api: 'analysis/events' },
+      query: {
+        api: {
+          url: 'analysis/events',
+          mockData: {
+            data: [
+              {
+                eventId: 'E01',
+                eventName: '事件1',
+                pv: 1000,
+                uv: 100
+              }
+            ]
+          }
+        }
+      },
       edit: { api: 'analysis/event', method: 'POST', dialog: addEditDialog(true) },
       trend: { label: '事件趋势' }
     },
