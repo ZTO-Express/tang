@@ -1,7 +1,7 @@
 export const genTypes = false
 
 export const rollup = {
-  internal: ['vue', '@element-plus/icons', '@element-plus/tokens', 'element-plus'],
+  internal: ['@element-plus/icons', '@element-plus/tokens', 'element-plus'],
   plugins: {
     vue: {
       preprocessOptions: {
@@ -12,6 +12,20 @@ export const rollup = {
           `
         }
       }
+    }
+  }
+}
+
+export const browser = {
+  // minify: true,
+  external: ['vue', '@zto/zpage-runtime', '@zto/zpage', 'element-plus'],
+  output: {
+    name: 'ZPageElementUI',
+    globals: {
+      vue: 'Vue',
+      '@zto/zpage-runtime': 'ZPageRuntime',
+      '@zto/zpage': 'ZPage',
+      'element-plus': 'ElementPlus'
     }
   }
 }

@@ -18,7 +18,7 @@ const props = defineProps<{
   schema: Record<string, any>
 }>()
 
-const wSchema = await useWidgetSchema(props.schema)
+const wSchema = useWidgetSchema(props.schema)
 
 const currentApp = computed(() => {
   return store.getters.app?.currentApp

@@ -9,5 +9,23 @@ export const tsconfig = {
 }
 
 export const rollup = {
-  internal: ['vue', 'vuex', 'vue-router']
+  internal: ['vue', 'vuex', 'vue-router'],
+  plugins: {
+    replace: {
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      __VUE_PROD_DEVTOOLS__: JSON.stringify(false)
+    }
+  }
+}
+
+export const browser = {
+  // minify: true,
+  external: ['axios', 'vue'],
+  output: {
+    name: 'ZPageRuntime',
+    globals: {
+      axios: 'axios',
+      vue: 'Vue'
+    }
+  }
 }

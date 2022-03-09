@@ -8,11 +8,25 @@
   <title>ZPage Micro Frontend</title>
   <link rel="shortcut icon" type="image/ico" href="favicon.ico">
 
+  <!-- <script>
+    window.process = {
+      env: {
+        NODE_ENV: 'production'
+      }
+    }
+  </script> -->
+
+  <!-- 导入 Axios Vue -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
+
   <!-- 导入 ZPage -->
+  <script type="text/javascript" src="zpage-runtime.browser.js" crossorigin></script>
+  <script type="text/javascript" src="zpage.browser.js" crossorigin></script>
 
-  <!-- 导入ZPage ElementUI样式 -->
-
-  <!-- 导入ZPage ElementUI组件库 -->
+  <!-- 导入ZPage ElementUI -->
+  <script src="https://unpkg.com/element-plus@1.1.0-beta.8/dist/index.full.js"></script>
+  <script type="text/javascript" src="zpage-ui-element.browser.js" crossorigin></script>
 </head>
 
 <body>

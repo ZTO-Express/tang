@@ -47,9 +47,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { vue } from '@zto/zpage'
 import { useAppStore, useWidgetSchema, tpl, useApiRequest, useAppContext, filterEmpty } from '@zto/zpage-ui-element'
 import { ArrowDownBold, InfoFilled } from '@element-plus/icons'
+
+const { computed, nextTick, ref, watch } = vue
 
 // import * as mock from '../../../mock'
 

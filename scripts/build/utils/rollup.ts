@@ -3,12 +3,9 @@ import { getPackageDependencies } from './pkg'
 
 import type { OutputOptions, RollupBuild } from 'rollup'
 
-export const generateExternal = async (options: {
-  full: boolean
-  pkgRoot: string
-  internal: string[]
-}) => {
+export const generateExternal = async (options: { full: boolean; pkgRoot: string; internal: string[] }) => {
   const pkgPath = path.resolve(options.pkgRoot, 'package.json')
+
   const packages: string[] = ['vue', 'vuex', 'vue-router', 'qs', 'axios']
   if (!options.full) {
     // dependencies
@@ -16,9 +13,7 @@ export const generateExternal = async (options: {
   }
 
   const internal = options.internal || []
-  const externelPackages: string[] = [
-    ...new Set(packages.filter(it => it && !internal.includes(it)))
-  ]
+  const externelPackages: string[] = [...new Set(packages.filter(it => it && !internal.includes(it)))]
 
   return (id: string) => {
     return externelPackages.some(pkg => id === pkg || id.startsWith(`${pkg}/`))

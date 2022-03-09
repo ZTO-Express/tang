@@ -3,6 +3,7 @@ import fse from 'fs-extra'
 import { rollup } from 'rollup'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import replace from '@rollup/plugin-replace'
 import esbuild from 'rollup-plugin-esbuild'
 import filesize from 'rollup-plugin-filesize'
 
@@ -17,7 +18,14 @@ import type { OutputOptions, RollupOptions, RollupBuild } from 'rollup'
 
 /** 编译库 */
 export async function compileLib(buildConfig: any) {
+  buildConfig.entryFileName = 'zpage' === buildConfig.packageName ? 'zpage' : `zpage-${buildConfig.packageName}`
+
   await _compile(buildConfig)
+
+  if (buildConfig.browser) {
+    await _compileBrowser(buildConfig)
+    await _compileBrowser(buildConfig, true)
+  }
 
   await _generateDts(buildConfig)
 }
@@ -69,13 +77,13 @@ async function _compile(buildConfig: any) {
 
   // 常用应用
   const entries = buildConfigEntries.filter(it => !it[1]?.minify)
+
   console.log('entries --->', entries.length)
   if (entries?.length) {
-    const bundle = await rollup(
-      getRollupOptions(rollupConfig, {
-        rollup: buildRoollupConfig
-      })
-    )
+    const _rollupOptions = getRollupOptions(rollupConfig, {
+      rollup: buildRoollupConfig
+    })
+    const bundle = await rollup(_rollupOptions)
 
     // 先清理输出目录
     await fse.remove(buildConfig.outDir)
@@ -87,14 +95,51 @@ async function _compile(buildConfig: any) {
   const minifyEntries = buildConfigEntries.filter(it => it[1]?.minify === true)
   console.log('minifyEntries --->', minifyEntries.length)
   if (minifyEntries?.length) {
-    const bundle = await rollup(
-      getRollupOptions(rollupConfig, {
-        minify: true,
-        rollup: buildRoollupConfig
-      })
-    )
+    const _rollupOptions = getRollupOptions(rollupConfig, {
+      minify: true,
+      rollup: buildRoollupConfig
+    })
+
+    const bundle = await rollup(_rollupOptions)
     await _writeBundles(bundle, minifyEntries, buildConfig)
   }
+}
+
+/** 浏览器压缩包编译 */
+async function _compileBrowser(buildConfig: any, minify = false) {
+  const buildRoollupConfig = buildConfig.rollup || {}
+  const input = buildRoollupConfig.input || buildConfig.input
+
+  const browserBuildConfig = buildConfig.browser || {}
+
+  const extName = `browser${minify ? '.min' : ''}.js`
+
+  const _rollupOptions = getRollupOptions(
+    {
+      input,
+      external: browserBuildConfig.external || []
+    },
+    { minify, rollup: buildRoollupConfig }
+  )
+  const bundle = await rollup(_rollupOptions)
+
+  const entryFileNames = `${buildConfig.entryFileName}.${extName}`
+
+  // 先清理输出目录
+  await fse.remove(path.join(buildConfig.outDir, entryFileNames))
+
+  await writeBundles(bundle, [
+    {
+      format: 'iife',
+      dir: buildConfig.outDir,
+      exports: undefined,
+      preserveModules: false,
+      preserveModulesRoot: buildConfig.inputDir,
+      sourcemap: false,
+      entryFileNames: entryFileNames,
+      ...browserBuildConfig.output
+    }
+  ])
 }
 
 /**
@@ -110,42 +155,29 @@ function getRollupOptions(
     rollup?: any
   }
 ) {
-  const esbuildOptions: any = { target: 'chrome58' }
-
-  const isMinify = exOptions.minify
   const exRollupConfig = exOptions.rollup || {}
-
-  if (isMinify === true) {
-    esbuildOptions.minify = true
-  }
-
   const pluginsConfig = exRollupConfig.plugins || {}
-  const esbuildConfig = { ...esbuildOptions, ...pluginsConfig.esbuild }
+  const esbuildConfig = { target: 'chrome58', minify: exOptions.minify === true, ...pluginsConfig.esbuild }
+  const replaceConfig = { ...pluginsConfig.replace }
 
-  const rollupConfig: RollupOptions = Object.assign(
-    {
-      plugins: [
-        nodeResolve({
-          extensions: ['.mjs', '.js', '.json', '.ts']
-        }),
-        commonjs(),
-        esbuild(esbuildConfig),
-        filesize({ reporter })
-      ],
-      treeshake: false
-    },
-    options
-  )
+  const rollupConfig: RollupOptions = {
+    plugins: [
+      nodeResolve({
+        extensions: ['.mjs', '.js', '.json', '.ts']
+      }),
+      replace(replaceConfig),
+      commonjs(),
+      esbuild(esbuildConfig),
+      filesize({ reporter })
+    ],
+    treeshake: false,
+    ...options
+  }
 
   return rollupConfig
 }
 
 async function _writeBundles(bundle: RollupBuild, entries: BuildConfigEntries, buildConfig: any) {
-  const packageName = buildConfig.packageName
-
-  let entryFileName = `zpage-${packageName}`
-  if ('zpage' === packageName) entryFileName = packageName
-
   await writeBundles(
     bundle,
     entries.map(([module, config]): OutputOptions => {
@@ -156,7 +188,7 @@ async function _writeBundles(bundle: RollupBuild, entries: BuildConfigEntries, b
         preserveModules: false,
         preserveModulesRoot: buildConfig.inputDir,
         sourcemap: false,
-        entryFileNames: `${entryFileName}.${config.ext}`
+        entryFileNames: `${buildConfig.entryFileName}.${config.ext}`
       }
     })
   )

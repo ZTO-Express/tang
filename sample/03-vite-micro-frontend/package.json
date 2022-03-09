@@ -7,8 +7,12 @@
     "build": "vite build",
     "lint": "eslint --fix \"./src/**/*.{ts,tsx,js,vue}\""
   },
-  "dependencies": {},
+  "dependencies": {
+    "@zto/zpage": "workspace:^",
+    "@zto/zpage-ui-element": "workspace:^"
+  },
   "devDependencies": {
-    "vite": "^2.6.14"
+    "vite": "^2.6.14",
+    "vite-plugin-externals": "^0.4.0"
   }
 }

@@ -14,8 +14,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { vue } from '@zto/zpage'
 import { useAppStore, useWidgetSchema } from '@zto/zpage-ui-element'
+
+const { computed } = vue
 
 const store = useAppStore()
 

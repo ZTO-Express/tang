@@ -8,8 +8,6 @@
               <c-fuzzy-select
                 :model-value="currentApp?.appCode"
                 :model-label="currentApp?.appName"
-                value-prop="appCode"
-                label-prop="appName"
                 trigger-focus
                 placeholder="请选择应用"
                 :remote-method="fetchApps"
@@ -27,10 +25,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted } from 'vue'
+import { vue } from '@zto/zpage'
 import { useAppStore, emitter, useWidgetSchema, useApi } from '@zto/zpage-ui-element'
 
 import { GLOBAL_EVENTS } from '@/consts'
+
+const { computed, watch, onMounted } = vue
 
 const store = useAppStore()
 const appApi = useApi('app')

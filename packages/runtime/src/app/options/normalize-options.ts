@@ -36,8 +36,13 @@ export function getNormalizedOptions(options?: AppOptions): NormalizedAppOptions
  * @param config
  */
 export function mergeAppOptions(targetOptions: Partial<AppOptions>, sourceOptions?: AppOptions): NormalizedAppOptions {
+  // 浏览器状态下ui无法深度merge编译有可能导致死循环，这里先把ui拿出来
+  const ui = sourceOptions?.ui
+  const _sourceOptions = _.omit(sourceOptions, 'ui')
+
   // 设置全局配置
-  const opts = _.deepMerge(targetOptions, sourceOptions)
+  const opts = _.deepMerge(targetOptions, _sourceOptions)
+  opts.ui = ui
 
   return opts
 }

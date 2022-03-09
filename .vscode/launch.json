@@ -5,12 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Lib Build",
+      "name": "Launch ZPage Build via NPM",
       "type": "node",
       "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "build"],
       "skipFiles": ["<node_internals>/**"],
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/sucrase-node",
-      "runtimeArgs": ["../../scripts/build", "--name=zpage"],
       "cwd": "${workspaceFolder}/packages/zpage"
     },
     {
@@ -21,15 +21,6 @@
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/sucrase-node",
       "runtimeArgs": ["../../scripts/build", "--name=ui-element"],
       "cwd": "${workspaceFolder}/packages/ui-element"
-    },
-    {
-      "name": "Gen Version",
-      "type": "node",
-      "request": "launch",
-      "skipFiles": ["<node_internals>/**"],
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/sucrase-node",
-      "runtimeArgs": ["scripts/version/gen-version.ts"],
-      "cwd": "${workspaceFolder}"
     }
   ]
 }

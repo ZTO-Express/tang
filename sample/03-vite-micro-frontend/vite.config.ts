@@ -1,13 +1,19 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import createVuePlugin from '@vitejs/plugin-vue'
+import { viteExternalsPlugin } from 'vite-plugin-externals'
 
 const vuePlugin = createVuePlugin({ include: [/\.vue$/] })
+const externalsPlugin = viteExternalsPlugin({
+  vue: 'Vue',
+  '@zto/zpage': 'ZPage',
+  '@zto/zpage-ui-element': 'ZPageElementUI'
+})
 
 export default defineConfig(async () => {
   return {
     root: __dirname,
-    plugins: [vuePlugin],
+    plugins: [vuePlugin, externalsPlugin],
     resolve: {
       alias: [
         {
@@ -18,16 +24,18 @@ export default defineConfig(async () => {
           find: /~(.+)/,
           replacement: resolve(__dirname, 'node_modules/$1')
         }
-      ]
+      ],
+      preserveSymlinks: false
     },
     build: {
+      minify: false,
       outDir: './dist',
       emptyOutDir: true,
       rollupOptions: {
         input: {
-          main: resolve(__dirname, 'index.html'),
-          project01: resolve(__dirname, 'project01/index.html'),
-          project02: resolve(__dirname, 'project02/index.html')
+          main: resolve(__dirname, 'index.html')
+          // project01: resolve(__dirname, 'prjs/project01/index.html'),
+          // project02: resolve(__dirname, 'prjs/project02/index.html')
         }
       }
     },
@@ -38,10 +46,10 @@ export default defineConfig(async () => {
     css: {
       preprocessorOptions: {
         scss: {
-          // additionalData: `
-          //   @use "sass:math";
-          //   @import "./src/styles/theme.scss";
-          // `
+          additionalData: `
+            @use "sass:math";
+            @import "./src/styles/theme.scss";
+          `
         }
       }
     },

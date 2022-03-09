@@ -45,7 +45,7 @@ export const defaultOptions = (): Partial<AppOptions> => {
     },
     extends: {
       widgets: [],
-      componnets: []
+      components: []
     }
   }
 }
