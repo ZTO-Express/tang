@@ -176,7 +176,6 @@ async function fetchOptions() {
   } else {
     innerOptions.value = optionsData
   }
-
   const valueProp = props.valueProp
   const optionValueProp = props.optionValueProp
   if (valueProp) {

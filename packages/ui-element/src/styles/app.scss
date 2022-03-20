@@ -99,6 +99,14 @@ hr.separator {
   text-overflow: ellipsis;
 }
 
+ul {
+  &.li-decimal {
+    li {
+      list-style-type: decimal;
+    }
+  }
+}
+
 .bg-white {
   background: white;
 }

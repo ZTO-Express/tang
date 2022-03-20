@@ -120,6 +120,51 @@ export function ensureArray<T>(items: Array<T | null | undefined> | T | null | u
 }
 
 /**
+ * 将对象转换为数组，并将对象的key转换为
+ * @param obj 目标对象
+ * @param retriever 获取数组对象的方法
+ * @returns
+ */
+export function objectToArray<T = any, E = any>(
+  obj: Record<string, E>,
+  retriever?: (item: E, key: string, obj: Record<string, E>) => T
+): (T | undefined | null)[] {
+  if (!obj) return []
+
+  const items = Object.keys(obj).map(key => {
+    let it: any = obj[key]
+    if (retriever) {
+      it = retriever(obj[key], key, obj)
+    }
+
+    return it
+  })
+
+  return items
+}
+
+/**
+ * 数组转换为对象
+ * @param arr 目标数组
+ * @param keyProp 对象key
+ * @returns
+ */
+export function arrayToObject<T = any>(arr: T[], keyProp: string): Record<string, T> {
+  if (!arr?.length) return {}
+
+  const obj: Record<string, T> = arr.reduce((pre: Record<string, T>, cur: T) => {
+    if (cur) {
+      const key: string = (cur as any)[keyProp]
+      if (key) pre[key] = cur
+    }
+
+    return pre
+  }, {})
+
+  return obj
+}
+
+/**
  * 查找目标key
  */
 export function findBy<T = unknown>(items: T[] | undefined | null, key: string, val: unknown): T | undefined {

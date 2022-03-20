@@ -7,7 +7,8 @@ export interface HttpRequestOptions extends AxiosRequestConfig {
   reqCode?: string
   reqLimit?: number
   isSocket?: boolean
-  isBuffer?: false
+  isBuffer?: boolean
+  isSilent?: boolean
 }
 
 // 请求错误
@@ -22,9 +23,9 @@ export interface HttpRequestError {
 export interface HttpRequestConfig {
   interceptors?: {
     beforeRequest?: (config: AxiosRequestConfig) => Promise<any> | GenericFunction
-    requestError?: (error: any) => Promise<any> | GenericFunction
-    afterResponse?: (response: AxiosResponse) => Promise<any> | GenericFunction
-    responseError?: (error: any) => Promise<any> | GenericFunction
+    requestError?: (error: any, config?: HttpRequestConfig) => Promise<any> | GenericFunction
+    afterResponse?: (response: AxiosResponse, config?: HttpRequestConfig) => Promise<any> | GenericFunction
+    responseError?: (error: any, config?: HttpRequestConfig) => Promise<any> | GenericFunction
   }
 
   [prop: string]: any
@@ -61,7 +62,6 @@ export class HttpRequest {
     if (options.isBuffer) config.responseType = 'blob'
 
     this.interceptors(instance, options.url)
-
     const res = await instance.request(config)
     return res
   }
@@ -95,7 +95,7 @@ export class HttpRequest {
 
         return config
       },
-      (error) => {
+      error => {
         const requestError = this._config?.interceptors?.requestError
         if (requestError) return Promise.resolve().then(() => requestError(error))
         return Promise.reject(error)
@@ -113,7 +113,7 @@ export class HttpRequest {
 
         return data
       },
-      (error) => {
+      error => {
         if (url) this.destroy(url)
 
         const responseError = this._config?.interceptors?.responseError

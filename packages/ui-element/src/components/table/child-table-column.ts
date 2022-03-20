@@ -87,18 +87,36 @@ const ChildTableColumn = defineComponent({
         // 编辑列
         scopedSlots.default = (scope: any) => {
           const context = useAppContext(scope)
-
-          if (config.tpl) return tpl.filter(config.tpl, context)
-          if (config.html) return renderHtml(config.html, context)
-
-          const rowEditable = !!scope.row.editable
-
-          const editor = config.editor
           const prop = config.prop
 
+          // __innerTexts用于导出数据时直接获取字符串
+          scope.row.__innerTexts = scope.row.__innerTexts || {}
+
+          let innerText = scope.row[prop]
+
+          if (config.tpl) {
+            innerText = tpl.filter(config.tpl, context)
+            scope.row.__innerTexts[prop] = innerText
+
+            return innerText
+          }
+
+          if (config.html) {
+            const htmlNode = renderHtml(config.html, context)
+            return htmlNode
+          }
+
+          const rowEditable = !!scope.row.editable
+          const editor = config.editor
+
           let tipSlot = null
+
           if (config?.tip) {
-            const tipProps = config?.tip
+            let tipProps: any = config?.tip
+            if (_.isFunction(config?.tip)) {
+              tipProps = config?.tip(context, config)
+            }
+
             let isTip = tipProps.visibleOn ? tpl.evalExpression(tipProps.visibleOn, context) : true
             tipSlot = isTip && h(CPoptip as any, { context, ...tipProps })
           }
@@ -130,15 +148,16 @@ const ChildTableColumn = defineComponent({
             )
           }
 
-          let innerText = scope.row[prop]
-
           /** 直接返回字段 */
           if (config.formatter) {
             innerText = config.formatter(scope.row, config, scope.row[prop], scope.$index, scope)
           }
+          scope.row.__innerTexts[prop] = innerText
 
           let innerStyle = {}
-          if (config.style) {
+          if (_.isFunction(config.style)) {
+            innerStyle = config.style(context, config)
+          } else if (config.style) {
             innerStyle = tpl.deepFilter(config.style, context)
           }
 
@@ -148,6 +167,7 @@ const ChildTableColumn = defineComponent({
             'div',
             {
               style: innerStyle,
+              class: { 'text-ellipsis': true },
               ...config.cell
             },
             _innerSolts

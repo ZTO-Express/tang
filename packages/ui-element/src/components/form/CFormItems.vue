@@ -41,6 +41,7 @@
           />
           <slot v-else v-bind="item" :name="item.prop" />
         </el-form-item>
+        <div v-if="item.tip" class="tip">{{ item.tip }}</div>
       </el-col>
     </template>
 
@@ -64,6 +65,7 @@ import { vue, tpl, _, useAppContext, useConfig, isWidgetEventKey } from '@zto/zp
 import { getFormItemRules } from '../../utils/form'
 
 import type { FormItemConfig } from '../../utils/form'
+import _Link from 'element-plus/lib/components/link'
 
 const { reactive, ref, computed, onMounted } = vue
 const formItemsConfig = useConfig('components.formItems', {})
@@ -232,7 +234,8 @@ function normalizeFormItem(formItem: any) {
 function isVisibleItem(item: FormItemConfig) {
   if (item.hidden === true || item.span === 0 || item.type === 'hidden') return false
   if (item.visibleOn) {
-    return tpl.evalExpression(item.visibleOn, context) !== false
+    if (_.isString(item.visibleOn)) return tpl.evalExpression(item.visibleOn, context) !== false
+    if (_.isFunction(item.visibleOn)) return item.visibleOn(context)
   } else {
     return itemExpanded[item.prop] !== false
   }
@@ -241,7 +244,8 @@ function isVisibleItem(item: FormItemConfig) {
 /** 是否disabled */
 function isDisabledItem(item: FormItemConfig) {
   if (item.disabledOn) {
-    return tpl.evalExpression(item.disabledOn, context)
+    if (_.isString(item.disabledOn)) return tpl.evalExpression(item.disabledOn, context)
+    if (_.isFunction(item.disabledOn)) return item.disabledOn(context)
   }
 
   return item.disabled === true
@@ -251,7 +255,8 @@ function isDisabledItem(item: FormItemConfig) {
 function isRequiredItem(item: FormItemConfig) {
   if (item.required === true) return true
   if (item.requiredOn) {
-    return tpl.evalExpression(item.requiredOn, context)
+    if (_.isString(item.requiredOn)) return tpl.evalExpression(item.requiredOn, context)
+    if (_.isFunction(item.requiredOn)) return item.requiredOn(context)
   } else {
     return false
   }

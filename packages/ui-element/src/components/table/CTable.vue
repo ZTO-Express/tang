@@ -115,7 +115,7 @@ import type { ExportColumn } from '../../utils/xlsx'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
 
-const { ref, reactive, nextTick, computed, watch, useAttrs } = vue
+const { ref, reactive, watch, nextTick, computed, useAttrs } = vue
 
 // 属性
 const props = withDefaults(

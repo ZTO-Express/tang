@@ -387,7 +387,6 @@ function getOperationActionAttrs(options: any, scope: any) {
     optConfig,
     { innerAttrs }
   )
-
   const configPayload = actConfig.payload || optConfig.payload
   if (typeof configPayload === 'function') {
     actionAttrs.payload = configPayload
@@ -524,6 +523,12 @@ function buildActionData(actionCfg: any, context: any) {
 
   if (typeof actionCfg.payload === 'function') {
     actionData = actionCfg.payload(context, { selection: selectedRows.value })
+  } else if (Array.isArray(actionCfg.payload)) {
+    const rowData = context.data.row || {}
+    actionData = actionCfg.payload.reduce((obj: any, key: string) => {
+      if (key) obj[key] = rowData[key]
+      return obj
+    }, {})
   } else if (actionCfg.payload && !_.isEmptyObject(actionCfg.payload)) {
     actionData = tpl.deepFilter(actionCfg.payload, context)
   } else {

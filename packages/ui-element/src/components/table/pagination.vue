@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
 import { vue, useConfig } from '@zto/zpage'
+import { watch } from 'vue'
 
 const { ref, nextTick } = vue
 const emit = defineEmits(['fetch', 'update:pageSize', 'update:pageIndex'])
@@ -39,8 +40,24 @@ const cfg = useConfig('components.pagination', {})
 const innerLayout = props.layout || cfg.layout
 const innerPageSizes = props.pageSizes || cfg.pageSizes
 
-const innerPageSize = ref<number>(props.pageSize || cfg.pageSize || 100)
-const innerPageIndex = ref<number>(props.pageIndex || props.total > 0 ? 1 : 0)
+const innerPageSize = ref<number>(100)
+const innerPageIndex = ref<number>(1)
+
+watch(
+  () => props.pageIndex,
+  () => {
+    innerPageIndex.value = props.pageIndex || (props.total > 0 ? 1 : 0)
+  },
+  { immediate: true }
+)
+
+watch(
+  () => props.pageSize,
+  () => {
+    innerPageSize.value = props.pageSize || cfg.pageSize || 100
+  },
+  { immediate: true }
+)
 
 /** 单页大小改变时触发 */
 function handleSizeChange() {

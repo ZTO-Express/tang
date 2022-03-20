@@ -42,7 +42,8 @@ export function mergeAppOptions(targetOptions: Partial<AppOptions>, sourceOption
 
   // 设置全局配置
   const opts = _.deepMerge(targetOptions, _sourceOptions)
-  opts.ui = ui
+
+  if (ui) opts.ui = ui
 
   return opts
 }

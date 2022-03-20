@@ -17,7 +17,6 @@ export const rollup = {
 }
 
 export const browser = {
-  // minify: true,
   external: ['vue', '@zto/zpage-runtime', '@zto/zpage', 'element-plus'],
   output: {
     name: 'ZPageElementUI',

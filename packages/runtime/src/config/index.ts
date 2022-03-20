@@ -52,8 +52,8 @@ export function useApiRequest<T = ApiRequest>() {
 }
 
 /** 获取环境信息 */
-export const useEnv = (name?: string) => {
-  const section = name ? `env.${name}` : 'env'
+export function useEnv<T = any>(envName?: string): T {
+  const section = envName ? `env.${envName}` : 'env'
   return useConfig(section)
 }
 

@@ -20,6 +20,12 @@
         </slot>
       </div>
 
+      <slot name="extraTip">
+        <div v-if="innerExtraTip?.componentType" class="extra-tip-con">
+          <component :is="innerExtraTip?.componentType" v-bind="innerExtraTip"></component>
+        </div>
+      </slot>
+
       <div class="footer-con">
         <slot name="footer">
           <div class="template-download">
@@ -33,10 +39,17 @@
 
 <script lang="ts">
 export default { inheritAttrs: false }
+
+export interface ImportExtraTip {
+  componentType?: string // 组件类型
+  html?: Record<string, any> // 展示html
+  tpl?: string // 展示模版
+  [prop: string]: any
+}
 </script>
 
 <script setup lang="ts">
-import { vue, useConfig, useRescs, useApiRequest, fileUtil } from '@zto/zpage'
+import { _, vue, useConfig, useRescs, useApiRequest, fileUtil } from '@zto/zpage'
 
 import { useMessage } from '../../composables'
 import * as xlsxUtil from '../../utils/xlsx'
@@ -50,6 +63,7 @@ const props = withDefaults(
     template: string
     title?: string
     tip?: string
+    extraTip?: string | ImportExtraTip
     maxCount?: number
     maxFileSize?: number // 文件大小限制，单位MB
     api?: ApiRequestAction
@@ -97,6 +111,24 @@ const fileImportCfg = useConfig('components.fileImport', {})
 const importTemplates = useRescs('import_templates', {})
 
 const selectedFile = ref()
+
+const innerExtraTip = computed(() => {
+  if (!props.extraTip) return null
+
+  let _extraTip: ImportExtraTip = {}
+
+  if (_.isString(props.extraTip)) {
+    _extraTip = { componentType: 'c-tpl', tpl: props.extraTip }
+  } else if (props.extraTip.tpl) {
+    _extraTip = { componentType: 'c-tpl', ...props.extraTip }
+  } else if (props.extraTip.html) {
+    _extraTip = { componentType: 'c-html', ...props.extraTip }
+  } else {
+    _extraTip = { ...props.extraTip }
+  }
+
+  return _extraTip
+})
 
 const fileList = computed(() => {
   return selectedFile.value ? [selectedFile.value] : []
@@ -198,9 +230,14 @@ async function innerImportMethod(data: any) {
   let importData = data
   if (props.transformMethod) importData = await props.transformMethod(data)
 
+  let paramsData = props.apiParams
+  if (_.isFunction(props.apiParams)) {
+    paramsData = props.apiParams({ data, template: templateData.value })
+  }
+
   const payload = {
     [props.dataProp]: importData,
-    ...props.apiParams
+    ...paramsData
   }
 
   if (importMethod) {
@@ -280,7 +317,8 @@ async function doApiImport(payload: any) {
 
   await apiRequest({
     action: props.api as string,
-    data: payload
+    data: payload,
+    isSilent: true // 防止接口出错后，重复弹出提示框
   })
 }
 

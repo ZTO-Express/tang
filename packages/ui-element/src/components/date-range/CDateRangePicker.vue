@@ -227,7 +227,6 @@ function validateRange(val: Array<string | Date>, notice = false) {
   let errorMessage = ''
 
   if (!dateUtil.isValid(fromDate)) {
-    debugger
     errorMessage = '无效开始时间'
   } else if (!dateUtil.isValid(toDate)) {
     errorMessage = '无效结束时间'

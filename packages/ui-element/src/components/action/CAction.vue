@@ -31,7 +31,7 @@ const props = withDefaults(
     beforeTrigger?: GenericFunction
     afterTrigger?: GenericFunction
     api?: ApiRequestAction // api 触发
-    apiParams?: Record<string, any> // API参数
+    apiParams?: Record<string, any> | GenericFunction // API参数
     payload?: any // 相关附加参数
     extData?: Record<string, any> // API参数
     contextData?: any // 数据上下文
@@ -45,9 +45,9 @@ const props = withDefaults(
     message?: any // message action
     innerAttrs?: Record<string, any> // 内部属性 action
     visible?: boolean
-    visibleOn?: string
+    visibleOn?: string | GenericFunction
     disabled?: boolean
-    disabledOn?: string
+    disabledOn?: string | GenericFunction
   }>(),
   {
     buttonType: 'primary',
@@ -65,15 +65,31 @@ const formDialogRef = ref<any>()
 const dialogRef = ref<any>()
 const importRef = ref<any>()
 
-const formModel = ref(props.form?.model || props.payload || {})
+const payloadData = computed(() => {
+  if (_.isFunction(props.payload)) {
+    const context = useAppContext(props.contextData)
+    return props.payload(context)
+  } else if (Array.isArray(props.payload)) {
+    const ctxData = props.contextData || {}
+    return props.payload.reduce((obj: any, key: string) => {
+      if (key) obj[key] = ctxData[key]
+      return obj
+    }, {})
+  } else {
+    return props.payload
+  }
+})
 
-const context = useAppContext(formModel)
+const actionContext = computed(() => {
+  const context = useAppContext(props.contextData || payloadData.value)
+  return context
+})
 
 const buttonAttrs = computed(() => {
   const actionName = props.name
   const type = props.buttonType
 
-  const label = tpl.filter(attrs.label || actionName, context)
+  const label = tpl.filter(attrs.label || actionName, actionContext.value)
 
   const btnAttrs = { type, ...props.innerAttrs?.button, label }
   return { ...btnAttrs }
@@ -82,15 +98,19 @@ const buttonAttrs = computed(() => {
 const isVisible = computed(() => {
   if (!props.visibleOn) return props.visible !== false
 
-  const context = useAppContext(props.contextData || formModel)
-  return tpl.evalExpression(props.visibleOn, context)
+  if (_.isString(props.visibleOn)) return tpl.evalExpression(props.visibleOn, actionContext.value)
+  if (_.isFunction(props.visibleOn)) return props.visibleOn(actionContext.value)
+
+  return props.visible !== false
 })
 
 const isDisabled = computed(() => {
   if (!props.disabledOn) return props.disabled === true
 
-  const context = useAppContext(props.contextData || formModel)
-  return tpl.evalExpression(props.disabledOn, context)
+  if (_.isString(props.disabledOn)) return tpl.evalExpression(props.disabledOn, actionContext.value)
+  if (_.isFunction(props.disabledOn)) return props.disabledOn(actionContext.value)
+
+  return props.disabled === true
 })
 
 const formDialogAttrs = computed(() => {
@@ -120,6 +140,7 @@ const isUpload = computed(() => {
 const importAttrs = computed(() => {
   return {
     api: props.api,
+    apiParams: props.apiParams,
     dialog: props.dialog,
     successMessage: props.successMessage,
     onSubmit: dialogSubmitMethod,
@@ -160,13 +181,13 @@ async function trigger() {
 
   if (actionType === 'form' || props.form) {
     // 执行表单活动
-    formDialogRef.value.show(formModel)
+    formDialogRef.value.show(payloadData.value)
   } else if (isImport.value) {
     // 打开导入弹框
     importRef.value.show()
   } else if (actionType === 'dialog' || props.dialog) {
     // 执行弹框活动
-    dialogRef.value.show()
+    dialogRef.value.show(payloadData.value)
   } else if (actionType === 'download') {
     // 执行下载
     await fsApi.downloadFile(props.link, attrs)
@@ -177,7 +198,7 @@ async function trigger() {
     await doAfterTrigger()
   } else if (actionType === 'event' || props.event) {
     // 发送事件
-    emitter.emits(props.event as any, props.payload)
+    emitter.emits(props.event as any, payloadData.value)
     await doAfterTrigger()
   } else if (props.message) {
     // 默认执行消息活动
@@ -206,13 +227,13 @@ async function trigger() {
 
     return MessageBox(msgConfig).then(async () => {
       if (props.api) {
-        await doApiRequest(props.payload)
+        await doApiRequest(payloadData.value)
       }
 
       await doAfterTrigger()
     })
   } else if (props.api) {
-    await doApiRequest(props.payload)
+    await doApiRequest(payloadData.value)
     await doAfterTrigger()
   }
 }

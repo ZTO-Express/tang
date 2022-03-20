@@ -1,10 +1,8 @@
-import qsUtil from 'qs'
+import qs from 'qs'
 import { _, noop } from '@zto/zpage-core'
 import { getPageKey, uniqId, guid, uuid } from './helper'
 import { warn } from './debug'
 import * as formatter from './formatter'
-
-const qs = qsUtil
 
 export { _, noop, getPageKey, warn, qs, uniqId, guid, uuid }
 
