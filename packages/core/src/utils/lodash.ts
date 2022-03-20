@@ -311,6 +311,11 @@ export function deepTrim(obj: any): any {
   })
 }
 
+/** 默认深度合并对象判断 */
+export function isDeepMergeableObject(o: any): boolean {
+  return Array.isArray(o) || isPlainObject(o)
+}
+
 /**
  * 深度合并，合并后会产生新的对象，排序靠后的会合并考前的对象
  * @param args 被和并的对象
@@ -318,7 +323,7 @@ export function deepTrim(obj: any): any {
 export function deepMerge(...args: any[]): any {
   const items = args.filter(it => !isNil(it))
   return deepmergeAll(items, {
-    isMergeableObject: isPlainObject
+    isMergeableObject: isDeepMergeableObject
   })
 }
 
@@ -332,7 +337,7 @@ export function deepMerge2(args: any[], options?: DeepmergeOptions): any {
 
   const opts = Object.assign(
     {
-      isMergeableObject: isPlainObject
+      isMergeableObject: isDeepMergeableObject
     },
     options
   )

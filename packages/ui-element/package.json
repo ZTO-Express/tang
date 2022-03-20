@@ -1,6 +1,6 @@
 {
   "name": "@zto/zpage-ui-element",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "@zto/zpage-ui-element",
   "main": "index.js",
   "module": "dist/zpage-ui-element.esm.js",
@@ -21,11 +21,7 @@
     "@element-plus/icons": "^0.0.11",
     "@element-plus/tokens": "^0.0.5",
     "@zto/zpage": "workspace:^",
-    "element-plus": "1.1.0-beta.8",
-    "nprogress": "^0.2.0"
-  },
-  "devDependencies": {
-    "@types/nprogress": "^0.2.0"
+    "element-plus": "1.1.0-beta.8"
   },
   "publishConfig": {
     "access": "public"
