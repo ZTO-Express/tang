@@ -74,6 +74,7 @@ const actions: ActionTree<AppState, RootState> = {
     if (authLoader) {
       let submodules: NavMenuItem[] = []
       if (authLoader?.getMenuData) submodules = await authLoader.getMenuData()
+
       commit('setAppInfo', { submodules })
     }
   },

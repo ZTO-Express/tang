@@ -14,7 +14,9 @@ export interface TableColumn {
 
 export interface TablePager {
   pageIndex: number
+  curPageIndex: number // 上一次查询页
   pageSize?: number
+  [prop: string]: any
 }
 
 export interface TableData {

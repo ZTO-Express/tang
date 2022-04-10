@@ -107,6 +107,11 @@ const bodyStyle = computed(() => {
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 100;
+  z-index: 1;
+}
+</style>
+<style>
+.el-table__fixed-footer-wrapper {
+  z-index: 2 !important;
 }
 </style>

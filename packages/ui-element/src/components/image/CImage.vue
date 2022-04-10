@@ -1,8 +1,13 @@
 <template>
   <div class="c-image">
     <el-button v-if="label" type="text" @click="handleLabelClick" :disabled="!innerSrcs.length">
-      <span>{{ label }}</span>
-      <span v-if="showCount && innerSrcs?.length">({{ innerSrcs?.length }})</span>
+      <template v-if="innerSrcs?.length">
+        <span>{{ label }}</span>
+        <span v-if="showCount && innerSrcs?.length">({{ innerSrcs?.length }})</span>
+      </template>
+      <template v-else>
+        <span>{{ emptyText || label }}</span>
+      </template>
     </el-button>
     <el-image
       v-else-if="innerUrl"
@@ -21,7 +26,7 @@
         </div>
       </template>
     </el-image>
-    <div v-else class="empty flex-center" v-bind="$attrs">暂无图片</div>
+    <div v-else class="empty flex-center" v-bind="$attrs">{{ emptyText }}</div>
     <el-image-viewer
       v-if="showPreview"
       :url-list="innerUrls"
@@ -43,16 +48,18 @@ const { ref, computed, watch, onMounted } = vue
 
 const props = withDefaults(
   defineProps<{
-    label?: String
-    showCount?: boolean // 是否显示图片张数（label不为true有效）
-    srcType?: 'path' | 'url' // path: 需要请求url才能显示，url: 直接显示
     src?: string | string[]
+    srcType?: 'path' | 'url' // path: 需要请求url才能显示，url: 直接显示
+    label?: string
+    emptyText?: string
+    showCount?: boolean // 是否显示图片张数（label不为true有效）
     fit?: string
     preview?: boolean
     initialIndex?: number
     hideOnClickModal?: boolean
   }>(),
   {
+    emptyText: '暂无图片',
     srcType: 'path',
     fit: 'contain',
     initialIndex: 0,

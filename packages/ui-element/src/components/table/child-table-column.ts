@@ -1,4 +1,4 @@
-import { vue, renderHtml, tpl, _, useAppContext } from '@zto/zpage'
+import { vue, tpl, _, useAppContext, renderHtml, renderCmpt } from '@zto/zpage'
 import { ElTableColumn, ElFormItem } from 'element-plus'
 
 import type { GenericFunction } from '@zto/zpage'
@@ -87,6 +87,7 @@ const ChildTableColumn = defineComponent({
         // 编辑列
         scopedSlots.default = (scope: any) => {
           const context = useAppContext(scope)
+
           const prop = config.prop
 
           // __innerTexts用于导出数据时直接获取字符串
@@ -101,15 +102,39 @@ const ChildTableColumn = defineComponent({
             return innerText
           }
 
+          /** 格式化字段 */
+          if (config.formatter) {
+            innerText = config.formatter(scope.row, config, scope.row[prop], scope.$index, scope)
+          }
+          scope.row.__innerTexts[prop] = innerText
+
           if (config.html) {
             const htmlNode = renderHtml(config.html, context)
             return htmlNode
           }
 
-          const rowEditable = !!scope.row.editable
-          const editor = config.editor
+          if (config.component) {
+            let cmptConfig: any = {}
 
-          let tipSlot = null
+            if (_.isFunction(config.component)) {
+              cmptConfig = config.component(context, config)
+            } else {
+              cmptConfig = { ...config.component }
+            }
+
+            // 借用formItem组件
+            let cmptType = cmptConfig.type || 'tpl'
+            if (!cmptConfig.type && cmptConfig.formItemType) {
+              cmptType = `c-form-item-${cmptConfig.formItemType}`
+              cmptConfig.model = scope.row
+              cmptConfig.prop = cmptConfig.prop || prop
+            }
+
+            const innerCmpt = renderCmpt({ props: cmptConfig, componentType: cmptType }, context)
+            return innerCmpt
+          }
+
+          let tipSlot: any = null
 
           if (config?.tip) {
             let tipProps: any = config?.tip
@@ -121,10 +146,13 @@ const ChildTableColumn = defineComponent({
             tipSlot = isTip && h(CPoptip as any, { context, ...tipProps })
           }
 
+          const rowEditable = !!scope.row.editable
+
           /** 编辑模式
            * editable 所有字段可编辑
            *  rowEditable 当前行可编辑 */
-          if (editor && (props.editable || rowEditable)) {
+          if (config.editor && (props.editable || rowEditable)) {
+            const editor = config.editor
             const Editor = resolveComponent(`c-form-item-${editor.itemType}`)
             const editAttrs = _.omit(editor, ['itemType', 'innerAttrs'])
             const formItemAttrs = editor.innerAttrs?.formItem
@@ -148,12 +176,6 @@ const ChildTableColumn = defineComponent({
             )
           }
 
-          /** 直接返回字段 */
-          if (config.formatter) {
-            innerText = config.formatter(scope.row, config, scope.row[prop], scope.$index, scope)
-          }
-          scope.row.__innerTexts[prop] = innerText
-
           let innerStyle = {}
           if (_.isFunction(config.style)) {
             innerStyle = config.style(context, config)
@@ -175,10 +197,26 @@ const ChildTableColumn = defineComponent({
         }
 
         scopedSlots.header = (scope: any) => {
-          let headerLabel = config.label
+          const context = useAppContext(scope)
 
+          let headerConfig = config.header
+          if (_.isFunction(headerConfig)) {
+            headerConfig = config.header(context, config)
+          }
+
+          if (headerConfig?.component) {
+            let headerCmptConfig: any = null
+
+            if (_.isFunction(headerConfig.component)) {
+              headerCmptConfig = config.header(context, config)
+            }
+
+            const headerCmpt = renderCmpt(headerCmptConfig, context)
+            return headerCmpt
+          }
+
+          let headerLabel = headerConfig?.label || config.label
           if (config.headerTpl) {
-            const context = useAppContext(scope)
             headerLabel = tpl.filter(config.headerTpl, context)
           }
 
@@ -218,7 +256,7 @@ const ChildTableColumn = defineComponent({
           return h(
             'div',
             {
-              ...config.header,
+              ...headerConfig,
               class: headerClass
             },
             headerLabel

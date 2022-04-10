@@ -1,5 +1,7 @@
 import { h, resolveComponent } from 'vue'
+import { _ } from '../utils'
 import * as tpl from './tpl'
+
 import type { VNode } from 'vue'
 
 /** 渲染html */
@@ -23,14 +25,15 @@ export function renderHtml(options: any, context: any = {}): VNode | string | un
 /** 渲染组件 */
 export function renderCmpt(options: any, context: any = {}): VNode | string | undefined {
   if (options && typeof options === 'string') return tpl.filter(options, context)
-
   if (!options) return undefined
+
+  if (_.isFunction(options)) options = options(context)
   if (options.visibleOn && !tpl.evalExpression(options?.visibleOn, context)) return undefined
 
   // 渲染html
   if (!options.type && options.tag) return renderHtml(options, context)
 
-  const cmpt = resolveComponent(options.type)
+  const cmpt = resolveComponent(options.componentType || options.ctype || options.type)
   if (!cmpt) return undefined
 
   const props = tpl.deepFilter(options.props, context)
@@ -44,13 +47,13 @@ export function renderCmpt(options: any, context: any = {}): VNode | string | un
   }
 
   if (options.slots) {
-    Object.keys(options.slots).forEach((key) => {
+    Object.keys(options.slots).forEach(key => {
       const slot = options.slots[key]
 
       children[key] = () => {
         if (!slot) return undefined
         if (Array.isArray(slot)) {
-          return slot.map((it) => renderCmpt(it, context))
+          return slot.map(it => renderCmpt(it, context))
         } else {
           return renderCmpt(it, context)
         }

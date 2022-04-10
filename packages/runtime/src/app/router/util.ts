@@ -1,10 +1,11 @@
 import { defineComponent, h } from 'vue'
 
 import { ROOT_ROUTE_NAME, ROOT_MENU_PREFIX } from '../../consts'
-import { _, uniqId, qs, warn, flattenTree, getPageKey } from '../../utils'
+import { _, strings, uniqId, qs, warn, flattenTree, getPageKey } from '../../utils'
 import { useConfig } from '../../config'
 import { findRepeats } from '../../utils/helper'
 import CPageLayout from '../components/CPageLayout'
+import CMicroLayout from '../components/CMicroLayout'
 
 import { defaultMenus } from '../options/defaults'
 
@@ -17,6 +18,7 @@ const __cachedNodes: Record<string, VNode> = {}
 
 /** 根据根据应用导航菜单配置构建路由 */
 export function createAppRoutes(router: Router, submodules: Submodule[]) {
+  const baseRoute = useConfig('router.base', '')
   const exMenus = useConfig('menus', [])
 
   // 规范化外部配置菜单
@@ -48,7 +50,7 @@ export function createAppRoutes(router: Router, submodules: Submodule[]) {
   if (repeatedNames.length) throw new Error(`存在重复的菜单名"${repeatedNames.join()}"`)
 
   submodules.forEach(it => {
-    _createSubRoute(router, it, it)
+    _createSubRoute(router, it, it, baseRoute)
   })
 }
 
@@ -66,8 +68,11 @@ export function pruneCachedPage(router: Router, page: any) {
   }
 }
 
+/** 新增微前端路由 */
+export function createMicroRoute(router: Router, menu: NavMenuItem, submodule: Submodule, baseRoute = '') {}
+
 /** 新增临时路由 */
-export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Submodule) {
+export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Submodule, baseRoute = '') {
   menu.meta = Object.assign(
     {
       hidden: true,
@@ -87,40 +92,43 @@ export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Sub
 
   menu.name = `${menu.name}__tmp_${uniqId()}`
 
-  return _createSubRoute(router, menu, submodule)
+  return _createSubRoute(router, menu, submodule, baseRoute)
 }
 
 /** 根据导航菜单构建路由 */
-function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule) {
+function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule, baseRoute = '') {
   let route: RouteRecordRaw | undefined = undefined
+
+  // 是否微前端菜单
+  const isMicroMenu = menu.isMicro
+
+  if (isMicroMenu && !menu.path) throw new Error('请设置微前端路径')
 
   // 有路径的菜单才有路由
   if (menu.path) {
-    const pathInfo = _parseMenuPath(menu.path)
-    pathInfo.query = Object.assign({}, pathInfo.query, menu.query)
+    const pathInfo = _parseMenuPath(menu.path, baseRoute)
+    pathInfo.query = { ...pathInfo.query, ...menu.query }
 
     // 路由源数据
-    const routeMeta = Object.assign(
-      {
-        type: 'page',
-        name: menu.name,
-        parentName: menu.parentName,
-        submodule: submodule.name,
-        isRoot: false, // 是否根页面
-        icon: menu.icon,
-        label: menu.title,
-        count: menu.children?.length || 0,
-        refererKey: menu.refererKey,
-        menuPath: menu.path,
-        schema: menu.schema,
-        teleportTo: menu.teleportTo,
-        ...pathInfo
-      },
-      menu.meta,
-      {
-        menu
-      }
-    )
+    const routeMeta = {
+      type: isMicroMenu ? 'micro' : 'page',
+      name: menu.name,
+      parentName: menu.parentName,
+      submodule: submodule.name,
+      isSubmodule: menu.isSubmodule,
+      isRoot: false, // 是否根页面
+      isMicro: isMicroMenu,
+      icon: menu.icon,
+      label: menu.title,
+      count: menu.children?.length || 0,
+      refererKey: menu.refererKey,
+      menuPath: menu.path,
+      schema: menu.schema,
+      teleportTo: menu.teleportTo,
+      ...pathInfo,
+      ...menu.meta,
+      menu
+    }
 
     const pageKey = getPageKey(routeMeta)
 
@@ -143,6 +151,8 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
 
     if (menu.redirect) {
       route!.redirect = menu.redirect
+    } else if (isMicroMenu) {
+      route!.component = _resolveMicroComponent(routeMeta)
     } else {
       route!.component = _resolvePageComponent(routeMeta)
     }
@@ -160,7 +170,7 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
     }
   }
 
-  if (menu.children?.length) {
+  if (menu.children?.length && !isMicroMenu) {
     menu.children.forEach(it => {
       _createSubRoute(router, it, submodule)
     })
@@ -170,8 +180,9 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
 }
 
 /** 解析菜单路径 */
-function _parseMenuPath(path: string) {
+function _parseMenuPath(path: string, baseRoute = '') {
   const result: any = { path }
+
   if (path.indexOf('?') > 0) {
     const pathStr = path.substring(0, path.indexOf('?'))
     const queryStr = path.substring(pathStr.length + 1)
@@ -179,6 +190,14 @@ function _parseMenuPath(path: string) {
     result.path = pathStr
     result.query = qs.parse(queryStr)
   }
+
+  if (baseRoute) {
+    const _base = strings.trim(baseRoute, '/')
+    const _path = strings.trim(result.path, '/')
+
+    result.path = `${_base}/${_path}`
+  }
+
   return result
 }
 
@@ -195,7 +214,7 @@ function _normalizeMenus(exMenus: NavMenuItemConfig[]) {
       warn(`建议为菜单${it.title}提供键。`)
     }
 
-    it.order = it.order || index
+    // it.order = it.order || index
 
     if (it.name === 'singles') {
       it.meta = { isSingle: true, ...it.meta }
@@ -298,7 +317,7 @@ function _sortMenus(menus: NavMenuItem[]) {
   return menus
 }
 
-/** 过去掉没有权限的菜单 */
+/** 过滤掉没有权限的菜单 */
 function _filterAuthMenus(menus: NavMenuItemConfig[], authMenus: NavMenuItem[]) {
   if (!menus?.length) return []
 
@@ -357,6 +376,24 @@ function _resolvePageComponent(routeMeta: any) {
           pagePath: routeMeta.path,
           pageSchema: routeMeta.schema,
           teleportTo: routeMeta.teleportTo
+        })
+      }
+    }
+  })
+
+  return pageCmpt
+}
+
+/** 由路由元数据获取微前端组件 */
+function _resolveMicroComponent(routeMeta: any) {
+  const pageCmpt = defineComponent({
+    name: routeMeta.pageKey,
+
+    setup: () => {
+      return () => {
+        return h(CMicroLayout, {
+          path: routeMeta.path,
+          meta: routeMeta
         })
       }
     }

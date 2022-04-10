@@ -43,7 +43,7 @@ export interface NavMenuItemConfig extends Partial<INavMenuItem<NavMenuItemConfi
 
 /** 应用子模块相关信息 */
 export interface Submodule extends NavMenuItem {
-  isSubmodule: true
+  isSubmodule: boolean
   defaultMenu?: NavMenuItemConfig
 }
 
@@ -72,6 +72,7 @@ export interface AppConfig extends RuntimeConfig {
 export interface AppOptions extends InstallableOptions {
   ui: AppUI
   el?: Element | string
+  baseRoute?: string // 基础路由
   schema?: AppSchema
   config?: AppConfig
 }

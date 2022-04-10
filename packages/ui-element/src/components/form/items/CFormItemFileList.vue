@@ -1,7 +1,8 @@
 <template>
   <!-- eslint-disable vue/no-mutating-props -->
   <div class="c-form-item-file-list">
-    <c-file-list :model-value="fileItems" v-bind="$attrs" />
+    <c-file-list v-if="fileItems?.length" :model-value="fileItems" v-bind="$attrs" />
+    <div v-else>{{ emptyText }}</div>
     <div v-if="title" class="title">{{ title }}</div>
   </div>
 </template>
@@ -20,8 +21,11 @@ const props = withDefaults(
     model: Record<string, any>
     prop: string
     title?: string
+    emptyText?: string
   }>(),
-  {}
+  {
+    emptyText: '--'
+  }
 )
 
 const fileItems = computed(() => {

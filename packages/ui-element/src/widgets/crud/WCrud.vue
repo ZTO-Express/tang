@@ -59,7 +59,7 @@
                   <template v-if="sSearch">
                     <el-divider direction="vertical" class="content__divider" />
                     <div class="inline">
-                      <el-button v-if="!sToolbar.noRefresh" type="text" class="q-ml-md" @click="doSearch">
+                      <el-button v-if="!sToolbar.noRefresh" type="text" class="q-ml-md" @click="handleRefresh">
                         刷新
                         <i class="el-icon-refresh-right"></i>
                       </el-button>
@@ -140,9 +140,10 @@ import {
 } from '@zto/zpage'
 
 import { useMessage } from '../../composables'
-import { DEFAULT_ACTIONS } from './consts'
-
 import { appUtil } from '../../utils'
+import { UI_GLOBAL_EVENTS } from '../../consts'
+
+import { DEFAULT_ACTIONS } from './consts'
 
 const { computed, reactive, ref, onMounted, nextTick } = vue
 
@@ -170,6 +171,13 @@ const wSchema = useWidgetSchema(props.schema)
 // 注册微件事件监听
 useWidgetEmitter(wSchema, {
   searchOn: doSearch
+})
+
+// Tab切换时重新布局（防止tab错位）
+emitter.on(UI_GLOBAL_EVENTS.PAGE_TAB_CHANGE, () => {
+  nextTick(() => {
+    doLayout()
+  })
 })
 
 // 活动 schema
@@ -267,6 +275,11 @@ async function handleSearch() {
   await doSearch(true)
 }
 
+// 执行重写加载
+async function handleRefresh() {
+  await doSearch(false, false)
+}
+
 // 按键查询
 function handleKeyup(event: KeyboardEvent) {
   if (event.code == 'Enter') doSearch(true)
@@ -275,6 +288,9 @@ function handleKeyup(event: KeyboardEvent) {
 // 执行重设
 function handleSearchReset() {
   searchFormRef.value.resetFields(true)
+  if (sSearch.onReset) {
+    sSearch.onReset(searchModel)
+  }
 }
 
 function toggleExpandSearch() {
@@ -352,8 +368,8 @@ function handleEditorSubmit() {
   doSearch()
 }
 
-function handleTableFetch() {
-  doSearch()
+function handleTableFetch(payload: any, resetPager: boolean) {
+  doSearch(resetPager)
 }
 
 // 获取操作列活动熟悉
@@ -573,6 +589,11 @@ function buildActionData(actionCfg: any, context: any) {
   return actionData
 }
 
+// table重新布局
+function doLayout() {
+  tableRef.value?.doLayout()
+}
+
 // 执行活动
 async function doAction(action: any, payload: any, options?: any) {
   if (options?.onAction) {
@@ -600,8 +621,10 @@ async function doAction(action: any, payload: any, options?: any) {
     })
 }
 
+const curSearchOptions = ref<any>()
+
 // 执行查询
-async function doSearch(resetPager = false) {
+async function doSearch(resetPager = false, refreshPager = false) {
   if (!tableRef.value) return
 
   if (resetPager === true) {
@@ -616,18 +639,57 @@ async function doSearch(resetPager = false) {
   }
 
   const pager = tableRef.value.pager
-  searchLoading.value = true
 
-  const searchParams = getSearchParams()
+  let searchParams = getSearchParams()
 
-  await apiRequest({
-    pageIndex: pager.pageIndex,
-    pageSize: pager.pageSize,
-    noPager: sTable.noPager,
-    action: { ...queryAction, type: 'query' },
-    params: searchParams
-  })
-    .then(res => {
+  const context = useAppContext()
+
+  if (sSearch.beforeSearch) {
+    const beforeSearchRes = await Promise.resolve().then(() =>
+      sSearch.beforeSearch({
+        ...context,
+        pager,
+        resetPager,
+        refreshPager,
+        searchParams,
+        queryAction
+      })
+    )
+
+    if (!_.isUndefined(beforeSearchRes)) searchParams = beforeSearchRes
+  }
+
+  if (!refreshPager) {
+    curSearchOptions.value = {
+      pageIndex: pager.pageIndex,
+      pageSize: pager.pageSize,
+      noPager: sTable.noPager,
+      action: { ...queryAction, type: 'query' },
+      params: searchParams
+    }
+  }
+
+  await apiRequest(curSearchOptions.value)
+    .then(async res => {
+      if (sSearch.afterSearch) {
+        const afterSearchRes = await Promise.resolve().then(() =>
+          sSearch.afterSearch(
+            {
+              ...context,
+              pager,
+              resetPager,
+              searchParams,
+              queryAction
+            },
+            res
+          )
+        )
+
+        if (!_.isUndefined(afterSearchRes)) res = afterSearchRes
+      }
+
+      pager.curPageIndex = pager.pageIndex
+
       searchResult.value = res
       tableRef.value?.setData(searchResult.value)
     })

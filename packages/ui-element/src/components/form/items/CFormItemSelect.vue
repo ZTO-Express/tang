@@ -7,6 +7,7 @@
     :filterable="filterable"
     :collapseTags="collapseTags"
     :disabled="disabled"
+    :multiple="multiple"
     @change="handleChange"
   >
     <template v-if="groupLabels?.length">
@@ -60,12 +61,14 @@ const props = withDefaults(
     filterable?: boolean
     onChange?: GenericFunction
     noWriteback?: boolean
+    multiple?: boolean
   }>(),
   {
     collapseTags: true,
     filterable: false,
     disabled: false,
-    noWriteback: false
+    noWriteback: false,
+    multiple: false
   }
 )
 

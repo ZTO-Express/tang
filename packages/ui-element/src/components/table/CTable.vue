@@ -24,7 +24,7 @@
             v-if="batchEditable ? true : showCheckbox"
             align="center"
             type="selection"
-            width="40"
+            width="46"
             :selectable="selectableFn"
             :fixed="showFixed"
           />
@@ -88,6 +88,7 @@
         v-bind="pagerAttrs"
         class="c-table__pagination"
         :small="paginationSmall"
+        :layout="paginationLayout"
         :total="tableData.total"
         :page-sizes="pageSizes"
         @fetch="doFetch"
@@ -392,12 +393,14 @@ const columnItems = computed<TableColumn[]>(() => {
 
 const pager = reactive<TablePager>({
   pageIndex: 1,
+  curPageIndex: 1,
   pageSize: props.pageSize || pageSizeCfg
 })
 
 /** 重设页面信息 */
 function resetPager() {
   pager.pageIndex = 1
+  pager.curPageIndex = 1
   return pager
 }
 
@@ -418,7 +421,8 @@ async function doFetch(isResetPager: boolean) {
       method: (attrs.apiMethod || attrs.method) as string,
       sourceType: 'table'
     },
-    ...pager,
+    pageIndex: pager.pageIndex,
+    pageSize: pager.pageSize,
     params: props.apiParams,
     noPager: props.noPager
   }
@@ -427,6 +431,7 @@ async function doFetch(isResetPager: boolean) {
     tableLoading.value = true
     await apiRequest(payload)
       .then(res => {
+        pager.curPageIndex = pager.pageIndex
         setData(res)
       })
       .finally(() => {
@@ -434,7 +439,7 @@ async function doFetch(isResetPager: boolean) {
       })
   }
 
-  emit('fetch', payload)
+  emit('fetch', payload, isResetPager)
 }
 
 /** 设置表格数据 */

@@ -17,7 +17,7 @@ import { vue, useConfig } from '@zto/zpage'
 import { watch } from 'vue'
 
 const { ref, nextTick } = vue
-const emit = defineEmits(['fetch', 'update:pageSize', 'update:pageIndex'])
+const emit = defineEmits(['fetch', 'change', 'update:pageSize', 'update:pageIndex'])
 
 const props = withDefaults(
   defineProps<{
@@ -64,19 +64,21 @@ function handleSizeChange() {
   innerPageIndex.value = 1
   emit('update:pageSize', innerPageSize.value)
   emit('update:pageIndex', innerPageIndex.value) // 改变单页大小，默认跳到第一页查询
-  execQuery()
+  execQuery(true)
 }
 
 /** 当前页改变时触发 */
 function handleCurrentChange() {
   emit('update:pageIndex', innerPageIndex.value)
+
+  emit('change')
   execQuery()
 }
 
 /** 执行查询 */
-function execQuery() {
+function execQuery(resetPager = false) {
   nextTick(() => {
-    emit('fetch')
+    emit('fetch', resetPager)
   })
 }
 </script>

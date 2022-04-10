@@ -97,7 +97,7 @@ function parseMenuItem(menu: IAMMenuItem): NavMenuItem {
     title: menu.menuName,
     icon: menu.icon,
     path: menu.path,
-    order: menu.ordinal || 0,
+    order: menu.order || menu.ordinal || 0,
     data,
     children
   }
