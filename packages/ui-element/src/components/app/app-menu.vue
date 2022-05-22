@@ -34,30 +34,28 @@
 </template>
 
 <script setup lang="ts">
-import { vue, vueRouter, useAppRoute, useAppRouter, useAppStore, useConfig } from '@zto/zpage'
-import { useMessage } from '../../composables'
+import { useCurrentAppInstance, computed, ref, onMounted, onBeforeRouteUpdate } from '@zto/zpage'
 
 import type { NavMenuItem } from '@zto/zpage'
-
-const { computed, ref, onMounted } = vue
-const { onBeforeRouteUpdate } = vueRouter
 
 const props = defineProps<{
   collapse?: boolean
 }>()
 
-const store = useAppStore()
-const router = useAppRouter()
-const route = useAppRoute()
+const app = useCurrentAppInstance()
 
-const navMenu = computed(() => store.getters.navMenu)
+const { appStore, pagesStore } = app.stores
+const router = app.router
+const route = app.useRoute()
 
 // 最多导航条
-const maxNavs = useConfig('app.menu.maxNavs', 10)
-const { Message } = useMessage()
+const maxNavs = app.useAppConfig('menu.maxNavs', 10)
+const { Message } = app.useMessage()
 
 const openedMenuNames = ref<Array<string>>([])
 const activedMenuName = ref<string>('')
+
+const navMenu = computed(() => appStore.navMenu)
 
 onMounted(() => {
   _onRouteChange(route)
@@ -75,7 +73,7 @@ function handleSelect(index: string, indexPath: string, item: any) {
   const meta = route?.meta
 
   if (meta?.cache !== false) {
-    const navPages = store.getters.navPages
+    const navPages = pagesStore.navPages
     if (navPages && navPages.length >= maxNavs) {
       Message.warning(`至多打开${maxNavs}个页面,请关闭不使用的页面后再次尝试！`)
       return
@@ -95,7 +93,7 @@ function _onRouteChange(route: any) {
   activedMenuName.value = menuName
 
   const allMenus = navMenu.value.menus as NavMenuItem[]
-  const currentMenu = allMenus.find((it) => it.name === menuName)
+  const currentMenu = allMenus.find(it => it.name === menuName)
 
   if (currentMenu) {
     openedMenuNames.value = _getParentMenuNames(currentMenu, allMenus, [])
@@ -108,7 +106,7 @@ function _onRouteChange(route: any) {
 function _getParentMenuNames(menu: NavMenuItem, allMenus: NavMenuItem[], cached: string[]) {
   if (!menu.parentId) return cached
 
-  const parentMenu = allMenus.find((it) => it.id === menu.parentId)
+  const parentMenu = allMenus.find(it => it.id === menu.parentId)
   if (!parentMenu) return cached
 
   cached.push(parentMenu.name)

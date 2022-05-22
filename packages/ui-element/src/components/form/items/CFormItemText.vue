@@ -8,11 +8,9 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { tpl, useAppContext, vue, _ } from '@zto/zpage'
+import { tpl, useCurrentAppInstance, computed, _, formatText } from '@zto/zpage'
 
 import type { GenericFunction } from '@zto/zpage'
-
-const { computed } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -20,7 +18,7 @@ const props = withDefaults(
     prop: string
     tpl?: string
     html?: string
-    formatter?: GenericFunction
+    formatter?: string | Record<string, any> | GenericFunction
     emptyText?: string
     style?: Record<string, any>
   }>(),
@@ -29,16 +27,15 @@ const props = withDefaults(
   }
 )
 
+const app = useCurrentAppInstance()
+
 const displayText = computed(() => {
   let text = props.model[props.prop]
 
   if (props.formatter) {
-    return props.formatter(text, props.model)
-  }
-
-  if (props.tpl) {
-    const context = useAppContext(props.model)
-    text = tpl.filter(props.tpl, context)
+    text = app.formatText(text, props.formatter, { model: props.model })
+  } else if (props.tpl) {
+    text = app.filter(props.tpl, props.model)
   }
 
   if (props.emptyText && _.isEmpty(text)) {

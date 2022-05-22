@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { useApi } from '../config'
 import { filesize } from './filesize'
+
+import { HostApp } from '../app/HostApp'
 
 interface FileNameParseResult {
   name: string
@@ -130,8 +131,8 @@ export function getFileMimeType(filename: string) {
 }
 
 export async function getFileUrls(names: string[]) {
-  const fsApi = useApi('fs')
-  const urls = await fsApi.getFileUrls(names)
+  const { fsApi } = HostApp.app!.apis
+  const urls = await fsApi.getFileUrls!(names)
   return urls
 }
 
@@ -143,7 +144,7 @@ export async function getUrlByPath(name: string) {
 
 // 删除文件
 export async function deleteFile(name: string) {
-  const fsApi = useApi('fs')
+  const { fsApi } = HostApp.app!.apis
 
   if (!name || !fsApi.deleteFile) return false
   return fsApi.deleteFile(name)

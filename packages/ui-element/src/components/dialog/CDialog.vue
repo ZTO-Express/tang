@@ -14,15 +14,11 @@
       </div>
     </template>
     <el-row :gutter="24" :style="`margin: 0 0 0; height: ${bodyHeight};`">
-      <el-col
-        ref="contentWrapperRef"
-        :class="`dialog-body-con ${size}`"
-        :span="24"
-        :style="`overflow-y: auto; padding: 12px; ${bodyStyle}`"
-      >
+      <el-col ref="contentWrapperRef" :class="`dialog-body-con fh ${size}`" :span="24" :style="innerBodyStyle">
         <slot />
+        <cmpt v-if="cmpt" ref="cmptRef" :config="cmpt" :context-data="dataModel" :on-submit="onCmptSubmit" />
         <c-form
-          v-if="dialogFormItems.length"
+          v-else-if="dialogFormItems.length"
           ref="formRef"
           v-bind="dialogFormAttrs"
           v-loading="loading"
@@ -68,23 +64,21 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, vueRouter, tpl, noop, _, useApiRequest, useAppContext } from '@zto/zpage'
-import { useMessage } from '../../composables'
+import { _, computed, ref, useAttrs, tpl, noop, onBeforeRouteUpdate, useCurrentAppInstance } from '@zto/zpage'
 
-import type { GenericFunction } from '@zto/zpage'
-
-const { computed, getCurrentInstance, ref, useAttrs, watch } = vue
-const { onBeforeRouteUpdate } = vueRouter
+import type { CmptConfig, GenericFunction } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
     title?: string
     loading?: boolean
+    width?: string | number
     size?: string // 对话框大小 large, full
     actions?: Record<string, any>
     innerAttrs?: Record<string, any> // 内部元素属性
     labelWidth?: string | number // 表单label宽度
-    formItemSpan?: number // 表单span
+    itemSpan?: number // 表单span
+    formItemSpan?: number // 表单span(遗弃)
     formItems?: Record<string, any> // 表单项
     appendToBody?: boolean
     noSubmit?: boolean // 没有提交按钮（只有关闭）
@@ -92,7 +86,10 @@ const props = withDefaults(
     noFooter?: boolean
     bodyStyle?: string
     bodyHeight?: string
+    cmpt?: CmptConfig // 自定义组件类型
+    beforeSubmit?: GenericFunction
     onSubmit?: GenericFunction
+    onShow?: GenericFunction
   }>(),
   {
     appendToBody: true,
@@ -113,25 +110,37 @@ if (props.noFooter) {
 
 const emit = defineEmits(['close', 'submitted'])
 
+const attrs = useAttrs()
+
 // 获取当前组件实例
-const instance = getCurrentInstance()
+const app = useCurrentAppInstance()
+
+const { Message } = app.useMessage()
+const apiRequest = app.request
 
 const contentWrapperRef = ref()
 const isShowDialog = ref(false)
 const formRef = ref<any>()
 
-const attrs = useAttrs()
-const { Message } = useMessage()
-const apiRequest = useApiRequest()
-
 let __callbacks__: GenericFunction[] = []
+
+const cmptRef = ref<any>()
 
 const dataModel = ref<any>({})
 
 const dialogVisible = ref(true)
 
+const innerBodyStyle = computed(() => {
+  if (!props.bodyStyle) {
+    return props.noPadding ? { padding: 0 } : {}
+  }
+})
+
 const dialogFormItems = computed<any>(() => {
-  if (typeof props.formItems === 'function') return props.formItems(dataModel.value)
+  if (typeof props.formItems === 'function') {
+    const context = app.useContext(dataModel.value)
+    return props.formItems(context)
+  }
   return props.formItems || []
 })
 
@@ -154,9 +163,9 @@ const actionItems = computed<any[]>(() => {
 })
 
 const dialogAttrs = computed(() => {
-  let dialogAttrs = { ...props.innerAttrs?.dialog }
+  let _attrs = { ...props.innerAttrs?.dialog, ...attrs }
 
-  let sizeAttrs = {}
+  let sizeAttrs: any = {}
 
   if (props.size === 'large') {
     sizeAttrs = { top: '20px', width: '1000px' }
@@ -164,7 +173,11 @@ const dialogAttrs = computed(() => {
     sizeAttrs = { top: '5px', width: '99vw' }
   }
 
-  return { ...sizeAttrs, ...dialogAttrs }
+  if (props.width) {
+    sizeAttrs.width = props.width
+  }
+
+  return { ...sizeAttrs, ..._attrs }
 })
 
 const dialogFormAttrs = computed(() => {
@@ -178,7 +191,7 @@ const dialogFormAttrs = computed(() => {
 const dialogFormItemsAttrs = computed(() => {
   const formItemsAttrs = {
     showOperation: false,
-    span: props.formItemSpan,
+    span: props.formItemSpan || props.itemSpan,
     ...props.innerAttrs?.formItems
   }
   return formItemsAttrs
@@ -188,6 +201,13 @@ const dialogFormItemsAttrs = computed(() => {
 onBeforeRouteUpdate(() => {
   close()
 })
+
+/** 组件提交 */
+async function onCmptSubmit(options?: any) {
+  await doSubmit(options)
+
+  if (options?.closeAfterSuccess !== false) close()
+}
 
 function handleActionAfterTrigger(options?: any) {
   if (options?.closeAfterSuccess !== false) {
@@ -199,6 +219,7 @@ function handleActionAfterTrigger(options?: any) {
 async function submit(options?: any) {
   if (!formRef.value) {
     await doSubmit(options)
+
     return
   }
 
@@ -206,7 +227,7 @@ async function submit(options?: any) {
 
   // 校验表单
   if (form.validate) {
-    let valid = await form.validate()
+    const valid = await form.validate()
     if (!valid) return
   }
 
@@ -234,7 +255,7 @@ async function submit(options?: any) {
 
     // 没传过callback 调用全局
     if (!__callbacks__ || !__callbacks__.length) {
-      emit('submitted', dataModel.value, attrs, form, instance)
+      emit('submitted', dataModel.value, attrs, form, app)
     }
 
     while (__callbacks__ && __callbacks__.length) {
@@ -254,10 +275,20 @@ async function submit(options?: any) {
 /**
  * 展示
  */
-function show(payload: any, callback?: GenericFunction) {
+async function show(payload: any, callback?: GenericFunction) {
   dataModel.value = _.deepClone(payload || {})
   if (callback) {
     ;(__callbacks__ || (__callbacks__ = [])).push(callback)
+  }
+
+  if (props.onShow) {
+    const context = app.useContext(dataModel.value)
+    const result = await Promise.resolve().then(() => props.onShow!(context))
+    if (result === false) return
+
+    if (Object.keys(result || {}).includes('payload')) {
+      dataModel.value = result.payload
+    }
   }
 
   isShowDialog.value = true
@@ -280,10 +311,27 @@ function close(options?: any) {
 
 /** 提交表单 */
 async function doSubmit(options?: any) {
-  const context = useAppContext(dataModel.value)
+  const extData = options?.extData && app.deepFilter(options?.extData, dataModel.value)
 
-  const extData = tpl.deepFilter(options.extData, context)
-  const payload = Object.assign({}, extData, dataModel.value)
+  let payload = { ...extData, ...dataModel.value }
+  if (props.beforeSubmit) {
+    const context = app.useContext(payload)
+    let result = await Promise.resolve().then(() => props.beforeSubmit!(context, dataModel, options))
+    if (result === false) return
+    if (result && _.isObject(result)) payload = result
+  }
+
+  // 执行自定义组件提交
+  if (cmptRef.value) {
+    const innerCmpt = cmptRef.value?.innerCmpt
+
+    if (innerCmpt?.submit) {
+      const flag = await Promise.resolve().then(() => {
+        return innerCmpt.submit(payload, options)
+      })
+      if (flag === false) return
+    }
+  }
 
   if (props.onSubmit) {
     return await Promise.resolve().then(() => {
@@ -294,13 +342,13 @@ async function doSubmit(options?: any) {
   if (!options?.api) return
 
   await apiRequest({ action: options.api, data: payload })
-
   Message.success(options?.successMessage || '执行成功！')
 }
 
 defineExpose({
   show,
-  close
+  close,
+  dataModel
 })
 </script>
 
@@ -312,6 +360,9 @@ defineExpose({
   }
 
   .dialog-body-con {
+    overflow-y: auto;
+    padding: 12px;
+
     max-height: calc(95vh - 110px); // 防止出现外部滚动条
 
     &.large {
@@ -325,6 +376,10 @@ defineExpose({
 
   &.no-padding {
     .el-dialog__body {
+      padding: 0;
+    }
+
+    .dialog-body-con {
       padding: 0;
     }
   }

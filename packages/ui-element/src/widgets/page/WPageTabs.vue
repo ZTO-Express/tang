@@ -7,24 +7,21 @@
 </template>
 
 <script setup lang="ts">
-import { vue, tpl, emitter, useAppContext, useWidgetSchema } from '@zto/zpage'
+import { computed, ref, tpl, useCurrentAppInstance } from '@zto/zpage'
 import { UI_GLOBAL_EVENTS } from '../../consts'
-
-const { computed, ref } = vue
 
 const props = defineProps<{
   schema: Record<string, any>
 }>()
 
-const wSchema = useWidgetSchema(props.schema)
+const app = useCurrentAppInstance()
 
-const cTabItems = useWidgetSchema(wSchema.items)
-
-const context = useAppContext()
+const emitter = app.emitter
+const wSchema = app.useWidgetSchema(props.schema)
+const cTabItems = app.useWidgetSchema(wSchema.items)
 
 // ---- tab相关 ----->
-
-const defaultTabName = tpl.filter(wSchema.default, context)
+const defaultTabName = app.filter(wSchema.default)
 
 const tabName = ref<string>(defaultTabName)
 

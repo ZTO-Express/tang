@@ -69,8 +69,8 @@ $--font-path: 'element-plus/packages/theme-chalk/src/fonts';
   }
 
   &.auto-height &__content {
+    display: contents;
     height: auto;
-    line-height: auto;
   }
 
   &.props-required &__label::before {

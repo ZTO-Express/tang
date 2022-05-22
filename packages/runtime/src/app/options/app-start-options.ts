@@ -1,15 +1,15 @@
 import { _ } from '../../utils'
-import { defaultOptions } from './defaults'
+import { getInnerStartOptions } from './defaults'
 
-import type { AppOptions, NormalizedAppOptions } from '../../typings'
+import type { AppStartOptions } from '../../typings'
 
 /**
  * 对传入的选项进行规范化
  * @param config
  */
-export function getNormalizedOptions(options?: AppOptions): NormalizedAppOptions {
+export function normalizeAppStartOptions(options?: AppStartOptions): AppStartOptions {
   // 设置全局配置
-  const opts = mergeAppOptions(defaultOptions(), options)
+  const opts = mergeAppStartOptions(getInnerStartOptions(), options)
 
   const keepAlive = _.get(opts, 'app.page.keepAlive')
   const showNav = _.get(opts, 'app.menu.showNav')
@@ -35,7 +35,10 @@ export function getNormalizedOptions(options?: AppOptions): NormalizedAppOptions
  * 对传入的选项进行规范化
  * @param config
  */
-export function mergeAppOptions(targetOptions: Partial<AppOptions>, sourceOptions?: AppOptions): NormalizedAppOptions {
+export function mergeAppStartOptions(
+  targetOptions: Partial<AppStartOptions>,
+  sourceOptions?: Partial<AppStartOptions>
+): AppStartOptions {
   // 浏览器状态下ui无法深度merge编译有可能导致死循环，这里先把ui拿出来
   const ui = sourceOptions?.ui
   const _sourceOptions = _.omit(sourceOptions, 'ui')

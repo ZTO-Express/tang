@@ -1,6 +1,6 @@
 /** 上传文件 */
 
-import { _, useConfig } from '@zto/zpage'
+import { _, useCurrentAppInstance } from '@zto/zpage'
 
 export interface UploadStoreOptions {
   [prop: string]: any
@@ -15,7 +15,9 @@ export interface UploadOptions {
 
 /** 执行文件上传 */
 export async function upload(file: File, options?: UploadOptions) {
-  const uploadCfg = useConfig('components.file.upload')
+  const app = useCurrentAppInstance(false, true)
+
+  const uploadCfg = app?.useComponentsConfig('file.upload')
 
   const uploadFn = uploadCfg?.fn
   const realOptions = _.omitNil(options)

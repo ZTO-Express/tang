@@ -13,10 +13,8 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useConfig } from '@zto/zpage'
-import { watch } from 'vue'
+import { ref, nextTick, watch, useCurrentAppInstance } from '@zto/zpage'
 
-const { ref, nextTick } = vue
 const emit = defineEmits(['fetch', 'change', 'update:pageSize', 'update:pageIndex'])
 
 const props = withDefaults(
@@ -34,7 +32,9 @@ const props = withDefaults(
   }
 )
 
-const cfg = useConfig('components.pagination', {})
+const app = useCurrentAppInstance()
+
+const cfg = app.useComponentsConfig('pagination', {})
 
 // 配置信息
 const innerLayout = props.layout || cfg.layout

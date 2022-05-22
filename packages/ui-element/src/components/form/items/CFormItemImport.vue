@@ -12,8 +12,7 @@ export default { inheritAttrs: false }
 <script setup lang="ts">
 /* eslint-disable vue/no-mutating-props */
 
-import { vue, useConfig, _ } from '@zto/zpage'
-const { ref, computed, useAttrs } = vue
+import { _, computed, useAttrs } from '@zto/zpage'
 
 import type { GenericFunction } from '@zto/zpage'
 

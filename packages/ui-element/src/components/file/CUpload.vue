@@ -27,12 +27,10 @@
 </template>
 
 <script setup lang="ts">
-import { _, vue } from '@zto/zpage'
-import { fileUtil, GenericFunction, useConfig } from '@zto/zpage-runtime'
+import { _, watch, fileUtil, reactive, computed, useCurrentAppInstance } from '@zto/zpage'
 
+import type { GenericFunction } from '@zto/zpage'
 import type { UploadFileItem } from './types'
-
-const { ref, watch, reactive, computed } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -74,7 +72,9 @@ const props = withDefaults(
 
 const emit = defineEmits(['update:modelValue', 'update:name', 'change', 'completed', 'deleted'])
 
-const uploadConfig = useConfig('components.file.upload', {})
+const app = useCurrentAppInstance()
+
+const uploadConfig = app.useComponentsConfig('file.upload', {})
 
 const uploadState = reactive<{
   fileList: UploadFileItem[]

@@ -44,12 +44,10 @@
 </template>
 
 <script setup lang="ts">
-import { _, vue, fileUtil } from '@zto/zpage'
+import { _, ref, watch, reactive, computed, fileUtil } from '@zto/zpage'
 
 import type { GenericFunction } from '@zto/zpage'
 import type { UploadFileItem } from './types'
-
-const { ref, watch, reactive, computed } = vue
 
 const props = withDefaults(
   defineProps<{

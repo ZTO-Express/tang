@@ -11,18 +11,14 @@
 </template>
 
 <script setup lang="ts">
-import { vue, _, useAppRouter, useApiRequest, useAppContext, useApi, emitter, tpl } from '@zto/zpage'
-import { useMessage } from '../../composables'
-
-import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
-
-const { computed, ref, useAttrs } = vue
+import { _, computed, useAttrs, useCurrentAppInstance } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
     label: string
     title?: string
     disabled?: boolean
+    contextData?: any // 数据上下文
     beforeTrigger?: Function
     onTrigger?: Function
     afterTrigger?: Function
@@ -33,6 +29,13 @@ const props = withDefaults(
 )
 
 const attrs = useAttrs()
+
+const app = useCurrentAppInstance()
+
+const actionContext = computed(() => {
+  const context = app.useContext(props.contextData)
+  return context
+})
 
 const buttonAttrs = computed(() => {
   return
@@ -52,13 +55,13 @@ async function trigger() {
 
 function onBeforeTrigger() {
   return Promise.resolve().then(() => {
-    if (props.beforeTrigger) return props.beforeTrigger()
+    if (props.beforeTrigger) return props.beforeTrigger(actionContext.value)
   })
 }
 
 function onAfterTrigger() {
   return Promise.resolve().then(() => {
-    if (props.afterTrigger) return props.afterTrigger(attrs)
+    if (props.afterTrigger) return props.afterTrigger(actionContext.value, attrs)
   })
 }
 

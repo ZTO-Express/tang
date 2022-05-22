@@ -1,76 +1,78 @@
-import { useAuthLoader } from '../../loaders'
+import { _ } from '../../../utils'
+import { STORE_NAME } from '../../../consts'
+import { App } from '../../App'
+import { defineStore } from '../util'
 
-import type { ActionTree, MutationTree } from 'vuex'
-import type { RootState, UserState } from '../../../typings/store'
+import type { UserState, UserGetters, UserActions } from '../../../typings'
 
-// 用户状态
-const state: UserState = {
-  logged: false,
-  userId: '',
-  mobile: '',
-  avatar: '',
-  username: '',
-  nickname: '',
-  menus: [],
-  roles: [],
-  permissions: []
-}
+export function defineUserStore(app: App) {
+  const appName = app.name
 
-const mutations: MutationTree<UserState> = {
-  setUserInfo: (state, payload: any) => {
-    state.logged = !!payload.username
+  return defineStore<UserState, UserGetters, UserActions>(STORE_NAME.USER, {
+    appName,
 
-    state.username = payload.username
-    state.avatar = payload.avatar
-    state.nickname = payload.nickname
-    state.mobile = payload.mobile
+    state: () => {
+      return {
+        logged: false,
+        userId: '',
+        mobile: '',
+        avatar: '',
+        username: '',
+        nickname: '',
+        menus: [],
+        roles: [],
+        permissions: [],
+        data: {}
+      }
+    },
 
-    state.roles = payload.roles
-    state.menus = payload.menus
-    state.permissions = payload.permissions
+    actions: {
+      /** 设置用户信息 */
+      set(payload: Record<string, any>) {
+        if (!payload) return
 
-    const pStates = payload.states
-    if (pStates) {
-      for (const key in pStates) {
-        state[key] = pStates[key]
+        this.$patch({
+          logged: !!payload.username,
+
+          username: payload.username,
+          avatar: payload.avatar,
+          nickname: payload.nickname,
+          mobile: payload.mobile,
+
+          roles: payload.roles,
+          menus: payload.menus,
+          permissions: payload.permissions
+        })
+
+        this.setData(payload.datas)
+      },
+
+      // 设置user 数据
+      setData(payload: Record<string, any>) {
+        if (!payload) return
+
+        this.$patch(state => {
+          const pData = payload
+
+          if (_.isObject(pData)) {
+            const sData = { ...state.data }
+
+            for (const key in pData) {
+              sData[key] = pData[key]
+            }
+            state.data = sData
+          }
+        })
+      },
+
+      async load(payload: Record<string, any>) {
+        const authLoader = app.useAuthLoader()
+
+        if (authLoader) {
+          const res = await authLoader.getUserInfo(app, payload)
+          this.set(res)
+        }
       }
     }
-  },
-
-  // 设置user states
-  setUserStates(state, payload: any) {
-    const pStates = payload
-    if (pStates) {
-      for (const key in pStates) {
-        state[key] = pStates[key]
-      }
-    }
-  }
-}
-
-const actions: ActionTree<UserState, RootState> = {
-  // 获取用户信息
-  async getUserInfo({ commit }, payload: Record<string, any>) {
-    const authLoader = useAuthLoader()
-
-    if (authLoader) {
-      const res = await authLoader.getUserInfo(payload)
-
-      // 设置用户信息
-      commit('setUserInfo', res)
-    }
-  },
-
-  // 登出
-  async logout() {
-    const authLoader = useAuthLoader()
-    if (authLoader) authLoader.logout()
-  }
-}
-
-export default {
-  namespaced: true,
-  state,
-  mutations,
-  actions
+  })
 }

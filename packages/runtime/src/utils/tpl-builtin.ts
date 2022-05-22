@@ -6,8 +6,9 @@ import uniq from 'lodash-es/uniq'
 import transform from 'lodash-es/transform'
 
 import { createObject, isObject, setVariable, qsstringify, keyToPath, string2regExp, deleteVariable } from './helper'
+import { formatText } from './format'
+
 import type { Enginer } from './tpl'
-import { formatText } from './util'
 
 const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 

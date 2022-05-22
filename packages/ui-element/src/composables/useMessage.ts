@@ -8,3 +8,13 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 export function useMessage() {
   return { Message: ElMessage, MessageBox: ElMessageBox }
 }
+
+/** 展示消息 */
+export function showMessage(options?: any) {
+  return ElMessage(options)
+}
+
+/** 展示消息方法 */
+export function showMessageBox(options?: any) {
+  return ElMessageBox(options)
+}

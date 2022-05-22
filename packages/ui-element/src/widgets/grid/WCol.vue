@@ -9,16 +9,16 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, _, useWidgetSchema } from '@zto/zpage'
-
-const { computed } = vue
+import { computed, _, useCurrentAppInstance } from '@zto/zpage'
 
 // 属性
 const props = defineProps<{
   schema: Record<string, any>
 }>()
 
-const wSchema = useWidgetSchema(props.schema)
+const app = useCurrentAppInstance()
+
+const wSchema = app.useWidgetSchema(props.schema)
 
 const colAttrs = computed(() => {
   return _.omit(wSchema, ['type', 'body'])

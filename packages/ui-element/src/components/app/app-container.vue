@@ -25,18 +25,19 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useConfig } from '@zto/zpage'
+import { computed, ref, useCurrentAppInstance } from '@zto/zpage'
 import { Back } from '@element-plus/icons'
 
 import AppMenu from './app-menu.vue'
 import AppNav from './app-nav.vue'
 import AppContent from './app-content.vue'
 
-const { computed, ref } = vue
-
 const asideCollapse = ref(false)
-const menuConfig = useConfig('app.menu', {})
-const frameConfig = useConfig('app.frame')
+
+const app = useCurrentAppInstance()
+
+const menuConfig = app.useAppConfig('menu', {})
+const frameConfig = app.useAppConfig('frame')
 
 /** 是否显示框架 */
 const showFrame = computed(() => {

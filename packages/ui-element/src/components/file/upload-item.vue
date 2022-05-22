@@ -57,12 +57,10 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, fileUtil } from '@zto/zpage'
+import { fileUtil, reactive, computed, watch, ref } from '@zto/zpage'
 import { Warning, Ticket, Camera, Minus, Check, Close } from '@element-plus/icons'
 
 import type { UploadData } from './types'
-
-const { reactive, computed, watch, ref } = vue
 
 const props = withDefaults(
   defineProps<{

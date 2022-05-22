@@ -1,39 +1,27 @@
-import { useConfig } from '../../config'
 import { authLoaders } from './auth'
 import { pageLoaders } from './page'
 
-import type { AppAuthLoader, AppPageLoader, AppLoader } from '../../typings'
+import type { AppLoader } from '../../typings'
 
-const __appLoaders: Record<string, AppLoader[]> = {
-  auth: authLoaders,
-  page: pageLoaders
+export function getInnerLoaders(): AppLoader[] {
+  return [...authLoaders, ...pageLoaders]
 }
 
-/** 获取loader */
-export function useLoader<T extends AppLoader>(type: keyof typeof __appLoaders, name: string | T) {
-  if (!type || !name) return undefined
+/** 合并两个加载器 */
+export function mergeLoaders(targetLoaders?: AppLoader[], sourceLoaders?: AppLoader[]) {
+  targetLoaders = targetLoaders || []
+  sourceLoaders = sourceLoaders || []
 
-  if (typeof name === 'object') {
-    return name
-  }
+  const _loaders = [...targetLoaders]
 
-  const loaders = __appLoaders[type] || []
-  const loader = loaders.find((it) => it.name === name)
-  return loader as T | undefined
-}
+  sourceLoaders.forEach(it => {
+    const existsIndex = _loaders.findIndex(_it => _it.type === it.type && _it.name === it.name)
+    if (existsIndex > -1) {
+      _loaders[existsIndex] = it
+    } else {
+      _loaders.push(it)
+    }
+  })
 
-/** 获取auth loader, 默认获取当前配置的loader */
-export function useAuthLoader(name?: string): AppAuthLoader | undefined {
-  if (!name) name = useConfig('app.auth', {}).loader
-  if (!name) return undefined
-
-  return useLoader<AppAuthLoader>('auth', name)
-}
-
-/** 获取page loader, 默认获取当前配置的loader */
-export function usePageLoader(name?: string): AppPageLoader | undefined {
-  if (!name) name = useConfig('app.page', {}).loader
-  if (!name) return undefined
-
-  return useLoader<AppPageLoader>('page', name)
+  return _loaders
 }

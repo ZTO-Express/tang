@@ -1,3 +1,5 @@
+import type { AppLoaderType } from '../consts'
+import type { App } from '../app/App'
 import type { VueComponent } from './vue'
 import type {
   Router,
@@ -7,16 +9,31 @@ import type {
   RouteLocationNormalized,
   RouteLocationNormalizedLoaded
 } from 'vue-router'
-import type { Widget, Plugin, Schema, PageSchema, PromiseFunction, PromiseObject } from '@zto/zpage-core'
+import type {
+  Widget,
+  Plugin,
+  Schema,
+  AppSchema,
+  PageSchema,
+  PartialPageSchema,
+  PromiseFunction,
+  PromiseObject,
+  Loader
+} from '@zto/zpage-core'
+import type { FfbProcessor } from '@zto/zpage-ffb'
 
-import type { InstallableOptions, RuntimeConfig, RuntimeUI } from './runtime'
-import type { AppStore } from './store'
+import type { AppConfigDefinition, AppAppConfig, AppApiConfig, AppApisDefinition, AppPageDefinition } from './config'
+import type { InstallableOptions, TextFormatters, ApiRequest, RuntimeUI, RuntimeExtensions } from './runtime'
+import type { AppDatas } from './store'
+import type { HttpRequest, HttpRequestConfig } from '../utils'
 
 export interface AppSchema extends Schema {
   type: 'app'
-  name: string
+  name?: string
   logo?: string
 }
+
+export type PartialAppSchema = Omit<AppSchema, 'type'>
 
 /** 菜单选项 */
 export interface INavMenuItem<T> {
@@ -60,103 +77,140 @@ export interface AppUI extends RuntimeUI {
   root: VueComponent
   router?: AppRouterConfig
   install?: PromiseFunction
+  useMessage: () => any
+  showMessage: (options?: any) => void
+  showMessageBox: (options?: any) => void
 
   [prop: string]: any
 }
 
-export interface AppConfig extends RuntimeConfig {
-  app?: Record<string, any>
+export interface AppExtensions extends RuntimeExtensions {
+  loaders?: AppLoader[]
+  plugins?: Plugin[]
+  widgets?: Widget[]
+}
+
+export type AppExtensionOptions = AppExtensions
+
+/** 应用配置 */
+export interface AppConfigOptions {
+  schema?: AppConfigDefinition<PartialAppSchema>
+  app?: AppConfigDefinition<AppAppConfig>
+  menus?: AppConfigDefinition<NavMenuItemConfig[]>
+  api?: AppConfigDefinition<AppApiConfig>
+  apis?: AppApisDefinition
+  widgets?: AppConfigDefinition
+  components?: AppConfigDefinition
+  formatters?: AppConfigDefinition<TextFormatters>
+  assets?: AppConfigDefinition
 }
 
 /** 运行时启动选项 */
-export interface AppOptions extends InstallableOptions {
+export interface AppStartOptions extends InstallableOptions {
+  name: string // 应用名称
+  isHost: boolean // 是否宿主应用（微服务时应用，默认true）
+  container?: Element | string
+  env: Record<string, any>
   ui: AppUI
-  el?: Element | string
-  baseRoute?: string // 基础路由
-  schema?: AppSchema
-  config?: AppConfig
+  menus?: NavMenuItem[]
+  pages?: AppPageDefinition[]
+  config?: AppConfigOptions
+  configs?: AppConfigOptions[]
+  extensions?: AppExtensionOptions
 }
 
-// 运行时配置
-
-export interface AppInstanceOptions {
-  ui: AppUI
-  router: Router
-  store: AppStore
-  el?: Element | string
-  plugins?: Plugin[]
-  widgets?: Widget[]
-  [prop: string]: any
+export interface PartialAppStartOptions extends Partial<AppStartOptions> {
+  options?: Partial<AppOptions>
 }
 
-/**
- * App启动选项
- *  T 为框架组件类型（vue为Vue）
- */
-export interface NormalizedAppOptions extends Required<AppOptions> {
-  schema: AppSchema
+/** 应用构造函数选项 */
+export interface AppCtorOptions extends AppStartOptions {}
+
+/** 默认应用上下文 */
+export interface AppContext {
+  runtime: typeof runtime
+  app: App
+
+  route?: RouteLocationNormalizedLoaded
+  datas: AppDatas
+}
+
+export interface PageContext extends AppDatas {
+  runtime: typeof runtime
+  app: App
+  apis: AppApis
+  api: AppApi
+
+  datas: AppDatas
+
+  route?: RouteLocationNormalizedLoaded
+  data?: any
 }
 
 // 应用加载器
-export interface AppLoader {
+export interface AppLoader extends Loader {
+  type: AppLoaderType
   name: string
 }
 
 // 权限加载器
 export interface AppAuthLoader extends AppLoader {
+  type: AppLoaderType.AUTH
+
   // 检查应用认证
-  checkAuth: (config: AppConfig) => PromiseObject
+  checkAuth: (app: App, ...args: any[]) => PromiseObject
 
   // 获取用户信息
-  getUserInfo: (...args: any[]) => Promise<any>
+  getUserInfo: (app: App, ...args: any[]) => Promise<any>
 
   // 解析获取的菜单数据
-  getMenuData: (...args: any[]) => Promise<NavMenuItem[]>
+  getMenuData: (app: App, ...args: any[]) => Promise<NavMenuItem[]>
 
   // 登出
-  logout: (...args: any[]) => Promise<void>
+  logout: (app: App, ...args: any[]) => Promise<void>
 }
 
 // 页面加载器
 export interface AppPageLoader extends AppLoader {
-  loadPage: (path: string) => Promise<PageSchema | undefined>
+  type: AppLoaderType.PAGE
+
+  loadPage: (app: App, path: string) => Promise<PageSchema | undefined>
+}
+
+export interface AppApi extends HttpRequest {
+  request: ApiRequest
+  [prop: string]: any
 }
 
 /**
  * 用户相关Api
  */
-export interface AppUserApi {
-  // 检查权限, 一般给auth loader用
-  checkAuth?: (config: AppConfig) => PromiseObject
-
-  // 获取接口调用token
-  getToken?: PromiseFunction
-
-  // 交换token
-  exchangeToken?: PromiseFunction
-
-  // 获取用户信息
-  getUserInfo: PromiseFunction
-
-  // 登出系统
-  logout?: PromiseFunction
+export interface AppAuthApi extends AppApi {
+  checkAuth?: PromiseFunction // 检查权限, 一般给auth loader用
+  getToken?: PromiseFunction // 获取接口调用token
+  exchangeToken?: PromiseFunction // 交换token
+  getUserInfo?: PromiseFunction // 获取用户信息
+  logout?: PromiseFunction // 登出系统
+  [prop: string]: any
 }
 
 /**
  * 文件系统相关Api
  */
-export interface AppFsApi {
-  // 根据文件名称获取文件地址
-  getFileUrls?: PromiseFunction
+export interface AppFsApi extends AppApi {
+  getFileUrls?: PromiseFunction // 根据文件名称获取文件地址
+  getUploadToken?: PromiseFunction // 获取上传token
+  deleteFile?: PromiseFunction // 删除文件
+  downloadFile?: (fileName: string, options?: any) => Promise<void> // 下载文件
+  [prop: string]: any
+}
 
-  // 获取上传token
-  getUploadToken?: PromiseFunction
-
-  // 删除文件
-  deleteFile?: PromiseFunction
-
-  // 下载文件
-  downloadFile?: (fileName: string, options?: any) => Promise<void>
+/** 应用Apis */
+export interface AppApis {
+  appApi: AppApi
+  fsApi: AppFsApi
+  authApi: AppAuthApi
+  [prop: string]: AppApi
 }
 
 export interface AppRendererOptions {

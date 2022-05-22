@@ -21,11 +21,11 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { dateUtil, vue } from '@zto/zpage'
+import { dateUtil, watch } from '@zto/zpage'
+
+import { useFormItem } from '../util'
 
 import type { GenericFunction } from '@zto/zpage'
-
-const { ref, watch } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -49,6 +49,8 @@ const props = withDefaults(
   }
 )
 
+const { handleChange } = useFormItem(props)
+
 watch(
   () => props.model[props.prop],
   (cur, old) => {
@@ -67,10 +69,5 @@ const innerDisabledDateFn = function (time: any) {
   if (props.minDate && time < new Date(props.minDate).getTime()) return true
   if (props.maxDate && time > new Date(props.maxDate).getTime()) return true
   return false
-}
-
-function handleChange(payload: any) {
-  if (!props.onChange) return
-  props.onChange(props.model, payload)
 }
 </script>

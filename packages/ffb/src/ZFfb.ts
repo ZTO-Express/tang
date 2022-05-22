@@ -1,56 +1,72 @@
 /** FFB标识器 */
 export const FFB_INDENTITY = '$'
 
-let __processors = {}
-
-/** 注册ffb处理器 */
-export function use(__process: any) {
-  __processors = __process || {}
+export interface FfbProcessor {
+  beforeRequest?: (config: any) => void
+  afterResponse?: (response: any) => any
 }
 
-/** 是否api ffb */
-export function isFfbApi(api: string) {
-  return api && api.endsWith(FFB_INDENTITY)
-}
+export class ZFfb {
+  readonly identity = FFB_INDENTITY
 
-/** 解析 */
-export function parseFfbApi(api: string) {
-  const processor = (__processors as any)[api]
-
-  if (!processor) return undefined
-
-  const realApi = api.substring(0, api.indexOf(FFB_INDENTITY))
-
-  return {
-    name: api,
-    api: realApi,
-    ...processor
+  constructor(processors?: Record<string, FfbProcessor>) {
+    this._processors = { ...this._processors, ...processors }
   }
-}
 
-/** 获取Ffb处理器 */
-export function interceptFfbRequest(cfg: any) {
-  const api = cfg?.url
-  if (!isFfbApi(api)) return cfg
+  private _processors = {}
 
-  const ffbConfig = parseFfbApi(api)
-  if (!ffbConfig) return cfg
+  /** 注册ffb处理器 */
+  use(processors: Record<string, FfbProcessor>) {
+    this._processors = { ...this._processors, ...processors }
+  }
 
-  cfg.url = ffbConfig.api // 设置实际请求api
-  cfg.ffb_config = ffbConfig
-  if (ffbConfig.beforeRequest) ffbConfig.beforeRequest(cfg)
+  /** 是否api ffb */
+  static isFfbApi(api: string) {
+    return api && api.endsWith(FFB_INDENTITY)
+  }
 
-  return cfg
-}
+  /** 解析 */
+  parseFfbApi(api: string) {
+    const processor = (this._processors as any)[api]
 
-/** 获取Ffb处理器 */
-export function interceptFfbResponse(response: any) {
-  const cfg = response.config
-  const ffbConfig = cfg.ffb_config
+    if (!processor) return undefined
 
-  if (!ffbConfig) return response
+    const realApi = api.substring(0, api.indexOf(FFB_INDENTITY))
 
-  if (ffbConfig.afterResponse) ffbConfig.afterResponse(response)
+    return {
+      name: api,
+      api: realApi,
+      ...processor
+    }
+  }
 
-  return response
+  /** 获取Ffb处理器 */
+  interceptFfbRequest(cfg: any) {
+    const api = cfg?.url
+    if (!ZFfb.isFfbApi(api)) return cfg
+
+    const ffbConfig = this.parseFfbApi(api)
+    if (!ffbConfig) return cfg
+
+    cfg.url = ffbConfig.api // 设置实际请求api
+    cfg.ffb_config = ffbConfig
+
+    if (ffbConfig.beforeRequest) {
+      ffbConfig.beforeRequest(cfg)
+    }
+
+    return cfg
+  }
+
+  /** 获取Ffb处理器 */
+  interceptFfbResponse(response: any) {
+    const cfg = response.config
+    const ffbConfig = cfg.ffb_config
+
+    if (!ffbConfig) return response
+
+    if (ffbConfig.afterResponse) ffbConfig.afterResponse(response)
+
+    return response
+  }
 }

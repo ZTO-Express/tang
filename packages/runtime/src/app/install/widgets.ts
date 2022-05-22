@@ -22,6 +22,6 @@ export default async (target: Installable, options: InstallableOptions) => {
   }
 
   // 注册widgets(优先注册外部组件，支持重载)
-  const exWidgets = options.extends?.widgets || []
+  const exWidgets = options.extensions?.widgets || []
   target.register([...exWidgets, ...innerWidgets])
 }

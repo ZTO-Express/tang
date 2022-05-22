@@ -68,11 +68,9 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, _, tpl, useApiRequest, useAppContext } from '@zto/zpage'
+import { _, tpl, ref, watch, computed, useAttrs, useCurrentAppInstance } from '@zto/zpage'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
-
-const { ref, watch, computed, useAttrs } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -104,7 +102,9 @@ const props = withDefaults(
 const emit = defineEmits(['update:modelValue', 'change'])
 
 const attrs = useAttrs()
-const apiRequest = useApiRequest()
+
+const app = useCurrentAppInstance()
+const appApi = app.api
 
 const innerOptions = ref<any[]>([])
 const innerValue: any = ref()
@@ -159,14 +159,12 @@ function handleChange(val: any) {
 
 // 获取options数据
 async function fetchOptions() {
-  const context = useAppContext()
-
   let optionsData: any = props.options || []
 
   if (props.api) {
-    const params = tpl.deepFilter(props.apiParams, context)
+    const params = app.deepFilter(props.apiParams)
 
-    optionsData = await apiRequest({
+    optionsData = await appApi.request({
       action: props.api,
       params: { ...params }
     })
@@ -198,5 +196,6 @@ defineExpose({
 .c-checkbox-group,
 .c-radio-group {
   height: 28px;
+  display: inline-block;
 }
 </style>

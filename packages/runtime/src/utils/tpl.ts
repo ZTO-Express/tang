@@ -1,8 +1,6 @@
 import { register as registerBulitin, getFilters } from './tpl-builtin'
 import { register as registerLodash } from './tpl-lodash'
 
-import type { GenericFunction } from '@zto/zpage-core'
-
 export interface Enginer {
   test: (tpl: string) => boolean
   removeEscapeToken?: (tpl: string) => string
@@ -65,7 +63,7 @@ export function deepFilter(obj?: any, data: object = {}, defaultFilter = '| raw'
 }
 
 // 缓存一下提升性能
-const EVAL_CACHE: { [key: string]: GenericFunction } = {}
+const EVAL_CACHE: { [key: string]: Function } = {}
 
 let customEvalExpressionFn: (expression: string, data?: any) => boolean
 export function setCustomEvalExpression(fn: (expression: string, data?: any) => boolean) {

@@ -1,5 +1,6 @@
 <template>
-  <div
+  <c-app-page
+    :meta="meta"
     class="c-page"
     :class="{
       'no-padding': noPadding,
@@ -15,13 +16,11 @@
     <div class="page-body-con" :style="bodyStyle">
       <slot />
     </div>
-  </div>
+  </c-app-page>
 </template>
 
 <script setup lang="ts">
-import { vue, useConfig } from '@zto/zpage'
-
-const { computed, useSlots } = vue
+import { computed, useSlots, useCurrentAppInstance } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
@@ -32,6 +31,7 @@ const props = withDefaults(
     noHeader?: boolean
     noBack?: boolean
     noPadding?: boolean
+    meta?: Record<string, any>
   }>(),
   {
     fixed: true,
@@ -42,8 +42,10 @@ const props = withDefaults(
 
 const slots = useSlots()
 
+const app = useCurrentAppInstance()
+
 // 获取全局配置
-const pageConfig = useConfig('CPage')
+const pageConfig = app.useComponentsConfig('page')
 
 // 是否显示页面头部
 const isHeader = computed(() => props.noHeader !== true && (props.title || !!slots.header))

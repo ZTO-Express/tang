@@ -3,20 +3,19 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useWidgetEmitter, useWidgetSchema } from '@zto/zpage'
-
-const { ref } = vue
+import { ref, useCurrentAppInstance } from '@zto/zpage'
 
 // 属性
 const props = defineProps<{
   schema: Record<string, any>
 }>()
 
-// schema
-const wSchema = useWidgetSchema(props.schema)
+const app = useCurrentAppInstance()
+
+const wSchema = app.useWidgetSchema(props.schema)
 
 // 注册微件事件监听
-useWidgetEmitter(wSchema, {
+app.useWidgetEmitter(wSchema, {
   triggerOn: doTrigger
 })
 

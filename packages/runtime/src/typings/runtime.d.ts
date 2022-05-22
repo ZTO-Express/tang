@@ -1,25 +1,57 @@
-import type { Widget, Schema, Plugin, PromiseFunction, PromiseObject } from '@zto/zpage-core'
+import type {
+  Widget,
+  Schema,
+  Loader,
+  Plugin,
+  PromiseFunction,
+  PromiseObject,
+  AppSchema,
+  PageSchema
+} from '@zto/zpage-core'
 import type { VueApp, VueComponent } from './vue'
+import type { TextFormatters } from './config'
 
-/** 运行时扩展选项 */
-export interface RuntimeExtends {
-  widgets?: Widget[] // 扩展微件
-  plugins?: Plugin[] // 扩展插件
+/** option选项相关配置 */
+export interface DataOptionItem {
+  value: number | string | undefined
+  label: string
   [prop: string]: any
 }
 
-/** 应用配置 */
+export type DataOptionItems = Record<string, DataOptionItem[]>
+
+// 格式化器
+export type TextFormatter = (val: any, options?: any) => string
+export type TextFormatters = Record<string, TextFormatter>
+
+// 格式化选项
+export interface FormatTextOptions {
+  formatters?: TextFormatters
+  [prop: string]: any
+}
+
+/** 运行时扩展选项 */
+export interface RuntimeExtensions {
+  widgets?: Widget[] // 扩展微件
+  plugins?: Plugin[] // 扩展插件
+  loaders?: Loader[] // 加载器
+  [prop: string]: any
+}
+
+/** 运行时配置，这是更多起的是说明文档的功能 */
 export interface RuntimeConfig {
-  env?: Record<string, any>
-  apis?: Record<string, any>
-  widgets?: Record<string, any>
-  components?: Record<string, any>
+  schema?: AppSchema // 运行时Schema
+  api?: Record<string, any> // api相关选项
+  apis?: Record<string, any> // 接入的api
+  pages?: PageSchema[] // 接入的页面
+  widgets?: Record<string, any> // 接入的微件配置
+  components?: Record<string, any> // 接入的组件配置
+  formatters?: TextFormatters // 格式化器配置
   [prop: string]: any
 }
 
 export interface RuntimeUI {
   install?: PromiseFunction
-
   [prop: string]: any
 }
 
@@ -30,10 +62,10 @@ export interface Installable {
 }
 
 export interface InstallableOptions {
-  widgets?: Widget[]
-  components?: VueComponent[]
-  extends?: RuntimeExtends
-  [prop: string]: any
+  env: Record<string, any>
+  ui?: RuntimeUI
+  config?: Record<string, any>
+  extensions?: RuntimeExtensions
 }
 
 export interface TokenData {
@@ -44,13 +76,23 @@ export interface TokenData {
   [prop: string]: any
 }
 
-export type ApiRequestAction =
-  | string
-  | { type?: string; api?: string; url?: string; sourceType?: string; [prop: string]: any }
+export type ApiRequestActionApi = string | { [prop: string]: any }
+
+export interface ApiRequestAction {
+  type?: string
+  api?: ApiRequestActionApi
+  url?: string
+  sourceType?: string
+  mockData?: any
+  [prop: string]: any
+}
 
 /** 请求参数 */
 export interface ApiRequestConfig {
-  action: ApiRequestAction
+  ns?: string // 命名空间
+  url?: string // 请求地址
+  api?: ApiRequestActionApi // api请求
+  action?: string | ApiRequestAction // 动作请求
   params?: Record<string, any>
 
   [prop: string]: any

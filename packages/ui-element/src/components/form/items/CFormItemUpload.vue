@@ -6,6 +6,7 @@
     :disabled="disabled"
     :on-completed="handleCompleted"
     :on-delete="handleDelete"
+    @change="handleChange"
   />
 </template>
 
@@ -14,9 +15,11 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, useApiRequest } from '@zto/zpage'
-import { fileUtil, GenericFunction, useAppContext } from '@zto/zpage-runtime'
-const { ref } = vue
+import { useCurrentAppInstance } from '@zto/zpage'
+
+import { useFormItem } from '../util'
+
+import type { GenericFunction } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
@@ -32,9 +35,11 @@ const props = withDefaults(
   }
 )
 
-const apiRequest = useApiRequest()
+const app = useCurrentAppInstance()
 
-const context = useAppContext(props.model)
+const context = app.useContext(props.model)
+
+const { handleChange } = useFormItem(props)
 
 async function handleCompleted(file: any) {
   if (props.onCompleted) {

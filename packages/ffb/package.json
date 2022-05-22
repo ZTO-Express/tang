@@ -1,6 +1,6 @@
 {
   "name": "@zto/zpage-ffb",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "@zto/zpage-ffb",
   "main": "index.js",
   "module": "dist/zpage-ffb.esm.js",

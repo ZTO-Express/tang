@@ -1,5 +1,5 @@
 <template>
-  <div class="w-crud" :style="sectionStyle">
+  <div class="w-crud" :class="sectionClass" :style="sectionStyle">
     <div class="w-crud__con" :class="{ 'no-toolbar': noToolbar }">
       <!-- 搜索区域 -->
       <el-collapse-transition v-if="!!sSearch">
@@ -42,6 +42,12 @@
                   {{ expandToggleFlag ? '展开所有' : '收起所有' }}
                 </el-button>
                 <c-action v-else-if="it.action" v-bind="getToolbarActionAttrs(it)" class="q-ml-md"></c-action>
+                <cmpt
+                  v-else-if="it.cmpt"
+                  :config="it.cmpt"
+                  v-bind="{ onSubmit: doSearch, ...it }"
+                  :context-data="innerContextData"
+                />
                 <component
                   v-else-if="it.componentType"
                   :is="it.componentType"
@@ -90,12 +96,19 @@
               ref="tableRef"
               class="w-crud__table"
               v-bind="tableAttrs"
-              :on-editor-submit="handleEditorSubmit"
+              @editor-submit="handleEditorSubmit"
+              @batch-editor-submit="handleBatchEditorSubmit"
               @fetch="handleTableFetch"
             >
               <template #operation="scope">
                 <template v-for="(it, index) in sTable?.operation?.items || []" :key="`operation_${String(index)}`">
                   <c-action v-if="it.action" v-bind="getOperationActionAttrs(it, scope)" class="q-ml-sm"></c-action>
+                  <cmpt
+                    v-else-if="it.cmpt"
+                    :config="it.cmpt"
+                    v-bind="{ onSubmit: doSearch, ...it }"
+                    :context-data="scope"
+                  />
                   <component
                     v-else-if="it.componentType"
                     :is="it.componentType"
@@ -124,54 +137,39 @@
 </template>
 
 <script setup lang="ts">
-import {
-  vue,
-  _,
-  tpl,
-  emitter,
-  useApi,
-  useAppRouter,
-  useWidgetEmitter,
-  useWidgetSchema,
-  useApiRequest,
-  useAppContext,
-  useConfig,
-  useWidgetsConfig
-} from '@zto/zpage'
+import { _, tpl, computed, reactive, ref, onMounted, nextTick, useCurrentAppInstance } from '@zto/zpage'
 
-import { useMessage } from '../../composables'
 import { appUtil } from '../../utils'
 import { UI_GLOBAL_EVENTS } from '../../consts'
-
 import { DEFAULT_ACTIONS } from './consts'
 
-const { computed, reactive, ref, onMounted, nextTick } = vue
+import type { PageContext } from '@zto/zpage'
 
 // 属性
 const props = defineProps<{
   schema: Record<string, any>
 }>()
 
-const router = useAppRouter()
+const app = useCurrentAppInstance()
 
-// api请求
-const apiRequest = useApiRequest()
+const router = app.router
 
-// 请求
-const { MessageBox, Message } = useMessage()
+const emitter = app.emitter
+const apiRequest = app.request // api请求
+const { MessageBox, Message } = app.useMessage() // 请求
 
-const crudConfig = useWidgetsConfig('crud', {})
-const tableConfig = useConfig('components.table.data', {})
+const fsApi = app.apis.fsApi
+
+const crudConfig = app.useWidgetsConfig('crud', {})
+const tableConfig = app.useComponentsConfig('table.data', {})
 
 // 数据属性
 const dataProp = tableConfig?.data?.dataProp || 'data'
 
-const wSchema = useWidgetSchema(props.schema)
+const wSchema = app.useWidgetSchema(props.schema)
 
 // 注册微件事件监听
-useWidgetEmitter(wSchema, {
-  searchOn: doSearch
-})
+app.useWidgetEmitter(wSchema, { searchOn: doSearch })
 
 // Tab切换时重新布局（防止tab错位）
 emitter.on(UI_GLOBAL_EVENTS.PAGE_TAB_CHANGE, () => {
@@ -181,19 +179,19 @@ emitter.on(UI_GLOBAL_EVENTS.PAGE_TAB_CHANGE, () => {
 })
 
 // 活动 schema
-const sSection = useWidgetSchema(wSchema.section || {})
+const sSection = app.useWidgetSchema(wSchema.section || {})
 
 // 活动 schema
-const sActions = useWidgetSchema(wSchema.actions || {})
+const sActions = app.useWidgetSchema(wSchema.actions || {})
 
 // 查询 schema
-const sSearch = useWidgetSchema(wSchema.search || {})
+const sSearch = app.useWidgetSchema(wSchema.search || {})
 
 // 工具栏 schema
-const sToolbar = useWidgetSchema(wSchema.toolbar || {})
+const sToolbar = app.useWidgetSchema(wSchema.toolbar || {})
 
 // 表格 schema
-const sTable = useWidgetSchema(wSchema.table || {})
+const sTable = app.useWidgetSchema(wSchema.table || {})
 const innerColumns = ref<any[]>([])
 innerColumns.value = Array.isArray(sTable.columns) ? sTable.columns : []
 
@@ -220,7 +218,7 @@ const innerContextData = computed(() => {
 
 // ----- 生命周期相关 ----->
 onMounted(async () => {
-  const context = useAppContext()
+  const context = app.useContext()
 
   if (_.isFunction(sTable.columns)) {
     innerColumns.value = await Promise.resolve().then(() => {
@@ -235,11 +233,12 @@ onMounted(async () => {
 })
 
 // ----- 模块相关 ----->
-const sectionStyle = computed(() => {
-  return {
-    height: sSection.height || '100%'
-  }
-})
+const sectionStyle = computed(() => ({
+  height: sSection.height || '100%',
+  ...wSchema.style
+}))
+
+const sectionClass = computed(() => wSchema.class)
 
 // ----- 查询相关 ----->
 
@@ -272,7 +271,7 @@ const searchItemsAttrs = computed(() => {
 // 执行查询
 async function handleSearch() {
   const valid = await searchFormRef.value.validate()
-  await doSearch(true)
+  if (valid) await doSearch(true)
 }
 
 // 执行重写加载
@@ -304,23 +303,17 @@ const noToolbar = sToolbar.hidden === true
 // 获取工具栏动作属性
 function getToolbarActionAttrs(config: any) {
   const name = config.action
-  const actionAttrs = Object.assign(
-    {
-      name,
-      trigger: () => triggerAction(actionAttrs)
-    },
-    (DEFAULT_ACTIONS as any)[name],
-    { ...sActions[config.action] },
-    _.omit(config, ['action'])
-  )
+  const actionAttrs = {
+    name,
+    trigger: () => triggerAction(actionAttrs),
+    ...(DEFAULT_ACTIONS as any)[name],
+    ...sActions[config.action],
+    ..._.omit(config, ['action'])
+  }
 
   if (actionAttrs.actionType === 'import') {
     actionAttrs.successMessage = actionAttrs.successMessage || '数据导入成功！'
-    actionAttrs.onSubmit =
-      actionAttrs.onSubmit ||
-      (() => {
-        doSearch()
-      })
+    actionAttrs.onSubmit = actionAttrs.onSubmit || (() => doSearch())
   }
 
   return actionAttrs
@@ -345,14 +338,15 @@ const tableAttrs = computed(() => {
     editable: sTable.editable,
     batchEditable: sTable.batchEditable,
     columns: innerColumns.value,
+    noOperation: _.isBoolean(sTable.noOperation) ? sTable.noOperation : !sTable.operation,
     operationWidth: sTable.operation?.width,
-    noPager: sTable.noPager,
-    noOperation: sTable.noOperation,
     showFixed: sTable.showFixed !== false,
     showCheckbox: sTable.showCheckbox,
+    noIndex: _.isBoolean(sTable.noIndex) ? sTable.noIndex : sTable.showCheckbox,
     selectableFn: sTable.checkboxSelectable,
     showSummary: sTable.showSummary,
     summaryText: sTable.summaryText || sTable.sumText,
+    noPager: sTable.noPager,
     data: sActions.query?.data,
     loadMethod: tableLoadFn,
     ...sTable.innerAttrs
@@ -368,6 +362,11 @@ function handleEditorSubmit() {
   doSearch()
 }
 
+/** 编辑内容提交触发 */
+function handleBatchEditorSubmit() {
+  doSearch()
+}
+
 function handleTableFetch(payload: any, resetPager: boolean) {
   doSearch(resetPager)
 }
@@ -380,29 +379,10 @@ function getOperationActionAttrs(options: any, scope: any) {
   const actConfig = sActions[name] || {}
   const optConfig = _.omit(options, ['action'])
 
-  // 单独处理innerAttrs，节约性能
-  const innerAttrs = _.deepMerge(
-    {
-      button: {
-        type: 'text'
-      }
-    },
-    defConfig?.innerAttrs,
-    actConfig?.innerAttrs,
-    optConfig?.innerAttrs
-  )
+  // 合并配置
+  const mergedConfig = _.deepMerge2([{ innerAttrs: { button: { type: 'text' } } }, defConfig, actConfig, optConfig])
+  const actionAttrs = { contextData: scope, name, scope, ...mergedConfig }
 
-  const actionAttrs = Object.assign(
-    {
-      contextData: scope,
-      name,
-      scope
-    },
-    defConfig,
-    actConfig,
-    optConfig,
-    { innerAttrs }
-  )
   const configPayload = actConfig.payload || optConfig.payload
   if (typeof configPayload === 'function') {
     actionAttrs.payload = configPayload
@@ -436,15 +416,16 @@ const dialogAttrs = computed(() => {
   const actionCfg = activeAction.value
   if (!actionCfg || !actionCfg.dialog) return
 
-  const title = actionCfg.title || actionCfg.label
-
-  let dialogAttrs = actionCfg.dialog || {}
+  let dialogAttrs = { ...actionCfg.dialog, ...actionCfg.innerAttrs?.dialog }
 
   if (typeof actionCfg.dialog === 'function') {
-    dialogAttrs = actionCfg.dialog(actionCfg.contextData, actionCfg)
+    const context = app.useContext(actionCfg.contextData)
+    dialogAttrs = actionCfg.dialog(context, actionCfg)
   }
 
-  return { title, ...dialogAttrs }
+  const title = app.filter(dialogAttrs.title || actionCfg.title || actionCfg.label, actionCfg.contextData)
+
+  return { ...dialogAttrs, title }
 })
 
 // 执行提交
@@ -452,7 +433,7 @@ async function handleDialogSubmit(model: any) {
   const actionCfg = activeAction.value
   if (!actionCfg) return
 
-  const context = useAppContext(model)
+  const context = app.useContext(model)
 
   const extData = tpl.deepFilter(dialogAttrs.value?.extData, context)
   const payload = _.deepMerge({}, extData, model)
@@ -472,7 +453,7 @@ async function triggerAction(actionCfg: any) {
   activeAction.value = actionCfg
   if (!actionCfg) return
 
-  const context = useAppContext(actionCfg.contextData)
+  const context = app.useContext(actionCfg.contextData)
 
   const actionData = buildActionData(actionCfg, context)
 
@@ -483,8 +464,7 @@ async function triggerAction(actionCfg: any) {
   } else if (actionCfg.actionType === 'download') {
     if (!actionCfg.link) return
     const link = tpl.deepFilter(actionCfg.link, context)
-    const fsApi = useApi('fs')
-    await fsApi.downloadFile(link, actionCfg)
+    await fsApi.downloadFile!(link, actionCfg)
   } else if (actionCfg.link) {
     const link = tpl.deepFilter(actionCfg.link, context)
     await router.goto(link)
@@ -517,14 +497,12 @@ async function triggerAction(actionCfg: any) {
         }
 
     msgConfig.title = msgConfig.title || '提示'
-    msgConfig = Object.assign(
-      {
-        showCancelButton: true,
-        cancelButtonText: '取消',
-        confirmButtonText: '确定'
-      },
-      msgConfig
-    )
+    msgConfig = {
+      showCancelButton: true,
+      cancelButtonText: '取消',
+      confirmButtonText: '确定',
+      ...msgConfig
+    }
 
     msgConfig = tpl.deepFilter(msgConfig, context)
     await MessageBox(msgConfig).then(() => {
@@ -534,7 +512,7 @@ async function triggerAction(actionCfg: any) {
 }
 
 // 构建活动参数
-function buildActionData(actionCfg: any, context: any) {
+function buildActionData(actionCfg: any, context: PageContext) {
   let actionData: any = {}
 
   if (typeof actionCfg.payload === 'function') {
@@ -546,19 +524,23 @@ function buildActionData(actionCfg: any, context: any) {
       return obj
     }, {})
   } else if (actionCfg.payload && !_.isEmptyObject(actionCfg.payload)) {
-    actionData = tpl.deepFilter(actionCfg.payload, context)
+    actionData = app.deepFilter(actionCfg.payload, context.data)
   } else {
-    actionData = _.deepMerge({}, actionCfg.scope?.row)
+    actionData = _.deepClone(_.omit(actionCfg.scope?.row, ['__innerTexts']))
+  }
+
+  let targetTypes: string[] = []
+  if (_.isString(actionCfg.targetType)) {
+    targetTypes = [actionCfg.targetType]
   }
 
   // 处理选中项
-  if (actionCfg.targetType === 'selected') {
+  if (targetTypes.includes('selected')) {
     // 判断当前有没有选中项
     if (!selectedRows.value.length) {
       const noSelectMessage = actionCfg.noSelectMessage || `请先选择需要${actionCfg.label}的记录`
       Message.warning(noSelectMessage)
-
-      throw new Error('没有选择行')
+      return
     }
 
     // 批量参数
@@ -574,16 +556,18 @@ function buildActionData(actionCfg: any, context: any) {
           batchPayload[key] = []
 
           selectedRows.value.forEach((row: any) => {
-            const _data = Object.assign({}, context?.data, { row })
-            const _context = useAppContext(_data)
-
-            batchPayload[key].push(tpl.deepFilter(batchTmpl, _context))
+            batchPayload[key].push(app.deepFilter(batchTmpl, { ...context?.data, row }))
           })
         }
       })
 
-      actionData = Object.assign({}, actionData, batchPayload)
+      actionData = { ...actionData, ...batchPayload }
     }
+  }
+
+  if (targetTypes.includes('search')) {
+    const searchParams = getSearchParams()
+    actionData = { ...actionData, searchParams }
   }
 
   return actionData
@@ -597,12 +581,21 @@ function doLayout() {
 // 执行活动
 async function doAction(action: any, payload: any, options?: any) {
   if (options?.onAction) {
-    return await Promise.resolve().then(() => {
-      return options.onAction!(payload, options)
+    const ctx = app.useContext(payload)
+
+    const flag = await Promise.resolve().then(() => {
+      return options.onAction!(ctx, options)
     })
+
+    if (flag !== false && options?.reload !== false) return doSearch()
+
+    return
   }
 
-  if (!action) return
+  if (!action) {
+    if (options?.reload !== false) return doSearch()
+    return
+  }
 
   dialogLoading.value = true
 
@@ -611,7 +604,7 @@ async function doAction(action: any, payload: any, options?: any) {
     data: payload
   })
     .then(res => {
-      if (options?.reload !== false) doSearch()
+      if (options?.reload !== false) return doSearch()
       if (options?.sucessMessage !== false) {
         Message.success(options?.sucessMessage || `${options.label || '操作'}成功！`)
       }
@@ -642,7 +635,7 @@ async function doSearch(resetPager = false, refreshPager = false) {
 
   let searchParams = getSearchParams()
 
-  const context = useAppContext()
+  const context = app.useContext()
 
   if (sSearch.beforeSearch) {
     const beforeSearchRes = await Promise.resolve().then(() =>
@@ -699,8 +692,12 @@ async function doSearch(resetPager = false, refreshPager = false) {
 }
 
 // 异步导出
-async function doAsyncExport(api: string, options: any, context: any) {
+async function doAsyncExport(api?: string, options?: any, context?: any) {
   if (!tableRef.value) return
+
+  const exportConfig = crudConfig.export || {}
+
+  api = api || exportConfig.api
 
   const data = tableRef.value.getData()
   if (!data?.length) {
@@ -712,24 +709,30 @@ async function doAsyncExport(api: string, options: any, context: any) {
   let searchParams = getSearchParams()
 
   if (options?.beforeExport) {
-    const flag = await Promise.resolve().then(() =>
-      options?.beforeExport(
-        {
-          ...options,
-          searchParams
-        },
-        context
-      )
-    )
+    const flag = await Promise.resolve().then(() => options?.beforeExport(context, { ...options, searchParams }))
     if (flag === false) return
   }
 
-  if (options?.exSearchParams) {
-    searchParams = { ...searchParams, ...options?.exSearchParams }
-  }
+  // 获取导出参数
+  const getExportParamsMethod = exportConfig.getExportParams || options.getExportParams
 
-  const searchParamProp = options.searchParamProp || crudConfig.export?.searchParamProp || 'search'
-  const reqParams = { ...options.apiParams, [searchParamProp]: searchParams }
+  let reqParams: any = {}
+
+  if (getExportParamsMethod) {
+    reqParams = getExportParamsMethod(options, context)
+  } else {
+    if (options?.exSearchParams) {
+      searchParams = { ...searchParams, ...options?.exSearchParams }
+    }
+
+    const searchParamProp = options.searchParamProp || exportConfig.searchParamProp || 'search'
+
+    // 导出类型
+    const searchTypeProp = options.searchTypeProp || exportConfig.searchTypeProp || 'exportType'
+    const searchType = options.exportType || options.type
+
+    reqParams = { [searchTypeProp]: searchType, [searchParamProp]: searchParams, ...options.apiParams }
+  }
 
   await apiRequest({
     action: { ...queryAction, api, type: 'export' },
@@ -744,8 +747,14 @@ async function doAsyncExport(api: string, options: any, context: any) {
 }
 
 function getSearchParams() {
-  const context = useAppContext(searchModel)
-  const searchParms = _.deepMerge({}, tpl.deepFilter(sSearch?.extData, context), searchModel)
+  const queryAction = sActions.query || {}
+
+  const context = app.useContext(searchModel)
+
+  const apiParams = app.deepFilter(queryAction?.apiParams, context)
+  const extData = app.deepFilter(sSearch?.extData, context)
+
+  const searchParms = _.deepMerge(extData, apiParams, searchModel)
 
   return searchParms
 }

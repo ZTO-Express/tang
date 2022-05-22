@@ -2,24 +2,19 @@ import { defineComponent, h } from 'vue'
 
 import { ROOT_ROUTE_NAME, ROOT_MENU_PREFIX } from '../../consts'
 import { _, strings, uniqId, qs, warn, flattenTree, getPageKey } from '../../utils'
-import { useConfig } from '../../config'
 import { findRepeats } from '../../utils/helper'
 import CPageLayout from '../components/CPageLayout'
 import CMicroLayout from '../components/CMicroLayout'
 
 import { defaultMenus } from '../options/defaults'
 
-import type { VNode } from 'vue'
 import type { Router, RouteRecordRaw } from 'vue-router'
 import type { NavMenuItem, NavMenuItemConfig, Submodule } from '../../typings'
 
-// 已缓存节点
-const __cachedNodes: Record<string, VNode> = {}
-
 /** 根据根据应用导航菜单配置构建路由 */
-export function createAppRoutes(router: Router, submodules: Submodule[]) {
-  const baseRoute = useConfig('router.base', '')
-  const exMenus = useConfig('menus', [])
+export function createAppRoutes(router: Router, submodules: Submodule[], options: any = {}) {
+  const baseRoute = options.baseRoute || ''
+  const exMenus = options.menus || []
 
   // 规范化外部配置菜单
   _normalizeMenus(exMenus)
@@ -58,18 +53,15 @@ export function createAppRoutes(router: Router, submodules: Submodule[]) {
 export function pruneCachedPage(router: Router, page: any) {
   const key = page?.key
 
-  if (key && __cachedNodes[key]) {
-    __cachedNodes[key] = undefined as any
-    delete __cachedNodes[key]
+  if (key && router.__cachedNodes[key]) {
+    router.__cachedNodes[key] = undefined as any
+    delete router.__cachedNodes[key]
   }
 
   if (page?.isTemp && page?.name) {
     router.removeRoute(page?.name)
   }
 }
-
-/** 新增微前端路由 */
-export function createMicroRoute(router: Router, menu: NavMenuItem, submodule: Submodule, baseRoute = '') {}
 
 /** 新增临时路由 */
 export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Submodule, baseRoute = '') {

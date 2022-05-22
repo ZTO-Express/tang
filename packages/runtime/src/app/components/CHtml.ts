@@ -1,6 +1,6 @@
 import { defineComponent } from 'vue'
 import { renderHtml, tpl } from '../../utils'
-import { useAppContext } from '../composables'
+import { useCurrentAppInstance } from '../composables'
 
 export default defineComponent({
   props: {
@@ -10,10 +10,10 @@ export default defineComponent({
 
   setup(props: any) {
     return () => {
-      const context = useAppContext(props.contextData || {})
+      const app = useCurrentAppInstance()
 
       if (!props.html) return ''
-      const html = tpl.deepFilter(props.html, context)
+      const html = app.deepFilter(props.html, props.contextData || {})
       return renderHtml(html)
     }
   }

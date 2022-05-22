@@ -20,10 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import { _, vue } from '@zto/zpage'
+import { _, computed } from '@zto/zpage'
 import { InfoFilled } from '@element-plus/icons'
-
-const { computed } = vue
 
 const props = withDefaults(
   defineProps<{

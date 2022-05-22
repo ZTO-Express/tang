@@ -28,27 +28,28 @@
 </template>
 
 <script setup lang="ts">
-import { _, vue, useAppConfig, useAppRouter, useAppStore, emitter } from '@zto/zpage'
+import { _, useCurrentAppInstance, computed, ref } from '@zto/zpage'
 
 import { UI_GLOBAL_EVENTS } from '../../consts'
 
 import CDownloadsDialog from '../file/CDownloadsDialog.vue'
 import AppHeaderExtra from './AppHeaderExtra.vue'
 
-const { computed, ref } = vue
+const app = useCurrentAppInstance()
 
-const router = useAppRouter()
-const store = useAppStore()
-
-const appConfig = useAppConfig('', {})
+const emitter = app.emitter
+const { appStore } = app.stores
+const router = app.router
+const appConfig = app.useAppConfig('', {})
 
 const appLogo = appConfig.assets?.logo
 const headerExtraComponent = appConfig.header?.extra?.component
 
 const tabItems = computed(() => {
-  return store.getters.submodules.map((it: any) => {
+  return appStore.submodules.map((it: any) => {
     return {
       name: it.name,
+      icon: it.icon,
       label: it.title
     }
   })
@@ -66,11 +67,11 @@ function handleLogoClick() {
 }
 
 // 当前激活按钮
-const activeTabName = ref(store.getters.navMenu.submodule)
+const activeTabName = ref(appStore.navMenu.submodule)
 
 // 菜单选中
 function handleTabClick() {
-  store.dispatch('app/changeSubmodule', { name: activeTabName.value })
+  appStore.changeSubmodule({ name: activeTabName.value })
 }
 </script>
 

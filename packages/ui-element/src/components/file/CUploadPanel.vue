@@ -23,7 +23,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
+import { computed, reactive, watch } from '@zto/zpage'
 import { useMessage } from '../../composables'
 import { uploadUtil } from '../../utils'
 
@@ -34,8 +34,6 @@ import UploadItem from './upload-item.vue'
 import type { GenericFunction } from '@zto/zpage'
 import type { UploadStoreOptions } from '../../utils/upload'
 import type { UploadData, UploadDataItems, UploadOpenParams } from './types'
-
-const { computed, reactive, watch } = vue
 
 const { Message } = useMessage()
 

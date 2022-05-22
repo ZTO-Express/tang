@@ -10,13 +10,12 @@
         @change="handleFileSelected()"
       />
     </form>
-    <slot> </slot>
+    <slot></slot>
   </div>
 </template>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
-const { computed, ref } = vue
+import { computed, ref } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{

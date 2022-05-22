@@ -18,3 +18,9 @@ export type SortCompareFunction<T = any> = (a: T, b: T) => number
 
 // 日期值类型
 export type DateValue = Date | string | number
+
+// 递归的Partial
+export type DeepPartial<T> = {
+  // 如果是 object，则递归类型
+  [U in keyof T]?: T[U] extends object ? DeepPartial<T[U]> : T[U]
+}

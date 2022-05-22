@@ -26,15 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import { vue, renderHtml } from '@zto/zpage'
+import { computed, onMounted, onUnmounted, onUpdated, ref, renderHtml } from '@zto/zpage'
 import { addResizeListener, removeResizeListener } from '../../utils/resize-event/resize-event'
 
 import NavButton from './nav-button.vue'
 import NavItem from './nav-item.vue'
 
 import type { GenericFunction } from '@zto/zpage'
-
-const { computed, onMounted, onUnmounted, onUpdated, ref } = vue
 
 const props = defineProps<{
   items: Array<Record<string, any>>
@@ -70,7 +68,7 @@ onUpdated(() => {
   update()
 })
 
-function setPageData() {
+function setNavData() {
   containerWidth.value = navScrollRef.value.offsetWidth
   navWidth.value = navWrapperRef.value?.offsetWidth || 0
   currentOffset.value = 0
@@ -84,11 +82,11 @@ function setPageData() {
 // 设置移动
 function setOffset(value: number) {
   transform.value = `translateX(-${value}px)`
-  setPageData()
+  setNavData()
 }
 
 function update() {
-  setPageData()
+  setNavData()
   if (containerWidth.value < navWidth.value) {
     scrollable.value = scrollable.value || {
       prev: Boolean(currentOffset),

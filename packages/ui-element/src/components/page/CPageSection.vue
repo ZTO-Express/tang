@@ -1,5 +1,5 @@
 <template>
-  <div class="c-page-section" :class="{ top }">
+  <div class="c-page-section" :class="{ top, border: isBorder }">
     <div v-if="isHeader" class="header-con">
       <slot name="header">
         <c-page-section-header :title="title">
@@ -21,16 +21,17 @@
 </template>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
-
-const { computed, useSlots } = vue
+import { _, computed, useSlots } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
     title?: string
     top?: boolean
+    border?: boolean
   }>(),
-  {}
+  {
+    border: undefined
+  }
 )
 
 const slots = useSlots()
@@ -40,6 +41,10 @@ const isHeader = computed(() => !!props.title || !!slots.header)
 const isFooter = computed(() => !!slots.footer)
 
 const isBody = computed(() => !!slots.default)
+
+const isBorder = computed(() => {
+  return _.isBoolean(props.border) ? props.border : !!isHeader.value
+})
 </script>
 
 <style lang="scss">
@@ -57,9 +62,12 @@ const isBody = computed(() => !!slots.default)
 .c-page-section {
   position: relative;
   background: $section-color;
-  border-radius: $border-radius;
-  box-shadow: 0 0 3px 0 $border-color;
   margin-top: $section-gutter;
+
+  &.border {
+    border-radius: $border-radius;
+    box-shadow: 0 0 3px 0 $border-color;
+  }
 
   .body-con {
     padding: $section-padding;

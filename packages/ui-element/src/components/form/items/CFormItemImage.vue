@@ -1,7 +1,7 @@
 <template>
   <!-- eslint-disable vue/no-mutating-props -->
   <div class="c-form-item-image">
-    <c-image :src="model[prop]" v-bind="$attrs" />
+    <c-image :src="model[prop]" v-bind="$attrs" @change="handleChange" />
     <div v-if="title" class="title">{{ title }}</div>
   </div>
 </template>
@@ -11,9 +11,9 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { _, vue } from '@zto/zpage'
+import { _, computed, ref } from '@zto/zpage'
 
-const { computed, ref } = vue
+import { useFormItem } from '../util'
 
 const props = withDefaults(
   defineProps<{
@@ -23,6 +23,8 @@ const props = withDefaults(
   }>(),
   {}
 )
+
+const { handleChange } = useFormItem(props)
 </script>
 
 <style lang="scss" scoped>

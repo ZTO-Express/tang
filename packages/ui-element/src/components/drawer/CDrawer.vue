@@ -16,13 +16,10 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, vueRouter, tpl, noop, _, useApiRequest, useAppContext } from '@zto/zpage'
+import { _, tryUseCurrentAppInstance, ref, onBeforeRouteUpdate } from '@zto/zpage'
 import { useMessage } from '../../composables'
 
 import type { GenericFunction } from '@zto/zpage'
-
-const { ref, watch } = vue
-const { onBeforeRouteUpdate } = vueRouter
 
 const props = withDefaults(
   defineProps<{
@@ -35,8 +32,10 @@ const emit = defineEmits(['close', 'submit'])
 
 const isShow = ref(false)
 
-const { Message } = useMessage()
-const apiRequest = useApiRequest()
+const app = tryUseCurrentAppInstance()
+
+const { Message } = app.useMessage()
+const apiRequest = app.request
 
 let __callbacks__: GenericFunction[] = []
 

@@ -1,2 +1,3 @@
+import CButton from './CButton.vue'
 import CExpandButton from './CExpandButton.vue'
-export { CExpandButton }
+export { CButton, CExpandButton }

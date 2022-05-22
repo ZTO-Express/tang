@@ -8,10 +8,11 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useConfig } from '@zto/zpage'
-const { computed } = vue
+import { computed, useCurrentAppInstance } from '@zto/zpage'
 
-const config = useConfig('app')
+const app = useCurrentAppInstance()
+
+const config = app.useAppConfig()
 const title = config.title
 
 const welcomePic = computed(() => {

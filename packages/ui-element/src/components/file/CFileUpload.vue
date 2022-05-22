@@ -41,7 +41,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
+import { ref, reactive, computed, watch, nextTick } from '@zto/zpage'
 import { RescMimeTypes } from './util'
 
 import UploadTip from './upload-tip.vue'
@@ -49,8 +49,6 @@ import UploadTip from './upload-tip.vue'
 import type { PromiseFunction } from '@zto/zpage'
 import type { RescType, UploadOpenOptions, UploadData, UploadDataItems, UploadStoreGroup } from './types'
 import type { UploadStoreOptions } from '../../utils/upload'
-
-const { ref, reactive, computed, watch, nextTick } = vue
 
 const props = withDefaults(
   defineProps<{

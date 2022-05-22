@@ -1,6 +1,5 @@
 import { defineComponent } from 'vue'
-import { tpl } from '../../utils'
-import { useAppContext } from '../composables'
+import { useCurrentAppInstance } from '../composables'
 
 export default defineComponent({
   props: {
@@ -9,11 +8,11 @@ export default defineComponent({
   },
 
   setup(props: any) {
-    const context = useAppContext(props.contextData || {})
+    const app = useCurrentAppInstance()
 
     return () => {
       if (!props.tpl) return ''
-      const text = tpl.filter(props.tpl, context)
+      const text = app.filter(props.tpl, props.contextData || {})
       return text
     }
   }

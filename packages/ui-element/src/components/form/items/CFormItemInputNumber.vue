@@ -16,11 +16,11 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, useConfig } from '@zto/zpage'
+import { computed, useCurrentAppInstance } from '@zto/zpage'
+
+import { useFormItem } from '../util'
 
 import type { GenericFunction } from '@zto/zpage'
-
-const { computed } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -30,15 +30,18 @@ const props = withDefaults(
     min?: number
     max?: number
     disabled?: boolean
-    onChange?: GenericFunction
   }>(),
   {
-    default: 'right',
+    controlsPosition: 'right',
     disabled: false
   }
 )
 
-const inputNumberCfg = useConfig('components.formItem.inputNumber', {})
+const app = useCurrentAppInstance()
+
+const inputNumberCfg = app.useComponentsConfig('formItem.inputNumber', {})
+
+const { handleChange } = useFormItem(props)
 
 const innerMin = computed(() => {
   return props.min || inputNumberCfg.min
@@ -47,9 +50,4 @@ const innerMin = computed(() => {
 const innerMax = computed(() => {
   return props.max || inputNumberCfg.max
 })
-
-function handleChange(payload: any) {
-  if (!props.onChange) return
-  props.onChange(props.model, payload)
-}
 </script>

@@ -14,19 +14,19 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useConfig, useAppRoute } from '@zto/zpage'
+import { computed, useCurrentAppInstance } from '@zto/zpage'
 
 import AppHeader from './app-header.vue'
 import AppContent from './app-content.vue'
 import AppContainer from './app-container.vue'
 import AppMicroContainer from './app-micro-container.vue'
 
-const { computed } = vue
+const app = useCurrentAppInstance()
 
-const frameConfig = useConfig('app.frame')
-const menuConfig = useConfig('app.menu', {})
+const frameConfig = app.useAppConfig('frame')
+const menuConfig = app.useAppConfig('menu', {})
 
-const route = useAppRoute()
+const route = app.useRoute()
 
 /** 是否显示框架 */
 const showFrame = computed(() => {

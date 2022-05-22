@@ -60,14 +60,12 @@
 </template>
 
 <script setup lang="ts">
-import { vue, _, tpl, useApiRequest, useAppContext, useConfig } from '@zto/zpage'
+import { _, tpl, computed, ref, useAttrs, useSlots, watch, nextTick, useCurrentAppInstance } from '@zto/zpage'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
 import type { FuzzySelectOption, FuzzySelectRemoteMethod, FuzzySelectResponse } from './types'
 
 // import { selectKey as ElSelectKey } from 'element-plus'
-
-const { computed, ref, useAttrs, useSlots, watch, nextTick } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -89,7 +87,7 @@ const props = withDefaults(
     triggerFocus?: boolean
     collapseTags?: boolean
 
-    api?: ApiRequestAction
+    api?: ApiRequestAction | string
     apiParams?: Record<string, any>
     pageSize?: number
     remote?: boolean
@@ -116,16 +114,18 @@ const props = withDefaults(
   }
 )
 
-const fuzzySelectConfig = useConfig('components.fuzzySelect', {})
-
-// const innerSelect = inject<any>(ElSelectKey)
-
 const emit = defineEmits(['change', 'update:label', 'update:modelValue'])
 
 const attrs = useAttrs()
 const slots = useSlots()
 
-const apiRequest = useApiRequest()
+// const innerSelect = inject<any>(ElSelectKey)
+
+const app = useCurrentAppInstance()
+
+const fuzzySelectConfig = app.useComponentsConfig('fuzzySelect', {})
+
+const apiRequest = app.request
 
 const selectRef = ref<any>()
 
@@ -289,7 +289,7 @@ async function execRemoteMethod(query?: string) {
 
   loading.value = true
 
-  const context = useAppContext()
+  const context = app.useContext()
   const params = tpl.deepFilter(props.apiParams, context)
 
   let methodResponse: FuzzySelectResponse = []

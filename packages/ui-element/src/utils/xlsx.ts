@@ -1,5 +1,5 @@
 /** 导出数据 */
-import { useConfig } from '@zto/zpage'
+import { HostApp } from '@zto/zpage'
 
 export interface ExportColumn {
   prop: string
@@ -20,12 +20,12 @@ interface ParseFileOptions {
 }
 
 export function exportData(data: any[], e2eOptions?: Export2ExcelOptions) {
-  const exportDataFn = useConfig('components.xlsx.exportData')
+  const exportDataFn = HostApp.useConfig('components.xlsx.exportData')
   return exportDataFn(data, e2eOptions)
 }
 
 // 解析文件
 export async function parseFile(file: File, options?: ParseFileOptions) {
-  const parseFileFn = useConfig('components.xlsx.parseFile')
+  const parseFileFn = HostApp.useConfig('components.xlsx.parseFile')
   return parseFileFn(file, options)
 }

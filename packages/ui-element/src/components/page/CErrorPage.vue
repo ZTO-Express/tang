@@ -18,9 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useAppRouter, useAuthLoader, useAppStore } from '@zto/zpage'
-
-const { computed } = vue
+import { computed, useCurrentAppInstance } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
@@ -58,16 +56,13 @@ const emit = defineEmits(['link', 'logout'])
 
 const defaultErrorPic = 'https://fscdn.zto.com/fs21/M01/F6/77/CgRRhGGLgYWAXrUCAAA4nWZTAXY302.png'
 
-const router = useAppRouter()
-const store = useAppStore()
+const app = useCurrentAppInstance()
 
-const isLogged = computed(() => {
-  return store.getters.isLogged
-})
+const router = app.router
+const { appStore, userStore } = app.stores
 
-const isAppLoaded = computed(() => {
-  return store.getters.isAppLoaded
-})
+const isLogged = computed(() => userStore.logged)
+const isAppLoaded = computed(() => appStore.loaded)
 
 const errorInfo = computed(() => {
   const currentRoute = router.currentRoute.value
@@ -94,10 +89,7 @@ function handleLink() {
 }
 
 function handleLogout() {
-  const authLoader = useAuthLoader()
-
-  if (authLoader) authLoader.logout()
-  else emit('logout')
+  app.logout()
 }
 </script>
 

@@ -67,8 +67,8 @@
             :column="item"
             :editable="editable"
             :batch-editable="batchEditable"
-            :on-editor-submit="handleEditorSubmit"
-            :on-batch-edit="handleBatchEditor"
+            @editor-submit="handleEditorSubmit"
+            @batch-editor-submit="handleBatchEditorSubmit"
           >
             <template v-for="prop of childProps(columnItems)" #[`${prop}Header`]="scope">
               <slot v-bind="scope" :name="prop + 'Header'" />
@@ -102,9 +102,8 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, _, useApiRequest, useConfig } from '@zto/zpage'
+import { ref, reactive, watch, nextTick, computed, useAttrs, _, useCurrentAppInstance } from '@zto/zpage'
 
-import { useMessage } from '../../composables'
 import { xlsxUtil } from '../../utils'
 
 import * as tableUtil from './util'
@@ -115,8 +114,6 @@ import type { TableColumn, TablePager, SummaryMethodParams, TableData } from './
 import type { ExportColumn } from '../../utils/xlsx'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
-
-const { ref, reactive, watch, nextTick, computed, useAttrs } = vue
 
 // 属性
 const props = withDefaults(
@@ -155,8 +152,6 @@ const props = withDefaults(
     paginationLayout?: string // pagination layout
     editable?: boolean // 是否可编辑
     batchEditable?: boolean // 是否可批量编辑
-    onEditorSubmit?: GenericFunction // 编辑器提交
-    onBatchEdit?: GenericFunction // 批量更新
   }>(),
   {
     data: () => [],
@@ -177,14 +172,14 @@ const props = withDefaults(
 )
 
 // 事件
-const emit = defineEmits(['selection-change', 'batch-edit', 'editor-submit', 'link', 'fetch'])
+const emit = defineEmits(['selection-change', 'batch-editor-submit', 'editor-submit', 'link', 'fetch'])
 
-// 消息提示
-const { Message } = useMessage()
 const attrs = useAttrs()
 
-// api请求
-const apiRequest = useApiRequest()
+const app = useCurrentAppInstance()
+
+const { Message } = app.useMessage() // 消息提示
+const apiRequest = app.request // api请求
 
 // 引用
 const tableRef = ref<any>()
@@ -259,8 +254,8 @@ function handleSelectionChange(selection: any[]) {
 /**批量編輯
  * @param data
  */
-async function handleBatchEditor(data: Record<string, string>) {
-  if (!selectedRows.value.length) return Message.error('请勾选列')
+async function handleBatchEditorSubmit(data: Record<string, string>) {
+  if (!selectedRows.value.length) return Message.error('请选择需要编辑的行')
 
   for (const row of selectedRows.value || []) {
     for (const [key, val] of Object.entries(data)) {
@@ -268,20 +263,14 @@ async function handleBatchEditor(data: Record<string, string>) {
     }
   }
 
-  await Promise.resolve().then(() => {
-    props.onBatchEdit && props.onBatchEdit(selectedRows, data)
-  })
-
-  emit('batch-edit', selectedRows.value, data)
+  emit('batch-editor-submit', selectedRows.value, data)
 }
 
 /**
  * 编辑器提交
  */
 async function handleEditorSubmit(...args: any[]) {
-  await Promise.resolve().then(() => {
-    props.onEditorSubmit && props.onEditorSubmit(...args)
-  })
+  await doFetch(false)
 
   emit('editor-submit', ...args)
 }
@@ -382,7 +371,7 @@ function validate() {
 
 // ---- 分页相关 ------->
 
-const pageSizeCfg = useConfig('components.pagination.pageSize', 100)
+const pageSizeCfg = app.useComponentsConfig('pagination.pageSize', 100)
 
 const columnItems = computed<TableColumn[]>(() => {
   return props.columns.map((col: any) => {
@@ -406,7 +395,7 @@ function resetPager() {
 
 // ---- 数据相关 ------->
 
-const dataCfg = useConfig('components.table.data', {})
+const dataCfg = app.useComponentsConfig('table.data', {})
 
 /** 请求数据 */
 async function doFetch(isResetPager: boolean) {
@@ -417,7 +406,7 @@ async function doFetch(isResetPager: boolean) {
     attrs,
     action: {
       type: 'query',
-      api: props.api as string,
+      api: props.api,
       method: (attrs.apiMethod || attrs.method) as string,
       sourceType: 'table'
     },
@@ -475,7 +464,7 @@ function getData() {
   return tableData.data
 }
 
-const exportDataFn = useConfig('components.table.exportData')
+const exportDataFn = app.useComponentsConfig('table.exportData')
 
 // 导出数据
 function exportData(fileName: string) {

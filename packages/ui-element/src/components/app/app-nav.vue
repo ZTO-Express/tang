@@ -26,13 +26,14 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useAppRoute, useAppRouter, useAppStore, emitter, RUNTIME_GLOBAL_EVENTS } from '@zto/zpage'
+import { useCurrentAppInstance, RUNTIME_GLOBAL_EVENTS, computed, onMounted, reactive, ref, watch } from '@zto/zpage'
 
-const { computed, onMounted, reactive, ref, watch } = vue
+const app = useCurrentAppInstance()
 
-const store = useAppStore()
-const router = useAppRouter()
-const route = useAppRoute()
+const emitter = app.emitter
+const { pagesStore } = app.stores
+const router = app.router
+const route = app.useRoute()
 
 const contextTab = ref<any>()
 
@@ -44,17 +45,17 @@ const popoverState = reactive({
 })
 
 const navItems = computed(() => {
-  return store.getters.navPages
+  return pagesStore.navPages
 })
 
 const currentKey = computed(() => {
-  return store.getters.pages.current
+  return pagesStore.current
 })
 
 watch(
   () => route.meta?.pageKey,
   async () => {
-    await store.dispatch('pages/addVisited', { route })
+    await pagesStore.addCurrentVisited({ route })
   },
   { immediate: true }
 )
@@ -96,19 +97,18 @@ function handleContextmenu(event: MouseEvent) {
 async function handleCloseOthers() {
   if (!contextTab.value) return
 
-  await store.dispatch('pages/removeVisitedOthers', contextTab.value)
+  await pagesStore.removeVisitedOthers(contextTab.value)
 }
 
 // 关闭所有标签
 async function handleCloseAll() {
-  await store.dispatch('pages/pruneVisited')
+  await pagesStore.pruneCurrentVisited()
 }
 
 // 关闭单个标签
 async function handleTabRemove(tab: any, event: MouseEvent) {
   event.stopPropagation()
-
-  await store.dispatch('pages/removeVisited', tab)
+  await pagesStore.removeCurrentVisited(tab)
 }
 </script>
 

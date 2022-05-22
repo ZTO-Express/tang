@@ -1,16 +1,17 @@
 import { _ } from '../../../utils'
-import { useAppStore } from '../../store'
+import { tryUseCurrentAppInstance } from '../../composables'
+
 import type { Directive } from 'vue'
 
 const permission: Directive = {
   mounted(el, binding) {
-    const store = useAppStore()
+    const app = tryUseCurrentAppInstance()
 
     const { value } = binding
 
-    if (_.isNil(value)) return
+    if (!app || _.isNil(value)) return
 
-    const roles: string[] = store.getters.permissions
+    const roles: string[] = app.stores.userStore.permissions
 
     if (value && Array.isArray(value)) {
       // 截取空格以容错

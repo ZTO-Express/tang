@@ -5,43 +5,49 @@ import * as tpl from './tpl'
 import type { VNode } from 'vue'
 
 /** 渲染html */
-export function renderHtml(options: any, context: any = {}): VNode | string | undefined {
-  if (options && typeof options === 'string') return tpl.filter(options, context)
+export function renderHtml(options: any, dataContext: any = {}): VNode | string | undefined {
+  if (options && typeof options === 'string') return tpl.filter(options, dataContext)
 
   if (!options) return undefined
-  if (options?.visibleOn && !tpl.evalExpression(options?.visibleOn, context)) return undefined
+  if (options?.visibleOn && !tpl.evalExpression(options?.visibleOn, dataContext)) return undefined
 
   // 渲染组件
-  if (!options.tag && options.type) return renderCmpt(options, context)
+  if (!options.tag && options.type) return renderCmpt(options, dataContext)
 
-  const props = tpl.deepFilter(options.props, context)
-  const children = (options.children || []).map((it: any) => {
-    return renderHtml(it, context)
+  const props = tpl.deepFilter(options.props, dataContext)
+
+  let childrenOpt = options.children
+  if (options.children && !Array.isArray(options.children)) {
+    childrenOpt = [options.children]
+  }
+  const children = childrenOpt.map((it: any) => {
+    return renderHtml(it, dataContext)
   })
 
-  return h(options.tag, props, children)
+  const tag = options.tag || 'div'
+  return h(tag, props, children)
 }
 
 /** 渲染组件 */
-export function renderCmpt(options: any, context: any = {}): VNode | string | undefined {
-  if (options && typeof options === 'string') return tpl.filter(options, context)
+export function renderCmpt(options: any, dataContext: any = {}): VNode | string | undefined {
+  if (options && typeof options === 'string') return tpl.filter(options, dataContext)
   if (!options) return undefined
 
-  if (_.isFunction(options)) options = options(context)
-  if (options.visibleOn && !tpl.evalExpression(options?.visibleOn, context)) return undefined
+  if (_.isFunction(options)) options = options(dataContext)
+  if (options.visibleOn && !tpl.evalExpression(options?.visibleOn, dataContext)) return undefined
 
   // 渲染html
-  if (!options.type && options.tag) return renderHtml(options, context)
+  if (!options.type && options.tag) return renderHtml(options, dataContext)
 
   const cmpt = resolveComponent(options.componentType || options.ctype || options.type)
   if (!cmpt) return undefined
 
-  const props = tpl.deepFilter(options.props, context)
+  const props = tpl.deepFilter(options.props, dataContext)
   const children: any = {}
   if (options.children) {
     children.default = () => {
       return (options.children || []).map((it: any) => {
-        return renderCmpt(it, context)
+        return renderCmpt(it, dataContext)
       })
     }
   }
@@ -53,9 +59,9 @@ export function renderCmpt(options: any, context: any = {}): VNode | string | un
       children[key] = () => {
         if (!slot) return undefined
         if (Array.isArray(slot)) {
-          return slot.map(it => renderCmpt(it, context))
+          return slot.map(it => renderCmpt(it, dataContext))
         } else {
-          return renderCmpt(it, context)
+          return renderCmpt(it, dataContext)
         }
       }
     })

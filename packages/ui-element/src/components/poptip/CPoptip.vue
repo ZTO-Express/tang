@@ -22,13 +22,13 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, renderHtml } from '@zto/zpage'
+import { computed, renderHtml, useCurrentAppInstance } from '@zto/zpage'
 
-const { computed } = vue
+const app = useCurrentAppInstance()
 
 const props = defineProps<{
   type?: string
-  context?: any
+  contextData?: any
   icon?: string
   label?: string
   title?: string
@@ -37,7 +37,8 @@ const props = defineProps<{
 }>()
 
 const innerContent = computed(() => {
-  return renderHtml(props.content, props.context)
+  const context = app.useContext(props.contextData)
+  return renderHtml(props.content, context)
 })
 </script>
 

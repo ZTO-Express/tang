@@ -29,11 +29,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { vue, useWidgetEmitter } from '@zto/zpage'
+import { computed, ref, useAttrs, useCurrentAppInstance } from '@zto/zpage'
 
-import type { GenericFunction } from '@zto/zpage'
-
-const { computed, ref, useAttrs } = vue
+import { useFormItem } from '../util'
 
 const props = withDefaults(
   defineProps<{
@@ -48,7 +46,6 @@ const props = withDefaults(
     collapseTags?: boolean
     multiple?: boolean
     showTips?: boolean
-    onChange?: GenericFunction
   }>(),
   {
     collapseTags: true,
@@ -57,10 +54,14 @@ const props = withDefaults(
 )
 
 const attrs = useAttrs()
+
+const app = useCurrentAppInstance()
 const fieldRef = ref<any>()
 
+const { handleChange } = useFormItem(props)
+
 // 注册微件事件监听
-useWidgetEmitter(attrs, {
+app.useWidgetEmitter(attrs, {
   fetchOn: doFetch
 })
 
@@ -86,11 +87,6 @@ function handleUpdateLabelProps(v: string) {
     // eslint-disable-next-line vue/no-mutating-props
     props.model[props.labelProp] = v
   }
-}
-
-function handleChange(payload: any) {
-  if (!props.onChange) return
-  props.onChange(props.model, payload)
 }
 
 function getSelectedOptions() {

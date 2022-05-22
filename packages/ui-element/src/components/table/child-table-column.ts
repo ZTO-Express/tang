@@ -1,31 +1,35 @@
-import { vue, tpl, _, useAppContext, renderHtml, renderCmpt } from '@zto/zpage'
+import {
+  _,
+  h,
+  tpl,
+  renderHtml,
+  renderCmpt,
+  Cmpt,
+  useSlots,
+  defineComponent,
+  resolveComponent,
+  useCurrentAppInstance
+} from '@zto/zpage'
 import { ElTableColumn, ElFormItem } from 'element-plus'
 
 import type { GenericFunction } from '@zto/zpage'
 
 import CPoptip from '../poptip/CPoptip.vue'
-import BatchEditor from './batch-editor.vue'
+import PopEditor from './pop-editor.vue'
 
 import type { TableColumn } from './types'
 
-const { defineComponent, ref, useSlots, h, resolveComponent } = vue
-
 const ChildTableColumn = defineComponent({
   props: {
-    column: {
-      type: Object,
-      default: () => {
-        return {} as TableColumn
-      }
-    },
+    column: { type: Object, default: () => ({} as TableColumn) },
     editable: { type: Boolean, default: false },
     batchEditable: { type: Boolean, default: false },
-    onBatchEdit: { type: Function },
     onEditorSubmit: { type: Function }
   },
 
   setup(props, { emit }) {
     const slots = useSlots()
+    const app = useCurrentAppInstance()
 
     function getColumnProps(config: any) {
       return {
@@ -68,10 +72,11 @@ const ChildTableColumn = defineComponent({
         }
 
         scopedSlots.header = (scope: any) => {
+          const context = app.useContext(scope)
+
           let headerLabel = config.label
 
           if (config.headerTpl) {
-            const context = useAppContext(scope)
             headerLabel = tpl.filter(config.headerTpl, context)
           }
 
@@ -86,7 +91,7 @@ const ChildTableColumn = defineComponent({
       } else {
         // 编辑列
         scopedSlots.default = (scope: any) => {
-          const context = useAppContext(scope)
+          const context = app.useContext()
 
           const prop = config.prop
 
@@ -111,6 +116,10 @@ const ChildTableColumn = defineComponent({
           if (config.html) {
             const htmlNode = renderHtml(config.html, context)
             return htmlNode
+          }
+
+          if (config.cmpt) {
+            return h(Cmpt, { config: config.cmpt, contextData: scope })
           }
 
           if (config.component) {
@@ -153,27 +162,39 @@ const ChildTableColumn = defineComponent({
            *  rowEditable 当前行可编辑 */
           if (config.editor && (props.editable || rowEditable)) {
             const editor = config.editor
-            const Editor = resolveComponent(`c-form-item-${editor.itemType}`)
-            const editAttrs = _.omit(editor, ['itemType', 'innerAttrs'])
-            const formItemAttrs = editor.innerAttrs?.formItem
-            return h(
-              ElFormItem,
-              {
-                prop: `list.${scope.$index}.${prop}`,
-                rules: config.rules,
-                style: editAttrs.noPadding ? 'margin: 0' : 'margin:15px 0',
-                ...formItemAttrs
-              },
-              [
-                h(Editor, {
-                  ...editAttrs,
-                  model: scope.row,
-                  prop,
-                  onSubmit: props.onEditorSubmit
-                }),
-                tipSlot
-              ]
-            )
+
+            if (editor.popover) {
+              return h(PopEditor as any, {
+                text: innerText,
+                column: config,
+                config: config.editor,
+                scope,
+                onSubmit: props.onEditorSubmit
+              })
+            } else {
+              const editAttrs = _.omit(editor, ['itemType', 'innerAttrs'])
+              const formItemAttrs = editor.innerAttrs?.formItem
+              const Editor = resolveComponent(`c-form-item-${editor.itemType}`)
+
+              return h(
+                ElFormItem,
+                {
+                  prop: `list.${scope.$index}.${prop}`,
+                  rules: config.rules,
+                  style: editAttrs.noPadding ? 'margin: 0' : 'margin:15px 0',
+                  ...formItemAttrs
+                },
+                [
+                  h(Editor, {
+                    ...editAttrs,
+                    model: scope.row,
+                    prop,
+                    onSubmit: props.onBatchEditorSubmit
+                  }),
+                  tipSlot
+                ]
+              )
+            }
           }
 
           let innerStyle = {}
@@ -197,18 +218,22 @@ const ChildTableColumn = defineComponent({
         }
 
         scopedSlots.header = (scope: any) => {
-          const context = useAppContext(scope)
+          const context = app.useContext(scope)
 
           let headerConfig = config.header
           if (_.isFunction(headerConfig)) {
             headerConfig = config.header(context, config)
           }
 
+          if (headerConfig?.cmpt) {
+            return h(Cmpt, { config: headerConfig.cmpt, contextData: scope, ...headerConfig })
+          }
+
           if (headerConfig?.component) {
             let headerCmptConfig: any = null
 
             if (_.isFunction(headerConfig.component)) {
-              headerCmptConfig = config.header(context, config)
+              headerCmptConfig = headerConfig.component(context, config)
             }
 
             const headerCmpt = renderCmpt(headerCmptConfig, context)
@@ -220,16 +245,16 @@ const ChildTableColumn = defineComponent({
             headerLabel = tpl.filter(config.headerTpl, context)
           }
 
-          const editor = config.editor
+          const batchEditor = config.batchEditor
 
           /** 批量编辑 */
           if (props.batchEditable && config.batchEditable) {
-            return h(BatchEditor as any, {
-              editorType: `c-form-item-${editor.itemType}`,
-              item: config,
-              onOk: (data: Record<string, string>) => {
-                return props.onBatchEdit && props.onBatchEdit(data)
-              }
+            return h(PopEditor as any, {
+              config: batchEditor,
+              column: config,
+              scope,
+              isBatch: true,
+              onSubmit: props.onBatchEdit
             })
           }
 
@@ -242,8 +267,8 @@ const ChildTableColumn = defineComponent({
           let isRequired = false
 
           /** 必填项 */
-          if (editor && (editor.required || config.rules)) {
-            if (editor.required || (config.rules || []).some((it: any) => it.required)) {
+          if (batchEditor && (batchEditor?.required || batchEditor?.rules)) {
+            if (batchEditor.required || (batchEditor.rules || []).some((it: any) => it.required)) {
               isRequired = true
             }
           }
@@ -270,14 +295,7 @@ const ChildTableColumn = defineComponent({
     const columnProps = getColumnProps(props.column)
     const childrenSlots = buildChildrenSlots(props.column)
 
-    return () =>
-      h(
-        ElTableColumn,
-        {
-          ...columnProps
-        },
-        childrenSlots
-      )
+    return () => h(ElTableColumn, { ...columnProps }, childrenSlots)
   }
 })
 

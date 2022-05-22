@@ -2,7 +2,7 @@ import * as widgetsMap from '../widgets'
 
 import type { VueComponent, Installable, InstallableOptions } from '@zto/zpage'
 
-export default (instance: Installable, options?: InstallableOptions): void => {
+export default (app: Installable, options?: InstallableOptions): void => {
   const innerWidgets: VueComponent[] = []
 
   for (const key in widgetsMap) {
@@ -12,5 +12,5 @@ export default (instance: Installable, options?: InstallableOptions): void => {
     innerWidgets.push(widget)
   }
 
-  instance.register([...innerWidgets])
+  app.register([...innerWidgets])
 }

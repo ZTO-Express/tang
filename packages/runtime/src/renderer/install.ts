@@ -1,4 +1,3 @@
-import { emitter } from '../utils'
 import { RendererFactory } from './Renderer'
 
 import type { RendererFactoryInstanceOptions } from '../typings'
@@ -10,11 +9,11 @@ export async function install(renderer: Renderer, options?: RendererFactoryInsta
 
   vueApp.config.globalProperties.$renderer = renderer
 
-  // 安装Event Bus
-  vueApp.config.globalProperties.$emitter = emitter
+  // // 安装Event Bus
+  // vueApp.config.globalProperties.$emitter = emitter
 
-  // 安装ui
-  if (RendererFactory.instance.ui.install) {
-    await RendererFactory.instance.ui.install(renderer, options)
-  }
+  // // 安装ui
+  // if (RendererFactory.instance.ui.install) {
+  //   await RendererFactory.instance.ui.install(renderer, options)
+  // }
 }

@@ -28,20 +28,17 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useAuthLoader, useAppStore, useAppConfig } from '@zto/zpage'
+import { useCurrentAppInstance, computed } from '@zto/zpage'
 import { ArrowDown, List as IconList } from '@element-plus/icons'
 
 import { appUtil } from '../../utils'
 
-const { computed, ref } = vue
+const app = useCurrentAppInstance()
 
-const store = useAppStore()
+const { userStore } = app.stores
+const downloadsConfig = app?.useAppConfig('header.downloads')
 
-const downloadsConfig = useAppConfig('header.downloads')
-
-const nickname = computed(() => {
-  return store.getters.nickname
-})
+const nickname = computed(() => userStore.nickname)
 
 const isDownloads = computed(() => {
   return !!(downloadsConfig && downloadsConfig !== false)
@@ -51,8 +48,7 @@ const isDownloads = computed(() => {
 function handleDropdownCommand(command: string) {
   switch (command) {
     case 'logout':
-      const authLoader = useAuthLoader()
-      authLoader && authLoader.logout()
+      app.logout()
       break
   }
 }

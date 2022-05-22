@@ -1,4 +1,8 @@
 import { _ } from './util'
+import * as dateUtil from './date'
+
+import type { DateValue } from '@zto/zpage-core'
+import type { DataOptionItem } from '../typings'
 
 export interface MoneyFormatOptions {
   decimals?: number // 保留小数位数
@@ -8,26 +12,26 @@ export interface MoneyFormatOptions {
 }
 
 /** 格式化金额(分) */
-export function fenMoney(input: number, options: MoneyFormatOptions = {}) {
-  if (_.isNil(input)) return options.emptyText || 'N/A'
+export function fenMoney(input: number, opts: MoneyFormatOptions = {}) {
+  if (_.isNil(input)) return opts.emptyText || 'N/A'
 
-  const yuan = +(+input / 100).toFixed(2)
+  const yuan = +(+input / 100).toFixed(opts.decimals || 2)
 
-  return yuanMoney(yuan, options)
+  return yuanMoney(yuan, opts)
 }
 
 /** 格式化金额（元） */
-export function yuanMoney(input: number, options: MoneyFormatOptions = {}) {
-  if (_.isNil(input)) return options.emptyText || 'N/A'
+export function yuanMoney(input: number, opts: MoneyFormatOptions = {}) {
+  if (_.isNil(input)) return opts.emptyText || 'N/A'
 
-  const decimals = options.decimals || 2
+  const decimals = opts.decimals || 2
 
   const num = (input + '').replace(/[^0-9+-Ee.]/g, '')
 
   let n = !isFinite(+num) ? 0 : +num,
     prec = !isFinite(decimals) ? 0 : Math.abs(decimals),
-    sep = options.thousandSep || ',',
-    dec = options.decimalSep || '.',
+    sep = opts.thousandSep || ',',
+    dec = opts.decimalSep || '.',
     s: string | string[] = '',
     toFixedFix = function (n: number, prec: number) {
       const k = Math.pow(10, prec)
@@ -47,4 +51,51 @@ export function yuanMoney(input: number, options: MoneyFormatOptions = {}) {
   }
 
   return s.join(dec)
+}
+
+/** 格式化枚举值 */
+export function enumStr(
+  input: number | string,
+  opts: {
+    options?: DataOptionItem[] | Record<string | number, string>
+  } = {}
+) {
+  const options = opts?.options
+
+  if (!options) return input
+
+  let str: any = input
+
+  if (Array.isArray(options)) {
+    str = options.find(it => it.value === input)?.label
+  } else {
+    str = options[String(input)]
+  }
+
+  if (!str) str = input
+
+  return str
+}
+
+/** 格式化日期 */
+export function date(input: DateValue, opts?: { formatType: string; emptyText: string }) {
+  const emptyText = opts?.emptyText || '--'
+  const formatType = opts?.formatType || 'YYYY-MM-DD'
+
+  if (_.isNil(input)) return emptyText
+
+  return dateUtil.format(input, formatType)
+}
+
+/**  */
+export function yesNo(input: number | boolean, opts: { options?: string[] } = {}) {
+  const options = opts?.options || []
+
+  if (_.isNil(input)) return ''
+
+  if (input) {
+    return options[0] || '是'
+  } else {
+    return options[1] || '否'
+  }
 }

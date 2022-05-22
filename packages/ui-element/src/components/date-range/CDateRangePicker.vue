@@ -20,10 +20,8 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { _, vue, dateUtil } from '@zto/zpage'
+import { _, computed, ref, watch, dateUtil } from '@zto/zpage'
 import { useMessage } from '../../composables'
-
-const { computed, ref, watch } = vue
 
 const props = withDefaults(
   defineProps<{

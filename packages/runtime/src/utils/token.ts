@@ -1,5 +1,5 @@
 import { TOKEN_DATA_STORAGE_KEY, TOKEN_REFRESH_DURATION } from '../consts'
-import { useApi, useConfig } from '../config'
+import { HostApp } from '../app'
 import { storage } from './storage'
 
 import type { Nil } from '@zto/zpage-core'
@@ -7,7 +7,7 @@ import type { TokenData } from '../typings'
 
 /** 获取token刷新间隔 */
 export function getRefreshDuration() {
-  const seconds = useConfig('app.auth.token.refreshDuration', TOKEN_REFRESH_DURATION)
+  const seconds = HostApp.useConfig('app.auth.token.refreshDuration') || TOKEN_REFRESH_DURATION
   return seconds * 1000
 }
 
@@ -15,7 +15,7 @@ export function getRefreshDuration() {
 let __tokenRefreshTimer: any = null
 export function checkStartAutoRefresh(flag = true) {
   // 自否自动刷新token
-  const autoRefresh = useConfig('app.auth.token.autoRefresh')
+  const autoRefresh = HostApp.useConfig('app.auth.token.autoRefresh')
 
   if (flag === false || autoRefresh) {
     __tokenRefreshTimer && clearTimeout(__tokenRefreshTimer)
@@ -32,7 +32,8 @@ export function checkStartAutoRefresh(flag = true) {
  * @param code
  */
 export async function refreshToken(code?: string) {
-  const userApi = useApi('user')
+  const authApi = HostApp.app?.apis.authApi
+  if (!authApi) return
 
   // 请求时间
   const requestTime = new Date().getTime()
@@ -40,16 +41,16 @@ export async function refreshToken(code?: string) {
   let tokenData: TokenData | null = null
 
   if (code) {
-    if (userApi.getToken) {
-      tokenData = await userApi.getToken(code)
+    if (authApi.getToken) {
+      tokenData = await authApi.getToken(code)
     } else {
       tokenData = { accessToken: code }
     }
   } else {
-    if (userApi.exchangeToken) {
+    if (authApi.exchangeToken) {
       const refreshToken = getLocalRefreshToken()
       if (refreshToken) {
-        tokenData = await userApi.exchangeToken(refreshToken)
+        tokenData = await authApi.exchangeToken(refreshToken)
       }
     }
   }

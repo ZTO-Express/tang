@@ -16,7 +16,7 @@
 
       <div class="tip-con">
         <slot name="tip">
-          {{ props.tip || `请先下载模板，数据不能超过${maxCount}条。文件大小不能超过${maxFileSize}MB。` }}
+          {{ props.tip || `请先下载模板，数据不能超过${innerMaxCount}条。文件大小不能超过${innerMaxFileSize}MB。` }}
         </slot>
       </div>
 
@@ -49,14 +49,11 @@ export interface ImportExtraTip {
 </script>
 
 <script setup lang="ts">
-import { _, vue, useConfig, useRescs, useApiRequest, fileUtil } from '@zto/zpage'
+import { _, computed, ref, fileUtil, useCurrentAppInstance } from '@zto/zpage'
 
-import { useMessage } from '../../composables'
 import * as xlsxUtil from '../../utils/xlsx'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
-
-const { computed, ref } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -66,7 +63,7 @@ const props = withDefaults(
     extraTip?: string | ImportExtraTip
     maxCount?: number
     maxFileSize?: number // 文件大小限制，单位MB
-    api?: ApiRequestAction
+    api?: string | ApiRequestAction
     apiParams?: any
     dataProp?: string // 导出数据的属性
     dialog?: any
@@ -82,15 +79,15 @@ const props = withDefaults(
   {
     closeAfterSuccess: true,
     dataProp: 'data',
-    maxCount: 3000,
-    maxFileSize: 10,
     filterEmpty: true,
     dataValidate: true
   }
 )
 
-const { Message } = useMessage()
-const apiRequest = useApiRequest()
+const app = useCurrentAppInstance()
+
+const { Message } = app.useMessage()
+const apiRequest = app.request
 
 const loading = ref(false)
 const dialogRef = ref<any>()
@@ -99,6 +96,7 @@ const dialogAttrs = computed(() => {
   const bodyStyle = 'padding: 10px 30px'
   return {
     title: props.title,
+    width: 600,
     noPadding: true,
     bodyStyle,
     onSubmit: handleDialogSubmit,
@@ -106,9 +104,9 @@ const dialogAttrs = computed(() => {
   }
 })
 
-const fileImportCfg = useConfig('components.fileImport', {})
+const fileImportCfg = app.useComponentsConfig('fileImport', {})
 
-const importTemplates = useRescs('import_templates', {})
+const importTemplates = app.useAssets('import_templates', {})
 
 const selectedFile = ref()
 
@@ -142,12 +140,20 @@ const fileAccept = computed(() => {
   return templateData.value?.accept || '.xlsx'
 })
 
+const innerMaxCount = computed(() => {
+  return props.maxCount || templateData.value?.maxCount || fileImportCfg?.maxCount || 3000
+})
+
+const innerMaxFileSize = computed(() => {
+  return props.maxFileSize || templateData.value?.maxFileSize || fileImportCfg?.maxFileSize || 10
+})
+
 // 文件选中后触发
 async function handleFileSelected(file: any) {
-  const exceededFileSize = file.size / 1024 / 1024 > props.maxFileSize
+  const exceededFileSize = file.size / 1024 / 1024 > innerMaxFileSize.value
 
   if (exceededFileSize) {
-    Message.warning(`文件大小不能超过${props.maxFileSize}MB。`)
+    Message.warning(`文件大小不能超过${innerMaxFileSize.value}MB。`)
     return
   }
 
@@ -192,7 +198,7 @@ async function handleDialogSubmit() {
         if (flag === false) return
       } else {
         if (!data?.length) throw new Error('没有需要上传的数据。')
-        if (data.length >= props.maxCount) throw new Error(`数据不能超过${props.maxCount}条`)
+        if (data.length >= innerMaxCount.value) throw new Error(`数据不能超过${innerMaxCount.value}条`)
       }
     }
 
@@ -301,6 +307,9 @@ async function doParseFile(file: any, options?: any) {
           }
         }
 
+        if (col.transform) val = col.transform(val)
+        if (col.formatter) val = app.formatText(val, col.formatter)
+
         if (col.prop) {
           it[col.prop] = val
         }
@@ -316,7 +325,7 @@ async function doApiImport(payload: any) {
   if (!props.api) throw new Error('api不存在')
 
   await apiRequest({
-    action: props.api as string,
+    action: props.api,
     data: payload,
     isSilent: true // 防止接口出错后，重复弹出提示框
   })

@@ -10,8 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
-const { ref, watch } = vue
+import { ref, watch } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{

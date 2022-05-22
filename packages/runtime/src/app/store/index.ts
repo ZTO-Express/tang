@@ -1,26 +1,52 @@
-import { createStore } from 'vuex'
-import app from './modules/app'
-import user from './modules/user'
-import pages from './modules/pages'
+import { FlushAppContextType } from '../../consts'
 
-import { getters } from './getters'
+import { defineAppStore } from './modules/app'
+import { defineUserStore } from './modules/user'
+import { definePagesStore } from './modules/pages'
 
-import type { AppStore } from '../../typings'
+import type { App } from '../App'
+import type { AppStores } from '../../typings'
 
-let store: AppStore | undefined = undefined
+/** 定义根store */
+export function defineAppStores(app: App) {
+  const useAppStore = defineAppStore(app)
+  const useUserStore = defineUserStore(app)
+  const usePagesStore = definePagesStore(app)
 
-export function createAppStore(): AppStore {
-  if (store) return store
-
-  store = createStore({
-    getters,
-    modules: { app, user, pages }
-  })
-
-  return store
+  return {
+    useAppStore,
+    useUserStore,
+    usePagesStore
+  }
 }
 
-// 获取当前store
-export function useAppStore() {
-  return createAppStore()
+/** 定义并应用appStores */
+export function defineAndUseAppStores(app: App): AppStores {
+  const { useAppStore, useUserStore, usePagesStore } = defineAppStores(app)
+
+  const appStore = useAppStore(app.pinia)
+  appStore.$subscribe(
+    () => {
+      app.flushContext(FlushAppContextType.APP)
+    },
+    { detached: true }
+  )
+
+  const userStore = useUserStore(app.pinia)
+  userStore.$subscribe(
+    () => {
+      app.flushContext(FlushAppContextType.USER)
+    },
+    { detached: true }
+  )
+
+  const pagesStore = usePagesStore(app.pinia)
+  pagesStore.$subscribe(
+    () => {
+      app.flushContext(FlushAppContextType.PAGE)
+    },
+    { detached: true }
+  )
+
+  return { appStore, userStore, pagesStore }
 }

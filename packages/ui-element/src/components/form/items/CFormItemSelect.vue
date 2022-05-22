@@ -40,12 +40,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { tpl, vue } from '@zto/zpage'
+import { tpl, computed, ref, watch, useCurrentAppInstance } from '@zto/zpage'
+
+import { useFormItem } from '../util'
 
 import type { GenericFunction } from '@zto/zpage'
-import { useAppContext } from '@zto/zpage-runtime'
-
-const { computed, ref, watch } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -59,7 +58,6 @@ const props = withDefaults(
     optionValueProp?: string
     collapseTags?: boolean
     filterable?: boolean
-    onChange?: GenericFunction
     noWriteback?: boolean
     multiple?: boolean
   }>(),
@@ -72,7 +70,11 @@ const props = withDefaults(
   }
 )
 
-const context = useAppContext(props.model)
+const app = useCurrentAppInstance()
+
+const context = app.useContext(props.model)
+
+const { handleChange } = useFormItem(props)
 
 const groupLabels = ref<any[]>([])
 
@@ -122,10 +124,5 @@ function getOptionsByLabel(groupLabel: string) {
 
   const options: any[] = selectOptions.value.filter((it: any) => it[groupNameVal] === groupLabel)
   return options
-}
-
-function handleChange(payload: any) {
-  if (!props.onChange) return
-  props.onChange(props.model, payload)
 }
 </script>

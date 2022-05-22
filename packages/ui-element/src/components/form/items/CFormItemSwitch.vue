@@ -8,26 +8,22 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
+import { computed } from '@zto/zpage'
+
+import { useFormItem } from '../util'
 
 import type { GenericFunction } from '@zto/zpage'
-
-const { computed } = vue
 
 const props = withDefaults(
   defineProps<{
     model: Record<string, any>
     prop: string
     disabled?: boolean
-    onChange?: GenericFunction
   }>(),
   {
     disabled: false
   }
 )
 
-function handleChange(payload: any) {
-  if (!props.onChange) return
-  props.onChange(props.model, payload)
-}
+const { handleChange } = useFormItem(props)
 </script>

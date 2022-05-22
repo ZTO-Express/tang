@@ -15,6 +15,7 @@ declare global {
 /** 扩展vue-router */
 declare module 'vue-router' {
   interface Router {
+    __cachedNodes: Record<string, VNode> // 已缓存节点
     goHome: () => Promise<void | NavigationFailure>
     goBack: () => Promise<void | NavigationFailure>
     goto: (to: any) => Promise<void | NavigationFailure>
@@ -22,6 +23,8 @@ declare module 'vue-router' {
     getRouteByName: (name: string) => RouteRecordNormalized | undefined
     getRouteByPageKey: (key: string) => RouteRecordNormalized | undefined
     getRouteByMenuPath: (menuPath: string) => RouteRecordNormalized | undefined
+    getCurrentPageKey: () => string | undefined
+    pruneCurrentPage: () => void
   }
 }
 

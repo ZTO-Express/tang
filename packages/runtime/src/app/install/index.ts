@@ -1,21 +1,13 @@
-import { emitter } from '../../utils'
 import installRouter from '../router/install'
 import installComponents from './components'
 import installWidgets from './widgets'
 import installPlugins from './plugins'
 
-import type { AppOptions, Installable, InstallableOptions } from '../../typings'
+import type { InstallableOptions } from '../../typings'
 import type { App } from '../App'
 
 /** 安装插件 */
-export async function install(app: App & Installable, options: AppOptions & InstallableOptions) {
-  const vueApp = app.vueApp
-
-  vueApp!.config.globalProperties.$runtime = app
-
-  // 安装Event Bus
-  vueApp!.config.globalProperties.$emitter = emitter
-
+export async function install(app: App, options: InstallableOptions) {
   // 安装全局组件，并配置相关变量
   await installComponents(app, options)
 

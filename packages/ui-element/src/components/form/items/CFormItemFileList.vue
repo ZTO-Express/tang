@@ -1,7 +1,7 @@
 <template>
   <!-- eslint-disable vue/no-mutating-props -->
   <div class="c-form-item-file-list">
-    <c-file-list v-if="fileItems?.length" :model-value="fileItems" v-bind="$attrs" />
+    <c-file-list v-if="fileItems?.length" :model-value="fileItems" v-bind="$attrs" @change="handleChange" />
     <div v-else>{{ emptyText }}</div>
     <div v-if="title" class="title">{{ title }}</div>
   </div>
@@ -12,9 +12,9 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { _, vue } from '@zto/zpage'
+import { _, computed, ref } from '@zto/zpage'
 
-const { computed, ref } = vue
+import { useFormItem } from '../util'
 
 const props = withDefaults(
   defineProps<{
@@ -27,6 +27,7 @@ const props = withDefaults(
     emptyText: '--'
   }
 )
+const { handleChange } = useFormItem(props)
 
 const fileItems = computed(() => {
   const val = props.model[props.prop]

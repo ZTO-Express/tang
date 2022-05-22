@@ -1,6 +1,6 @@
 import { defineComponent, h, ref, Teleport, watch } from 'vue'
-import { usePageLoader } from '../loaders'
 import { Widget } from '../../entry'
+import { useCurrentAppInstance } from '../composables'
 
 export default defineComponent({
   props: {
@@ -10,7 +10,9 @@ export default defineComponent({
   },
 
   async setup(props: any) {
-    const pageLoader = usePageLoader()
+    const app = useCurrentAppInstance()
+
+    const pageLoader = app.usePageLoader()
     const innerSchema = ref<any>()
 
     watch(
@@ -22,8 +24,8 @@ export default defineComponent({
 
     async function resetPageSchema() {
       let pageSchema = props.pageSchema
-      if (!pageSchema) {
-        pageSchema = await pageLoader?.loadPage(props.pagePath as string)
+      if (!pageSchema && pageLoader) {
+        pageSchema = await pageLoader.loadPage(app, props.pagePath as string)
       }
 
       if (!pageSchema) pageSchema = { type: 'blank' }

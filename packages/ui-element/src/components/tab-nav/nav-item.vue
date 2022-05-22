@@ -15,12 +15,10 @@
 </template>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
+import { computed } from '@zto/zpage'
 import { CircleClose } from '@element-plus/icons'
 
 import type { GenericFunction } from '@zto/zpage'
-
-const { computed } = vue
 
 const props = defineProps<{
   navItem: Record<string, any>
@@ -85,7 +83,7 @@ const itemClass = computed(() => {
 
   &.active {
     color: $primary;
-    background: $bg-color;
+    background: $app-bg-color;
     border-radius: 4px 4px 0px 0px;
     opacity: 1;
 

@@ -1,20 +1,20 @@
+import { AppLoaderType } from '../../../consts'
 import { resetToken, refreshToken, clearTokenData } from '../../../utils'
-import { useApi } from '../../../config'
-import { useAppStore } from '../../store'
-import { useAppRouter } from '../../router'
 
 import type { AppAuthLoader, NavMenuItem } from '../../../typings'
+import type { App } from '../../App'
 
 export const LocalAuthLoader: AppAuthLoader = {
+  type: AppLoaderType.AUTH,
+
   name: 'local',
 
-  async checkAuth(config: any) {
-    const router = useAppRouter()
+  async checkAuth(app: App) {
+    const router = app.router
+    const { authApi } = app.apis
 
-    const userApi = useApi('user')
-
-    if (userApi.checkAuth) {
-      await userApi.checkAuth(config)
+    if (authApi.checkAuth) {
+      await authApi.checkAuth(app.config)
     } else {
       // 从url获取code
       const searchParams = new URL(window.location.href).searchParams
@@ -28,28 +28,27 @@ export const LocalAuthLoader: AppAuthLoader = {
   },
 
   // 获取用户信息
-  async getUserInfo() {
-    const userApi = useApi('user')
-
+  async getUserInfo(app: App) {
+    const { authApi } = app.apis
     // 先重设token
     await resetToken()
 
-    const res = await userApi.getUserInfo()
+    const res = await authApi.getUserInfo!()
 
     return res
   },
 
   // 解析菜单数据
-  async getMenuData() {
-    const store = useAppStore()
-    const menus: NavMenuItem[] = store.getters.user?.menus || []
+  async getMenuData(app: App) {
+    const menus: NavMenuItem[] = app.stores.userStore.menus || []
     return menus
   },
 
-  async logout() {
-    const userApi = useApi('user')
-    if (userApi.logout) {
-      userApi.logout()
+  async logout(app: App) {
+    const { authApi } = app.apis
+
+    if (authApi.logout) {
+      authApi.logout()
     } else {
       await clearTokenData()
     }

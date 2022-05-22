@@ -8,6 +8,7 @@
     :disabled="disabled"
     :maxlength="inputMaxlength"
     :show-word-limit="innerShowWordLimit"
+    @change="handleChange"
   />
 </template>
 
@@ -16,11 +17,9 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { _, vue, useConfig } from '@zto/zpage'
-const { ref, computed } = vue
+import { _, computed, useCurrentAppInstance } from '@zto/zpage'
 
-const inputConfig = useConfig('components.formItem.input', {})
-const textareaConfig = useConfig('components.formItem.textarea', {})
+import { useFormItem } from '../util'
 
 const props = withDefaults(
   defineProps<{
@@ -36,6 +35,13 @@ const props = withDefaults(
     showWordLimit: undefined
   }
 )
+
+const app = useCurrentAppInstance()
+
+const inputConfig = app?.useComponentsConfig('formItem.input', {})
+const textareaConfig = app?.useComponentsConfig('formItem.textarea', {})
+
+const { handleChange } = useFormItem(props)
 
 const inputMaxlength = computed(() => {
   if (props.maxlength) return props.maxlength

@@ -5,26 +5,26 @@
 </template>
 
 <script setup lang="ts">
-import { vue, tpl, useApiRequest, useAppContext, useWidgetEmitter, useWidgetSchema } from '@zto/zpage'
-
-const { computed, ref } = vue
+import { computed, ref, tpl, useCurrentAppInstance } from '@zto/zpage'
 
 // 属性
 const props = defineProps<{
   schema: Record<string, any>
 }>()
 
+const app = useCurrentAppInstance()
+
 // api请求
-const apiRequest = useApiRequest()
+const apiRequest = app.request
 
 // schema
-const wSchema = useWidgetSchema(props.schema)
+const wSchema = app.useWidgetSchema(props.schema)
 
 // 加载项
 const loading = ref<any>({})
 
 // 注册微件事件监听
-useWidgetEmitter(wSchema, {
+app.useWidgetEmitter(wSchema, {
   fetchOn: doFetch,
   resetOn: doReset
 })
@@ -39,7 +39,7 @@ const sModel = wSchema.model || {}
 const formModel = ref<any>(sModel)
 
 // 应用上下文
-const context = useAppContext(formModel)
+const context = app.useContext(formModel)
 
 const formItems = wSchema.formItems
 

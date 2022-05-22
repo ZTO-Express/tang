@@ -8,13 +8,14 @@
 </template>
 
 <script setup lang="ts">
-import { _, vue, useAppConfig } from '@zto/zpage'
-
-const { computed, ref } = vue
+import { _, computed, ref, useCurrentAppInstance } from '@zto/zpage'
 
 const dialogRef = ref<any>()
 
-const downloadsConfig = useAppConfig('header.downloads', {})
+const app = useCurrentAppInstance()
+
+const downloadsConfig = app.useAppConfig('header.downloads', {})
+
 const dialogConfig = downloadsConfig.dialog || {}
 const listConfig = downloadsConfig.list || {}
 

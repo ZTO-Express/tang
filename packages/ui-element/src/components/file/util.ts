@@ -1,6 +1,3 @@
-// import userapi from '@/api/userapi'
-// import { ENV } from '@/utils/env'
-// import store from '@/store'
 import { fileUtil, useApi } from '@zto/zpage'
 
 import type { UploadData } from './types'
@@ -80,12 +77,6 @@ export async function getFileThumbnail(file: File): Promise<string> {
   let url = await readFileAsDataUrl(file)
 
   return url
-}
-
-export async function getUploadToken() {
-  const fsApi = useApi('fs')
-  const res = await fsApi.getUploadToken()
-  return res && res.token
 }
 
 // 文件已经准备好上传

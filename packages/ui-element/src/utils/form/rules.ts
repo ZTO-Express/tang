@@ -1,9 +1,6 @@
-import { _, validator as v, useConfig } from '@zto/zpage'
+import { _, validator as v } from '@zto/zpage'
 
 import type { GenericFunction } from '@zto/zpage'
-
-/** 外部注册规则 */
-export const outerRules = useConfig('components.form.rules')
 
 export const innerRules = Object.freeze({
   required: {
@@ -115,8 +112,6 @@ export const innerRules = Object.freeze({
     }
   }
 })
-
-export const allRules = { ...innerRules, ...outerRules }
 
 /** 验证必填 */
 export function verifyRequired(rule: any, val: any, cb: GenericFunction) {

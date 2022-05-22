@@ -6,6 +6,7 @@
     :placeholder="$attrs.placeholder || '请选择'"
     :disabled="disabled"
     :options="options || []"
+    @change="handleChange"
   />
 </template>
 
@@ -14,8 +15,8 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
-const { ref } = vue
+import { ref } from '@zto/zpage'
+import { useFormItem } from '../util'
 
 const props = withDefaults(
   defineProps<{
@@ -28,4 +29,6 @@ const props = withDefaults(
     disabled: false
   }
 )
+
+const { handleChange } = useFormItem(props)
 </script>

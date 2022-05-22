@@ -14,6 +14,7 @@
         </template>
 
         <el-form-item
+          v-show="item.visible !== false"
           v-bind="item.itemAttrs"
           :class="{
             'form-item': true,
@@ -30,6 +31,13 @@
             <span v-else-if="item.label && item.labelWidth !== 0">{{ item.label + ':' }}</span>
             <span v-else></span>
           </template>
+          <cmpt
+            v-if="item.cmpt"
+            :config="item.cmpt"
+            :context-data="model"
+            :disabled="item.isDisabled"
+            :style="{ width: item.width || itemWidth }"
+          />
           <component
             :is="item.componentType"
             v-if="!item.showSlot"
@@ -60,19 +68,16 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, tpl, _, useAppContext, useConfig, isWidgetEventKey } from '@zto/zpage'
+import { _, isWidgetEventKey, reactive, ref, computed, onMounted, useCurrentAppInstance } from '@zto/zpage'
 
 import { getFormItemRules } from '../../utils/form'
 
 import type { FormItemConfig } from '../../utils/form'
 import _Link from 'element-plus/lib/components/link'
 
-const { reactive, ref, computed, onMounted } = vue
-const formItemsConfig = useConfig('components.formItems', {})
-
 const props = withDefaults(
   defineProps<{
-    model: Record<string, any> // 传进来的共享的model表单值对象
+    model?: Record<string, any> // 传进来的共享的model表单值对象
     items?: Array<any> | Function // 列表项文件
     itemWidth?: string // item宽度
     disabled?: boolean // 全部禁用
@@ -82,9 +87,7 @@ const props = withDefaults(
   }>(),
   {
     items: () => [],
-    model: () => {
-      return {}
-    },
+    model: () => ({}),
     itemWidth: '100%',
     disabled: false,
     clearable: true,
@@ -92,7 +95,10 @@ const props = withDefaults(
   }
 )
 
-const context = useAppContext(props.model)
+const app = useCurrentAppInstance()
+
+const formItemsConfig = app.useComponentsConfig('formItems', {})
+const exFormRules = app.useComponentsConfig('form.rules')
 
 const itemSpan = ref(props.span || formItemsConfig.itemSpan || 12)
 
@@ -101,19 +107,21 @@ const itemExpanded = reactive<Record<string, boolean>>({})
 
 // 处理过的formItems
 const innerFormItems = computed<any>(() => {
+  const pageContext = app.useContext(props.model)
+
   let formItems: FormItemConfig[] = []
 
   if (typeof props.items === 'function') {
-    formItems = props.items(context)
+    formItems = (props.items as any)(pageContext)
   } else {
     formItems = props.items || []
   }
 
   const items = formItems.map((item: any) => {
     let formItem = item
-    if (typeof item === 'function') formItem = item(context)
+    if (typeof item === 'function') formItem = item(pageContext)
     if (typeof formItem.dynamicAttrs === 'function') {
-      const dynamicAttrs = formItem.dynamicAttrs(context)
+      const dynamicAttrs = formItem.dynamicAttrs(pageContext)
       formItem = _.omit(formItem, ['dynamicAttrs'])
       formItem = _.deepMerge(formItem, dynamicAttrs)
     }
@@ -125,15 +133,16 @@ const innerFormItems = computed<any>(() => {
     const isDisabled = isDisabledItem(formItem)
     const isRequired = isRequiredItem(formItem)
 
-    const itemRules = typeof formItem.rules === 'function' ? formItem.rules(context) : formItem.rules
+    const itemRules = typeof formItem.rules === 'function' ? formItem.rules(pageContext) : formItem.rules
+
     let rules =
       getFormItemRules({
         ...formItem,
         rules: itemRules,
-        context: {
-          data: props.model
-        }
+        context: { data: props.model },
+        exFormRules
       }) || []
+
     if (!isRequired) {
       rules = rules.filter((r: any) => r.ruleName !== 'required')
     }
@@ -233,33 +242,21 @@ function normalizeFormItem(formItem: any) {
 /** 是否展示表单 */
 function isVisibleItem(item: FormItemConfig) {
   if (item.hidden === true || item.span === 0 || item.type === 'hidden') return false
-  if (item.visibleOn) {
-    if (_.isString(item.visibleOn)) return tpl.evalExpression(item.visibleOn, context) !== false
-    if (_.isFunction(item.visibleOn)) return item.visibleOn(context)
-  } else {
-    return itemExpanded[item.prop] !== false
-  }
+
+  const result = app.calcOnExpression(item.visibleOn, props.model, itemExpanded[item.prop] !== false)
+  return result
 }
 
 /** 是否disabled */
 function isDisabledItem(item: FormItemConfig) {
-  if (item.disabledOn) {
-    if (_.isString(item.disabledOn)) return tpl.evalExpression(item.disabledOn, context)
-    if (_.isFunction(item.disabledOn)) return item.disabledOn(context)
-  }
-
-  return item.disabled === true
+  const result = app.calcOnExpression(item.disabledOn, props.model, item.disabled === true)
+  return result
 }
 
 /** 是否required */
 function isRequiredItem(item: FormItemConfig) {
-  if (item.required === true) return true
-  if (item.requiredOn) {
-    if (_.isString(item.requiredOn)) return tpl.evalExpression(item.requiredOn, context)
-    if (_.isFunction(item.requiredOn)) return item.requiredOn(context)
-  } else {
-    return false
-  }
+  const result = app.calcOnExpression(item.requiredOn, props.model, item.required === true)
+  return result
 }
 
 /** 表单展示变化 */

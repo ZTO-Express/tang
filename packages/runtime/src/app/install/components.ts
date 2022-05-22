@@ -35,7 +35,7 @@ export default async (target: Installable, options: InstallableOptions) => {
   }
 
   // 安装外部组件
-  const exComponents = options.extends?.components || []
+  const exComponents = options.extensions?.components || []
   exComponents.forEach((cmpt: Component) => {
     if (cmpt.name && cmpt.name.startsWith('C')) {
       vueApp.component(cmpt.name as string, cmpt)

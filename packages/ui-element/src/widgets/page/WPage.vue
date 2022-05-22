@@ -1,5 +1,5 @@
 <template>
-  <c-page :header-height="headerHeight" :no-header="!isHeader">
+  <c-page :meta="pageMeta" :header-height="headerHeight" :no-header="!isHeader">
     <template v-if="isHeader" #header>
       <c-page-header v-bind="headerAttrs" />
     </template>
@@ -11,23 +11,28 @@
 </template>
 
 <script setup lang="ts">
-import { vue, tpl, useAppRouter, useAppContext, useWidgetSchema, useConfig } from '@zto/zpage'
-
-const { computed, ref } = vue
-
-const router = useAppRouter()
+import { computed, ref, tpl, useCurrentAppInstance } from '@zto/zpage'
 
 const props = defineProps<{
   schema: Record<string, any>
 }>()
 
-const wSchema = useWidgetSchema(props.schema)
+const app = useCurrentAppInstance()
 
-const cTabs = useWidgetSchema(wSchema.tabs)
+const pageCfg = app.useWidgetsConfig('page', {})
 
-const context = useAppContext()
+const wSchema = app.useWidgetSchema(props.schema)
+const cTabs = app.useWidgetSchema(wSchema.tabs)
 
-const pageCfg = useConfig('widgets.page', {})
+const router = app.router
+
+// ---- page相关 ----->
+const pageMeta = computed(() => {
+  return {
+    initData: wSchema.data,
+    ...wSchema.meta
+  }
+})
 
 // ---- header相关 ----->
 
@@ -63,7 +68,7 @@ const isTab = computed(() => {
 })
 
 const innerTabValue = computed(() => {
-  return tpl.filter(tabValue.value, context)
+  return app.filter(tabValue.value)
 })
 
 async function handlePageTabChange(tabItem: any) {

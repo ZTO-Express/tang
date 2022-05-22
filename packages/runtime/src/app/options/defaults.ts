@@ -1,49 +1,32 @@
 import {
-  DEFAULT_MOUNT_EL,
+  DEFAULT_CONATINER_EL,
   ROOT_ROUTE_NAME,
   DEFAULT_MENU_NAME,
   DEFAULT_PAGE_NAME,
   DEFAULT_PAGE_PATH
 } from '../../consts'
 import { _ } from '../../utils'
-import CAppLayout from '../components/CAppLayout'
+import { CAppLayout } from '../components' // WARNING: 不能通过路径直接导出，否则打包会有问题
 
 import type { RouteRecordRaw } from 'vue-router'
-import type { AppOptions, NavMenuItemConfig, NormalizedAppOptions } from '../../typings'
+import type { AppStartOptions, NavMenuItemConfig } from '../../typings'
 
 /**
- * 对传入的选项进行规范化
- * @param config
- */
-export function getNormalizedOptions(options?: AppOptions): NormalizedAppOptions {
-  // 设置全局配置
-  const opts = _.deepMerge(defaultOptions(), options)
-
-  return opts
-}
-
-/**
- * 返回应用默认配置
+ * 返回应用内部默认配置
  * @returns
  */
-export const defaultOptions = (): Partial<AppOptions> => {
+export const getInnerStartOptions = (): Partial<AppStartOptions> => {
   return {
-    el: DEFAULT_MOUNT_EL,
+    container: DEFAULT_CONATINER_EL,
+    env: {},
     config: {
-      env: {},
       app: {
         frame: {},
-        menu: {
-          showNav: false
-        },
-        page: {
-          keepAlive: false
-        }
-      },
-      apis: {},
-      routes: []
+        menu: { showNav: false },
+        page: { keepAlive: false }
+      }
     },
-    extends: {
+    extensions: {
       widgets: [],
       components: []
     }

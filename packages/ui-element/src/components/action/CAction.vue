@@ -1,26 +1,29 @@
 <template>
   <div v-if="isVisible" v-perm="$attrs.perms" class="c-action">
     <c-upload v-if="isUpload" v-bind="uploadAttrs" :disabled="isDisabled"></c-upload>
+    <cmpt
+      v-else-if="cmpt"
+      v-bind="{ ...$props, ...$attrs }"
+      :disabled="isDisabled"
+      :config="cmpt"
+      :context-data="contextData"
+    ></cmpt>
     <el-button v-else v-bind="buttonAttrs" :disabled="isDisabled" @click="handleClick">
       <slot>
         {{ buttonAttrs.label }}
       </slot>
     </el-button>
     <c-dialog v-if="form" ref="formDialogRef" v-bind="formDialogAttrs" />
-    <c-dialog v-else-if="dialog" ref="dialogRef" v-bind="dialogAttrs" />
+    <c-dialog v-else-if="dialog" ref="dialogRef" v-bind="innerDialogAttrs" />
     <c-import-dialog v-else-if="isImport" ref="importRef" v-bind="importAttrs" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { vue, _, useAppRouter, useApiRequest, useAppContext, useApi, emitter, tpl } from '@zto/zpage'
-import { useMessage } from '../../composables'
+import { _, useCurrentAppInstance, tpl, computed, ref, useAttrs } from '@zto/zpage'
+import { getActionPayload } from '../../utils'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
-
-const { computed, ref, useAttrs } = vue
-
-const router = useAppRouter()
 
 const props = withDefaults(
   defineProps<{
@@ -48,6 +51,7 @@ const props = withDefaults(
     visibleOn?: string | GenericFunction
     disabled?: boolean
     disabledOn?: string | GenericFunction
+    cmpt?: Record<string, any>
   }>(),
   {
     buttonType: 'primary',
@@ -57,75 +61,71 @@ const props = withDefaults(
 )
 
 const attrs = useAttrs()
-const { MessageBox, Message } = useMessage()
-const apiRequest = useApiRequest()
-const fsApi = useApi('fs')
+
+const app = useCurrentAppInstance()
+
+const router = app.router
+const emitter = app.emitter
+const { MessageBox, Message } = app.useMessage()
+const fsApi = app.apis.fsApi
 
 const formDialogRef = ref<any>()
 const dialogRef = ref<any>()
 const importRef = ref<any>()
 
 const payloadData = computed(() => {
-  if (_.isFunction(props.payload)) {
-    const context = useAppContext(props.contextData)
-    return props.payload(context)
-  } else if (Array.isArray(props.payload)) {
-    const ctxData = props.contextData || {}
-    return props.payload.reduce((obj: any, key: string) => {
-      if (key) obj[key] = ctxData[key]
-      return obj
-    }, {})
-  } else {
-    return props.payload
-  }
+  if (!props.payload) return props.payload
+
+  const context = app.useContext(props.contextData)
+  return getActionPayload(props.payload, context)
+})
+
+const actionContextData = computed(() => {
+  return props.contextData || payloadData.value
 })
 
 const actionContext = computed(() => {
-  const context = useAppContext(props.contextData || payloadData.value)
-  return context
+  return app.useContext(actionContextData.value)
+})
+
+const actionLabel = computed(() => {
+  const label = tpl.filter(attrs.label || props.name, actionContextData.value)
+  return label
 })
 
 const buttonAttrs = computed(() => {
-  const actionName = props.name
-  const type = props.buttonType
-
-  const label = tpl.filter(attrs.label || actionName, actionContext.value)
-
-  const btnAttrs = { type, ...props.innerAttrs?.button, label }
-  return { ...btnAttrs }
+  const btnAttrs = { type: props.buttonType, ...props.innerAttrs?.button, label: actionLabel.value }
+  return btnAttrs
 })
 
 const isVisible = computed(() => {
-  if (!props.visibleOn) return props.visible !== false
-
-  if (_.isString(props.visibleOn)) return tpl.evalExpression(props.visibleOn, actionContext.value)
-  if (_.isFunction(props.visibleOn)) return props.visibleOn(actionContext.value)
-
-  return props.visible !== false
+  const result = app.calcOnExpression(props.visibleOn, actionContextData.value, props.visible !== false)
+  return result
 })
 
 const isDisabled = computed(() => {
-  if (!props.disabledOn) return props.disabled === true
-
-  if (_.isString(props.disabledOn)) return tpl.evalExpression(props.disabledOn, actionContext.value)
-  if (_.isFunction(props.disabledOn)) return props.disabledOn(actionContext.value)
-
-  return props.disabled === true
+  const result = app.calcOnExpression(props.disabledOn, actionContextData.value, props.disabled === true)
+  return result
 })
 
 const formDialogAttrs = computed(() => {
   const form = props.form
   return {
+    title: actionLabel.value,
     form,
     onSubmit: dialogSubmitMethod,
+    contextData: props.contextData,
     ...props.innerAttrs?.dialog
   }
 })
 
-const dialogAttrs = computed(() => {
+const innerDialogAttrs = computed(() => {
   return {
+    title: actionLabel.value,
     onSubmit: dialogSubmitMethod,
-    ...props.dialog
+    contextData: props.contextData,
+    ...props.dialog,
+    ...props.innerAttrs?.dialog
   }
 })
 
@@ -139,6 +139,7 @@ const isUpload = computed(() => {
 
 const importAttrs = computed(() => {
   return {
+    title: actionLabel.value,
     api: props.api,
     apiParams: props.apiParams,
     dialog: props.dialog,
@@ -163,9 +164,7 @@ function handleClick() {
 
 /** 提交表单 */
 async function dialogSubmitMethod(payload: any) {
-  if (props.api) {
-    await doApiRequest(payload)
-  }
+  if (props.api) await doApiRequest(payload)
 
   await doAfterTrigger()
 }
@@ -190,7 +189,7 @@ async function trigger() {
     dialogRef.value.show(payloadData.value)
   } else if (actionType === 'download') {
     // 执行下载
-    await fsApi.downloadFile(props.link, attrs)
+    await fsApi.downloadFile!(props.link, attrs)
     await doAfterTrigger()
   } else if (actionType === 'link' || props.link) {
     // 执行弹框活动
@@ -241,7 +240,7 @@ async function trigger() {
 function doBeforeTrigger() {
   return Promise.resolve().then(() => {
     if (props.beforeTrigger) {
-      return props.beforeTrigger()
+      return props.beforeTrigger(actionContext.value)
     }
   })
 }
@@ -249,20 +248,20 @@ function doBeforeTrigger() {
 function doAfterTrigger() {
   return Promise.resolve().then(() => {
     if (props.afterTrigger) {
-      return props.afterTrigger(attrs)
+      return props.afterTrigger(actionContext.value, attrs)
     }
   })
 }
 
 async function doApiRequest(payload: any) {
+  if (!props.api) return Promise.resolve()
+
   let params: any = undefined
 
-  const context = useAppContext(props.contextData)
-
-  if (payload) params = tpl.deepFilter(payload, context)
+  if (payload) params = tpl.deepFilter(payload, actionContext.value)
 
   if (props.apiParams) {
-    const apiParams = tpl.deepFilter(props.apiParams, context)
+    const apiParams = tpl.deepFilter(props.apiParams, actionContext.value)
     params = { ...params, ...apiParams }
   }
 
@@ -270,17 +269,12 @@ async function doApiRequest(payload: any) {
     params = { ...params, ...props.extData }
   }
 
-  await apiRequest({
-    action: props.api as string,
-    params
-  })
+  await app.request({ action: props.api, params })
 
   Message.success(props.successMessage || '执行成功！')
 }
 
-defineExpose({
-  trigger
-})
+defineExpose({ trigger })
 </script>
 
 <style lang="scss" scoped>

@@ -1,8 +1,8 @@
+import { AppLoaderType } from '../../../consts'
 import { clearTokenData, refreshToken, getAccessToken, resetToken, uniqId, _, reloadUrl } from '../../../utils'
-import { useApi, useEnv } from '../../../config'
-import { useAppStore } from '../../store'
 
 import type { AppAuthLoader, NavMenuItem } from '../../../typings'
+import type { App } from '../../App'
 
 /** iam菜单项 */
 interface IAMMenuItem {
@@ -20,10 +20,12 @@ interface IAMMenuItem {
 }
 
 export const IAMAuthLoader: AppAuthLoader = {
+  type: AppLoaderType.AUTH,
+
   name: 'iam',
 
   // 检查用户权限
-  async checkAuth() {
+  async checkAuth(app: App) {
     // 从url获取code
     const searchParams = new URL(window.location.href).searchParams
     const code = searchParams.get('code')
@@ -38,25 +40,28 @@ export const IAMAuthLoader: AppAuthLoader = {
     }
 
     if (!getAccessToken()) {
-      await IAMAuthLoader.logout()
+      await app.logout()
     } else if (code) {
       reloadUrl()
     }
   },
 
   // 获取用户信息
-  async getUserInfo() {
-    const userApi = useApi('user')
-    const res = await userApi.getUserInfo()
+  async getUserInfo(app: App) {
+    const { authApi } = app.apis
+
+    if (!authApi.getUserInfo) {
+      throw new Error('当前接口没有定义获取用户信息方法，请在接口中添加getUserInfo方法')
+    }
+
+    const res = await authApi.getUserInfo()
 
     return res
   },
 
   // 解析菜单数据
-  async getMenuData() {
-    const store = useAppStore()
-
-    const menus = store.getters.user?.menus || []
+  async getMenuData(app: App) {
+    const menus = app.stores.userStore.menus || []
 
     const navMenus = menus.map((it: any) => {
       return parseMenuItem(it)
@@ -65,12 +70,12 @@ export const IAMAuthLoader: AppAuthLoader = {
     return navMenus
   },
 
-  async logout() {
-    const ENV = useEnv()
-    const userApi = useApi('user')
+  async logout(app: App) {
+    const ENV = app.env
+    const { authApi } = app.apis
 
-    if (userApi.logout) {
-      await userApi.logout()
+    if (authApi.logout) {
+      await authApi.logout()
     } else {
       await clearTokenData()
 

@@ -1,14 +1,15 @@
-/* eslint-disable indent */
 import { defineComponent, computed, h, Transition, KeepAlive, Suspense } from 'vue'
 import { RouterView } from 'vue-router'
-import { useAppStore } from '../store'
+
+import { useCurrentAppInstance } from '../composables'
 
 export default defineComponent({
-  setup() {
-    const store = useAppStore()
+  setup(props, { slots }) {
+    const app = useCurrentAppInstance()
+    const { pagesStore } = app.stores
 
     const cachedPageKeys = computed(() => {
-      const keys = store.getters.visitedPages.map((it: any) => it.key)
+      const keys = pagesStore.visited.map((it: any) => it.key)
       return keys
     })
 
