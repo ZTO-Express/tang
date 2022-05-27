@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { _, ref, watch, reactive, computed, fileUtil } from '@zto/zpage'
+import { _, ref, watch, reactive, computed, fileUtil, useCurrentAppInstance } from '@zto/zpage'
 
 import type { GenericFunction } from '@zto/zpage'
 import type { UploadFileItem } from './types'
@@ -77,6 +77,8 @@ const props = withDefaults(
 )
 
 const emit = defineEmits(['update:modelValue', 'delete', 'deleted'])
+
+const app = useCurrentAppInstance()
 
 const listState = reactive<{
   items: UploadFileItem[]
@@ -129,12 +131,10 @@ async function innerDownloadMethod(it: UploadFileItem) {
   } else {
     let url = it.url
     if (props.srcType === 'path' && it.path) {
-      url = await fileUtil.getUrlByPath(it.path)
+      url = await fileUtil.getUrlByPath(it.path, { app })
     }
 
-    if (url) {
-      await fileUtil.download(url, options)
-    }
+    if (url) await fileUtil.download(url, options)
   }
 }
 
@@ -150,7 +150,7 @@ async function deleteItem(item: UploadFileItem | number) {
 
   if (item && index >= 0) {
     if (props.remoteDelete && item.path) {
-      await fileUtil.deleteFile(item.path)
+      await fileUtil.deleteFile(item.path, { app })
     }
 
     listState.items.splice(index, 1)

@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
-  <c-checkbox ref="fieldRef" v-model="model[prop]" v-bind="$attrs" :disabled="disabled" @change="handleChange" />
+  <c-checkbox ref="fieldRef" v-model="model[prop]" v-bind="innerAttrs" :disabled="disabled" />
   <!-- 下面代码，防止初始化时报错 -->
   <div style="display: none">{{ model[prop] }}</div>
 </template>
@@ -10,7 +10,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { ref, useAttrs, useCurrentAppInstance } from '@zto/zpage'
+import { ref, useCurrentAppInstance } from '@zto/zpage'
 import { useFormItem } from '../util'
 
 const props = withDefaults(
@@ -25,17 +25,13 @@ const props = withDefaults(
   }
 )
 
-const attrs = useAttrs()
-
 const app = useCurrentAppInstance()
 const fieldRef = ref()
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs, allAttrs } = useFormItem(props)
 
 // 注册微件事件监听
-app.useWidgetEmitter(attrs, {
-  fetchOn: doFetch
-})
+app.useWidgetEmitter(allAttrs.value, { fetchOn: doFetch })
 
 async function doFetch() {
   await fieldRef.value?.fetchOptions()

@@ -2,11 +2,10 @@
   <!-- eslint-disable vue/no-mutating-props -->
   <el-cascader
     v-model="model[prop]"
-    v-bind="$attrs"
-    :placeholder="$attrs.placeholder || '请选择'"
+    v-bind="innerAttrs"
+    :placeholder="innerAttrs.placeholder || '请选择'"
     :disabled="disabled"
     :options="options || []"
-    @change="handleChange"
   />
 </template>
 
@@ -30,5 +29,5 @@ const props = withDefaults(
   }
 )
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs } = useFormItem(props)
 </script>

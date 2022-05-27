@@ -1,7 +1,7 @@
 <template>
   <!-- eslint-disable vue/no-mutating-props -->
-  <div class="c-form-item-image">
-    <c-image :src="model[prop]" v-bind="$attrs" @change="handleChange" />
+  <div class="c-form-item c-form-item-image">
+    <c-image :src="model[prop]" v-bind="innerAttrs" />
     <div v-if="title" class="title">{{ title }}</div>
   </div>
 </template>
@@ -24,7 +24,7 @@ const props = withDefaults(
   {}
 )
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs } = useFormItem(props)
 </script>
 
 <style lang="scss" scoped>

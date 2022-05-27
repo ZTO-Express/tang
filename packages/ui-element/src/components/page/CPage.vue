@@ -1,12 +1,5 @@
 <template>
-  <c-app-page
-    :meta="meta"
-    class="c-page"
-    :class="{
-      'no-padding': noPadding,
-      fixed
-    }"
-  >
+  <c-app-page :meta="meta" class="c-page" :class="{ 'no-padding': noPadding, fixed }">
     <div v-if="isHeader" class="page-header-con" :style="headerStyle">
       <slot name="header">
         <c-page-header :referer="referer" :title="title" :no-back="noBack" />

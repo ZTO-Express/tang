@@ -134,6 +134,7 @@ const innerBodyStyle = computed(() => {
   if (!props.bodyStyle) {
     return props.noPadding ? { padding: 0 } : {}
   }
+  return props.bodyStyle
 })
 
 const dialogFormItems = computed<any>(() => {

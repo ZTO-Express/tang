@@ -153,6 +153,7 @@ const props = defineProps<{
 const app = useCurrentAppInstance()
 
 const router = app.router
+const route = app.useRoute()
 
 const emitter = app.emitter
 const apiRequest = app.request // api请求
@@ -332,6 +333,8 @@ const columnPropTypes = computed(() => {
 })
 
 const tableAttrs = computed(() => {
+  const exportOptions = { fileName: route.meta.label, ...crudConfig.table?.export, ...sTable.export }
+
   return {
     border: sTable.border !== false,
     action: sActions.query,
@@ -349,6 +352,7 @@ const tableAttrs = computed(() => {
     noPager: sTable.noPager,
     data: sActions.query?.data,
     loadMethod: tableLoadFn,
+    export: { ...exportOptions },
     ...sTable.innerAttrs
   }
 })
@@ -463,8 +467,8 @@ async function triggerAction(actionCfg: any) {
     await doAsyncExport(actionCfg.api, actionCfg, context)
   } else if (actionCfg.actionType === 'download') {
     if (!actionCfg.link) return
-    const link = tpl.deepFilter(actionCfg.link, context)
-    await fsApi.downloadFile!(link, actionCfg)
+    const link = tpl.filter(actionCfg.link, context)
+    await fsApi.downloadFile!(link, { ...actionCfg })
   } else if (actionCfg.link) {
     const link = tpl.deepFilter(actionCfg.link, context)
     await router.goto(link)
@@ -483,12 +487,7 @@ async function triggerAction(actionCfg: any) {
       }) || `确认${actionCfg.label}选中的记录？`
 
     let msgConfig: any = _.isString(messageCfg)
-      ? {
-          boxType: 'confirm',
-          type: 'warning',
-          showCancelButton: true,
-          message: messageCfg
-        }
+      ? { boxType: 'confirm', type: 'warning', showCancelButton: true, message: messageCfg }
       : {
           ...messageCfg,
           boxType: 'confirm' || messageCfg.boxType,
@@ -497,12 +496,7 @@ async function triggerAction(actionCfg: any) {
         }
 
     msgConfig.title = msgConfig.title || '提示'
-    msgConfig = {
-      showCancelButton: true,
-      cancelButtonText: '取消',
-      confirmButtonText: '确定',
-      ...msgConfig
-    }
+    msgConfig = { showCancelButton: true, cancelButtonText: '取消', confirmButtonText: '确定', ...msgConfig }
 
     msgConfig = tpl.deepFilter(msgConfig, context)
     await MessageBox(msgConfig).then(() => {
@@ -582,13 +576,9 @@ function doLayout() {
 async function doAction(action: any, payload: any, options?: any) {
   if (options?.onAction) {
     const ctx = app.useContext(payload)
-
-    const flag = await Promise.resolve().then(() => {
-      return options.onAction!(ctx, options)
-    })
+    const flag = await Promise.resolve().then(() => options.onAction!(ctx, options))
 
     if (flag !== false && options?.reload !== false) return doSearch()
-
     return
   }
 
@@ -604,10 +594,11 @@ async function doAction(action: any, payload: any, options?: any) {
     data: payload
   })
     .then(res => {
-      if (options?.reload !== false) return doSearch()
       if (options?.sucessMessage !== false) {
         Message.success(options?.sucessMessage || `${options.label || '操作'}成功！`)
       }
+
+      if (options?.reload !== false) return doSearch()
     })
     .finally(() => {
       dialogLoading.value = false
@@ -691,6 +682,19 @@ async function doSearch(resetPager = false, refreshPager = false) {
     })
 }
 
+function getSearchParams() {
+  const queryAction = sActions.query || {}
+
+  const context = app.useContext(searchModel)
+
+  const apiParams = app.deepFilter(queryAction?.apiParams, context)
+  const extData = app.deepFilter(sSearch?.extData, context)
+
+  const searchParms = _.deepMerge(extData, apiParams, searchModel)
+
+  return searchParms
+}
+
 // 异步导出
 async function doAsyncExport(api?: string, options?: any, context?: any) {
   if (!tableRef.value) return
@@ -746,22 +750,10 @@ async function doAsyncExport(api?: string, options?: any, context?: any) {
   }, 100)
 }
 
-function getSearchParams() {
-  const queryAction = sActions.query || {}
-
-  const context = app.useContext(searchModel)
-
-  const apiParams = app.deepFilter(queryAction?.apiParams, context)
-  const extData = app.deepFilter(sSearch?.extData, context)
-
-  const searchParms = _.deepMerge(extData, apiParams, searchModel)
-
-  return searchParms
-}
-
 // 导出
 async function doExport() {
   if (!tableRef.value) return
+
   tableRef.value.exportData()
 }
 

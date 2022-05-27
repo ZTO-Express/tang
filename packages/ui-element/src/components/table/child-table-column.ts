@@ -61,13 +61,7 @@ const ChildTableColumn = defineComponent({
             const _columnProps = getColumnProps(col)
             const _childrenSlots = buildChildrenSlots(col)
 
-            return h(
-              ElTableColumn,
-              {
-                ..._columnProps
-              },
-              _childrenSlots
-            )
+            return h(ElTableColumn, { ..._columnProps }, _childrenSlots)
           })
         }
 
@@ -80,18 +74,12 @@ const ChildTableColumn = defineComponent({
             headerLabel = tpl.filter(config.headerTpl, context)
           }
 
-          return h(
-            'div',
-            {
-              ...config.header
-            },
-            headerLabel
-          )
+          return h('div', { ...config.header }, headerLabel)
         }
       } else {
         // 编辑列
         scopedSlots.default = (scope: any) => {
-          const context = app.useContext()
+          const context = app.useContext(scope)
 
           const prop = config.prop
 
@@ -198,6 +186,7 @@ const ChildTableColumn = defineComponent({
           }
 
           let innerStyle = {}
+
           if (_.isFunction(config.style)) {
             innerStyle = config.style(context, config)
           } else if (config.style) {
@@ -206,15 +195,7 @@ const ChildTableColumn = defineComponent({
 
           const _innerSolts = tipSlot ? [innerText, tipSlot] : innerText
 
-          return h(
-            'div',
-            {
-              style: innerStyle,
-              class: { 'text-ellipsis': true },
-              ...config.cell
-            },
-            _innerSolts
-          )
+          return h('div', { style: innerStyle, class: { 'text-ellipsis': true }, ...config.cell }, _innerSolts)
         }
 
         scopedSlots.header = (scope: any) => {
@@ -278,14 +259,7 @@ const ChildTableColumn = defineComponent({
             headerClass['c-table-col-text-required'] = true
           }
 
-          return h(
-            'div',
-            {
-              ...headerConfig,
-              class: headerClass
-            },
-            headerLabel
-          )
+          return h('div', { ...headerConfig, class: headerClass }, headerLabel)
         }
       }
 

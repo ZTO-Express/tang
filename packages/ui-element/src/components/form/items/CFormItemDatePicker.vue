@@ -2,17 +2,16 @@
   <!-- eslint-disable vue/no-mutating-props -->
   <el-date-picker
     v-model="model[prop]"
-    v-bind="$attrs"
+    v-bind="innerAttrs"
     :type="pickerType"
     range-separator="至"
     start-placeholder="开始日期"
     end-placeholder="结束日期"
     style="width: 100%"
     :value-format="valueFormat"
-    :placeholder="$attrs.placeholder || '选择日期'"
+    :placeholder="innerAttrs.placeholder || '选择日期'"
     :disabled="disabled"
     :disabled-date="innerDisabledDateFn"
-    @change="handleChange"
   />
 </template>
 
@@ -49,7 +48,7 @@ const props = withDefaults(
   }
 )
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs } = useFormItem(props)
 
 watch(
   () => props.model[props.prop],

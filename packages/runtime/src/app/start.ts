@@ -1,9 +1,9 @@
+import { APP_NAME_PATTERN } from '../consts'
 import { normalizeAppStartOptions } from './options'
 import { App } from './App'
 import { HostApp } from './HostApp'
 
 import type { AppCtorOptions, AppStartOptions } from '../typings'
-import { APP_NAME_PATTERN } from '../consts'
 
 /**
  * 创建应用

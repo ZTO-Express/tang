@@ -2,13 +2,12 @@
   <!-- eslint-disable vue/no-mutating-props -->
   <el-input
     v-model="model[prop]"
-    v-bind="$attrs"
-    :placeholder="$attrs.placeholder || '请输入'"
+    v-bind="innerAttrs"
+    :placeholder="innerAttrs.placeholder || '请输入'"
     :type="inputType || 'text'"
     :disabled="disabled"
     :maxlength="inputMaxlength"
     :show-word-limit="innerShowWordLimit"
-    @change="handleChange"
   />
 </template>
 
@@ -41,7 +40,7 @@ const app = useCurrentAppInstance()
 const inputConfig = app?.useComponentsConfig('formItem.input', {})
 const textareaConfig = app?.useComponentsConfig('formItem.textarea', {})
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs } = useFormItem(props)
 
 const inputMaxlength = computed(() => {
   if (props.maxlength) return props.maxlength

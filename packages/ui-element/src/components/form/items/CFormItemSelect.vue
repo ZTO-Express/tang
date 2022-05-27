@@ -2,13 +2,12 @@
 <template>
   <el-select
     v-model="model[prop]"
-    v-bind="$attrs"
-    :placeholder="$attrs.placeholder || '请选择'"
+    v-bind="innerAttrs"
+    :placeholder="innerAttrs.placeholder || '请选择'"
     :filterable="filterable"
     :collapseTags="collapseTags"
     :disabled="disabled"
     :multiple="multiple"
-    @change="handleChange"
   >
     <template v-if="groupLabels?.length">
       <el-option-group v-for="label in groupLabels" :key="label" :label="label">
@@ -74,7 +73,7 @@ const app = useCurrentAppInstance()
 
 const context = app.useContext(props.model)
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs } = useFormItem(props)
 
 const groupLabels = ref<any[]>([])
 

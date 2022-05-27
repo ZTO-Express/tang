@@ -1,9 +1,11 @@
 import axios from 'axios'
 import { filesize } from './filesize'
+import * as dateUtil from './date'
+import { _ } from './util'
 
-import { HostApp } from '../app/HostApp'
+import type { AppContextOptions } from '../typings'
 
-interface FileNameParseResult {
+export interface FileNameParseResult {
   name: string
   fpath: string
   fname: string
@@ -13,7 +15,7 @@ interface FileNameParseResult {
   ext: string
 }
 
-interface ReadFileOptions {
+export interface ReadFileOptions {
   readAs: 'dataUrl' | 'binaryString' | 'text' | 'arrayBuffer'
   encoding?: string
 }
@@ -130,21 +132,22 @@ export function getFileMimeType(filename: string) {
   return filetype
 }
 
-export async function getFileUrls(names: string[]) {
-  const { fsApi } = HostApp.app!.apis
+export async function getFileUrls(names: string[], options: AppContextOptions) {
+  const { fsApi } = options.app!.apis
   const urls = await fsApi.getFileUrls!(names)
   return urls
 }
 
 // 根据文件路径获取Url
-export async function getUrlByPath(name: string) {
-  const urls = await getFileUrls([name])
+export async function getUrlByPath(name: string, options: AppContextOptions) {
+  const { fsApi } = options.app!.apis
+  const urls = await fsApi.getFileUrls!([name])
   return urls[0]
 }
 
 // 删除文件
-export async function deleteFile(name: string) {
-  const { fsApi } = HostApp.app!.apis
+export async function deleteFile(name: string, options: AppContextOptions) {
+  const { fsApi } = options.app!.apis
 
   if (!name || !fsApi.deleteFile) return false
   return fsApi.deleteFile(name)
@@ -198,4 +201,20 @@ export async function download(url: string, options?: any) {
     window.URL.revokeObjectURL(href) // 释放掉blob对象
     return
   }
+}
+
+/** 获取文件名后缀 */
+export function getFileNamePostfix(options?: any) {
+  if (options === false) return ''
+  if (_.isString(options)) return options
+
+  let _postfix = options.postfix
+
+  if (typeof _postfix === 'function') {
+    _postfix = _postfix(options)
+  } else {
+    _postfix = dateUtil.format(new Date(), 'dense')
+  }
+
+  return _postfix
 }

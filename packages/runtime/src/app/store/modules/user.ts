@@ -44,7 +44,7 @@ export function defineUserStore(app: App) {
           permissions: payload.permissions
         })
 
-        this.setData(payload.datas)
+        this.setData(payload.data)
       },
 
       // 设置user 数据
@@ -70,6 +70,7 @@ export function defineUserStore(app: App) {
 
         if (authLoader) {
           const res = await authLoader.getUserInfo(app, payload)
+
           this.set(res)
         }
       }

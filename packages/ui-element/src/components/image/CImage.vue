@@ -42,7 +42,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { fileUtil, ref, computed, watch, onMounted } from '@zto/zpage'
+import { ref, computed, watch, onMounted, useCurrentAppInstance } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
@@ -65,6 +65,10 @@ const props = withDefaults(
     hideOnClickModal: true
   }
 )
+
+const app = useCurrentAppInstance()
+
+const { fsApi } = app.apis
 
 const innerUrls = ref<string[]>([])
 const showPreview = ref<boolean>(false)
@@ -119,7 +123,7 @@ async function loadImageUrls() {
     innerUrls.value = innerSrcs.value
   } else {
     if (!innerSrcs.value?.length) return []
-    const urls = await fileUtil.getFileUrls(innerSrcs.value)
+    const urls = await fsApi.getFileUrls!(innerSrcs.value)
     innerUrls.value = urls
   }
 }

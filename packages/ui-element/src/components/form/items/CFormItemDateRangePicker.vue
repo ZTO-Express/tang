@@ -1,12 +1,11 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
-  <div class="c-form-item-date-range-picker">
+  <div class="c-form-item c-form-item-date-range-picker">
     <c-date-range-picker
       v-model:from="model[prop]"
       v-model:to="model[toProp]"
-      v-bind="$attrs"
+      v-bind="innerAttrs"
       :disabled="disabled"
-      @change="handleChange"
     />
     <el-form-item :prop="toProp"></el-form-item>
   </div>
@@ -33,5 +32,5 @@ const props = withDefaults(
   }
 )
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs } = useFormItem(props)
 </script>

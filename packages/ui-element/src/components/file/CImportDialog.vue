@@ -16,11 +16,14 @@
 
       <div class="tip-con">
         <slot name="tip">
-          {{ props.tip || `请先下载模板，数据不能超过${innerMaxCount}条。文件大小不能超过${innerMaxFileSize}MB。` }}
+          {{ props.tip || `请先下载模板，数据不能超过${innerMaxCount}条，文件大小不能超过${innerMaxFileSize}MB。` }}
         </slot>
       </div>
 
       <slot name="extraTip">
+        <div v-if="innerExtraTip?.cmpt" class="extra-tip-con">
+          <cmpt :config="innerExtraTip?.cmpt"></cmpt>
+        </div>
         <div v-if="innerExtraTip?.componentType" class="extra-tip-con">
           <component :is="innerExtraTip?.componentType" v-bind="innerExtraTip"></component>
         </div>
@@ -93,12 +96,11 @@ const loading = ref(false)
 const dialogRef = ref<any>()
 
 const dialogAttrs = computed(() => {
-  const bodyStyle = 'padding: 10px 30px'
   return {
     title: props.title,
     width: 600,
     noPadding: true,
-    bodyStyle,
+    bodyStyle: { padding: '10px 30px' },
     onSubmit: handleDialogSubmit,
     ...props.dialog
   }
@@ -110,30 +112,31 @@ const importTemplates = app.useAssets('import_templates', {})
 
 const selectedFile = ref()
 
-const innerExtraTip = computed(() => {
-  if (!props.extraTip) return null
-
-  let _extraTip: ImportExtraTip = {}
-
-  if (_.isString(props.extraTip)) {
-    _extraTip = { componentType: 'c-tpl', tpl: props.extraTip }
-  } else if (props.extraTip.tpl) {
-    _extraTip = { componentType: 'c-tpl', ...props.extraTip }
-  } else if (props.extraTip.html) {
-    _extraTip = { componentType: 'c-html', ...props.extraTip }
-  } else {
-    _extraTip = { ...props.extraTip }
-  }
-
-  return _extraTip
-})
-
 const fileList = computed(() => {
   return selectedFile.value ? [selectedFile.value] : []
 })
 
 const templateData = computed(() => {
   return importTemplates[props.template]
+})
+
+const innerExtraTip = computed(() => {
+  const _tip = props.extraTip || templateData.value?.extraTip
+  if (!_tip) return null
+
+  let _extraTip: ImportExtraTip = {}
+
+  if (_.isString(_tip)) {
+    _extraTip = { componentType: 'c-tpl', tpl: _tip }
+  } else if (_tip.tpl) {
+    _extraTip = { componentType: 'c-tpl', ..._tip }
+  } else if (_tip.html) {
+    _extraTip = { componentType: 'c-html', ..._tip }
+  } else {
+    _extraTip = { ..._tip }
+  }
+
+  return _extraTip
 })
 
 const fileAccept = computed(() => {
@@ -198,7 +201,7 @@ async function handleDialogSubmit() {
         if (flag === false) return
       } else {
         if (!data?.length) throw new Error('没有需要上传的数据。')
-        if (data.length >= innerMaxCount.value) throw new Error(`数据不能超过${innerMaxCount.value}条`)
+        if (data.length > innerMaxCount.value) throw new Error(`数据不能超过${innerMaxCount.value}条`)
       }
     }
 
@@ -257,9 +260,9 @@ async function innerImportMethod(data: any) {
 async function doParseFile(file: any, options?: any) {
   let data: any[] = []
   if (fileImportCfg.parseFile) {
-    data = await fileImportCfg.parseFile(file)
+    data = await fileImportCfg.parseFile(file, { app })
   } else {
-    data = await xlsxUtil.parseFile(file)
+    data = await xlsxUtil.parseFile(file, { app })
   }
 
   // 移除第一行
@@ -290,27 +293,25 @@ async function doParseFile(file: any, options?: any) {
 
         let val = dt[idx]
 
-        if (val === undefined) {
-          val = ''
-        } else {
-          switch (col.type) {
-            case 'number':
-              val = parseFloat(val)
-              break
-            case 'int':
-            case 'integer':
-              val = parseInt(val)
-              break
-            default:
-              val = String(val)
-              break
-          }
-        }
-
         if (col.transform) val = col.transform(val)
         if (col.formatter) val = app.formatText(val, col.formatter)
 
-        if (col.prop) {
+        switch (col.type) {
+          case 'number':
+            val = parseFloat(val)
+            if (isNaN(val)) val = undefined
+            break
+          case 'int':
+          case 'integer':
+            val = parseInt(val)
+            if (isNaN(val)) val = undefined
+            break
+          default:
+            if (!_.isNil(val)) val = String(val)
+            break
+        }
+
+        if (col.prop && !_.isNil(val)) {
           it[col.prop] = val
         }
       })
@@ -353,7 +354,8 @@ defineExpose({ show, close, clear })
   padding: 10px 0;
 }
 
-.tip-con {
+.tip-con,
+.extra-tip-con {
   font-size: 12px;
   opacity: 0.8;
   padding: 10px 0;

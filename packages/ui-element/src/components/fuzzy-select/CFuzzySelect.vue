@@ -59,6 +59,10 @@
   </el-select>
 </template>
 
+<script lang="ts">
+export default { inheritAttrs: false }
+</script>
+
 <script setup lang="ts">
 import { _, tpl, computed, ref, useAttrs, useSlots, watch, nextTick, useCurrentAppInstance } from '@zto/zpage'
 
@@ -75,6 +79,7 @@ const props = withDefaults(
     multiple?: boolean
     filterable?: boolean
     optionStyle?: any
+    keepMultipleOrder?: boolean // 是否保持多选时的顺序
 
     modelValueKey?: string
     keywordProp?: string
@@ -134,6 +139,14 @@ const loading = ref(false)
 const innerLabelProp = computed(() => props.labelProp || 'name')
 const innerValueProp = computed(() => props.valueProp || 'code')
 
+watch(
+  () => [props.api, props.apiParams],
+  () => {
+    firstNoRemote.value = true
+    fuzzyOptions.value = []
+  }
+)
+
 // 远程查询出来的选项
 const remoteFuzzyOptions = ref<FuzzySelectOption[]>([])
 const fuzzyOptions = ref<FuzzySelectOption[]>([])
@@ -159,9 +172,7 @@ watch(
   (v: string | string[]) => {
     emit('update:modelValue', v)
   },
-  {
-    immediate: true
-  }
+  { immediate: true }
 )
 
 watch(
@@ -240,7 +251,7 @@ function getValueByPath(option: FuzzySelectOption, modelValueKey?: string) {
 
 function handleFocusChange() {
   // 远程搜索 如果没有options 则请求
-  if (!props.triggerFocus) return
+  if (!props.triggerFocus || remoteFuzzyOptions.value.length > 0) return
 
   if (props.remote) {
     execRemoteMethod()
@@ -252,23 +263,23 @@ function handleFocusChange() {
 }
 
 function handleSelectChange(value: string | Array<string>) {
+  const valProp = innerValueProp.value
+
+  const valueArr = Array.isArray(value) ? value : [value]
+  const options = fuzzyOptions.value.filter((it: any) => valueArr.includes(it[valProp]))
+
+  if (valueArr.length > 0 && props.keepMultipleOrder) {
+    value = options.map(it => it[valProp])
+  }
+
   const label = _findLabels(value)
 
   innerValue.value = value
   setLabel(label)
 
-  const valueArr = Array.isArray(value) ? value : [value]
-
-  const options = fuzzyOptions.value.filter((it: any) => valueArr.includes(it[innerValueProp.value]))
-
   const option: any = props.multiple ? undefined : options[0]
 
-  emit('change', {
-    value,
-    label,
-    option,
-    options
-  })
+  emit('change', { value, label, option, options })
 }
 
 function setLabel(v: string | string[]) {

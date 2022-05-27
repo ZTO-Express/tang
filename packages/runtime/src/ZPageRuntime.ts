@@ -38,6 +38,7 @@ import type {
 import type { DataOptionItem, DataOptionItems } from './typings'
 
 export {
+  Fragment,
   reactive,
   ref,
   unref,
@@ -63,6 +64,7 @@ export {
   getCurrentInstance,
   h
 } from 'vue'
+
 export { onBeforeRouteUpdate } from 'vue-router'
 
 export * as vue from 'vue'

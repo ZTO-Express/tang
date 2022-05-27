@@ -23,7 +23,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, fileUtil } from '@zto/zpage'
+import { ref, computed, watch, onMounted, useCurrentAppInstance } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
@@ -35,6 +35,10 @@ const props = withDefaults(
     srcType: 'path'
   }
 )
+
+const app = useCurrentAppInstance()
+
+const { fsApi } = app.apis
 
 const dialogRef = ref<any>()
 
@@ -70,7 +74,7 @@ async function loadVideoUrl() {
   if (props.srcType === 'url') {
     innerUrl.value = props.src
   } else {
-    const urls = await fileUtil.getFileUrls([props.src])
+    const urls = await fsApi.getFileUrls!([props.src])
     innerUrl.value = urls[0]
   }
 }

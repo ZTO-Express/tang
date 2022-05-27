@@ -152,7 +152,7 @@ async function handleUploadCompleted(e: any) {
 // 文件删除
 async function handleFileDelete(item: any, index: number) {
   if (innerRemoteDelete.value && item.path) {
-    await fileUtil.deleteFile(item.path)
+    await fileUtil.deleteFile(item.path, { app })
   }
 
   if (props.onDelete) {

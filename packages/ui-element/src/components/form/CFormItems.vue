@@ -107,21 +107,21 @@ const itemExpanded = reactive<Record<string, boolean>>({})
 
 // 处理过的formItems
 const innerFormItems = computed<any>(() => {
-  const pageContext = app.useContext(props.model)
+  const context = app.useContext(props.model)
 
   let formItems: FormItemConfig[] = []
 
   if (typeof props.items === 'function') {
-    formItems = (props.items as any)(pageContext)
+    formItems = (props.items as any)(context)
   } else {
     formItems = props.items || []
   }
 
   const items = formItems.map((item: any) => {
     let formItem = item
-    if (typeof item === 'function') formItem = item(pageContext)
+    if (typeof item === 'function') formItem = item(context)
     if (typeof formItem.dynamicAttrs === 'function') {
-      const dynamicAttrs = formItem.dynamicAttrs(pageContext)
+      const dynamicAttrs = formItem.dynamicAttrs(context)
       formItem = _.omit(formItem, ['dynamicAttrs'])
       formItem = _.deepMerge(formItem, dynamicAttrs)
     }
@@ -133,7 +133,7 @@ const innerFormItems = computed<any>(() => {
     const isDisabled = isDisabledItem(formItem)
     const isRequired = isRequiredItem(formItem)
 
-    const itemRules = typeof formItem.rules === 'function' ? formItem.rules(pageContext) : formItem.rules
+    const itemRules = typeof formItem.rules === 'function' ? formItem.rules(context) : formItem.rules
 
     let rules =
       getFormItemRules({
@@ -241,6 +241,8 @@ function normalizeFormItem(formItem: any) {
 
 /** 是否展示表单 */
 function isVisibleItem(item: FormItemConfig) {
+  if (!app.checkPermission(item.perm)) return false
+
   if (item.hidden === true || item.span === 0 || item.type === 'hidden') return false
 
   const result = app.calcOnExpression(item.visibleOn, props.model, itemExpanded[item.prop] !== false)
@@ -285,6 +287,10 @@ defineExpose({
     &.col-#{$i} {
       grid-template-columns: repeat($i, math.div(100%, $i));
     }
+  }
+
+  .c-form-item {
+    width: 100%;
   }
 }
 

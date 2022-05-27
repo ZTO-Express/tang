@@ -1,4 +1,4 @@
-import { fileUtil, useApi } from '@zto/zpage'
+import { fileUtil } from '@zto/zpage'
 
 import type { UploadData } from './types'
 

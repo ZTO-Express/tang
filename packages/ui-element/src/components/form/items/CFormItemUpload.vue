@@ -2,11 +2,10 @@
   <!-- eslint-disable vue/no-mutating-props -->
   <c-upload
     v-model="model[prop]"
-    v-bind="$attrs"
+    v-bind="innerAttrs"
     :disabled="disabled"
     :on-completed="handleCompleted"
     :on-delete="handleDelete"
-    @change="handleChange"
   />
 </template>
 
@@ -39,7 +38,7 @@ const app = useCurrentAppInstance()
 
 const context = app.useContext(props.model)
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs } = useFormItem(props)
 
 async function handleCompleted(file: any) {
   if (props.onCompleted) {

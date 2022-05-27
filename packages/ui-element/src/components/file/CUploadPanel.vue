@@ -23,7 +23,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from '@zto/zpage'
+import { computed, reactive, watch, useCurrentAppInstance } from '@zto/zpage'
 import { useMessage } from '../../composables'
 import { uploadUtil } from '../../utils'
 
@@ -34,9 +34,6 @@ import UploadItem from './upload-item.vue'
 import type { GenericFunction } from '@zto/zpage'
 import type { UploadStoreOptions } from '../../utils/upload'
 import type { UploadData, UploadDataItems, UploadOpenParams } from './types'
-
-const { Message } = useMessage()
-
 const props = withDefaults(
   defineProps<{
     accept: string
@@ -49,6 +46,10 @@ const props = withDefaults(
 )
 
 const emit = defineEmits(['items-change', 'completed', 'uploaded'])
+
+const { Message } = useMessage()
+
+const app = useCurrentAppInstance()
 
 const uploadProps = reactive<{
   sizeLimit: number // 上传文件大小限制(MB)
@@ -211,6 +212,7 @@ async function upload(item: UploadData) {
   // 上传管理器
   return uploadUtil
     .upload(item.file, {
+      app,
       onProgress: onUploadProgress(item),
       onUpload: onUploadStart(item),
       storePath: uploadProps.storePath,

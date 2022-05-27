@@ -11,6 +11,7 @@ export default { inheritAttrs: false }
 import { tpl, useCurrentAppInstance, computed, _, formatText } from '@zto/zpage'
 
 import type { GenericFunction } from '@zto/zpage'
+import { useFormItem } from '../util'
 
 const props = withDefaults(
   defineProps<{
@@ -28,6 +29,8 @@ const props = withDefaults(
 )
 
 const app = useCurrentAppInstance()
+
+useFormItem(props)
 
 const displayText = computed(() => {
   let text = props.model[props.prop]

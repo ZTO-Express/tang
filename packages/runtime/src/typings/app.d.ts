@@ -126,6 +126,12 @@ export interface PartialAppStartOptions extends Partial<AppStartOptions> {
 /** 应用构造函数选项 */
 export interface AppCtorOptions extends AppStartOptions {}
 
+/** 以app为上下文的操作 */
+export interface AppContextOptions {
+  app: App
+  [prop: string]: any
+}
+
 /** 默认应用上下文 */
 export interface AppContext {
   runtime: typeof runtime
@@ -191,6 +197,7 @@ export interface AppAuthApi extends AppApi {
   exchangeToken?: PromiseFunction // 交换token
   getUserInfo?: PromiseFunction // 获取用户信息
   logout?: PromiseFunction // 登出系统
+  checkPermission?: (...args: any[]) => boolean // 检查权限
   [prop: string]: any
 }
 

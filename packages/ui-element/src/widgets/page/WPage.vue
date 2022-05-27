@@ -50,9 +50,7 @@ const headerHeight = computed(() => {
 })
 
 const headerAttrs = computed(() => {
-  return Object.assign({}, wSchema.header, {
-    noBack: wSchema.noBack === true
-  })
+  return { ...wSchema.header, noBack: wSchema.noBack === true }
 })
 
 // ---- tab相关 ----->

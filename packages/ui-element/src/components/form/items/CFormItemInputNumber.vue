@@ -2,12 +2,11 @@
 <template>
   <el-input-number
     v-model="model[prop]"
-    v-bind="$attrs"
+    v-bind="innerAttrs"
     :controls-position="controlsPosition"
     :min="innerMin"
     :max="innerMax"
     :disabled="disabled"
-    @change="handleChange"
   />
 </template>
 
@@ -41,10 +40,10 @@ const app = useCurrentAppInstance()
 
 const inputNumberCfg = app.useComponentsConfig('formItem.inputNumber', {})
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs } = useFormItem(props)
 
 const innerMin = computed(() => {
-  return props.min || inputNumberCfg.min
+  return props.min || inputNumberCfg.min || 0
 })
 
 const innerMax = computed(() => {

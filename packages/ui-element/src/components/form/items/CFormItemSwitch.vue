@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
-  <el-switch v-model="model[prop]" v-bind="$attrs" :disabled="disabled" @change="handleChange" />
+  <el-switch v-model="model[prop]" v-bind="innerAttrs" :disabled="disabled" />
 </template>
 
 <script lang="ts">
@@ -25,5 +25,5 @@ const props = withDefaults(
   }
 )
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs } = useFormItem(props)
 </script>

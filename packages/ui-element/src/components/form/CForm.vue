@@ -93,11 +93,11 @@ const innerLabelWidth = computed(() => {
 
 // 执行验证
 async function validate(...args: any[]) {
-  const pageContext = app.useContext(dataModel)
+  const context = app.useContext(dataModel)
 
   const ops = validatorItems.map(it => {
     return Promise.resolve().then(() => {
-      return it.validate!(pageContext)
+      return it.validate!(context)
     })
   })
 

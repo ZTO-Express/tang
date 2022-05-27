@@ -28,25 +28,17 @@ const dialogAttrs = computed(() => {
     bodyHeight: dialogConfig.bodyHeight || '80vh',
     noPadding: true,
     noFooter: dialogConfig.noFooter,
-    innerAttrs: {
-      dialog: _.omit(innerDialogAttrs, 'title')
-    }
+    innerAttrs: { dialog: _.omit(innerDialogAttrs, 'title') }
   }
 })
 
 const listSchema = computed(() => {
-  const schemaAttrs = Object.assign(
-    {
-      type: 'crud',
-      search: {
-        hidden: true
-      },
-      actions: {
-        query: downloadsConfig.query
-      }
-    },
-    listConfig
-  )
+  const schemaAttrs = {
+    type: 'crud',
+    search: { hidden: true },
+    actions: { query: downloadsConfig.query },
+    ...listConfig
+  }
 
   return schemaAttrs
 })

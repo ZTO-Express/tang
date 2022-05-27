@@ -1,10 +1,10 @@
 <template>
   <!-- eslint-disable vue/no-mutating-props -->
-  <div class="c-form-item-fuzzy-select">
+  <div class="c-form-item c-form-item-fuzzy-select">
     <el-tooltip placement="top-start" trigger="hover" :disabled="!isShowTips" :content="tipContent">
       <c-fuzzy-select
         ref="fieldRef"
-        v-bind="$attrs"
+        v-bind="innerAttrs"
         v-model="model[prop]"
         :model-label="labelProp && model[labelProp]"
         :option-data="optionProp && model[optionProp]"
@@ -15,7 +15,6 @@
         :disabled="disabled"
         return-label
         @update:label="handleUpdateLabelProps"
-        @change="handleChange"
       />
     </el-tooltip>
     <el-form-item v-show="false" :prop="labelProp"></el-form-item>
@@ -29,7 +28,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, useAttrs, useCurrentAppInstance } from '@zto/zpage'
+import { computed, ref, watch, useAttrs, useCurrentAppInstance } from '@zto/zpage'
 
 import { useFormItem } from '../util'
 
@@ -53,15 +52,13 @@ const props = withDefaults(
   }
 )
 
-const attrs = useAttrs()
-
 const app = useCurrentAppInstance()
 const fieldRef = ref<any>()
 
-const { handleChange } = useFormItem(props)
+const { innerAttrs, allAttrs } = useFormItem(props)
 
 // 注册微件事件监听
-app.useWidgetEmitter(attrs, {
+app.useWidgetEmitter(allAttrs.value, {
   fetchOn: doFetch
 })
 

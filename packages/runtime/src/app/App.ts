@@ -122,7 +122,7 @@ export class App implements Installable {
     const initApi = (apiCfg: AppApiConfig) => {
       const baseUrl = apiCfg.baseUrl || baseCfg.baseUrl
 
-      const cfg = { ...apiCfg, ...baseCfg }
+      const cfg = _.deepMerge(baseCfg, apiCfg)
 
       const api = new HttpRequest(baseUrl, cfg) as any
       api.request = cfg.request
@@ -294,11 +294,20 @@ export class App implements Installable {
     return await authLoader!.logout(this)
   }
 
+  /**
+   * 检查权限
+   * @param codes
+   * @returns
+   */
+  checkPermission(codes: string | string[]) {
+    return this.apis.authApi.checkPermission!(codes)
+  }
+
   /** 获取上传token */
-  async getUploadToken() {
+  async getUploadToken(...args: any[]) {
     if (!this.apis.fsApi.getUploadToken) throw new Error('fsApi为定义 getUploadToken')
 
-    const token = await this.apis.fsApi.getUploadToken()
+    const token = await this.apis.fsApi.getUploadToken(...args)
     return token
   }
 

@@ -1,6 +1,6 @@
 <template>
   <!-- eslint-disable vue/no-mutating-props -->
-  <div class="c-form-item-video">
+  <div class="c-form-item c-form-item-video">
     <c-video :src="model[prop]" v-bind="$attrs" />
     <div v-if="title" class="title">{{ title }}</div>
   </div>
@@ -12,6 +12,7 @@ export default { inheritAttrs: false }
 
 <script setup lang="ts">
 import { _, computed, ref } from '@zto/zpage'
+import { useFormItem } from '../util'
 
 const props = withDefaults(
   defineProps<{
@@ -21,6 +22,8 @@ const props = withDefaults(
   }>(),
   {}
 )
+
+useFormItem(props)
 </script>
 
 <style lang="scss" scoped>

@@ -152,6 +152,8 @@ const props = withDefaults(
     paginationLayout?: string // pagination layout
     editable?: boolean // 是否可编辑
     batchEditable?: boolean // 是否可批量编辑
+
+    export?: Record<string, any> // 导出配置
   }>(),
   {
     data: () => [],
@@ -374,10 +376,14 @@ function validate() {
 const pageSizeCfg = app.useComponentsConfig('pagination.pageSize', 100)
 
 const columnItems = computed<TableColumn[]>(() => {
-  return props.columns.map((col: any) => {
-    col.formatter = tableUtil.getColFormatter(col)
-    return col
-  })
+  return props.columns
+    .filter(col => {
+      return app.checkPermission(col.perm)
+    })
+    .map((col: any) => {
+      col.formatter = tableUtil.getColFormatter(col)
+      return col
+    })
 })
 
 const pager = reactive<TablePager>({
@@ -467,15 +473,13 @@ function getData() {
 const exportDataFn = app.useComponentsConfig('table.exportData')
 
 // 导出数据
-function exportData(fileName: string) {
+function exportData(options?: any) {
   if (!tableData.data.length) {
     Message.warning('请先查询出数据')
     return
   }
-  const exportOpts: any = {
-    fileName,
-    columns: vTableHead.value
-  }
+
+  const exportOpts = { columns: vTableHead.value, ...props.export, ...options, app }
 
   if (exportDataFn) {
     exportDataFn(tableData.data, exportOpts)

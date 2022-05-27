@@ -27,6 +27,8 @@ export function format(dateVal?: DateValue, template?: DateFormatType | string):
     template = 'YYYY-MM-DD HH:mm'
   } else if (template === 'full' || template === 'datetime') {
     template = 'YYYY-MM-DD HH:mm:ss'
+  } else if (template === 'dense') {
+    template = 'YYYYMMDDHHmmss'
   }
 
   const dateStr = dayjs(dateVal).format(template)
