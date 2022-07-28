@@ -14,6 +14,7 @@
               <div v-if="isDownloadable" class="action-mask flex-center">
                 <el-button
                   v-if="!readonly"
+                  v-preventReclick
                   class="btn-image-download"
                   type="text"
                   icon="el-icon-bottom"
@@ -30,6 +31,7 @@
 
             <el-button
               v-if="!readonly"
+              v-preventReclick
               class="btn-delete"
               type="info"
               icon="el-icon-close"
@@ -216,9 +218,9 @@ function getModelValue() {
 </script>
 
 <style lang="scss" scoped>
-$image-size: 80px;
-
 .c-file-list {
+  --image-size: 80px;
+
   display: inline-block;
   border-radius: 3px;
 
@@ -256,12 +258,12 @@ $image-size: 80px;
       }
 
       :deep(.c-image) {
-        width: $image-size;
-        height: $image-size;
+        width: var(--image-size);
+        height: var(--image-size);
 
         .el-image {
-          width: $image-size;
-          height: $image-size;
+          width: var(--image-size);
+          height: var(--image-size);
           cursor: pointer;
         }
       }

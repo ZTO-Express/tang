@@ -21,9 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
-
-const { computed, useSlots } = vue
+import { computed, useSlots } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
@@ -45,8 +43,8 @@ const isBody = computed(() => !!slots.default)
 .c-page-section {
   & > .header-con {
     & > .c-page-section-header {
-      border-top-left-radius: $border-radius;
-      border-top-right-radius: $border-radius;
+      border-top-left-radius: var(--border-radius);
+      border-top-right-radius: var(--border-radius);
     }
   }
 }
@@ -55,18 +53,18 @@ const isBody = computed(() => !!slots.default)
 <style lang="scss" scoped>
 .c-page-section {
   position: relative;
-  background: $section-color;
-  border-radius: $border-radius;
-  box-shadow: 0 0 3px 0 $border-color;
-  margin-top: $section-gutter;
+  background: var(--section-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 3px 0 var(--border-color);
+  margin-top: var(--section-gutter);
 
   .body-con {
-    padding: $section-padding;
+    padding: var(--section-padding);
     box-sizing: border-box;
   }
 
   .footer-con {
-    padding: $section-padding;
+    padding: var(--section-padding);
   }
 }
 </style>

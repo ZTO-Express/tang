@@ -1,5 +1,4 @@
-import AppRoot from './components/app/AppRoot.vue'
-import AppTheme from './components/app/AppTheme.vue'
+import { AppRoot, AppTheme } from './components/app'
 import * as AppRouter from './router'
 
 import type { VueComponent } from '@zto/zpage'

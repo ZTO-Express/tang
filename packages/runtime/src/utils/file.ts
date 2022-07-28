@@ -155,7 +155,7 @@ export async function deleteFile(name: string, options: AppContextOptions) {
 
 // 导入模板文件下载（返回文件流）
 export async function download(url: string, options?: any) {
-  options = Object.assign({}, options)
+  options = { ...options }
   let filetype = options.filetype
   let filename = options.filename
 

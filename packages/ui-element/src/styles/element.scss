@@ -35,6 +35,21 @@ $--font-path: 'element-plus/packages/theme-chalk/src/fonts';
   th.el-table__cell {
     background-color: $bg-color;
   }
+
+  td.el-table__cell {
+    &.expand-column {
+      text-align: left;
+
+      &>.cell {
+        &>.el-table__expand-icon + div.expand-content {
+          padding-left: 0;
+        }
+        &>div.expand-content:first-child {
+          padding-left: 25px;
+        }
+      }
+    }
+  }
 }
 
 .el-dialog {
@@ -69,7 +84,7 @@ $--font-path: 'element-plus/packages/theme-chalk/src/fonts';
   }
 
   &.auto-height &__content {
-    display: contents;
+    // display: contents;
     height: auto;
   }
 

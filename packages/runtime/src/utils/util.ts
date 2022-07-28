@@ -1,5 +1,5 @@
-import qs from 'qs'
-import { nextTick } from 'vue'
+import _qs from 'qs'
+import { nextTick, camelize, capitalize } from 'vue'
 import { getPageKey, uniqId, guid, uuid } from './helper'
 import { warn } from './debug'
 
@@ -19,11 +19,13 @@ export {
   isPromise,
   isString,
   isSymbol,
-  isUndefined
+  isUndefined,
+  throttle,
+  debound
 } from '@zto/zpage-core'
 
-export { qs }
-export { nextTick }
+export const qs = _qs
+export { nextTick, camelize, capitalize }
 export { getPageKey, uniqId, guid, uuid }
 export { warn }
 
@@ -31,4 +33,9 @@ export { warn }
 export function filterEmpty(val: any, replaceText = '--') {
   if (!val && val !== 0) return replaceText
   return val
+}
+
+/** 获取Vue组件 */
+export function resolveVueAsset(registry: Record<string, any> | undefined, name: string) {
+  return registry && (registry[name] || registry[camelize(name)] || registry[capitalize(camelize(name))])
 }

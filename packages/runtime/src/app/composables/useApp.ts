@@ -1,4 +1,4 @@
-import { getCurrentInstance } from 'vue'
+import { getCurrentInstance, ComponentInternalInstance, App as VueApp } from 'vue'
 import { App } from '../App'
 import { HostApp } from '../HostApp'
 
@@ -15,16 +15,22 @@ export function useCurrentAppInstance(getSingleApp = false): App {
  * 获取当前应用实例，如果没有不抛出错误
  * @param getSingleApp
  */
-export function tryUseCurrentAppInstance(getSingleApp = false): App | undefined {
-  const cmptInstance = getCurrentInstance()
+export function tryUseCurrentAppInstance(
+  getSingleApp = false,
+  vueInstance?: VueApp | ComponentInternalInstance | null
+): App | undefined {
+  if (!vueInstance) vueInstance = getCurrentInstance()
 
-  let ins = cmptInstance?.appContext?.config.globalProperties.$app
+  let appInstance: App | undefined = undefined
 
-  if (!ins && getSingleApp === true) {
-    ins = HostApp?.app
+  if (vueInstance) {
+    const appContext = (vueInstance as ComponentInternalInstance).appContext || (vueInstance as VueApp)._context
+    appInstance = appContext?.config.globalProperties.$app
   }
 
-  return ins
+  if (!appInstance && getSingleApp === true) appInstance = HostApp?.app
+
+  return appInstance
 }
 
 /**

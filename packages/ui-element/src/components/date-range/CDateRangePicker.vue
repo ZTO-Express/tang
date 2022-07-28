@@ -11,7 +11,6 @@
     :disabled-date="innerDisabledDateFn"
     :readonly="readonly"
     @change="handleChange"
-    @blur="handleBlur"
   ></el-date-picker>
 </template>
 
@@ -30,6 +29,8 @@ const props = withDefaults(
     readonly?: boolean
     valueFormat?: string
     beforeToday?: boolean
+    beforeDate?: string | Date // 可选最大时间
+    afterDate?: string | Date // 可选最小时间
     defaultFrom?: any // 默认开始时间 string | Date
     defaultTo?: any // 默认开始时间 string | Date
     defaultRange?: number // 默认时间范围(天)
@@ -62,7 +63,6 @@ const { Message } = useMessage()
 
 const innerModelValue = ref<string[]>([])
 const innerRangeValue = ref<string[]>([])
-const boundaryDate = ref<string[]>([]) // 时间边界，根据maxRange
 
 const innerClearable = computed(() => {
   if (props.maxRange) return false
@@ -81,17 +81,29 @@ const innerToDate = computed(() => {
 })
 
 const innerDisabledDateFn = computed(() => {
+  let beforeTime: number | null = null
+  let afterTime: number | null = null
+
+  if (props.beforeDate) {
+    beforeTime = dateUtil.parse(props.beforeDate).getTime()
+  }
+
+  if (props.afterDate) {
+    afterTime = dateUtil.parse(props.afterDate).getTime()
+  }
+
   const fn = (time: any) => {
-    if (boundaryDate.value.length) {
-      return (
-        time < new Date(boundaryDate.value[0]).getTime() ||
-        (props.beforeToday
-          ? time > new Date(boundaryDate.value[1]).getTime() || time >= Date.now()
-          : time > new Date(boundaryDate.value[1]).getTime())
-      )
-    } else {
-      if (props.beforeToday) return time >= Date.now()
+    let _now = Date.now()
+    let _beforeTime = beforeTime
+    let _afterTime = afterTime
+
+    if (props.beforeToday && _beforeTime) {
+      _beforeTime = _beforeTime < _now ? _beforeTime : _now
     }
+
+    if (_beforeTime && time >= _beforeTime) return true
+    if (_afterTime && time <= _afterTime) return true
+
     return false
   }
 
@@ -164,13 +176,9 @@ function handleChange(val: any) {
   innerModelValue.value = val
 }
 
-function handleBlur() {
-  boundaryDate.value = []
-}
-
 // 设置开始时间
 function setFrom(from: Date | string) {
-  const fromDate = new Date(from)
+  const fromDate = dateUtil.parse(from)
 
   if (!dateUtil.isValid(fromDate)) {
     innerModelValue.value = []
@@ -191,9 +199,9 @@ function setFrom(from: Date | string) {
   innerModelValue.value = [dateUtil.format(fromDate, props.valueFormat), dateUtil.format(toDate, props.valueFormat)]
 }
 
+// 设置结束时间
 function setTo(to: Date | string) {
-  if (to === 'now') to = new Date()
-  const toDate = new Date(to)
+  const toDate = dateUtil.parse(to)
 
   if (!dateUtil.isValid(toDate)) {
     innerModelValue.value = []
@@ -204,7 +212,7 @@ function setTo(to: Date | string) {
 
   let fromDate = new Date(innerFromDate.value)
   if (!dateUtil.isValid(fromDate) && defaultRange) {
-    fromDate = dateUtil.addDays(new Date(to), props.defaultRange * -1 + 1)
+    fromDate = dateUtil.addDays(new Date(toDate), props.defaultRange * -1 + 1)
   }
 
   if (!validateRange([fromDate, toDate])) {
@@ -214,6 +222,7 @@ function setTo(to: Date | string) {
   innerModelValue.value = [dateUtil.format(fromDate, props.valueFormat), dateUtil.format(toDate, props.valueFormat)]
 }
 
+// 验证范围
 function validateRange(val: Array<string | Date>, notice = false) {
   const maxRange = props.maxRange
 

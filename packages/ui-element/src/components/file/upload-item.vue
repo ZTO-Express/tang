@@ -35,14 +35,14 @@
       <div class="tail">
         <div v-if="updateState.errorMsg" class="error-message">
           <div class="message text-ellipsis" :title="updateState.errorMsg">{{ updateState.errorMsg }}</div>
-          <el-button type="info" plain class="btn-action q-ml-sm" circle @click="handleRemove">
+          <el-button type="info" plain class="btn-action q-ml-sm" circle v-preventReclick @click="handleRemove">
             <Minus :size="15" color="grey" />
           </el-button>
         </div>
-        <el-button v-else-if="updateState.uploadCompleted" type="text" class="btn-action" circle>
+        <el-button v-else-if="updateState.uploadCompleted" type="text" class="btn-action" circle v-preventReclick>
           <Check :size="15" color="green" />
         </el-button>
-        <el-button v-else-if="!noCancel" type="text" class="btn-action" circle @click="handleCancel">
+        <el-button v-else-if="!noCancel" type="text" class="btn-action" circle v-preventReclick @click="handleCancel">
           <Close :size="15" />
         </el-button>
       </div>
@@ -248,7 +248,7 @@ function reset() {
 <style lang="scss">
 .c-upload-item {
   .z-spinner-inner .path {
-    stroke: $primary;
+    stroke: var(--primary);
   }
 }
 </style>

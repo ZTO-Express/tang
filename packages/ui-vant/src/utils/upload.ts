@@ -1,16 +1,17 @@
 /** 上传文件 */
 
-import { _, useConfig } from '@zto/zpage'
+import { _ } from '@zto/zpage'
+
+import type { AppContextOptions } from '@zto/zpage'
 
 export interface UploadStoreOptions {
   [prop: string]: any
 }
 
-export interface UploadOptions {
+export interface UploadOptions extends AppContextOptions {
   storePath?: string
   storeGroup?: string
   storeOptions?: UploadStoreOptions
-  [prop: string]: any
 }
 
 export interface UploadRescOption {
@@ -42,8 +43,10 @@ export const UploadRescOptions: Record<string, UploadRescOption> = {
 }
 
 /** 执行文件上传 */
-export async function upload(file: File, options?: UploadOptions) {
-  const uploadCfg = useConfig('components.file.upload')
+export async function upload(file: File, options: UploadOptions) {
+  const app = options.app
+
+  const uploadCfg = app.useComponentsConfig('file.upload')
 
   const uploadFn = uploadCfg?.fn
   const realOptions = _.omitNil(options)

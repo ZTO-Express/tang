@@ -3,15 +3,14 @@
   "version": "0.2.5",
   "workspaces": [
     "packages/*",
-    "play",
-    "docs",
+    "bases",
     "sample"
   ],
   "scripts": {
     "prepare": "husky install",
     "commit": "git-cz",
     "test": "jest",
-    "dev": "pnpm dev --dir sample/vite-ui-element",
+    "dev": "vite",
     "build": "pnpm rebuild --filter zpage-core --filter zpage-ffb --filter zpage-runtime && pnpm rebuild --filter '@zto/zpage' && pnpm rebuild --filter '@zto/zpage-ui-*'",
     "gen:version": "sucrase-node scripts/version/gen-version.ts",
     "update:version": "sucrase-node scripts/version/update-version.ts",
@@ -28,12 +27,6 @@
     "vue": "^3.2.0"
   },
   "dependencies": {
-    "@zto/zpage": "workspace:^",
-    "@zto/zpage-core": "workspace:^",
-    "@zto/zpage-ffb": "workspace:^",
-    "@zto/zpage-runtime": "workspace:^",
-    "@zto/zpage-ui-element": "workspace:^",
-    "@zto/zpage-ui-vant": "workspace:^",
     "dayjs": "^1.10.7",
     "lodash": "^4.17.21"
   },

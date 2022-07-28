@@ -1,22 +1,13 @@
-import {
-  _,
-  h,
-  tpl,
-  renderHtml,
-  renderCmpt,
-  Cmpt,
-  useSlots,
-  defineComponent,
-  resolveComponent,
-  useCurrentAppInstance
-} from '@zto/zpage'
+import { _, h, tpl, renderHtml, renderCmpt, Cmpt, useSlots, defineComponent, useCurrentAppInstance } from '@zto/zpage'
 import { ElTableColumn, ElFormItem } from 'element-plus'
 
-import type { GenericFunction } from '@zto/zpage'
-
+import Cell from './cell.vue'
+import HeaderCell from './header-cell.vue'
 import CPoptip from '../poptip/CPoptip.vue'
 import PopEditor from './pop-editor.vue'
+import CAction from '../action/CAction.vue'
 
+import type { GenericFunction } from '@zto/zpage'
 import type { TableColumn } from './types'
 
 const ChildTableColumn = defineComponent({
@@ -32,18 +23,28 @@ const ChildTableColumn = defineComponent({
     const app = useCurrentAppInstance()
 
     function getColumnProps(config: any) {
-      return {
-        ...config,
-        key: `table${config.prop}`,
-        prop: config.prop,
-        width: config.width || '',
-        formatter: config.formatter,
-        align: config.children ? 'center' : config.align || 'center',
-        className: config.className,
-        showOverflowTooltip: config.tooltip !== false,
-        fixed: config.fixed || undefined,
-        editable: props.editable
+      // 计算className
+      if (config.expandColumn) {
+        config.className = `expand-column ${config.className || ''}`
       }
+
+      let colProps = _.omit(
+        {
+          ...config,
+          align: config.align || 'center',
+          key: `table${config.prop}`,
+          prop: config.prop,
+          width: config.width || '',
+          formatter: config.formatter,
+          className: config.className,
+          showOverflowTooltip: config.tooltip !== false,
+          fixed: config.fixed || undefined,
+          editable: props.editable
+        },
+        'children'
+      )
+
+      return colProps
     }
 
     /** 构建子slots */
@@ -60,21 +61,8 @@ const ChildTableColumn = defineComponent({
           return config.children.map((col: any) => {
             const _columnProps = getColumnProps(col)
             const _childrenSlots = buildChildrenSlots(col)
-
             return h(ElTableColumn, { ..._columnProps }, _childrenSlots)
           })
-        }
-
-        scopedSlots.header = (scope: any) => {
-          const context = app.useContext(scope)
-
-          let headerLabel = config.label
-
-          if (config.headerTpl) {
-            headerLabel = tpl.filter(config.headerTpl, context)
-          }
-
-          return h('div', { ...config.header }, headerLabel)
         }
       } else {
         // 编辑列
@@ -99,6 +87,7 @@ const ChildTableColumn = defineComponent({
           if (config.formatter) {
             innerText = config.formatter(scope.row, config, scope.row[prop], scope.$index, scope)
           }
+
           scope.row.__innerTexts[prop] = innerText
 
           if (config.html) {
@@ -108,6 +97,19 @@ const ChildTableColumn = defineComponent({
 
           if (config.cmpt) {
             return h(Cmpt, { config: config.cmpt, contextData: scope })
+          }
+
+          if (config.action) {
+            // 单元格内的action
+            return h(
+              CAction,
+              {
+                ...config.action,
+                contextData: scope,
+                textEllipsis: true
+              },
+              innerText
+            )
           }
 
           if (config.component) {
@@ -131,17 +133,7 @@ const ChildTableColumn = defineComponent({
             return innerCmpt
           }
 
-          let tipSlot: any = null
-
-          if (config?.tip) {
-            let tipProps: any = config?.tip
-            if (_.isFunction(config?.tip)) {
-              tipProps = config?.tip(context, config)
-            }
-
-            let isTip = tipProps.visibleOn ? tpl.evalExpression(tipProps.visibleOn, context) : true
-            tipSlot = isTip && h(CPoptip as any, { context, ...tipProps })
-          }
+          const tipSlot = getTableTip(config, context)
 
           const rowEditable = !!scope.row.editable
 
@@ -162,7 +154,7 @@ const ChildTableColumn = defineComponent({
             } else {
               const editAttrs = _.omit(editor, ['itemType', 'innerAttrs'])
               const formItemAttrs = editor.innerAttrs?.formItem
-              const Editor = resolveComponent(`c-form-item-${editor.itemType}`)
+              const Editor = app.resolveComponent(`c-form-item-${editor.itemType}`)
 
               return h(
                 ElFormItem,
@@ -185,82 +177,83 @@ const ChildTableColumn = defineComponent({
             }
           }
 
-          let innerStyle = {}
-
-          if (_.isFunction(config.style)) {
-            innerStyle = config.style(context, config)
-          } else if (config.style) {
-            innerStyle = tpl.deepFilter(config.style, context)
-          }
-
           const _innerSolts = tipSlot ? [innerText, tipSlot] : innerText
 
-          return h('div', { style: innerStyle, class: { 'text-ellipsis': true }, ...config.cell }, _innerSolts)
+          return h(Cell, { app, scope, config, ...config.cell }, { default: () => _innerSolts })
+        }
+      }
+
+      scopedSlots.header = (scope: any) => {
+        const context = app.useContext(scope)
+
+        let headerConfig = config.header || {}
+        if (_.isFunction(headerConfig)) {
+          headerConfig = config.header(context, config)
         }
 
-        scopedSlots.header = (scope: any) => {
-          const context = app.useContext(scope)
-
-          let headerConfig = config.header
-          if (_.isFunction(headerConfig)) {
-            headerConfig = config.header(context, config)
-          }
-
-          if (headerConfig?.cmpt) {
-            return h(Cmpt, { config: headerConfig.cmpt, contextData: scope, ...headerConfig })
-          }
-
-          if (headerConfig?.component) {
-            let headerCmptConfig: any = null
-
-            if (_.isFunction(headerConfig.component)) {
-              headerCmptConfig = headerConfig.component(context, config)
-            }
-
-            const headerCmpt = renderCmpt(headerCmptConfig, context)
-            return headerCmpt
-          }
-
-          let headerLabel = headerConfig?.label || config.label
-          if (config.headerTpl) {
-            headerLabel = tpl.filter(config.headerTpl, context)
-          }
-
-          const batchEditor = config.batchEditor
-
-          /** 批量编辑 */
-          if (props.batchEditable && config.batchEditable) {
-            return h(PopEditor as any, {
-              config: batchEditor,
-              column: config,
-              scope,
-              isBatch: true,
-              onSubmit: props.onBatchEdit
-            })
-          }
-
-          /** 插槽 */
-          if (typeof config.showHeader !== 'undefined') {
-            const slot = slots[`${config.prop}Header`]
-            return slot && slot(scope)
-          }
-
-          let isRequired = false
-
-          /** 必填项 */
-          if (batchEditor && (batchEditor?.required || batchEditor?.rules)) {
-            if (batchEditor.required || (batchEditor.rules || []).some((it: any) => it.required)) {
-              isRequired = true
-            }
-          }
-
-          let headerClass = config.header?.class
-          if (isRequired && _.isObject(headerClass)) {
-            headerClass['c-table-col-text-required'] = true
-          }
-
-          return h('div', { ...headerConfig, class: headerClass }, headerLabel)
+        if (headerConfig.cmpt) {
+          return h(Cmpt, { config: headerConfig.cmpt, contextData: scope, ...headerConfig })
         }
+
+        if (headerConfig.component) {
+          let headerCmptConfig: any = null
+
+          if (_.isFunction(headerConfig.component)) {
+            headerCmptConfig = headerConfig.component(context, config)
+          }
+
+          const headerCmpt = renderCmpt(headerCmptConfig, context)
+          return headerCmpt
+        }
+
+        let headerLabel = headerConfig.label || config.label
+        if (config.headerTpl) {
+          headerLabel = tpl.filter(config.headerTpl, context)
+        }
+
+        const batchEditor = config.batchEditor
+
+        /** 批量编辑 */
+        if (props.batchEditable && config.batchEditable) {
+          return h(PopEditor as any, {
+            config: batchEditor,
+            column: config,
+            scope,
+            isBatch: true,
+            onSubmit: props.onBatchEdit
+          })
+        }
+
+        /** 插槽 */
+        if (typeof config.showHeader !== 'undefined') {
+          const slot = slots[`${config.prop}Header`]
+          return slot && slot(scope)
+        }
+
+        let isRequired = false
+        /** 必填项 */
+        if (batchEditor && (batchEditor?.required || batchEditor?.rules)) {
+          if (batchEditor.required || (batchEditor.rules || []).some((it: any) => it.required)) {
+            isRequired = true
+          }
+        }
+
+        let headerClass = headerConfig?.class
+        if (isRequired && _.isObject(headerClass)) {
+          headerClass['c-table-col-text-required'] = true
+        }
+
+        return h(
+          HeaderCell,
+          { app, scope, config, ...headerConfig, class: headerClass },
+          {
+            default: () => {
+              let tipSlot = getTableTip(headerConfig, context)
+              const _innerSolts = tipSlot ? [headerLabel, tipSlot] : headerLabel
+              return _innerSolts
+            }
+          }
+        )
       }
 
       return scopedSlots
@@ -272,5 +265,23 @@ const ChildTableColumn = defineComponent({
     return () => h(ElTableColumn, { ...columnProps }, childrenSlots)
   }
 })
+
+/** 渲染表格提示 */
+export function getTableTip(config: any, context: any) {
+  let tipProps: any = config?.tip
+
+  if (!tipProps) return undefined
+
+  if (_.isString(config?.tip)) {
+    tipProps = { content: config?.tip }
+  } else if (_.isFunction(tipProps)) {
+    tipProps = config?.tip(context, config)
+  }
+
+  let isTip = tipProps.visibleOn ? tpl.evalExpression(tipProps.visibleOn, context) : true
+  const tipSlot = isTip && h(CPoptip as any, { contextData: context.data, ...tipProps })
+
+  return tipSlot
+}
 
 export default ChildTableColumn

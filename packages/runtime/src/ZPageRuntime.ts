@@ -22,6 +22,7 @@ import type {
   AppStartOptions,
   AppConfigOptions,
   AppContext,
+  AppContextOptions,
   AppFsApi,
   AppAuthApi,
   NavMenuItem,
@@ -42,6 +43,7 @@ export {
   reactive,
   ref,
   unref,
+  toRef,
   toRefs,
   shallowRef,
   computed,
@@ -65,10 +67,10 @@ export {
   h
 } from 'vue'
 
-export { onBeforeRouteUpdate } from 'vue-router'
+export { RouterView, RouterLink, onBeforeRouteUpdate } from 'vue-router'
 
 export * as vue from 'vue'
-export * as vuex from 'vuex'
+export * as pinia from 'pinia'
 export * as vueRouter from 'vue-router'
 
 export * from './typings/config.d'
@@ -87,6 +89,7 @@ export type {
   AppConfigOptions,
   AppConfigDefinition,
   AppContext,
+  AppContextOptions,
   AppFsApi,
   AppAuthApi,
   NavMenuItem,

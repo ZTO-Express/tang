@@ -33,7 +33,7 @@ hr.separator {
   text-align: left;
 }
 .text-primary {
-  color: $primary !important;
+  color: var(--primary) !important;
 }
 .text-faded {
   color: $faded !important;

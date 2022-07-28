@@ -1,4 +1,4 @@
-import { _ } from '@zto/zpage-core'
+import { _ } from '../utils'
 import * as formatter from './formatter'
 
 import type { FormatTextOptions } from '../typings'

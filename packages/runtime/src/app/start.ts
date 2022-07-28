@@ -2,6 +2,7 @@ import { APP_NAME_PATTERN } from '../consts'
 import { normalizeAppStartOptions } from './options'
 import { App } from './App'
 import { HostApp } from './HostApp'
+import { _ } from '../utils'
 
 import type { AppCtorOptions, AppStartOptions } from '../typings'
 
@@ -18,6 +19,9 @@ export async function startApp(options: AppStartOptions) {
   const startOptions = normalizeAppStartOptions(options)
 
   const app = createApp(options)
+
+  // 直接设置元应用入口（主要用于调试或单独启动元应用的情况）
+  if (options.meta) window[options.name] = { meta: options.meta }
 
   // 载入应用页面
   await app.start(startOptions)
@@ -40,10 +44,12 @@ export function checkAppStartOptions(options: AppStartOptions) {
  * @returns
  */
 export function createApp(options: AppCtorOptions) {
-  if (options.isHost && HostApp.isInitialized) {
-    throw new Error('宿主应用已经初始化过了。')
+  if (!_.isBoolean(options.isMicro)) options.isMicro = false
+
+  if (!options.isMicro && !options.isDebug && HostApp.isInitialized) {
+    throw new Error('宿主应用已经存在，无法重复创建。')
   }
 
-  const app = options.isHost ? HostApp.initialize(options) : new App(options)
+  const app = !options.isMicro ? HostApp.initialize(options) : new App(options)
   return app
 }

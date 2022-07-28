@@ -25,5 +25,10 @@ const props = withDefaults(
   }
 )
 
+// 当值为['', null, undefined]，默认值调整为false
+if (['', null, undefined].includes(props.model[props.prop])) {
+  props.model[props.prop] = false
+}
+
 const { innerAttrs } = useFormItem(props)
 </script>

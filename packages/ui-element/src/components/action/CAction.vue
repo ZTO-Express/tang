@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isVisible" v-perm="$attrs.perms" class="c-action">
+  <div v-if="isVisible" v-perm="innerPerms" v-preventReclick class="c-action" :class="{ ellipsis: textEllipsis }">
     <c-upload v-if="isUpload" v-bind="uploadAttrs" :disabled="isDisabled"></c-upload>
     <cmpt
       v-else-if="cmpt"
@@ -8,7 +8,7 @@
       :config="cmpt"
       :context-data="contextData"
     ></cmpt>
-    <el-button v-else v-bind="buttonAttrs" :disabled="isDisabled" @click="handleClick">
+    <el-button v-else v-bind="buttonAttrs" class="c-action-button" :disabled="isDisabled" @click="handleClick">
       <slot>
         {{ buttonAttrs.label }}
       </slot>
@@ -20,8 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import { _, useCurrentAppInstance, tpl, computed, ref, useAttrs } from '@zto/zpage'
-import { getActionPayload } from '../../utils'
+import { _, useCurrentAppInstance, tpl, computed, ref, useAttrs, usePreventReclick } from '@zto/zpage'
+import { appUtil } from '../../utils'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
 
@@ -30,15 +30,16 @@ const props = withDefaults(
     actionType?: string // 行为类型 （fetch, ajax）
     name?: string // 活动名称
     buttonType?: string // 按钮类型
+    textEllipsis?: boolean // true = 单元格内的按钮文案如果超出宽度则省略号 / false = 默认
     trigger?: GenericFunction // 触发器，覆盖action自身触发
     beforeTrigger?: GenericFunction
     afterTrigger?: GenericFunction
-    api?: ApiRequestAction // api 触发
+    api?: ApiRequestAction | string // api 触发
     apiParams?: Record<string, any> | GenericFunction // API参数
     payload?: any // 相关附加参数
     extData?: Record<string, any> // API参数
     contextData?: any // 数据上下文
-    successMessage?: string // 成功消息
+    successMessage?: string | boolean // 成功消息
     dialog?: any // dialog action
     form?: Record<string, any> // form action
     import?: Record<string, any> // import action
@@ -54,7 +55,6 @@ const props = withDefaults(
     cmpt?: Record<string, any>
   }>(),
   {
-    buttonType: 'primary',
     visible: true,
     disabled: false
   }
@@ -73,11 +73,26 @@ const formDialogRef = ref<any>()
 const dialogRef = ref<any>()
 const importRef = ref<any>()
 
+/** 这里的disable主要用来从内部控制控件只读状态（不受外界状态影响） */
+const { reclickDisabled } = usePreventReclick()
+
+const innerPerms = computed(() => {
+  if (attrs.perm == false) return null
+
+  if (attrs.perms) return attrs.perms
+  if (!attrs.perm) return null
+
+  if (_.isString(attrs.perm)) return [attrs.perm]
+  if (attrs.perm === true && props.api) return [props.api]
+
+  return appUtil.getCmptPermData({ ...attrs, api: props.api })
+})
+
 const payloadData = computed(() => {
   if (!props.payload) return props.payload
 
   const context = app.useContext(props.contextData)
-  return getActionPayload(props.payload, context)
+  return appUtil.getActionPayload(props.payload, context)
 })
 
 const actionContextData = computed(() => {
@@ -94,7 +109,12 @@ const actionLabel = computed(() => {
 })
 
 const buttonAttrs = computed(() => {
-  const btnAttrs = { type: props.buttonType, ...props.innerAttrs?.button, label: actionLabel.value }
+  let buttonType = props.buttonType
+  if (!buttonType) {
+    buttonType = props.actionType === 'link' ? 'text' : 'primary'
+  }
+
+  const btnAttrs = { type: buttonType, ...props.innerAttrs?.button, label: actionLabel.value }
   return btnAttrs
 })
 
@@ -103,8 +123,12 @@ const isVisible = computed(() => {
   return result
 })
 
+// 是否只读
 const isDisabled = computed(() => {
-  const result = app.calcOnExpression(props.disabledOn, actionContextData.value, props.disabled === true)
+  // 防重复点击功能
+  if (reclickDisabled.value === true) return true
+
+  const result = app.calcOnExpression(props.disabledOn, actionContextData.value, props.disabled)
   return result
 })
 
@@ -124,6 +148,7 @@ const innerDialogAttrs = computed(() => {
     title: actionLabel.value,
     onSubmit: dialogSubmitMethod,
     contextData: props.contextData,
+    bodyHeight: attrs.height,
     ...props.dialog,
     ...props.innerAttrs?.dialog
   }
@@ -178,6 +203,8 @@ async function trigger() {
 
   const actionType = props.actionType
 
+  let afterTriggerPayload: any = null
+
   if (actionType === 'form' || props.form) {
     // 执行表单活动
     formDialogRef.value.show(payloadData.value)
@@ -193,11 +220,12 @@ async function trigger() {
     await doAfterTrigger()
   } else if (actionType === 'link' || props.link) {
     // 执行弹框活动
-    await router.goto(props.link)
+    const link = tpl.deepFilter(props.link, actionContext.value)
+    await router.goto(link)
     await doAfterTrigger()
   } else if (actionType === 'event' || props.event) {
     // 发送事件
-    emitter.emits(props.event as any, payloadData.value)
+    app.emits(props.event as any, payloadData.value)
     await doAfterTrigger()
   } else if (props.message) {
     // 默认执行消息活动
@@ -226,14 +254,13 @@ async function trigger() {
 
     return MessageBox(msgConfig).then(async () => {
       if (props.api) {
-        await doApiRequest(payloadData.value)
+        afterTriggerPayload = await doApiRequest(payloadData.value)
       }
-
-      await doAfterTrigger()
+      await doAfterTrigger(afterTriggerPayload)
     })
   } else if (props.api) {
-    await doApiRequest(payloadData.value)
-    await doAfterTrigger()
+    afterTriggerPayload = await doApiRequest(payloadData.value)
+    await doAfterTrigger(afterTriggerPayload)
   }
 }
 
@@ -245,10 +272,10 @@ function doBeforeTrigger() {
   })
 }
 
-function doAfterTrigger() {
+function doAfterTrigger(payload?: any) {
   return Promise.resolve().then(() => {
     if (props.afterTrigger) {
-      return props.afterTrigger(actionContext.value, attrs)
+      return props.afterTrigger(actionContext.value, payload, attrs)
     }
   })
 }
@@ -269,16 +296,32 @@ async function doApiRequest(payload: any) {
     params = { ...params, ...props.extData }
   }
 
-  await app.request({ action: props.api, params })
+  const res = await app.request({ action: props.api, params })
 
-  Message.success(props.successMessage || '执行成功！')
+  if (props.successMessage !== false) {
+    Message.success(props.successMessage || '执行成功！')
+  }
+
+  return res
 }
 
-defineExpose({ trigger })
+defineExpose({ trigger, reclickDisabled })
 </script>
 
 <style lang="scss" scoped>
 .c-action {
   display: inline-block;
+
+  &.ellipsis {
+    width: 100%;
+
+    .c-action-button {
+      width: 100%;
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
 </style>

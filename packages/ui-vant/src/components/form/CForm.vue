@@ -27,12 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, tpl, useConfig, useAppContext, useApiRequest, warn } from '@zto/zpage'
-import { useMessage } from '../../composables'
-
-const { computed, ref } = vue
-
-const formConfig = useConfig('components.form', {})
+import { computed, ref, tpl, warn, useCurrentAppInstance } from '@zto/zpage'
 
 const props = defineProps<{
   labelWidth?: number | string
@@ -43,15 +38,19 @@ const props = defineProps<{
   afterSubmit?: Function
 }>()
 
-const { Message } = useMessage()
-const apiRequest = useApiRequest()
+const app = useCurrentAppInstance()
+
+const formConfig = app.useComponentsConfig('form', {})
+
+const { Message } = app.useMessage()
+const apiRequest = app.request
 
 const formRef = ref<any>()
 
 // ----- 数据相关 ----->
 
 const dataModel = ref<any>(props.model || {})
-const context = useAppContext(dataModel)
+const context = app.useContext(dataModel)
 
 function setData(data: any) {
   dataModel.value = data
@@ -118,7 +117,7 @@ async function handleActionAfterTrigger(action: any) {}
 async function doSubmit(action?: any) {
   const form = formRef.value
 
-  const payload = tpl.deepFilter(Object.assign({}, action.extData, dataModel.value), context)
+  const payload = tpl.deepFilter({ ...action.extData, ...dataModel.value }, context)
 
   if (props.beforeSubmit) {
     const submitFlag = await Promise.resolve().then(() => {

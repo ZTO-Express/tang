@@ -2,8 +2,8 @@ import axios from 'axios'
 import { ZFfb } from '@zto/zpage-ffb'
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import type { GenericFunction } from '@zto/zpage-core'
 import type { FfbProcessor } from '@zto/zpage-ffb'
+import type { GenericFunction } from '../typings'
 
 // 请求选项
 export interface HttpRequestOptions extends AxiosRequestConfig {
@@ -25,6 +25,14 @@ export interface HttpRequestError {
 
 export interface HttpRequestConfig {
   baseUrl?: string
+
+  inner?: {
+    timeout?: number
+    withCredentials?: boolean
+    method?: string
+    headers?: Record<string, any>
+    [prop: string]: any
+  }
 
   ffbs?: Record<string, FfbProcessor>
 
@@ -89,9 +97,8 @@ export class HttpRequest {
       withCredentials: true,
       method: 'POST',
       timeout: 60000,
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      ...this._config?.inner,
+      headers: { 'Content-Type': 'application/json', ...this._config?.inner?.headers }
     }
 
     return config

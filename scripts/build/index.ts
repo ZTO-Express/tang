@@ -2,6 +2,7 @@ import { resolve } from 'path'
 import { compile } from './compiler'
 import { readBuildConfig } from './utils/config'
 import * as log from './utils/log'
+import * as argv from './utils/argv'
 import { resolvePkgRoot } from './utils/paths'
 
 build()
@@ -10,34 +11,29 @@ build()
 async function build() {
   log.cyan('构建开始...')
 
-  const argv = process.argv
+  const targetNameStr = argv.parseByName('name')
 
-  const nameArgPrefix = '--name='
-  const nameArg = argv.find(arg => arg.startsWith(nameArgPrefix))
-
-  const nameStr = nameArg?.substring(nameArgPrefix.length)
-
-  if (!nameStr) {
+  if (!targetNameStr) {
     log.yellow('没有编码名称，请添加--name参数.')
     return
   }
 
-  const names = nameStr.split(',')
+  const targetNames = targetNameStr.split(',')
 
-  for (const it of names) {
-    await buildByName(it)
+  for (const it of targetNames) {
+    await buildByTargetName(it)
   }
 
   process.exit()
 }
 
-async function buildByName(name: string) {
-  if (!name) return
+async function buildByTargetName(targetName: string) {
+  if (!targetName) return
 
-  log.cyan(`开始编译 ${name}`)
+  log.cyan(`开始编译 ${targetName}`)
 
   // 准备配置文件
-  const pkgRoot = resolvePkgRoot(name)
+  const pkgRoot = resolvePkgRoot(targetName)
   const outDir = resolve(pkgRoot, 'dist')
   const outTypesDir = resolve(outDir, 'types')
 
@@ -47,20 +43,19 @@ async function buildByName(name: string) {
 
   const buildConfig = await readBuildConfig(pkgRoot, '', {})
 
-  buildConfig.packageName = name
-  buildConfig.pkgRoot = buildConfig.pkgRoot || pkgRoot
-
-  buildConfig.outDir = buildConfig.outDir || outDir
-  buildConfig.outTypesDir = buildConfig.outTypesDir || outTypesDir
-
-  buildConfig.inputDir = buildConfig.inputDir || inputDir
-  buildConfig.inputTypesDir = buildConfig.inputTypesDir || inputTypesDir
-  buildConfig.input = buildConfig.input || inputFile
-
   try {
-    await compile(buildConfig)
+    await compile({
+      pkgRoot,
+      outDir,
+      outTypesDir,
+      inputDir,
+      inputTypesDir,
+      input: inputFile,
+      ...buildConfig,
+      packageName: targetName
+    })
 
-    log.green(`${name} 编译完成`)
+    log.green(`${targetName} 编译完成`)
   } catch (err: any) {
     log.errorAndExit(err)
   }

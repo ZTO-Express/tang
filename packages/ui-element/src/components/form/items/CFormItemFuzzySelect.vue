@@ -28,7 +28,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, watch, useAttrs, useCurrentAppInstance } from '@zto/zpage'
+import { computed, ref, useCurrentAppInstance } from '@zto/zpage'
 
 import { useFormItem } from '../util'
 
@@ -55,7 +55,9 @@ const props = withDefaults(
 const app = useCurrentAppInstance()
 const fieldRef = ref<any>()
 
-const { innerAttrs, allAttrs } = useFormItem(props)
+const { innerAttrs, allAttrs } = useFormItem(props, {
+  clearModelEmptyPropOnChange: true
+})
 
 // 注册微件事件监听
 app.useWidgetEmitter(allAttrs.value, {

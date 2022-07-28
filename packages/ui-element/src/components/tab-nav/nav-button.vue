@@ -56,10 +56,10 @@ function scrollNext() {
   top: 0;
 
   .icon-arrow {
-    border: 1px solid $primary;
+    border: 1px solid var(--primary);
     border-radius: 50%;
     padding: 2px;
-    color: $primary;
+    color: var(--primary);
     font-size: 12px;
   }
 

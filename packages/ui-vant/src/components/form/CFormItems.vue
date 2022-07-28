@@ -43,17 +43,14 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, tpl, _, useAppContext, useConfig, isWidgetEventKey } from '@zto/zpage'
+import { reactive, ref, computed, tpl, _, isWidgetEventKey, useCurrentAppInstance } from '@zto/zpage'
 
-import { getFormItemRules } from '../../utils/form'
+import { getFormItemRules, calcDynamicAttrs } from '../../utils/form'
 
 import CInputField from './CInputField.vue'
 import CTextField from './CTextField.vue'
 
 import type { FormItemConfig } from '../../utils/form'
-
-const { reactive, ref, computed } = vue
-const formItemsConfig = useConfig('components.formItems', {})
 
 const props = withDefaults(
   defineProps<{
@@ -75,7 +72,12 @@ const props = withDefaults(
   }
 )
 
-const context = useAppContext(props.model)
+const app = useCurrentAppInstance()
+
+const formItemsConfig = app.useComponentsConfig('formItems', {})
+const exFormRules = app.useComponentsConfig('form.rules')
+
+const context = app.useContext(props.model)
 
 // 所有字段的展开情况
 const itemExpanded = reactive<Record<string, boolean>>({})
@@ -85,7 +87,7 @@ const innerFormItems = computed<any>(() => {
   let formItems: FormItemConfig[] = []
 
   if (typeof props.items === 'function') {
-    formItems = props.items(context)
+    formItems = (props.items as Function)(context)
   } else {
     formItems = props.items || []
   }
@@ -93,8 +95,8 @@ const innerFormItems = computed<any>(() => {
   const items = formItems.map((item: any) => {
     let formItem = item
     if (typeof item === 'function') formItem = item(context)
-    if (typeof formItem.dynamicAttrs === 'function') {
-      const dynamicAttrs = formItem.dynamicAttrs(context)
+    if (formItem.dynamicAttrs) {
+      const dynamicAttrs = calcDynamicAttrs(formItem.dynamicAttrs, context)
       formItem = _.omit(formItem, ['dynamicAttrs'])
       formItem = _.deepMerge(formItem, dynamicAttrs)
     }
@@ -110,9 +112,8 @@ const innerFormItems = computed<any>(() => {
       getFormItemRules({
         ...formItem,
         rules: itemRules,
-        context: {
-          data: props.model
-        }
+        context: { data: props.model },
+        exFormRules
       }) || []
     if (!isRequired) {
       rules = rules.filter((r: any) => r.ruleName !== 'required')
@@ -120,7 +121,7 @@ const innerFormItems = computed<any>(() => {
 
     const it: any = {}
     // 移除微件事件Key，防止重复计算事件
-    Object.keys(formItem).forEach((key) => {
+    Object.keys(formItem).forEach(key => {
       if (!isWidgetEventKey(key)) it[key] = formItem[key]
     })
 

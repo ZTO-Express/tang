@@ -84,6 +84,7 @@ export interface ApiRequestAction {
   url?: string
   sourceType?: string
   mockData?: any
+  uniqueApiParamProp?: string
   [prop: string]: any
 }
 

@@ -1,29 +1,45 @@
 <template>
-  <el-popover v-bind="popoverAttrs" v-model:visible="isVisible" type="primary">
+  <template v-if="isReadonly">{{ innerText }}</template>
+  <el-popover
+    v-else
+    v-bind="popoverAttrs"
+    v-model:visible="isVisible"
+    type="primary"
+    trigger="manual"
+    :width="config.width"
+  >
     <div v-if="isVisible" class="body-content">
       <div class="title">{{ title }}</div>
-      <cmpt v-if="config.cmpt" :config="config.cmpt" :model="formModel" />
+      <cmpt v-if="config.cmpt" v-bind="cmptAttrs" :model="formModel" />
       <c-form v-else ref="formRef" v-bind="formAttrs" :actions="formActions" :model="formModel">
         <c-form-items ref="formItemsRef" v-bind="formItemsAttrs" :model="formModel" />
       </c-form>
     </div>
     <template #reference>
-      <span class="reference-content">
-        <span class="reference-text">{{ innerText }}</span>
+      <span class="reference-content" @click="isVisible = true">
         <span v-if="isShowIcon" class="reference-icon">
           <i v-if="config.icon" :class="config.icon" />
           <el-icon v-else><Edit /></el-icon>
         </span>
+        <span class="reference-text">{{ innerText }}</span>
       </span>
     </template>
   </el-popover>
+
+  <!-- mask -->
+  <!-- 模拟类弹窗 -->
+  <!-- 解决多个pop重叠问题，滚动z-index问题 -->
+  <!-- 会一直触发el-table的show-overflow-tooltip，稍微影响用户体验，采用teleport解决此问题 -->
+  <teleport v-if="isVisible" to="body">
+    <div class="pop-editor-mask" @click="isVisible = false"></div>
+  </teleport>
 </template>
 
 <script setup lang="ts">
-import { _, ref, computed, watch, useCurrentAppInstance } from '@zto/zpage'
+import { _, ref, computed, watch, useCurrentAppInstance, uuid, onMounted, onUnmounted } from '@zto/zpage'
 
 import { Edit } from '@element-plus/icons'
-import { getActionPayload } from '../../utils'
+import { appUtil } from '../../utils'
 
 const props = withDefaults(
   defineProps<{
@@ -51,23 +67,57 @@ const formRef = ref<any>()
 
 const isVisible = ref<boolean>(false)
 
+// 编辑权限
+const innerEditPerms = computed(() => {
+  const api = props.config?.api
+  const editPerm = props.config?.editPerm
+  const editPerms = props.config?.editPerms
+
+  if (editPerm == false) return null
+  if (editPerms) return editPerms
+  if (!editPerm) return null
+  if (_.isString(editPerm)) return [editPerm]
+  if (editPerm === true && api) return [api]
+  return null
+})
+
+// 只读
+const isReadonly = computed(() => {
+  return !app.checkPermission(innerEditPerms.value)
+})
+
 const innerText = computed(() => {
   return props.text || props.column.label || '编辑'
 })
 
 const popoverAttrs = computed(() => {
-  return props.popover && _.isObject(props.popover) ? props.popover : {}
+  const _attrs = props.popover && _.isObject(props.popover) ? props.popover : {}
+  if (!_attrs.placement) _attrs.placement = 'top'
+  return _attrs
 })
 
 const isShowIcon = computed(() => {
   return props.config.showIcon !== false
 })
 
+// 组件属性
+const cmptAttrs = computed(() => {
+  return {
+    prop: props.column?.prop || 'value',
+    column: props.column,
+    config: props.config?.cmpt,
+    onCancel: handleCancel,
+    onSubmit: handleSubmit
+  }
+})
+
+// 表单属性
 const formAttrs = computed(() => {
   const _formAttrs = _.pick(props.config, 'submitMethod', 'beforeSubmit', 'afterSubmit')
   return {
     span: 24,
     labelWidth: 200,
+    column: props.column,
     onCancel: handleCancel,
     onSubmit: handleSubmit,
     ..._formAttrs,
@@ -119,7 +169,7 @@ watch(
 
     if (props.config?.payload) {
       const context = app.useContext(props.scope?.row || props.model)
-      modelData = getActionPayload(props.config?.payload, context)
+      modelData = appUtil.getActionPayload(props.config?.payload, context)
     } else if (!modelData) {
       if (!props.scope?.row) {
         modelData = {}
@@ -161,11 +211,35 @@ function submit() {
     padding: 5px;
   }
 }
+.reference-content {
+  width: 100%;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .reference-icon {
   cursor: pointer;
   color: #3693ff;
   vertical-align: middle;
-  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.pop-editor-mask {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+</style>
+
+<!-- 全局 el-popper样式调整 -->
+<style lang="scss">
+.el-popper {
+  max-width: 800px;
 }
 </style>

@@ -5,14 +5,14 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useWidgetSchema } from '@zto/zpage'
-
-const { ref } = vue
+import { ref, useCurrentAppInstance } from '@zto/zpage'
 
 const props = defineProps<{
   schema: Record<string, any>
 }>()
 
+const app = useCurrentAppInstance()
+
 // schema
-const wSchema = await useWidgetSchema(props.schema)
+const wSchema = app.useWidgetSchema(props.schema)
 </script>

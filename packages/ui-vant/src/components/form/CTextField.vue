@@ -18,12 +18,10 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
+import { ref, computed } from '@zto/zpage'
 import Tooltip from './tooltip.vue'
 
 import type { GenericFunction } from '@zto/zpage'
-
-const { ref, computed } = vue
 
 const props = withDefaults(
   defineProps<{

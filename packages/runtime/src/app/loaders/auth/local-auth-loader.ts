@@ -1,5 +1,4 @@
 import { AppLoaderType } from '../../../consts'
-import { resetToken, refreshToken, clearTokenData } from '../../../utils'
 
 import type { AppAuthLoader, NavMenuItem } from '../../../typings'
 import type { App } from '../../App'
@@ -23,7 +22,7 @@ export const LocalAuthLoader: AppAuthLoader = {
         token = router?.currentRoute.value?.query?.token
       }
 
-      if (token) await refreshToken(token)
+      if (token) await app.token.refresh(token)
     }
   },
 
@@ -31,7 +30,7 @@ export const LocalAuthLoader: AppAuthLoader = {
   async getUserInfo(app: App) {
     const { authApi } = app.apis
     // 先重设token
-    await resetToken()
+    await app.token.reset()
 
     const res = await authApi.getUserInfo!()
 
@@ -50,7 +49,7 @@ export const LocalAuthLoader: AppAuthLoader = {
     if (authApi.logout) {
       authApi.logout()
     } else {
-      await clearTokenData()
+      await app.token.clearData()
     }
   }
 }

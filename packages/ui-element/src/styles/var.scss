@@ -1,0 +1,62 @@
+@import './variables.scss';
+@import './theme.scss';
+
+:root {
+  --primary: #{$primary};
+  --secondary: #{$secondary};
+  --tertiary: #{$tertiary};
+
+  --positive: #{$positive};
+  --negative: #{$negative};
+  --info: #{$info};
+  --warning: #{$warning};
+  --error: #{$negative};
+  --danger: #{$negative};
+  --active: #{$active};
+
+  --light: #{$light};
+  --dark: #{$dark};
+  --faded: #{$faded};
+  --grey: #{$grey};
+  --black: #{$black};
+  --white: #{$white};
+  --red: #{$red};
+
+  --bg-color: #{$bg-color};
+  --bg-disabled: #{$bg-disabled};
+
+  --panel-color: #{$panel-color};
+  --tip-color: #{$tip-color};
+  --link-color: #{$link-color};
+  --legend-color: #{$legend-color};
+
+  --title-color: #{$title-color};
+  --title-bg-color: #{$title-bg-color};
+
+  --border-color: #{$border-color};
+  --light-border-color: #{$light-border-color};
+  --border-radius: #{$border-radius};
+  --border-radius-sm: #{$border-radius-sm};
+  --border-radius-md: #{$border-radius-md};
+
+  --section-color: #{$section-color};
+  --section-gutter: #{$section-gutter};
+  --section-padding: #{$section-padding};
+
+  --form-light: #{$form-light};
+  --form-dark: #{$form-dark};
+  --form-autofill: #{$form-autofill};
+
+  --app-bg-color: #{$app-bg-color};
+  --app-header-height: #{$app-header-height};
+  --app-nav-height: #{$app-nav-height};
+  --app-sidebar-width: #{$app-sidebar-width};
+  --app-page-height: #{$app-page-height};
+  --app-page-min-width: #{$app-page-min-width};
+  --app-progress-color: #{$app-progress-color};
+
+  --text-color: #{$text-color};
+  --primary-color: #{$primary-color};
+  --select-shadow: #{$select-shadow};
+  --selected-shadow: #{$selected-shadow};
+}

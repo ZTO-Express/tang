@@ -62,7 +62,7 @@ function handleDownloadsClick() {
 <style lang="scss">
 .app-header-extra {
   display: flex;
-  height: $app-header-height;
+  height: var(--app-header-height);
   padding-right: 20px;
 
   & > div {

@@ -8,23 +8,12 @@ export const Entry = defineComponent({
   components: { Widget },
 
   props: {
-    schema: {
-      type: Object,
-      default: () => ({})
-    }
+    schema: { type: Object, default: () => ({}) }
   },
 
   setup(props: any) {
     return () => {
-      return h(
-        'div',
-        {
-          class: {
-            'w-entry': true
-          }
-        },
-        h(Widget, { schema: props.schema })
-      )
+      return h('div', { class: { 'w-entry': true } }, h(Widget, { schema: props.schema }))
     }
   }
 })

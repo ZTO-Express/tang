@@ -72,18 +72,19 @@ export interface AppState {
 }
 
 export interface AppGetters extends _GettersTree<AppState> {
-  submodule: (state: AppState) => Submodule | undefined
-  submodules: (state: AppState) => Submodule[]
+  submodule(state: AppState): Submodule | undefined
+  submodules(state: AppState): Submodule[]
 }
 
 export interface AppActions {
-  set: (payload: Record<string, any>) => void
-  setLoaded: (loaded: boolean) => void
-  setNavMenu: (payload: any) => void
-  setData: (payload: SetDataOptions) => void
-  init: (payload: { appId?: string; default?: string; submodules?: Submodule[] }) => void
-  load: (options?: Record<string, any>) => Promise<void>
-  changeSubmodule: (payload: any) => Promise<void>
+  set(payload: Record<string, any>): void
+  setLoaded(loaded: boolean): void
+  setNavMenu(payload: any): void
+  setData(payload: SetDataOptions): void
+  getData<T = any>(path?: string): T | undefined
+  init(payload: { appId?: string; default?: string; submodules?: Submodule[] }): void
+  load(options?: Record<string, any>): Promise<void>
+  changeSubmodule(payload: any): Promise<void>
 }
 
 export type UserStore = Store<string, UserState, UserGetters, UserActions>
@@ -104,9 +105,10 @@ export interface UserState {
 export interface UserGetters extends _GettersTree<UserState> {}
 
 export interface UserActions {
-  set: (payload: Record<string, any>) => void
-  setData: (payload: SetDataOptions) => void
-  load: (payload: Record<string, any>) => Promise<void>
+  set(payload: Record<string, any>): void
+  setData(payload: SetDataOptions): void
+  getData<T = any>(path?: string): T | undefined
+  load(payload: Record<string, any>): Promise<void>
 }
 
 export type PagesStore = Store<string, PagesState, PagesGetters, PagesActions>
@@ -136,22 +138,24 @@ export interface PagesState {
 }
 
 export interface PagesGetters extends _GettersTree<PagesState> {
-  currentPage: (state: PagesState) => { key: string; data: Record<string, any> }
-  navPages: (state: PagesState) => PageInfo[]
+  currentPage(state: PagesState): { key: string; data: Record<string, any> }
+  navPages(state: PagesState): PageInfo[]
 }
 
 export interface PagesActions {
-  setCurrent: (pageKey: string) => void
-  setDefaults: (pages: PageInfo[]) => void
-  addVisited: (page: PageInfo) => void
-  addCurrentVisited: (payload: { route?: any; redirect?: boolean }) => Promise<void>
-  removeVisited: (page: PageInfoData) => void
-  removeVisitedOthers: (page: PageInfoData) => void
-  removeCurrentVisited: (page: PageInfoData) => Promise<boolean>
-  pruneVisited: (submodule: string) => void
-  pruneCurrentVisited: (payload?: { submodule?: string; redirect?: boolean }) => void
-  addTemp: (menu: NavMenuItem) => void
-  removeTemp: (page: PageInfoData) => Promise<void>
-  setPageData: (pageKey: string, payload: SetDataOptions) => void
-  setCurrentPageData: (options: SetDataOptions) => void
+  setCurrent(pageKey: string): void
+  setDefaults(pages: PageInfo[]): void
+  addVisited(page: PageInfo): void
+  addCurrentVisited(payload: { route?: any; redirect?: boolean }): Promise<void>
+  removeVisited(page: PageInfoData): void
+  removeVisitedOthers(page: PageInfoData): void
+  removeCurrentVisited(page: PageInfoData): Promise<boolean>
+  pruneVisited(submodule: string): void
+  pruneCurrentVisited(payload?: { submodule?: string; redirect?: boolean }): void
+  addTemp(menu: NavMenuItem): void
+  removeTemp(page: PageInfoData): Promise<void>
+  setPageData(pageKey: string, payload: SetDataOptions): void
+  getPageData<T = any>(pageKey: string, path?: string): T | undefined
+  setCurrentPageData(options: SetDataOptions): void
+  getCurrentPageData<T = any>(path?: string): T | undefined
 }

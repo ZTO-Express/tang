@@ -9,9 +9,11 @@
 </template>
 
 <script setup lang="ts">
-import { useAppRouter } from '@zto/zpage'
+import { useCurrentAppInstance } from '@zto/zpage'
 
-const router = useAppRouter()
+const app = useCurrentAppInstance()
+
+const router = app.router
 
 function handleLink() {
   router.goHome()

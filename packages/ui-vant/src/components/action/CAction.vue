@@ -7,14 +7,10 @@
 </template>
 
 <script setup lang="ts">
-import { vue, _, useAppRouter, useApiRequest, useAppContext, useApi, emitter, tpl } from '@zto/zpage'
+import { computed, ref, useAttrs, _, tpl, useCurrentAppInstance } from '@zto/zpage'
 import { useMessage } from '../../composables'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
-
-const { computed, ref, useAttrs } = vue
-
-const router = useAppRouter()
 
 const props = withDefaults(
   defineProps<{
@@ -49,9 +45,15 @@ const props = withDefaults(
 )
 
 const attrs = useAttrs()
-const { MessageBox, Message } = useMessage()
-const apiRequest = useApiRequest()
-const fsApi = useApi('fs')
+
+const app = useCurrentAppInstance()
+
+const router = app.router
+const emitter = app.emitter
+const apiRequest = app.request
+const { fsApi } = app.apis
+
+const { MessageBox, Message } = app.useMessage()
 
 const formDialogRef = ref<any>()
 const dialogRef = ref<any>()
@@ -59,7 +61,7 @@ const importRef = ref<any>()
 
 const formModel = ref(props.form?.model || props.payload || {})
 
-const context = useAppContext(formModel)
+const context = app.useContext(formModel)
 
 const buttonAttrs = computed(() => {
   const actionName = props.name
@@ -74,14 +76,14 @@ const buttonAttrs = computed(() => {
 const isVisible = computed(() => {
   if (!props.visibleOn) return props.visible !== false
 
-  const context = useAppContext(props.contextData || formModel)
+  const context = app.useContext(props.contextData || formModel)
   return tpl.evalExpression(props.visibleOn, context)
 })
 
 const isDisabled = computed(() => {
   if (!props.disabledOn) return props.disabled === true
 
-  const context = useAppContext(props.contextData || formModel)
+  const context = app.useContext(props.contextData || formModel)
   return tpl.evalExpression(props.disabledOn, context)
 })
 
@@ -159,7 +161,7 @@ async function trigger() {
     dialogRef.value.show()
   } else if (actionType === 'download' || props.link) {
     // 执行下载
-    await fsApi.downloadFile(props.link, attrs)
+    await fsApi.downloadFile!(props.link, attrs)
   } else if (actionType === 'link' || props.link) {
     // 执行弹框活动
     await router.goto(props.link)
@@ -186,13 +188,11 @@ async function trigger() {
 
     msgConfig.title = msgConfig.title || '提示'
 
-    msgConfig = Object.assign(
-      {
-        cancelButtonText: '取消',
-        confirmButtonText: '确定'
-      },
-      msgConfig
-    )
+    msgConfig = {
+      cancelButtonText: '取消',
+      confirmButtonText: '确定',
+      ...msgConfig
+    }
 
     if (props.api) {
       return MessageBox(msgConfig).then(async () => {
@@ -226,7 +226,7 @@ async function doApiRequest(payload: any) {
   let params: any = undefined
 
   if (payload) {
-    const context = useAppContext(props.contextData)
+    const context = app.useContext(props.contextData)
     params = tpl.deepFilter(payload, context)
   } else {
     params = props.contextData

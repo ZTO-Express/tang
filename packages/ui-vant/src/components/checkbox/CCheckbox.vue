@@ -44,12 +44,10 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, _, tpl, useApiRequest, useAppContext } from '@zto/zpage'
+import { ref, watch, computed, useAttrs, _, tpl, useCurrentAppInstance } from '@zto/zpage'
 import { Checkbox, CheckboxGroup, Radio, RadioGroup } from 'vant'
 
 import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
-
-const { ref, watch, computed, useAttrs } = vue
 
 const props = withDefaults(
   defineProps<{
@@ -78,8 +76,10 @@ const props = withDefaults(
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
+const app = useCurrentAppInstance()
+
 const attrs = useAttrs()
-const apiRequest = useApiRequest()
+const apiRequest = app.request
 
 const innerOptions = ref<any[]>([])
 const innerValue: any = ref()
@@ -134,7 +134,7 @@ function handleChange(val: any) {
 
 // 获取options数据
 async function fetchOptions() {
-  const context = useAppContext()
+  const context = app.useContext()
 
   let optionsData: any = props.options || []
 
@@ -156,7 +156,7 @@ async function fetchOptions() {
   const valueProp = props.valueProp
   const optionValueProp = props.optionValueProp
   if (valueProp) {
-    const vals = innerOptions.value.filter((v) => !!v[valueProp]).map((it) => it[optionValueProp])
+    const vals = innerOptions.value.filter(v => !!v[valueProp]).map(it => it[optionValueProp])
 
     if (props.inputType === 'radio') {
       innerValue.value = vals[0] || ''

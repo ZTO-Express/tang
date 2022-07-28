@@ -13,8 +13,9 @@ export default defineComponent({
       const app = useCurrentAppInstance()
 
       if (!props.html) return ''
-      const html = app.deepFilter(props.html, props.contextData || {})
-      return renderHtml(html)
+
+      const context = app.useContext(props.contextData)
+      return renderHtml(props.html, context)
     }
   }
 })

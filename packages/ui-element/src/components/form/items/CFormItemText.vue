@@ -18,7 +18,6 @@ const props = withDefaults(
     model: Record<string, any>
     prop: string
     tpl?: string
-    html?: string
     formatter?: string | Record<string, any> | GenericFunction
     emptyText?: string
     style?: Record<string, any>

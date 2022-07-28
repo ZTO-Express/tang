@@ -1,0 +1,29 @@
+{
+  "name": "@zto/zpage-site-base",
+  "version": "0.1.0",
+  "description": "开天平台站点基础库",
+  "main": "index.js",
+  "module": "dist/zpage-site-base.esm.js",
+  "types": "src/index.ts",
+  "files": [
+    "index.js",
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "sucrase-node ../../scripts/build --name=site-base",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@zto/zpage": "workspace:^",
+    "@zto/zpage-ui-element": "workspace:^",
+    "echarts": "^5.2.2",
+    "sha1": "^1.1.1",
+    "xlsx": "^0.17.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

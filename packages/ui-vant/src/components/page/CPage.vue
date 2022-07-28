@@ -12,9 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useConfig } from '@zto/zpage'
-
-const { computed, useSlots } = vue
+import { computed, useSlots, useCurrentAppInstance } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
@@ -32,8 +30,10 @@ const props = withDefaults(
 
 const slots = useSlots()
 
+const app = useCurrentAppInstance()
+
 // 获取全局配置
-const pageConfig = useConfig('CPage')
+const pageConfig = app.useComponentsConfig('page')
 
 // 是否显示页面头部
 const isHeader = computed(() => props.title || !!slots.header)

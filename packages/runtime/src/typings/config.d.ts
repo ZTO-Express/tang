@@ -1,10 +1,19 @@
 import type { AxiosRequestConfig } from 'axios'
-import type { AppApi, AppFsApi, AppPageLoader, AppAuthLoader, AppAuthApi, AppStartOptions } from './app'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
 
 import type { PartialPageSchema } from '@zto/zpage-core'
 import type { HttpRequest, HttpRequestConfig } from '../utils'
 import type { App } from '../app/App'
 import type { ApiRequest, RuntimeConfig } from './runtime'
+import type {
+  AppApi,
+  AppFsApi,
+  AppPageLoader,
+  AppAuthLoader,
+  AppAuthApi,
+  AppStartOptions,
+  NavMenuItemConfig
+} from './app'
 
 /** 应用配置 */
 export interface AppConfig extends RuntimeConfig {
@@ -32,7 +41,9 @@ export interface AppAppApiConfig<T extends AppApi = AppApi> extends AppApiConfig
 
 export interface AppAppMenuConfig {
   showNav?: boolean
+  maxNavs?: number
   items?: NavMenuItemConfig[]
+  displayedSubmodules?: string[] // 显示的子模块
 }
 
 export interface AppAppPageConfig {
@@ -48,6 +59,23 @@ export interface AppAppAuthConfig {
   }
 }
 
+// 微应用激活规则
+export type MicroAppActiveRule = string | ((route: RouteLocationNormalizedLoaded, app: App) => boolean) // 激活规则
+
+/** 单个微应用配置 */
+export interface MicroAppConfig {
+  name: string
+  activeRule: MicroAppActiveRule
+  type?: 'meta' | 'qiankun' // 元数据模式，乾坤模式(默认meta模式)
+  entry?: string // 元数据模式下的入口
+  container?: string // 乾坤模式下的容器
+}
+
+/** 微应用相关配置 */
+export interface AppMicroConfig {
+  apps?: MicroAppConfig[]
+}
+
 export interface AppAppConfig {
   title?: string
   frame?: AppAppFrameConfig
@@ -55,6 +83,7 @@ export interface AppAppConfig {
   header?: AppAppHeaderConfig
   page?: AppAppPageConfig
   auth?: AppAppAuthConfig
+  exContext?: Record<string, any> // 扩展上下文
   onLoad?: (app: App, options: AppStartOptions) => Promise<void> | void
   onUnload?: (app: App) => Promise<void> | void
 }
@@ -117,8 +146,8 @@ export type AppApiDefinition<T extends AppApi = AppApi> = AppApiConfig<T> | UseA
 
 /** 应用Apis */
 export interface AppApisDefinition {
-  app: AppApiDefinition
-  fs: AppApiDefinition<AppFsApi>
-  auth: AppApiDefinition<AppAuthApi>
+  app?: AppApiDefinition
+  fs?: AppApiDefinition<AppFsApi>
+  auth?: AppApiDefinition<AppAuthApi>
   [prop: string]: AppApiDefinition
 }

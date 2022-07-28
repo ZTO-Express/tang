@@ -114,7 +114,7 @@ async function handleTabRemove(tab: any, event: MouseEvent) {
 
 <style lang="scss" scoped>
 .app-nav {
-  height: $app-nav-height;
+  height: var(--app-nav-height);
   background: white;
 
   &__header {

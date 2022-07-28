@@ -18,7 +18,7 @@ import type { AppStartOptions, NavMenuItemConfig } from '../../typings'
 export const getInnerStartOptions = (): Partial<AppStartOptions> => {
   return {
     container: DEFAULT_CONATINER_EL,
-    env: {},
+    env: { name: 'prod' },
     config: {
       app: {
         frame: {},

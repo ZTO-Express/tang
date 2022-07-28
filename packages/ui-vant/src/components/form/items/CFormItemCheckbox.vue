@@ -17,8 +17,8 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, useWidgetEmitter } from '@zto/zpage'
-const { ref, useAttrs } = vue
+import { ref, useAttrs, useCurrentAppInstance } from '@zto/zpage'
+
 const props = withDefaults(
   defineProps<{
     model: Record<string, any>
@@ -35,11 +35,13 @@ const props = withDefaults(
   }
 )
 
+const app = useCurrentAppInstance()
+
 const attrs = useAttrs()
 const fieldRef = ref()
 
 // 注册微件事件监听
-useWidgetEmitter(attrs, {
+app.useWidgetEmitter(attrs, {
   fetchOn: doFetch
 })
 

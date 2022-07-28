@@ -230,7 +230,10 @@ export function definePagesStore(app: App) {
         const router = app.router
         if (!router) return
 
-        const submodule = appStore.submodule
+        let submodule = appStore.submodule
+        if (menu.submodule) {
+          submodule = appStore.submodules.find(it => it.name === menu.submodule)
+        }
 
         if (!submodule) throw new Error('无法获取当前子模块，请检查当前模块是否加载成功')
 
@@ -266,6 +269,15 @@ export function definePagesStore(app: App) {
         this.datas = pageDatas
       },
 
+      // 获取页面数据
+      getPageData(pageKey: string, path?: string) {
+        if (!pageKey) return
+        const datas = this.datas || {}
+
+        if (!path) return datas[pageKey]
+        return _.get(datas[pageKey], path)
+      },
+
       setCurrentPageData(payload: SetDataOptions) {
         const router = app.router
         if (!router) return
@@ -274,6 +286,16 @@ export function definePagesStore(app: App) {
         if (!pageKey) return
 
         this.setPageData(pageKey, { ...payload })
+      },
+
+      getCurrentPageData(path?: string) {
+        const router = app.router
+        if (!router) return
+
+        const pageKey = router.getCurrentPageKey()
+        if (!pageKey) return
+
+        return this.getPageData(pageKey, path)
       }
     }
   })

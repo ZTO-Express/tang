@@ -1,8 +1,9 @@
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
+import { _ } from './util'
 
 import type { OpUnitType, QUnitType } from 'dayjs'
-import type { DateValue } from '@zto/zpage-core'
+import type { DateValue } from '../typings'
 
 type DateFormatType = 'date' | 'full' | 'normal' | 'simple' | 'normal_simple'
 
@@ -76,15 +77,41 @@ export function simpleFormat(dateVal?: DateValue, withTime?: boolean): string {
 
 /**
  * 解析日期字符串
- * @param str 字符串
+ * @param val 字符串
  * @param format 格式
  * @param locale 本地化语言（需要导入dayjs语言）
  * @param strict 严格模式（要求格式和输入内容完全匹配，包括分隔符）
  * @returns
  */
-export function parse(str: string, format?: string, locale?: string, strict?: boolean): Date {
-  if (!str) {
-    return new Date('')
+export function parse(val: string | Date, format?: string, locale?: string, strict?: boolean): Date {
+  if (!_.isString(val)) return new Date(val)
+
+  const str = val.trim()
+
+  if (!str) return new Date('')
+
+  switch (str) {
+    case 'now':
+    case 'today':
+      return new Date()
+    case 'yestoday':
+      return dayjs().subtract(1, 'day').toDate()
+  }
+
+  if (str.startsWith('last')) {
+    let duNum = 1
+
+    const units = ['Day', 'Week', 'Month', 'Quarter', 'Year']
+    const unit = (units.find(u => str.includes(u)) || 'Day').toLocaleLowerCase()
+
+    if (str.endsWith('s')) {
+      const duNumStr = str.substring(4, str.length - unit.length - 1)
+      duNum = parseInt(duNumStr, 10)
+    }
+
+    return dayjs()
+      .subtract(duNum, unit as any)
+      .toDate()
   }
 
   const date = dayjs(str, format, locale, strict).toDate()

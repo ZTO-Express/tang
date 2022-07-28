@@ -2,7 +2,7 @@
   <c-dialog ref="dialogRef" class="c-downloads-dialog" v-bind="dialogAttrs">
     <widget :schema="listSchema"></widget>
     <template #footer>
-      <el-button @click="close">关闭</el-button>
+      <el-button v-preventReclick @click="close">关闭</el-button>
     </template>
   </c-dialog>
 </template>

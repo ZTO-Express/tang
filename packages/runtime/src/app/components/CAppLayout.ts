@@ -16,20 +16,14 @@ export default defineComponent({
     return () =>
       h(
         'div',
-        {
-          class: 'c-app fs'
-        },
+        { class: 'c-app fs' },
         h(RouterView, ({ Component }: any) =>
           !Component
             ? h('div')
             : h(Transition, { mode: 'out-in' }, () =>
                 h(
                   KeepAlive,
-                  {
-                    'keep-alive-props': {
-                      include: cachedPageKeys
-                    }
-                  },
+                  { 'keep-alive-props': { include: cachedPageKeys } },
                   h(
                     Suspense,
                     {},

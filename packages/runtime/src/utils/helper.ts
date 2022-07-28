@@ -9,7 +9,10 @@ import { simpleCompare } from './sort'
 import { evalExpression } from './tpl'
 import { isPureVariable, resolveVariable, resolveVariableAndFilter } from './tpl-builtin'
 
-import type { GenericFunction } from '@zto/zpage-core'
+import type { GenericFunction } from '../typings'
+
+// 方法属性名
+export type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T]
 
 export function isObject(obj: any) {
   const typename = typeof obj
@@ -351,11 +354,10 @@ export function immutableExtends(to: any, from: any, deep = false) {
 }
 
 /** 将上下文指定的方法绑定到当前上下文 */
-export const bulkBindFunctions = function <
-  T extends {
-    [propName: string]: any
-  }
->(context: T, funNames: Array<FunctionPropertyNames<T>>) {
+export function bulkBindFunctions<T extends { [propName: string]: any }>(
+  context: T,
+  funNames: Array<FunctionPropertyNames<T>>
+) {
   funNames.forEach(key => (context[key] = context[key].bind(context)))
 }
 
@@ -686,12 +688,16 @@ export function getPageKey(page: any) {
       path = pathData.path
 
       if (pathData.queryStr) {
-        query = Object.assign({}, pathData.query, query)
+        query = { ...pathData.query, ...query }
       }
 
-      qstr = qs.stringify(query, {
-        sort: simpleCompare
-      })
+      // 移除特殊参数
+      const qryObj = Object.keys(query).reduce((obj: any, key: string) => {
+        if (key && !key.startsWith('__')) obj[key] = query[key]
+        return obj
+      }, {} as any)
+
+      qstr = qs.stringify(qryObj, { sort: simpleCompare })
     }
   }
 
@@ -965,61 +971,6 @@ export function object2formData(
   fileObjects.forEach((fileObject: any[]) => fd.append(fileObject[0], fileObject[1], fileObject[1].name))
 
   return fd
-}
-
-/** 动态加载脚本 */
-export function loadScript(src: string) {
-  return new Promise<void>((ok, fail) => {
-    const script = document.createElement('script')
-    script.onerror = reason => fail(reason)
-
-    if (~src.indexOf('{{callback}}')) {
-      const callbackFn = `loadscriptcallback_${uuid()}`
-      ;(window as any)[callbackFn] = () => {
-        ok()
-        delete (window as any)[callbackFn]
-      }
-      src = src.replace('{{callback}}', callbackFn)
-    } else {
-      script.onload = () => ok()
-    }
-
-    script.src = src
-    document.head.appendChild(script)
-  })
-}
-
-let scrollbarWidth: number
-
-/**
- * 获取浏览器滚动条宽度 https://stackoverflow.com/a/13382873
- */
-
-export function getScrollbarWidth() {
-  if (typeof scrollbarWidth !== 'undefined') {
-    return scrollbarWidth
-  }
-  // Creating invisible container
-  const outer = document.createElement('div')
-  outer.style.visibility = 'hidden'
-  outer.style.overflow = 'scroll' // forcing scrollbar to appear
-  // @ts-ignore
-  outer.style.msOverflowStyle = 'scrollbar' // needed for WinJS apps
-  document.body.appendChild(outer)
-
-  // Creating inner element and placing it in the container
-  const inner = document.createElement('div')
-  outer.appendChild(inner)
-
-  // Calculating difference between container's full width and the child width
-  scrollbarWidth = outer.offsetWidth - inner.offsetWidth
-
-  // Removing temporary elements from the DOM
-  if (outer.parentNode) {
-    outer.parentNode.removeChild(outer)
-  }
-
-  return scrollbarWidth
 }
 
 function resolveValueByName(data: any, name?: string) {

@@ -1,6 +1,6 @@
-import { fileUtil, useApi } from '@zto/zpage'
+import { fileUtil } from '@zto/zpage'
 
-import { UploadData, UploadStatus } from './types'
+import type { UploadData, UploadStatus } from './types'
 
 export const RescMimeTypes = {
   image: 'image/*',
@@ -104,18 +104,6 @@ export async function getFileThumbnail(file: File): Promise<string> {
   let url = await readFileAsDataUrl(file)
 
   return url
-}
-
-export async function getUploadToken() {
-  const fsApi = useApi('fs')
-  const res = await fsApi.getUploadToken()
-  return res && res.token
-}
-
-export async function getFileUrls(paths: string[]) {
-  const fsApi = useApi('fs')
-  const urls = await fsApi.getFileUrls(paths)
-  return urls
 }
 
 // 文件已经准备好上传

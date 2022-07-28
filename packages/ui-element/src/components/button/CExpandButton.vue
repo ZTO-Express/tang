@@ -1,5 +1,5 @@
 <template>
-  <el-button v-perm="$attrs.perms" :type="buttonType" :size="size" @click="handleClick">
+  <el-button v-preventReclick v-perm="$attrs.perms" :type="buttonType" :size="size" @click="handleClick">
     <slot>
       {{ isExpanded ? hideLabelText || '收起' : expandLabelText || '展开' }}
     </slot>

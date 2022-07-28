@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
+import { ref } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
@@ -14,8 +14,6 @@ const props = withDefaults(
   }>(),
   {}
 )
-
-const { ref } = vue
 
 const showPopover = ref<boolean>(false)
 </script>

@@ -22,9 +22,12 @@ export function defineAppStores(app: App) {
 
 /** 定义并应用appStores */
 export function defineAndUseAppStores(app: App): AppStores {
+  const hostApp = app.useHostApp()
+
   const { useAppStore, useUserStore, usePagesStore } = defineAppStores(app)
 
-  const appStore = useAppStore(app.pinia)
+  const appStore = app.applyStore(useAppStore)
+
   appStore.$subscribe(
     () => {
       app.flushContext(FlushAppContextType.APP)
@@ -32,7 +35,10 @@ export function defineAndUseAppStores(app: App): AppStores {
     { detached: true }
   )
 
-  const userStore = useUserStore(app.pinia)
+  /** 只关联主应用userStore */
+  let userStore = hostApp.stores?.userStore
+  if (!userStore) userStore = app.applyStore(useUserStore)
+
   userStore.$subscribe(
     () => {
       app.flushContext(FlushAppContextType.USER)
@@ -40,7 +46,7 @@ export function defineAndUseAppStores(app: App): AppStores {
     { detached: true }
   )
 
-  const pagesStore = usePagesStore(app.pinia)
+  const pagesStore = app.applyStore(usePagesStore)
   pagesStore.$subscribe(
     () => {
       app.flushContext(FlushAppContextType.PAGE)

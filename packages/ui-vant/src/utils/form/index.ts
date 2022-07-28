@@ -1,36 +1,33 @@
-import { _ } from '@zto/zpage'
-import { allRules } from './rules'
+import { tpl } from '@zto/zpage'
+import { innerRules } from './rules'
 
 import type { FormItemConfig } from './types'
 
 export type { FormItemConfig }
-
-export { allRules }
 
 /**
  * 从formItem配置中获取规则
  */
 export function getFormItemRules(config: any) {
   const cfgRules = config.rules || []
+  // 扩展规则
+  const exFormRules = config.exFormRules || {}
 
-  if (config.type === 'uploaders') {
-    if (config.required) {
-      mergeRule('uploadersRequired', cfgRules, { validator: uploadersRequiredValidator, config })
-    }
-  } else {
-    if (config.required) {
-      const messagePrefix = config.validatorMessagePrefix || /(s|S)elect$/.test(config.type) ? '请选择' : '请输入'
-      mergeRule('required', cfgRules, { label: config.label, messagePrefix })
-    }
-
-    if (config.minlength) {
-      mergeRule('minlength', cfgRules, { minlength: config.minlength, label: config.label })
-    }
-
-    if (config.maxlength) {
-      mergeRule('maxlength', cfgRules, { maxlength: config.maxlength, label: config.label })
-    }
+  if (config.required) {
+    const messagePrefix = config.messagePrefix || /(s|S)elect$/.test(config.type) ? '请选择' : '请输入'
+    mergeRule('required', cfgRules, { label: config.label, messagePrefix })
   }
+
+  if (config.minlength) {
+    mergeRule('minlength', cfgRules, { minlength: config.minlength, label: config.label })
+  }
+
+  if (config.maxlength) {
+    mergeRule('maxlength', cfgRules, { maxlength: config.maxlength, label: config.label })
+  }
+
+  /** 外部注册规则 */
+  const allRules = { ...innerRules, ...exFormRules }
 
   const rules = cfgRules.map((it: any) => {
     if (it.ruleName) {
@@ -42,23 +39,6 @@ export function getFormItemRules(config: any) {
   })
 
   return rules
-}
-
-/** 获取文件上传组验证规则 */
-export function uploadersRequiredValidator(val: any, rule: any) {
-  const config = rule.config || {}
-  const model = rule.context?.data || {}
-
-  const errorItems = (config.items || [] || []).filter((it: any) => {
-    const isRequried = it.required || (config.required && it.required !== false)
-    return isRequried && _.isEmpty(model[it.prop])
-  })
-
-  if (!errorItems.length) return true
-
-  const errorLabels = errorItems.map((it: any) => it.label)
-
-  return `请上传 “${errorLabels.join()}”`
 }
 
 // 合并规则
@@ -82,4 +62,19 @@ export function findFormItem(prop: string, formItems: FormItemConfig[]) {
   let index = formItems.length
   while (index-- && formItems[index].prop !== prop);
   return { index, item: formItems[index] }
+}
+
+/** 计算动态属性 */
+export function calcDynamicAttrs(dynamicAttrs: any, context: any) {
+  let _attrs: any = {}
+
+  if (typeof dynamicAttrs === 'function') {
+    _attrs = dynamicAttrs(context)
+  } else if (typeof dynamicAttrs === 'object') {
+    _attrs = tpl.deepFilter(dynamicAttrs, context)
+  } else if (typeof dynamicAttrs === 'string') {
+    _attrs = tpl.evalExpression(dynamicAttrs, context)
+  }
+
+  return _attrs
 }

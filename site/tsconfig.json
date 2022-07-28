@@ -1,0 +1,17 @@
+{
+  "extends": "../packages/site-base/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@zto/zpage": ["../packages/zpage/src"],
+      "@zto/zpage-core": ["../packages/core/src"],
+      "@zto/zpage-ffb": ["../packages/ffb/src"],
+      "@zto/zpage-runtime": ["../packages/runtime/src"],
+      "@zto/zpage-ui-element": ["../packages/ui-element/src"],
+      "@zto/zpage-site-base": ["../packages/site-base/src"],
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "exclude": ["./node_modules", "./dist"]
+}

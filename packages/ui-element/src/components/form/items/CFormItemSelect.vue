@@ -73,7 +73,9 @@ const app = useCurrentAppInstance()
 
 const context = app.useContext(props.model)
 
-const { innerAttrs } = useFormItem(props)
+const { innerAttrs } = useFormItem(props, {
+  clearModelEmptyPropOnChange: true
+})
 
 const groupLabels = ref<any[]>([])
 

@@ -8,10 +8,8 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue } from '@zto/zpage'
+import { ref, useAttrs } from '@zto/zpage'
 import { Switch as VanSwitch } from 'vant'
-
-const { ref, useAttrs } = vue
 
 const props = withDefaults(
   defineProps<{

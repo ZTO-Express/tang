@@ -10,8 +10,10 @@
       <div class="c-error-page__title">{{ errorInfo.description }}</div>
       <div class="c-error-page__tip">{{ errorInfo.message }}</div>
       <div class="c-error-page__action">
-        <el-button v-if="linkLabel" type="primary" size="small" @click="handleLink">{{ linkLabel }}</el-button>
-        <el-button v-if="isLogged" size="small" @click="handleLogout">{{ logoutLabel }}</el-button>
+        <el-button v-if="linkLabel" type="primary" size="small" v-preventReclick @click="handleLink">
+          {{ linkLabel }}
+        </el-button>
+        <el-button v-if="isLogged" size="small" v-preventReclick @click="handleLogout">{{ logoutLabel }}</el-button>
       </div>
     </div>
   </div>
@@ -98,7 +100,7 @@ function handleLogout() {
   display: flex;
   text-align: center;
   flex-direction: column;
-  background: $bg-color;
+  background: var(--bg-color);
   padding: 20px;
   height: 100%;
 
@@ -122,11 +124,11 @@ function handleLogout() {
     font-weight: 700;
     font-size: 16px;
     margin-top: 24px;
-    color: $title-color;
+    color: var(--title-color);
   }
 
   &__tip {
-    color: $tip-color;
+    color: var(--tip-color);
   }
 
   &__action {

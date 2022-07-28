@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAppRouter } from '@zto/zpage'
+import { useCurrentAppInstance } from '@zto/zpage'
 
 const props = defineProps<{
   bgPic?: string
@@ -28,7 +28,9 @@ const props = defineProps<{
 
 const emit = defineEmits(['link'])
 
-const router = useAppRouter()
+const app = useCurrentAppInstance()
+
+const router = app.router
 
 function handleLink() {
   if (props.link) router.goto(props.link)
@@ -41,7 +43,7 @@ function handleLink() {
   display: flex;
   text-align: center;
   flex-direction: column;
-  background: $bg-color;
+  background: var(--bg-color);
   padding: 20px;
   height: 100%;
 
@@ -65,11 +67,11 @@ function handleLink() {
     font-weight: 700;
     font-size: 16px;
     margin-top: 24px;
-    color: $title-color;
+    color: var(--title-color);
   }
 
   &__tip {
-    color: $tip-color;
+    color: var(--tip-color);
   }
 
   &__action {

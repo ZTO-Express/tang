@@ -51,8 +51,8 @@ const isBorder = computed(() => {
 .c-page-section {
   & > .header-con {
     & > .c-page-section-header {
-      border-top-left-radius: $border-radius;
-      border-top-right-radius: $border-radius;
+      border-top-left-radius: var(--border-radius);
+      border-top-right-radius: var(--border-radius);
     }
   }
 }
@@ -61,21 +61,21 @@ const isBorder = computed(() => {
 <style lang="scss" scoped>
 .c-page-section {
   position: relative;
-  background: $section-color;
-  margin-top: $section-gutter;
+  background: var(--section-color);
+  margin-top: var(--section-gutter);
 
   &.border {
-    border-radius: $border-radius;
-    box-shadow: 0 0 3px 0 $border-color;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 3px 0 var(--border-color);
   }
 
   .body-con {
-    padding: $section-padding;
+    padding: var(--section-padding);
     box-sizing: border-box;
   }
 
   .footer-con {
-    padding: $section-padding;
+    padding: var(--section-padding);
   }
 
   &.top {

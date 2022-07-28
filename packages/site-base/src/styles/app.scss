@@ -1,0 +1,13 @@
+// 加载滚动条样式
+#nprogress .bar {
+  background: var(--app-progress-color);
+  height: 2px;
+}
+
+.app-header .header-logo {
+  width: 120px;
+  img {
+    filter: drop-shadow(#fff 1000px 0);
+    margin-left: -1000px;
+  }
+}

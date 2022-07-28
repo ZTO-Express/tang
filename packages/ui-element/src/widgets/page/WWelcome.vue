@@ -13,10 +13,12 @@ import { computed, useCurrentAppInstance } from '@zto/zpage'
 const app = useCurrentAppInstance()
 
 const config = app.useAppConfig()
+const imageAssets = app.useAssets('images', {})
+
 const title = config.title
 
 const welcomePic = computed(() => {
-  return config.assets?.welcomePic || config.assets?.logo
+  return imageAssets.welcome || imageAssets.logo
 })
 </script>
 

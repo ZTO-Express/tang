@@ -18,14 +18,14 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useAppStore } from '@zto/zpage'
+import { computed, useCurrentAppInstance } from '@zto/zpage'
 
-const { computed, ref } = vue
+const app = useCurrentAppInstance()
 
-const store = useAppStore()
+const { pagesStore } = app.stores
 
 const cachedPageKeys = computed(() => {
-  const keys = store?.getters.visitedPages.map((it: any) => it.key)
+  const keys = pagesStore.visited.map((it: any) => it.key)
   return keys
 })
 </script>

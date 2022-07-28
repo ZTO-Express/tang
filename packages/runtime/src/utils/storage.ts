@@ -1,3 +1,3 @@
-import storage from 'store2'
+import _storage from 'store2'
 
-export { storage }
+export const storage = _storage

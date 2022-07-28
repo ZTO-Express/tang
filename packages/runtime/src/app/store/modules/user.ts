@@ -65,14 +65,15 @@ export function defineUserStore(app: App) {
         })
       },
 
+      /** 获取用户数据 */
+      getData(path?: string) {
+        if (!path) return this.data
+        return _.get(this.data, path)
+      },
+
       async load(payload: Record<string, any>) {
-        const authLoader = app.useAuthLoader()
-
-        if (authLoader) {
-          const res = await authLoader.getUserInfo(app, payload)
-
-          this.set(res)
-        }
+        const res = await app.auth.getUserInfo(payload)
+        if (res) this.set(res)
       }
     }
   })

@@ -10,6 +10,7 @@ import { defaultMenus } from '../options/defaults'
 
 import type { Router, RouteRecordRaw } from 'vue-router'
 import type { NavMenuItem, NavMenuItemConfig, Submodule } from '../../typings'
+import type { App } from '../App'
 
 /** 根据根据应用导航菜单配置构建路由 */
 export function createAppRoutes(router: Router, submodules: Submodule[], options: any = {}) {
@@ -65,16 +66,7 @@ export function pruneCachedPage(router: Router, page: any) {
 
 /** 新增临时路由 */
 export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Submodule, baseRoute = '') {
-  menu.meta = Object.assign(
-    {
-      hidden: true,
-      isTemp: true
-    },
-    menu.meta,
-    {
-      noCache: false
-    }
-  )
+  menu.meta = { hidden: true, isTemp: true, ...menu.meta, noCache: false }
 
   // 不继承noCache
   delete menu.meta.noCache
@@ -82,7 +74,10 @@ export function createTmpRoute(router: Router, menu: NavMenuItem, submodule: Sub
   // 不继承redirectQuery
   delete menu.meta.redirectQuery
 
-  menu.name = `${menu.name}__tmp_${uniqId()}`
+  menu.name = `${menu.name || ''}__tmp_${uniqId()}`
+
+  // __title用于刷新时作为路由的label
+  menu.query = { __title: menu.title, __submodule: submodule?.name || '', ...menu.query }
 
   return _createSubRoute(router, menu, submodule, baseRoute)
 }
@@ -98,7 +93,11 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
 
   // 有路径的菜单才有路由
   if (menu.path) {
+    // 路径必须以‘/’开头
+    menu.path = normalizeMenuPath(menu.path)
+
     const pathInfo = _parseMenuPath(menu.path, baseRoute)
+
     pathInfo.query = { ...pathInfo.query, ...menu.query }
 
     // 路由源数据
@@ -164,11 +163,49 @@ function _createSubRoute(router: Router, menu: NavMenuItem, submodule: Submodule
 
   if (menu.children?.length && !isMicroMenu) {
     menu.children.forEach(it => {
+      // 合并路由器
+      it.path = combinePath(menu.path, it.path)
+
       _createSubRoute(router, it, submodule)
     })
   }
 
   return route
+}
+
+/** 处理初次加载位置 */
+export async function processAppInitialLocation(app: App) {
+  if (!location.hash) return
+
+  const hashPath = location.hash.substring(1)
+  const pathInfo = _parseMenuPath(hashPath)
+
+  if (!pathInfo?.path) return // 路径不存在则不作处理
+
+  const existsRoute = app.router.getRouteByMenuPath(pathInfo.path)
+  if (existsRoute) return // route已存在则不作处理
+
+  const existsPage = app.pages.find(it => it.path === pathInfo.path)
+  if (!existsPage) return // 页面不存在则不作处理
+
+  // 是否存在父路由(参考路由)，用父节点的pageKey作为refererKey
+  const parentPath = pathInfo.path.substring(0, pathInfo.path.lastIndexOf('/'))
+  const existsParentRoute = parentPath ? app.router.getRouteByMenuPath(parentPath) : null
+  const refererKey = existsParentRoute?.meta?.pageKey
+
+  // 尝试用query.__submodule作为submodule
+  const submodule = pathInfo.query?.__submodule || existsParentRoute?.meta?.submodule
+  pathInfo.query = { ...pathInfo.query }
+
+  // 尝试用query.__title作为title
+  const title = pathInfo.query?.__title
+
+  await app.router.goto({
+    title,
+    submodule,
+    refererKey,
+    ...pathInfo
+  })
 }
 
 /** 解析菜单路径 */
@@ -274,13 +311,11 @@ function _mergeMenu(menus: NavMenuItemConfig[], exMenu: NavMenuItemConfig) {
     return
   }
 
-  const menu = Object.assign(
-    {
-      children: []
-    },
-    menus[menuIndex],
-    _.omit(exMenu, ['children'])
-  )
+  const menu = {
+    children: [],
+    ...menus[menuIndex],
+    ..._.omit(exMenu, ['children'])
+  }
 
   // order重设（优选取非0值）
   menu.order = exMenu.order || menus[menuIndex].order
@@ -383,13 +418,38 @@ function _resolveMicroComponent(routeMeta: any) {
 
     setup: () => {
       return () => {
-        return h(CMicroLayout, {
-          path: routeMeta.path,
-          meta: routeMeta
-        })
+        return h(CMicroLayout, { path: routeMeta.path, meta: routeMeta })
       }
     }
   })
 
   return pageCmpt
+}
+
+/** 路径必须以'/'开头 */
+function normalizeMenuPath(path: string) {
+  if (!path) return path
+
+  if (!path.startsWith('/')) path = `/${path}`
+
+  return path
+}
+
+/** 合并路径 */
+function combinePath(basePath?: string, targetPath?: string) {
+  if (!targetPath) return ''
+
+  basePath = basePath || ''
+  targetPath = targetPath || ''
+
+  if (targetPath.startsWith('/')) return targetPath
+
+  if (basePath) {
+    if (!basePath.startsWith('/')) basePath = '/' + basePath
+    if (!basePath.endsWith('/')) basePath += '/'
+  } else {
+    basePath = '/'
+  }
+
+  return `${basePath}${targetPath}`
 }

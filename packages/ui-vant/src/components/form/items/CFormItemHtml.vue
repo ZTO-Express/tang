@@ -1,7 +1,5 @@
 <script lang="ts">
-import { vue, renderHtml, useAppContext } from '@zto/zpage'
-
-const { defineComponent } = vue
+import { defineComponent, renderHtml, useCurrentAppInstance } from '@zto/zpage'
 
 export default defineComponent({
   inheritAttrs: false,
@@ -13,7 +11,9 @@ export default defineComponent({
   },
 
   setup(props: any) {
-    const context = useAppContext(props.model)
+    const app = useCurrentAppInstance()
+
+    const context = app.useContext(props.model)
 
     return () => {
       return renderHtml(props.html, context)

@@ -17,11 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useAppRoute, useAppRouter } from '@zto/zpage'
-
-const { computed } = vue
-
-const router = useAppRouter()
+import { computed, useCurrentAppInstance } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
@@ -32,7 +28,10 @@ const props = withDefaults(
   {}
 )
 
-const route = useAppRoute()
+const app = useCurrentAppInstance()
+
+const router = app.router
+const route = app.useRoute()
 
 const routeMeta = computed(() => {
   return route.meta || {}
@@ -60,11 +59,11 @@ function handleBack() {
   box-sizing: border-box;
   padding: 0 20px;
   line-height: 40px;
-  background: $title-bg-color;
+  background: var(--title-bg-color);
 
   & > .header__content {
     flex: 1;
-    color: $title-color;
+    color: var(--title-color);
     font-weight: bold;
     font-size: 14px;
   }

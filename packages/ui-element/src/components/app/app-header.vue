@@ -42,16 +42,21 @@ const { appStore } = app.stores
 const router = app.router
 const appConfig = app.useAppConfig('', {})
 
-const appLogo = appConfig.assets?.logo
+const imageAssets = app.useAssets('images', {})
+
+const appLogo = imageAssets?.logo
 const headerExtraComponent = appConfig.header?.extra?.component
 
+const displaySubmodules = appConfig.menu?.displayedSubmodules
+
 const tabItems = computed(() => {
-  return appStore.submodules.map((it: any) => {
-    return {
-      name: it.name,
-      icon: it.icon,
-      label: it.title
-    }
+  let submodules = appStore.submodules
+  if (displaySubmodules?.length) {
+    submodules = submodules.filter(it => displaySubmodules.includes(it.name))
+  }
+
+  return submodules.map((it: any) => {
+    return { name: it.name, icon: it.icon, label: it.title }
   })
 })
 
@@ -77,11 +82,11 @@ function handleTabClick() {
 
 <style lang="scss" scoped>
 $app-header-padding: 5px;
-$app-header-inner-height: ($app-header-height - $app-header-padding * 2);
+$app-header-inner-height: calc(var(--app-header-height) - $app-header-padding * 2);
 
 .app-header {
   height: 100%;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   color: hsla(0, 0%, 100%, 0.8);
   background: linear-gradient(315deg, #5430ff, #3693ff);
@@ -116,7 +121,7 @@ $app-header-inner-height: ($app-header-height - $app-header-padding * 2);
   flex: 1;
 
   :deep(.el-tabs) {
-    height: $app-header-height;
+    height: var(--app-header-height);
 
     .el-tabs {
       &__header {
@@ -125,7 +130,7 @@ $app-header-inner-height: ($app-header-height - $app-header-padding * 2);
       }
 
       &__nav {
-        height: $app-header-height;
+        height: var(--app-header-height);
       }
 
       &__active-bar {
@@ -137,8 +142,8 @@ $app-header-inner-height: ($app-header-height - $app-header-padding * 2);
       }
 
       &__item {
-        height: $app-header-height;
-        line-height: $app-header-height;
+        height: var(--app-header-height);
+        line-height: var(--app-header-height);
         opacity: 0.5;
         color: white;
 

@@ -52,7 +52,15 @@
           <div v-if="htmlTpl">
             <c-html :html="htmlTpl" :context-data="item" />
           </div>
-          <span v-else>{{ getOptionDisplay(item) }}</span>
+          <el-tooltip
+            v-else
+            effect="dark"
+            :content="getOptionDisplay(item)"
+            placement="top"
+            :disabled="!isOptionLabelPropTooltip"
+          >
+            <span class="option-label-display">{{ getOptionDisplay(item) }}</span>
+          </el-tooltip>
         </slot>
       </el-option>
     </template>
@@ -87,9 +95,12 @@ const props = withDefaults(
     labelProp?: string
     valueProp?: string
     tpl?: string | Record<string, any>
+    optionLabelPropFormatter?: (option: any) => void
+    isOptionLabelPropTooltip?: boolean // 下拉选项的label是否需要tooltip（label内容太多可以开启）
 
+    autoClearProp?: boolean
     returnLabel?: boolean
-    triggerFocus?: boolean
+    triggerFocus?: boolean // 是否简单
     collapseTags?: boolean
 
     api?: ApiRequestAction | string
@@ -98,6 +109,7 @@ const props = withDefaults(
     remote?: boolean
     remoteMethod?: GenericFunction
     preventRemote?: boolean // 阻止远程请求
+    beforeRemote?: (app: any, params: any) => boolean // 阻止远程请求
 
     dataOptionsProp?: string
 
@@ -111,9 +123,12 @@ const props = withDefaults(
     filterable: true,
     modelValueKey: '',
     keywordProp: 'keyword',
+
+    autoClearProp: true,
     returnLabel: false,
     triggerFocus: false,
     collapseTags: true,
+
     api: '',
     remote: true
   }
@@ -139,14 +154,6 @@ const loading = ref(false)
 const innerLabelProp = computed(() => props.labelProp || 'name')
 const innerValueProp = computed(() => props.valueProp || 'code')
 
-watch(
-  () => [props.api, props.apiParams],
-  () => {
-    firstNoRemote.value = true
-    fuzzyOptions.value = []
-  }
-)
-
 // 远程查询出来的选项
 const remoteFuzzyOptions = ref<FuzzySelectOption[]>([])
 const fuzzyOptions = ref<FuzzySelectOption[]>([])
@@ -168,45 +175,56 @@ const htmlTpl = computed(() => {
 })
 
 watch(
-  () => innerValue.value,
-  (v: string | string[]) => {
-    emit('update:modelValue', v)
-  },
-  { immediate: true }
+  () => [props.api, props.apiParams],
+  ([curApi, curApiParams], [oldApi, oldApiParams]) => {
+    if (_.deepEqual(curApi, oldApi) && _.deepEqual(curApiParams, oldApiParams)) return
+
+    firstNoRemote.value = true
+    fuzzyOptions.value = []
+    remoteFuzzyOptions.value = []
+
+    // 自动清空当前值
+    if (props.autoClearProp) {
+      setValueLabel('', '')
+    }
+  }
 )
 
 watch(
   () => [props.modelLabel, props.modelValue, props.optionData, remoteFuzzyOptions.value],
   cur => {
-    innerLabel.value = props.modelLabel
-    innerValue.value = props.modelValue
+    nextTick(() => {
+      // 方式modelLabel和modelValue其中一个发生变化，出现相互覆盖的情况
+      innerLabel.value = props.modelLabel
+      innerValue.value = props.modelValue
 
-    const label = innerLabel.value
-    const optionData = props.optionData
+      const label = innerLabel.value
+      const optionData = props.optionData
 
-    const options: any[] = remoteFuzzyOptions.value
+      const options: any[] = remoteFuzzyOptions.value
 
-    const pushOption = (label: string, value: any, optionData: any) => {
-      const option = options.find(option => getOptionValue(option) === value)
+      const pushOption = (label: string, value: any, optionData: any) => {
+        const option = options.find(option => getOptionValue(option) === value)
 
-      if (!option) {
-        options.push({
-          ...(optionData || {}),
-          [innerLabelProp.value]: label,
-          [innerValueProp.value]: value
-        })
+        if (!option) {
+          options.push({
+            ...(optionData || {}),
+            [innerLabelProp.value]: label,
+            [innerValueProp.value]: value
+          })
+        }
       }
-    }
 
-    if (props.multiple && Array.isArray(innerValue.value)) {
-      for (const [idx, value] of innerValue.value.entries()) {
-        pushOption(label[idx] as string, value, optionData?.[idx])
+      if (props.multiple && Array.isArray(innerValue.value)) {
+        for (const [idx, value] of innerValue.value.entries()) {
+          pushOption(label[idx] as string, value, optionData?.[idx])
+        }
+      } else if (label && !_.isNil(innerValue.value)) {
+        pushOption(label as string, innerValue.value, optionData)
       }
-    } else if (label && !_.isNil(innerValue.value)) {
-      pushOption(label as string, innerValue.value, optionData)
-    }
 
-    fuzzyOptions.value = options
+      fuzzyOptions.value = options
+    })
   },
   {
     immediate: true
@@ -218,6 +236,10 @@ const firstNoRemote = ref(true)
 
 // 通过 labelName 在option中获取label
 function getOptionLabel(option: FuzzySelectOption) {
+  // 如果自定义参数格式化
+  if (typeof props.optionLabelPropFormatter === 'function') {
+    return props.optionLabelPropFormatter(option)
+  }
   return option[innerLabelProp.value] || ''
 }
 
@@ -251,11 +273,11 @@ function getValueByPath(option: FuzzySelectOption, modelValueKey?: string) {
 
 function handleFocusChange() {
   // 远程搜索 如果没有options 则请求
-  if (!props.triggerFocus || remoteFuzzyOptions.value.length > 0) return
+  if (!props.triggerFocus) return
 
   if (props.remote) {
     execRemoteMethod()
-  } else if (firstNoRemote.value || !fuzzyOptions.value.length) {
+  } else if (firstNoRemote.value) {
     // 非远程搜索只请求一次
     execRemoteMethod()
     firstNoRemote.value = false
@@ -268,23 +290,43 @@ function handleSelectChange(value: string | Array<string>) {
   const valueArr = Array.isArray(value) ? value : [value]
   const options = fuzzyOptions.value.filter((it: any) => valueArr.includes(it[valProp]))
 
-  if (valueArr.length > 0 && props.keepMultipleOrder) {
+  // 选择值数量大于1时需要判断是否保持选择顺序
+  if (valueArr.length > 1 && props.keepMultipleOrder) {
     value = options.map(it => it[valProp])
   }
 
   const label = _findLabels(value)
 
-  innerValue.value = value
-  setLabel(label)
+  setValueLabel(value, label)
 
   const option: any = props.multiple ? undefined : options[0]
 
   emit('change', { value, label, option, options })
 }
 
+// 设置value值
+function setValue(v: string | string[]) {
+  if (!v && props.multiple) v = []
+
+  innerValue.value = v
+  emit('update:modelValue', v)
+}
+
+/** 设置label值 */
 function setLabel(v: string | string[]) {
+  if (!v && props.multiple) v = []
+
   innerLabel.value = v
   props.returnLabel && emit('update:label', v)
+}
+
+/** 同时设置Modal和value模型值 */
+function setValueLabel(v: string | string[], label?: string | string[]) {
+  setValue(v)
+
+  if (!_.isUndefined(label)) {
+    setLabel(label!)
+  }
 }
 
 /** 根据label获取options */
@@ -295,13 +337,25 @@ function getOptionsByLabel(groupLabel: string) {
   return fuzzyOptions.value.filter(it => it[groupProp] === groupLabel)
 }
 
+function doBeforeRemote(params: any) {
+  return Promise.resolve().then(() => {
+    if (props.beforeRemote) {
+      return props.beforeRemote(app, params)
+    }
+  })
+}
+
 async function execRemoteMethod(query?: string) {
   if (props.preventRemote) return
 
-  loading.value = true
-
   const context = app.useContext()
   const params = tpl.deepFilter(props.apiParams, context)
+
+  // 根据props.beforeRemote判断是否继续运行
+  const flag = await doBeforeRemote(params)
+  if (flag === false) return
+
+  loading.value = true
 
   let methodResponse: FuzzySelectResponse = []
 
@@ -404,5 +458,14 @@ defineExpose({
 <style lang="scss" scoped>
 .c-fuzzy-select {
   width: 100%;
+}
+
+.option-label-display {
+  width: 100%;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

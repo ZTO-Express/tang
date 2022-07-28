@@ -60,7 +60,7 @@ const bodyStyle = computed(() => {
 
 <style lang="scss">
 .c-page {
-  min-width: $app-page-min-width;
+  min-width: var(--app-page-min-width);
 }
 </style>
 

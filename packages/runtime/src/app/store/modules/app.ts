@@ -30,20 +30,32 @@ export function defineAppStore(app: App) {
     getters: {
       submodule: state => _getSubmodule(state, state.navMenu.submodule),
       submodules: state => {
-        const moduels = (state.allSubmodules || []).filter(it => !it.meta?.hidden)
-        return moduels
+        const displaySubmodules = app.useAppConfig('menu.displayedSubmodules', [])
+
+        let modules = (state.allSubmodules || []).filter(it => !it.meta?.hidden)
+        if (displaySubmodules?.length) {
+          modules = modules.filter(it => displaySubmodules.includes(it.name))
+        }
+
+        return modules
       }
     },
 
     actions: {
       // 初始化应用信息
       init(payload) {
+        const displaySubmodules = app.useAppConfig('menu.displayedSubmodules', [])
+
         this.appId = payload.appId || ''
 
-        const submodules: Submodule[] = payload.submodules || []
+        let submodules: Submodule[] = payload.submodules || []
 
         // 顶级菜单作为子模块
         submodules.forEach(it => (it.isSubmodule = true))
+
+        if (displaySubmodules?.length) {
+          submodules = submodules.filter(it => displaySubmodules.includes(it.name))
+        }
 
         this.allSubmodules = submodules
 
@@ -86,24 +98,18 @@ export function defineAppStore(app: App) {
         })
       },
 
+      /** 获取应用数据 */
+      getData(path?: string) {
+        if (!path) return this.data
+        return _.get(this.data, path)
+      },
+
       // 加载应用基本信息
       async load() {
-        const { userStore } = app.stores
+        const menuData = await app.auth.getMenuData()
 
-        // 1. 加载用户信息
-        await userStore.load({ root: true })
-
-        // 2. 设置应用信息
-        const authLoader = app.useAuthLoader()
-
-        if (authLoader) {
-          let submodules: Submodule[] = []
-          if (authLoader?.getMenuData) {
-            submodules = (await authLoader.getMenuData(app)) as Submodule[]
-          }
-
-          this.init({ submodules })
-        }
+        let submodules: Submodule[] = (menuData as Submodule[]) || []
+        this.init({ submodules })
       },
 
       // 切换子模块

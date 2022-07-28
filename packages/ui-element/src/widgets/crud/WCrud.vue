@@ -13,12 +13,15 @@
                   v-perm="$attrs.perm"
                   :loading="searchLoading"
                   type="primary"
+                  v-preventReclick
                   @click="handleSearch"
                 >
                   查询
                 </el-button>
-                <el-button v-else :loading="searchLoading" type="primary" @click="handleSearch">查询</el-button>
-                <el-button @click="handleSearchReset">重置</el-button>
+                <el-button v-else :loading="searchLoading" type="primary" v-preventReclick @click="handleSearch">
+                  查询
+                </el-button>
+                <el-button v-preventReclick @click="handleSearchReset">重置</el-button>
               </template>
             </c-form-items>
           </c-form>
@@ -37,6 +40,7 @@
                   type="primary"
                   v-bind="getToolbarActionAttrs(it)"
                   class="q-ml-md"
+                  v-preventReclick
                   @click="doToggleExpand"
                 >
                   {{ expandToggleFlag ? '展开所有' : '收起所有' }}
@@ -65,11 +69,23 @@
                   <template v-if="sSearch">
                     <el-divider direction="vertical" class="content__divider" />
                     <div class="inline">
-                      <el-button v-if="!sToolbar.noRefresh" type="text" class="q-ml-md" @click="handleRefresh">
+                      <el-button
+                        v-if="!sToolbar.noRefresh"
+                        type="text"
+                        class="q-ml-md"
+                        v-preventReclick
+                        @click="handleRefresh"
+                      >
                         刷新
                         <i class="el-icon-refresh-right"></i>
                       </el-button>
-                      <el-button v-if="!sToolbar.noExport" type="text" class="q-ml-md" @click="doExport">
+                      <el-button
+                        v-if="!sToolbar.noExport"
+                        type="text"
+                        class="q-ml-md"
+                        v-preventReclick
+                        @click="doExport"
+                      >
                         导出
                         <i class="el-icon-download"></i>
                       </el-button>
@@ -78,6 +94,7 @@
                         v-show="sSearch.hidden !== true"
                         type="text"
                         class="q-ml-md"
+                        v-preventReclick
                         @click="toggleExpandSearch"
                       >
                         {{ expandedSearch ? '隐藏筛选' : '展开筛选' }}
@@ -103,6 +120,18 @@
               <template #operation="scope">
                 <template v-for="(it, index) in sTable?.operation?.items || []" :key="`operation_${String(index)}`">
                   <c-action v-if="it.action" v-bind="getOperationActionAttrs(it, scope)" class="q-ml-sm"></c-action>
+                  <!-- 如果有items配置，走“更多操作”样式 -->
+                  <c-more-action v-if="it.items?.length && isShowCMoreAction" :label="it.label" v-bind="it">
+                    <div ref="cMoreActions">
+                      <c-action
+                        v-for="(_it, index) in it.items || []"
+                        :key="`operation_more_${String(index)}`"
+                        v-bind="getOperationActionAttrs(_it, scope)"
+                        class="q-ml-sm"
+                        style="display: block"
+                      ></c-action>
+                    </div>
+                  </c-more-action>
                   <cmpt
                     v-else-if="it.cmpt"
                     :config="it.cmpt"
@@ -193,6 +222,10 @@ const sToolbar = app.useWidgetSchema(wSchema.toolbar || {})
 
 // 表格 schema
 const sTable = app.useWidgetSchema(wSchema.table || {})
+
+// 树形相关schema
+const sTree = app.useWidgetSchema(sTable.tree || {})
+
 const innerColumns = ref<any[]>([])
 innerColumns.value = Array.isArray(sTable.columns) ? sTable.columns : []
 
@@ -317,6 +350,10 @@ function getToolbarActionAttrs(config: any) {
     actionAttrs.onSubmit = actionAttrs.onSubmit || (() => doSearch())
   }
 
+  if (actionAttrs.componentType) {
+    actionAttrs.componentType = app.resolveComponent(actionAttrs.componentType)
+  }
+
   return actionAttrs
 }
 
@@ -334,6 +371,14 @@ const columnPropTypes = computed(() => {
 
 const tableAttrs = computed(() => {
   const exportOptions = { fileName: route.meta.label, ...crudConfig.table?.export, ...sTable.export }
+
+  // 树形表格相关
+  const treeOptions = {
+    rowKey: sTree.rowKey,
+    lazy: _.isBoolean(sTree.lazy) ? sTree.lazy : true,
+    treeProps: { chilren: sTree.childrenProp, hasChildren: sTree.hasChildrenProp },
+    loadWithCondition: _.isBoolean(sTree.withCondition) ? sTree.withCondition : true
+  }
 
   return {
     border: sTable.border !== false,
@@ -353,6 +398,7 @@ const tableAttrs = computed(() => {
     data: sActions.query?.data,
     loadMethod: tableLoadFn,
     export: { ...exportOptions },
+    ...treeOptions,
     ...sTable.innerAttrs
   }
 })
@@ -398,8 +444,21 @@ function getOperationActionAttrs(options: any, scope: any) {
     triggerAction(actionAttrs)
   }
 
+  if (actionAttrs.componentType) {
+    actionAttrs.componentType = app.resolveComponent(actionAttrs.componentType)
+  }
+
   return actionAttrs
 }
+
+// 更多操作c-more-action
+const cMoreActions = ref<any>(null) // 更多操作的dom
+let isShowCMoreAction = ref(true) // 是否展示“更多操作”
+
+onMounted(() => {
+  // 根据dom下的子元素（会根据权限显隐各个action）判断是否展示“更多操作”
+  isShowCMoreAction.value = cMoreActions.value?.[0]?.children?.length > 0
+})
 
 /** 获取行编号（用于唯一标识一行） */
 function getRowCode(row: any) {
@@ -460,6 +519,9 @@ async function triggerAction(actionCfg: any) {
   const context = app.useContext(actionCfg.contextData)
 
   const actionData = buildActionData(actionCfg, context)
+
+  // 构建数据问题，则不执行接下来的代码
+  if (!actionData) return
 
   actionCfg.label = actionCfg.label || '操作'
 
@@ -594,8 +656,8 @@ async function doAction(action: any, payload: any, options?: any) {
     data: payload
   })
     .then(res => {
-      if (options?.sucessMessage !== false) {
-        Message.success(options?.sucessMessage || `${options.label || '操作'}成功！`)
+      if (options?.successMessage !== false) {
+        Message.success(options?.successMessage || `${options.label || '操作'}成功！`)
       }
 
       if (options?.reload !== false) return doSearch()
@@ -630,14 +692,7 @@ async function doSearch(resetPager = false, refreshPager = false) {
 
   if (sSearch.beforeSearch) {
     const beforeSearchRes = await Promise.resolve().then(() =>
-      sSearch.beforeSearch({
-        ...context,
-        pager,
-        resetPager,
-        refreshPager,
-        searchParams,
-        queryAction
-      })
+      sSearch.beforeSearch({ ...context, pager, resetPager, refreshPager, searchParams, queryAction })
     )
 
     if (!_.isUndefined(beforeSearchRes)) searchParams = beforeSearchRes
@@ -657,16 +712,7 @@ async function doSearch(resetPager = false, refreshPager = false) {
     .then(async res => {
       if (sSearch.afterSearch) {
         const afterSearchRes = await Promise.resolve().then(() =>
-          sSearch.afterSearch(
-            {
-              ...context,
-              pager,
-              resetPager,
-              searchParams,
-              queryAction
-            },
-            res
-          )
+          sSearch.afterSearch({ ...context, pager, resetPager, searchParams, queryAction }, res)
         )
 
         if (!_.isUndefined(afterSearchRes)) res = afterSearchRes
@@ -675,6 +721,7 @@ async function doSearch(resetPager = false, refreshPager = false) {
       pager.curPageIndex = pager.pageIndex
 
       searchResult.value = res
+
       tableRef.value?.setData(searchResult.value)
     })
     .finally(() => {
@@ -743,7 +790,9 @@ async function doAsyncExport(api?: string, options?: any, context?: any) {
     params: reqParams
   })
 
-  appUtil.openDownloadsDialog()
+  if (options?.openDownloads !== false) {
+    appUtil.openDownloadsDialog()
+  }
 
   setTimeout(() => {
     Message.success(options?.successMessage || '导出成功！')
@@ -767,19 +816,33 @@ async function doToggleExpand() {
 }
 
 async function tableLoadFn(row: any, node: any, resolve: Function) {
-  const parentProp = tableAttrs.value.parentProp
-  const rowKey = tableAttrs.value.rowKey
-  if (!parentProp || !rowKey) return
+  let parentProp = tableAttrs.value.parentProp
+  let rowKey = tableAttrs.value.rowKey
+
+  // 树形相关数据
+  if (sTree) {
+    rowKey = sTree.rowKey || 'id'
+    parentProp = sTree.parentProp || 'pid'
+  }
+
+  if (!rowKey || !parentProp) return
 
   const queryAction = sActions.query || {}
   if (!queryAction.api) return
+
+  let loadParams: any = { [parentProp]: row[rowKey] }
+
+  if (tableAttrs.value.loadWithCondition) {
+    const searchParams = getSearchParams()
+    loadParams = { ...searchParams, ...loadParams }
+  }
 
   await apiRequest({
     pageIndex: 1,
     pageSize: 1000,
     noPager: sTable.noPager,
     action: { ...queryAction, type: 'query' },
-    params: { [parentProp]: row[rowKey] }
+    params: loadParams
   })
     .then(res => {
       resolve(res[dataProp])
@@ -791,68 +854,70 @@ async function tableLoadFn(row: any, node: any, resolve: Function) {
 </script>
 
 <style lang="scss" scoped>
-$toolbar-height: 50px;
-
 .w-crud {
+  --toolbar-height: 50px;
+
   height: 100%;
-  background: $section-color;
+  background: var(--section-color);
   padding: 16px 16px 8px 16px;
   box-sizing: border-box;
-}
 
-.w-crud__con {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.w-crud__search {
-  border-bottom: 1px solid $border-color;
-  padding-bottom: 4px;
-}
-
-.w-crud__content {
-  flex: 1;
-  flex-grow: 1;
-  height: 100%;
-  position: relative;
-
-  &-body {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+  .w-crud__con {
     height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
-  .w-crud__body {
-    height: calc(100% - $toolbar-height);
+  .w-crud__search {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 4px;
   }
-}
 
-.w-crud__toolbar {
-  padding: 10px 0;
-  display: flex;
+  .w-crud__content {
+    flex: 1;
+    flex-grow: 1;
+    height: 100%;
+    position: relative;
 
-  & > .toolbar {
-    &__line {
-      width: 4px;
-      height: 16px;
-      margin: 4px 8px 0 0;
-      background-color: $primary;
-      border-radius: 8px;
-    }
-
-    &__actions {
-      flex: 1;
-    }
-  }
-}
-
-.w-crud__con {
-  &.no-toolbar {
-    .w-crud__body {
+    &-body {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
       height: 100%;
+    }
+
+    .w-crud__body {
+      height: calc(100% - var(--toolbar-height));
+    }
+  }
+
+  .w-crud__toolbar {
+    padding: 10px 0;
+    display: flex;
+    line-height: 28px;
+
+    & > .toolbar {
+      &__line {
+        width: 4px;
+        height: 16px;
+        margin: 4px 8px 0 0;
+        background-color: var(--primary);
+        border-radius: 8px;
+      }
+
+      &__actions {
+        flex: 1;
+        line-height: 23px;
+      }
+    }
+  }
+
+  .w-crud__con {
+    &.no-toolbar {
+      .w-crud__body {
+        height: 100%;
+      }
     }
   }
 }

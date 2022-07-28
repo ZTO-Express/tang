@@ -1,5 +1,7 @@
+import CFormItemAction from './CFormItemAction.vue'
 import CFormItemCascader from './CFormItemCascader.vue'
 import CFormItemCheckbox from './CFormItemCheckbox.vue'
+import CFormItemContent from './CFormItemContent.vue'
 import CFormItemDatePicker from './CFormItemDatePicker.vue'
 import CFormItemDateRangePicker from './CFormItemDateRangePicker.vue'
 import CFormItemFileList from './CFormItemFileList.vue'
@@ -16,8 +18,10 @@ import CFormItemImage from './CFormItemImage.vue'
 import CFormItemVideo from './CFormItemVideo.vue'
 
 export {
+  CFormItemAction,
   CFormItemCascader,
   CFormItemCheckbox,
+  CFormItemContent,
   CFormItemDatePicker,
   CFormItemDateRangePicker,
   CFormItemFileList,

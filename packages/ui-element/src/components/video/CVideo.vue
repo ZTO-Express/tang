@@ -1,6 +1,6 @@
 <template>
   <div class="c-video">
-    <el-button v-if="label" type="text" @click="handleLabelClick" :disabled="!innerUrl">
+    <el-button v-if="label" type="text" v-preventReclick @click="handleLabelClick" :disabled="!innerUrl">
       <span>{{ label }}</span>
     </el-button>
     <video
@@ -27,7 +27,7 @@ import { ref, computed, watch, onMounted, useCurrentAppInstance } from '@zto/zpa
 
 const props = withDefaults(
   defineProps<{
-    src: string
+    src?: string
     label?: String
     srcType?: 'path' | 'url' // path: 需要请求url才能显示，url: 直接显示
   }>(),

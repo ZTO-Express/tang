@@ -1,3 +1,4 @@
+import { tpl } from '@zto/zpage'
 import { innerRules } from './rules'
 
 import type { FormItemConfig } from './types'
@@ -61,4 +62,19 @@ export function findFormItem(prop: string, formItems: FormItemConfig[]) {
   let index = formItems.length
   while (index-- && formItems[index].prop !== prop);
   return { index, item: formItems[index] }
+}
+
+/** 计算动态属性 */
+export function calcDynamicAttrs(dynamicAttrs: any, context: any) {
+  let _attrs: any = {}
+
+  if (typeof dynamicAttrs === 'function') {
+    _attrs = dynamicAttrs(context)
+  } else if (typeof dynamicAttrs === 'object') {
+    _attrs = tpl.deepFilter(dynamicAttrs, context)
+  } else if (typeof dynamicAttrs === 'string') {
+    _attrs = tpl.evalJS(dynamicAttrs, context)
+  }
+
+  return _attrs
 }

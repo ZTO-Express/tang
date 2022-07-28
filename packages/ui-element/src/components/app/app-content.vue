@@ -12,9 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { vue, useCurrentAppInstance } from '@zto/zpage'
-
-const { computed } = vue
+import { computed, useCurrentAppInstance } from '@zto/zpage'
 
 const app = useCurrentAppInstance()
 const { pagesStore } = app.stores

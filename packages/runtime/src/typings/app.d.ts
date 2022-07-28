@@ -10,6 +10,7 @@ import type {
   RouteLocationNormalizedLoaded
 } from 'vue-router'
 import type {
+  Nil,
   Widget,
   Plugin,
   Schema,
@@ -26,6 +27,22 @@ import type { AppConfigDefinition, AppAppConfig, AppApiConfig, AppApisDefinition
 import type { InstallableOptions, TextFormatters, ApiRequest, RuntimeUI, RuntimeExtensions } from './runtime'
 import type { AppDatas } from './store'
 import type { HttpRequest, HttpRequestConfig } from '../utils'
+
+/** 应用环境变量 */
+export interface AppEnv {
+  readonly name: string // 当前环境名
+  [prop: string]: any
+}
+
+export type AppEnvConfig<T = AppEnv> = Omit<T, 'name'>
+
+/** 主机域名和环境变量的映射 */
+export interface AppEnvMap<T = AppEnv> {
+  [envName: string]: {
+    HOSTs: string[]
+    ENV: AppEnvConfig<T>
+  }
+}
 
 export interface AppSchema extends Schema {
   type: 'app'
@@ -86,8 +103,10 @@ export interface AppUI extends RuntimeUI {
 
 export interface AppExtensions extends RuntimeExtensions {
   loaders?: AppLoader[]
-  plugins?: Plugin[]
   widgets?: Widget[]
+  components?: VueComponent[]
+  formatters?: TextFormatters
+  plugins?: Plugin[]
 }
 
 export type AppExtensionOptions = AppExtensions
@@ -101,22 +120,23 @@ export interface AppConfigOptions {
   apis?: AppApisDefinition
   widgets?: AppConfigDefinition
   components?: AppConfigDefinition
-  formatters?: AppConfigDefinition<TextFormatters>
   assets?: AppConfigDefinition
 }
 
 /** 运行时启动选项 */
 export interface AppStartOptions extends InstallableOptions {
   name: string // 应用名称
-  isHost: boolean // 是否宿主应用（微服务时应用，默认true）
+  isDebug?: boolean // 是否调试模式
+  isMicro?: boolean // 是否微应用（微服务时应用，默认false）
   container?: Element | string
-  env: Record<string, any>
+  env: AppEnv // 应用环境变量
   ui: AppUI
   menus?: NavMenuItem[]
   pages?: AppPageDefinition[]
   config?: AppConfigOptions
   configs?: AppConfigOptions[]
   extensions?: AppExtensionOptions
+  meta?: (app: App) => MetaAppMetadata // 用于调试元应用时单独启动元应用
 }
 
 export interface PartialAppStartOptions extends Partial<AppStartOptions> {
@@ -180,7 +200,7 @@ export interface AppAuthLoader extends AppLoader {
 export interface AppPageLoader extends AppLoader {
   type: AppLoaderType.PAGE
 
-  loadPage: (app: App, path: string) => Promise<PageSchema | undefined>
+  loadPage: (app: App, path: string) => Promise<PageSchema | Nil>
 }
 
 export interface AppApi extends HttpRequest {
@@ -236,4 +256,28 @@ export interface AppRendererPage {
   key: string
   schema: Schema
   [prop: string]: any
+}
+
+/** 元应用配置元数据 */
+export interface MetaAppMetadata {
+  name: string
+  style?: boolean | string
+  app: MetaAppOptions
+}
+
+/** 元应用安装方法 */
+export type MetaAppInstallFunction = (app: App) => Promise<void>
+
+/** 元应用项， 元应用不能包含UI */
+export interface MetaAppOptions
+  extends Partial<
+    Omit<AppStartOptions, 'ui' | 'name' | 'env' | 'isDebug' | 'isMicro' | 'container' | 'configs' | 'menus'>
+  > {
+  envMap?: AppEnvMap
+  install?: MetaAppInstallFunction
+}
+
+/** 为应用配置 */
+export interface MetaAppCtorOptions extends MetaAppOptions {
+  name: string
 }

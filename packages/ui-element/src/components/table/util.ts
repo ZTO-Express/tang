@@ -1,5 +1,6 @@
 import { _, tpl, formatText } from '@zto/zpage'
 
+import type { App } from '@zto/zpage'
 import type { TableColumn } from './types'
 
 /** 扁平化所有子列
@@ -28,6 +29,24 @@ export function flattenChildren(columns: TableColumn[]) {
 export function getChildProps(columns: TableColumn[]) {
   const allColumns = flattenChildren(columns)
   return allColumns.map(c => c.prop)
+}
+
+/**  */
+export function getColCellStyleFn(app: App, cellStyle: any, columnStyles?: any[]) {
+  if (!cellStyle && !columnStyles?.length) return null
+
+  let baseCellStyle: any = {}
+  if (_.isObject(cellStyle)) baseCellStyle = { ...cellStyle }
+
+  return (scope: any) => {
+    let funcStyle: any = {}
+    if (_.isFunction(cellStyle)) funcStyle = cellStyle(scope)
+
+    const colStyle = columnStyles?.find(it => it.prop && it.prop === scope.column?.property)
+    const style = app.deepFilter({ ...baseCellStyle, ...funcStyle, ...colStyle?.style }, scope)
+
+    return style
+  }
 }
 
 /**

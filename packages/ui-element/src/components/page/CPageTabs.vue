@@ -6,14 +6,14 @@
     :tab-position="tabPosition"
     @tab-click="handleTabClick"
   >
-    <el-tab-pane v-for="item in tabItems" :key="item.value" :label="item.label" :name="item.value">
+    <el-tab-pane v-for="item in newTabItems" :key="item.value" :label="item.label" :name="item.value">
       <slot v-if="showPane" v-bind="item" />
     </el-tab-pane>
   </el-tabs>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from '@zto/zpage'
+import { ref, watch, onMounted, computed, useCurrentAppInstance } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
@@ -34,13 +34,31 @@ const props = withDefaults(
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
+const app = useCurrentAppInstance()
+// 根据权限筛选出新的newTabItems数据
+const newTabItems = computed(() => {
+  return props.tabItems.filter(item => app.checkPermission(item.perm))
+})
+
+// newTabItems数据查找是否有配置的默认值default
+const isHasDefault = computed(() => {
+  return newTabItems.value.filter(item => item.value === props.modelValue).length > 0
+})
+
+onMounted(() => {
+  // 如果newTabItems数据里面没有匹配到默认值default，则设置第一个
+  if (!isHasDefault.value) {
+    emit('update:modelValue', newTabItems.value?.[0]?.value)
+  }
+})
+
 function handleTabClick(tab: any) {
   const tabName = tab.paneName
 
   if (tabName !== props.modelValue) {
     emit('update:modelValue', tabName)
 
-    const item = props.tabItems.find(it => it.value === tabName)
+    const item = newTabItems.value.find(it => it.value === tabName)
     emit('change', item)
   }
 }

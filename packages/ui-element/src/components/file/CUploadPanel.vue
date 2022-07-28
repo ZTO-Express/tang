@@ -34,6 +34,7 @@ import UploadItem from './upload-item.vue'
 import type { GenericFunction } from '@zto/zpage'
 import type { UploadStoreOptions } from '../../utils/upload'
 import type { UploadData, UploadDataItems, UploadOpenParams } from './types'
+
 const props = withDefaults(
   defineProps<{
     accept: string
@@ -280,7 +281,7 @@ function onUploadCompleted(item: UploadData, result?: any) {
 function resetItem(item: UploadData) {
   if (!item?.key) return
 
-  item = Object.assign({}, item)
+  item = { ...item }
   uploadState.items[item.key] = item
 }
 

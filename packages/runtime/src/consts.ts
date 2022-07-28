@@ -1,16 +1,22 @@
 export const TOKEN_DATA_STORAGE_KEY = 'token' // token数据存储key
 export const TOKEN_REFRESH_DURATION = 120 // 每120秒刷新一次token
 
-export const ROOT_ROUTE_NAME = 'root' // 根路由名称
-export const ROOT_MENU_PREFIX = 'root:' // 根路由名称
-
 export const DEFAULT_CONATINER_EL = '#app' // 默认菜单名
 
 export const DEFAULT_MENU_NAME = 'default' // 默认菜单名
 export const DEFAULT_PAGE_NAME = 'welcome' // 默认页名
 export const DEFAULT_PAGE_PATH = `/${DEFAULT_PAGE_NAME}` // 默认页名
 
-export const APP_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]*$/ // 应用名称正则
+export const ROOT_ROUTE_NAME = 'root' // 根路由名称
+export const ROOT_MENU_PREFIX = 'root:' // 根路由名称
+
+export const ERROR_ROUTE = Object.freeze({
+  FORBIDDEN: '403',
+  NOT_FOUND: '404',
+  SERVER_ERROR: '500'
+})
+
+export const ERROR_ROUTE_NAMES = Object.values(ERROR_ROUTE)
 
 export enum STORE_NAME {
   ROOT = 'root',
@@ -19,8 +25,9 @@ export enum STORE_NAME {
   PAGES = 'pages'
 }
 
-export const MICRO_CONTAINER_SUB_MODULE_DOM_ID = 'zpageMicroAppSubModuleContainer' // 微前端容器子模块id
-export const MICRO_CONTAINER_PAGE_DOM_ID = 'zpageMicroAppPageContainer' // 微前端容器页面id
+export const APP_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]*$/ // 应用名称正则
+
+export const MICRO_PAGE_CONTENT_DOM_ID = 'zpageMicroPageContent' // 微前端容器页面id
 
 export enum AppLoaderType {
   AUTH = 'auth',

@@ -3,13 +3,16 @@
     <div class="header__prefix">
       <slot name="prefix">
         <div v-if="isShowBack" class="header-back">
-          <el-button icon="el-icon-back" type="text" @click="handleBack">返回</el-button>
+          <el-button icon="el-icon-back" type="text" v-preventReclick @click="handleBack">返回</el-button>
           <el-divider direction="vertical"></el-divider>
         </div>
       </slot>
     </div>
     <div class="header__content">
       <slot>{{ pageTitle }}</slot>
+      <slot name="tip">
+        <c-poptip v-if="pageTip" v-bind="pageTip"></c-poptip>
+      </slot>
     </div>
     <div class="header__extra">
       <slot name="extra" />
@@ -18,11 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useCurrentAppInstance } from '@zto/zpage'
+import { _, computed, useCurrentAppInstance } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
     title?: string
+    tip?: any
     isBack?: boolean
     noBack?: boolean
   }>(),
@@ -49,6 +53,20 @@ const pageTitle = computed(() => {
   return props.title || routeMeta.value?.label
 })
 
+const pageTip = computed(() => {
+  if (!props.tip) return undefined
+
+  let tipAttrs: any = { placement: 'bottom' }
+
+  if (_.isObject(props.tip)) {
+    tipAttrs = { ...tipAttrs, ...props.tip }
+  } else {
+    tipAttrs.content = String(props.tip)
+  }
+
+  return tipAttrs
+})
+
 function handleBack() {
   router.goBack()
 }
@@ -60,11 +78,11 @@ function handleBack() {
   box-sizing: border-box;
   padding: 0 20px;
   line-height: 40px;
-  background: $title-bg-color;
+  background: var(--title-bg-color);
 
   & > .header__content {
     flex: 1;
-    color: $title-color;
+    color: var(--title-color);
     font-weight: bold;
     font-size: 14px;
   }

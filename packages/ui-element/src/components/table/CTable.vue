@@ -17,6 +17,8 @@
           :load="innerLoadMethod"
           :row-key="rowKey"
           highlight-current-row
+          :cell-style="innerCellStyle"
+          :header-cell-style="innerHeaderCellStyle"
           @selection-change="handleSelectionChange"
         >
           <!-- 全选列-->
@@ -153,6 +155,9 @@ const props = withDefaults(
     editable?: boolean // 是否可编辑
     batchEditable?: boolean // 是否可批量编辑
 
+    cellStyle?: any // 单元格样式
+    headerCellStyle?: any // 头部单元格样式
+
     export?: Record<string, any> // 导出配置
   }>(),
   {
@@ -200,12 +205,47 @@ const tableData = reactive<TableData>({
   summary: {}
 })
 
+const isTreeTable = computed(() => {
+  return !!props.rowKey
+})
+
 const innerSummaryMethod = computed(() => {
   return props.summaryMethod || tableSummaryFn
 })
 
 const innerLoadMethod = computed(() => {
   return props.loadMethod || tableLoadFn
+})
+
+const columnItems = computed<TableColumn[]>(() => {
+  const columns = normalizeColumns(props.columns)
+  return columns
+})
+
+/** 父子列摊平 */
+const flattenColumns = computed<TableColumn[]>(() => {
+  const columns = tableUtil.flattenChildren(columnItems.value)
+  return columns || []
+})
+
+/** 单元格样式 */
+const innerCellStyle = computed(() => {
+  const columnStyles = flattenColumns.value
+    .filter(it => it.cellStyle)
+    .map(it => ({ prop: it.prop, style: it.cellStyle }))
+
+  const fn = tableUtil.getColCellStyleFn(app, props.cellStyle, columnStyles)
+  return fn
+})
+
+/** 头部单元格样式 */
+const innerHeaderCellStyle = computed(() => {
+  const columnStyles = flattenColumns.value
+    .filter(it => it?.headerStyle)
+    .map(it => ({ prop: it.prop, style: it.headerStyle }))
+
+  const fn = tableUtil.getColCellStyleFn(app, props.headerCellStyle, columnStyles)
+  return fn
 })
 
 // 可见表格头, 加入多级表头
@@ -215,7 +255,7 @@ const vTableHead = computed<ExportColumn[]>(() => {
   if (!tableHead) return []
 
   const formatCol = (col: TableColumn) => {
-    const _col: any = Object.assign({}, col)
+    const _col: any = { ...col }
     const _width = `${(_col.width || '') as string}`
     if (_width) {
       _col.width = parseInt(_width.replace(/[a-zA-Z]/g, ''))
@@ -352,6 +392,30 @@ function getColumnByProp(prop: string, cols: any[]): any {
   return undefined
 }
 
+/** 规范化列配置 */
+function normalizeColumns(columns: TableColumn[], pid?: string) {
+  if (!columns?.length) return columns
+
+  pid = pid || '_col' // pid用于定位为唯一列
+
+  const _columns = columns
+    .filter(col => {
+      return app.checkPermission(col.perm)
+    })
+    .map((col: any, index: number) => {
+      col.__id = `${pid}_${index}`
+      if (!col.prop) col.prop = col.__id // 如果没有prop，默认设置prop，以备后续识别
+      col.formatter = tableUtil.getColFormatter(col)
+      return col
+    })
+
+  _columns.forEach(col => {
+    col.children = normalizeColumns(col.children, col.__id)
+  })
+
+  return _columns
+}
+
 /** 重新layout */
 function doLayout() {
   // 多级表头筛选有问题，暂时这样解决
@@ -374,17 +438,6 @@ function validate() {
 // ---- 分页相关 ------->
 
 const pageSizeCfg = app.useComponentsConfig('pagination.pageSize', 100)
-
-const columnItems = computed<TableColumn[]>(() => {
-  return props.columns
-    .filter(col => {
-      return app.checkPermission(col.perm)
-    })
-    .map((col: any) => {
-      col.formatter = tableUtil.getColFormatter(col)
-      return col
-    })
-})
 
 const pager = reactive<TablePager>({
   pageIndex: 1,
@@ -457,13 +510,19 @@ function setData(data: any) {
     total = data[totalProp] || 0
   }
 
-  tableData.data = list || []
-  tableData.total = total > 0 ? total : pager.pageIndex === 1 ? 0 : tableData.total
-
-  if (data[summaryProp]) {
-    tableData.summary = data[summaryProp]
-    nextTick((tableRef as any).doLayout)
+  if (isTreeTable.value) {
+    tableData.data = []
   }
+
+  nextTick(() => {
+    tableData.data = list || []
+    tableData.total = total > 0 ? total : pager.pageIndex === 1 ? 0 : tableData.total
+
+    if (data[summaryProp]) {
+      tableData.summary = data[summaryProp]
+      nextTick((tableRef as any).doLayout)
+    }
+  })
 }
 
 function getData() {

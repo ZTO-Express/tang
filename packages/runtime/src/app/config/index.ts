@@ -38,6 +38,11 @@ export function defineAppCmpt<T>(config: Record<string, any>) {
   return _defineAppConfig<UseAppConfigMethod<T>>(config, AppConfigType.CMPT)
 }
 
+/** 定义应用扩展 */
+export function defineAppExtension<T>(config: Record<string, any>) {
+  return _defineAppConfig<UseAppConfigMethod<T>>(config, AppConfigType.PLUGIN)
+}
+
 /** 定义应用插件 */
 export function defineAppPlugin<T>(config: Record<string, any>) {
   return _defineAppConfig<UseAppConfigMethod<T>>(config, AppConfigType.PLUGIN)

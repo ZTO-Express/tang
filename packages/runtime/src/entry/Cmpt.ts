@@ -1,4 +1,4 @@
-import { h, ref, useAttrs, defineComponent, resolveComponent, resolveDynamicComponent } from 'vue'
+import { h, ref, useAttrs, defineComponent } from 'vue'
 import { _ } from '../utils'
 import { useCurrentAppInstance } from '../app'
 import { isAppUseMethod, _useAppConfig } from '../app/config/use-config'
@@ -53,16 +53,19 @@ export const Cmpt = defineComponent({
     }
 
     // 获取组件
-    function resolveCmpt(type: string): ConcreteComponent | string {
-      let cType = type || 'c-html'
+    function resolveCmpt(type: string | ConcreteComponent): ConcreteComponent | string {
+      if (!_.isString(type)) return type
 
-      let c: ConcreteComponent | string = cType
+      let cType = (type || 'c-html') as string
+
+      let c: ConcreteComponent | string = app.resolveComponent(cType)
+
+      if (!_.isString(type)) return c
 
       // 前缀查找
       for (let it of cmptPrefixs) {
         if (cType.startsWith(it)) {
-          // c = resolveDynamicComponent(cType)
-          c = resolveComponent(cType)
+          c = app.resolveComponent(cType)
           if (!_.isString(c)) break
         }
       }
@@ -72,8 +75,7 @@ export const Cmpt = defineComponent({
 
       // 未找到组件，则尝试添加前缀并查找
       for (let it of cmptPrefixs) {
-        // c = resolveDynamicComponent(`${it}${cType}`)
-        c = resolveComponent(`${it}${cType}`)
+        c = app.resolveComponent(`${it}${cType}`)
         if (!_.isString(c)) break
       }
 

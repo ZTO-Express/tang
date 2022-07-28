@@ -358,7 +358,7 @@ export function entries<T>(obj: Record<string, T>): Array<[string, T]> {
  * @param seconds
  * @returns
  */
-export async function delay<T>(fn: GenericFunction, seconds = 1): Promise<T> {
+export async function delay<T>(fn: GenericFunction, milliseconds = 1): Promise<T> {
   return await new Promise((resolve, reject) => {
     setTimeout(() => {
       Promise.resolve()
@@ -372,6 +372,6 @@ export async function delay<T>(fn: GenericFunction, seconds = 1): Promise<T> {
         .catch(err => {
           reject(err)
         })
-    }, seconds)
+    }, milliseconds)
   })
 }

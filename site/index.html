@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>
+    <%- APP_TITLE %>
+  </title>
+  <link rel="icon" href="./favicon.ico?v1">
+</head>
+
+<body>
+  <div id="<%- APP_NAME %>" class="fs"></div>
+  <script type="module" src="/site/src/main.ts"></script>
+</body>
+
+<!-- <script type="text/javascript" src="https://uedcdn.zto.com/static/zcat/2.0.0/zcat.browser.min.js" crossorigin></script>
+<script>
+  const zcatApp = [{ key: '<%- APP_ZCAT_KEY %>', hosts: JSON.parse('<%- APP_PROD_HOSTS %>') }].find(it => it.hosts.indexOf(window.location.host) >= 0);
+  if (zcatApp && window.zcat) {
+    window.zcat.init({ appKey: zcatApp.key })
+  }
+</script> -->
+
+</html>

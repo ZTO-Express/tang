@@ -1,5 +1,6 @@
 import { AppLoaderType } from '../../../consts'
-import { clearTokenData, refreshToken, getAccessToken, resetToken, uniqId, _, reloadUrl } from '../../../utils'
+import { uniqId, _, reloadUrl } from '../../../utils'
+import { HostApp } from '../../HostApp'
 
 import type { AppAuthLoader, NavMenuItem } from '../../../typings'
 import type { App } from '../../App'
@@ -33,16 +34,16 @@ export const IAMAuthLoader: AppAuthLoader = {
     // 刷新token
     if (code) {
       // 刷新并设置token
-      await refreshToken(code)
+      await app.token.refresh(code)
     } else {
       // 重设token
-      await resetToken()
+      await app.token.reset()
     }
 
-    if (!getAccessToken()) {
+    if (!app.token.getAccessToken()) {
       await app.logout()
     } else if (code) {
-      reloadUrl()
+      await reloadUrl()
     }
   },
 
@@ -70,20 +71,36 @@ export const IAMAuthLoader: AppAuthLoader = {
     return navMenus
   },
 
-  async logout(app: App) {
-    const ENV = app.env
+  async logout(app: App, args: any) {
+    if (!app.isIndependent && HostApp.loaded) {
+      await HostApp.logout()
+      return
+    }
+
     const { authApi } = app.apis
 
     if (authApi.logout) {
-      await authApi.logout()
+      await authApi.logout(args)
     } else {
-      await clearTokenData()
-
-      const redirectUrl = encodeURIComponent(window.location.origin)
-      const loginUrl = `${ENV.iamUrl}/oauth2?app_id=${ENV.appId}&redirect_url=${redirectUrl}&state=${uniqId()}`
-      window.location.href = loginUrl
+      await iamLogout(app)
     }
+  },
+
+  async iamLogout(app: App) {
+    return iamLogout(app)
   }
+}
+
+/** iam登出 */
+async function iamLogout(app: App) {
+  const ENV = app.env
+
+  await app.token.clearData()
+
+  const redirectUrl = encodeURIComponent(window.location.origin)
+  const loginUrl = `${ENV.iamUrl}/oauth2?app_id=${ENV.appId}&redirect_url=${redirectUrl}&state=${uniqId()}`
+
+  await reloadUrl(loginUrl)
 }
 
 // 解析单项菜单

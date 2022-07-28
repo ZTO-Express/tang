@@ -1,6 +1,6 @@
 <template>
   <div class="c-image">
-    <el-button v-if="label" type="text" @click="handleLabelClick" :disabled="!innerSrcs.length">
+    <el-button v-if="label" type="text" v-preventReclick @click="handleLabelClick" :disabled="!innerSrcs.length">
       <template v-if="innerSrcs?.length">
         <span>{{ label }}</span>
         <span v-if="showCount && innerSrcs?.length">({{ innerSrcs?.length }})</span>
@@ -19,7 +19,7 @@
     >
       <template #error>
         <div class="error flex-center">
-          <el-button v-if="srcType === 'path'" class="error-button" type="text" @click="handleReload">
+          <el-button v-if="srcType === 'path'" class="error-button" type="text" v-preventReclick @click="handleReload">
             重新加载
           </el-button>
           <div v-else class="error-label">加载失败</div>
@@ -42,12 +42,27 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, useCurrentAppInstance } from '@zto/zpage'
+import {
+  ref,
+  reactive,
+  toRef,
+  toRefs,
+  computed,
+  inject,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  useCurrentAppInstance
+} from '@zto/zpage'
+
+import { C_IMAGE_VIEWER_KEY, getImageUrls } from './image'
+
+import type { ImageSrcType, ImageViewerContext } from './image'
 
 const props = withDefaults(
   defineProps<{
     src?: string | string[]
-    srcType?: 'path' | 'url' // path: 需要请求url才能显示，url: 直接显示
+    srcType?: ImageSrcType
     label?: string
     emptyText?: string
     showCount?: boolean // 是否显示图片张数（label不为true有效）
@@ -66,9 +81,10 @@ const props = withDefaults(
   }
 )
 
-const app = useCurrentAppInstance()
+/** 注入image viewer */
+const viewerContext = inject<ImageViewerContext | undefined>(C_IMAGE_VIEWER_KEY, undefined)
 
-const { fsApi } = app.apis
+const app = useCurrentAppInstance()
 
 const innerUrls = ref<string[]>([])
 const showPreview = ref<boolean>(false)
@@ -97,13 +113,31 @@ watch(
   }
 )
 
+/** 图片上下文 */
+const imageContext = reactive({
+  ...toRefs(props),
+  innerSrcs: toRef(innerSrcs, 'value'),
+  innerUrl: toRef(innerUrl, 'value')
+})
+
 onMounted(async () => {
   await loadImageUrls()
+
+  viewerContext?.addImage(imageContext)
+})
+
+onBeforeUnmount(() => {
+  viewerContext?.removeImage(imageContext)
 })
 
 function handleLabelClick() {
   if (props.preview === false) return
-  showPreview.value = true
+
+  if (viewerContext) {
+    viewerContext.show(imageContext)
+  } else {
+    showPreview.value = true
+  }
 }
 
 function handleReload() {
@@ -119,13 +153,8 @@ async function loadImageUrls() {
   // 只有要显示图片时才正式加载
   if (!showImage.value) return
 
-  if (props.srcType === 'url') {
-    innerUrls.value = innerSrcs.value
-  } else {
-    if (!innerSrcs.value?.length) return []
-    const urls = await fsApi.getFileUrls!(innerSrcs.value)
-    innerUrls.value = urls
-  }
+  const urls = await getImageUrls(app, innerSrcs.value, props.srcType)
+  innerUrls.value = urls
 }
 </script>
 

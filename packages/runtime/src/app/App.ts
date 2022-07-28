@@ -1,19 +1,24 @@
-import { createApp, onUnmounted, watch, computed } from 'vue'
-import { createPinia, Pinia, setActivePinia, getActivePinia } from 'pinia'
+import { createApp, onUnmounted, watch, computed, resolveComponent } from 'vue'
+import { createPinia, Pinia } from 'pinia'
 import { Router, useRoute } from 'vue-router'
-import { AppError, ErrorCodes } from '@zto/zpage-core'
+import { AppError, ErrorCodes, Nil } from '@zto/zpage-core'
 
 import { AppLoaderType, FlushAppContextType } from '../consts'
-import { _, tpl, warn, queryEl, formatText, Emitter, HttpRequest } from '../utils'
+import { _, tpl, warn, queryEl, formatText, Emitter } from '../utils'
 import { getInnerLoaders, mergeLoaders } from './loaders'
 import { defineAndUseAppStores } from './store'
-import { createAppRouter } from './router'
-import { install } from './install'
-import { isWidgetEventKey } from './composables'
+import { createAppRouter, processAppInitialLocation } from './router'
+import { installUI, installRouter, installPlugins } from './install'
+import { isWidgetEventKey, normalizeEventTypes } from './composables'
 import { useAppConfigs, useAppPages } from './config/use-config'
+import { HostApp } from './HostApp'
+
+import { InternalAppAuth, InternalAppToken, InternalAppMicro } from './_internal'
+import { initalizeApis, normalizeWidgetName } from './_internal/util'
 
 import * as runtime from '../ZPageRuntime'
 
+import type { Handler } from 'mitt'
 import type { Widget, Plugin, PageSchema } from '@zto/zpage-core'
 import type {
   VueApp,
@@ -21,6 +26,7 @@ import type {
   VueComponent,
   Installable,
   AppStartOptions,
+  AppEnv,
   AppConfig,
   AppLoader,
   AppAuthLoader,
@@ -31,8 +37,7 @@ import type {
   AppUI,
   AppContext,
   PageContext,
-  AppApi,
-  AppApiConfig
+  AppPageDefinition
 } from '../typings'
 
 import type { TextFormatters, FormatTextOptions } from '../typings'
@@ -41,17 +46,25 @@ import type { TextFormatters, FormatTextOptions } from '../typings'
 const __app_names: string[] = []
 
 export class App implements Installable {
-  readonly env: any
-  readonly isHost: boolean
-  readonly name: string
-  readonly config: AppConfig
-  readonly emitter: Emitter
-  readonly stores: AppStores
-  readonly ui: AppUI
-  readonly router: Router
+  readonly isDebug: boolean // 当前是否调试模式
+  readonly isMicro: boolean // 当前应用是否微应用
+  readonly emitter: Emitter // 应用事件
+  readonly stores: AppStores // 应用store
+  readonly ui: AppUI // 应用UI
+  readonly router: Router // 应用路由
 
-  readonly apis: AppApis
-  readonly pages: PageSchema[]
+  readonly auth: InternalAppAuth
+  readonly token: InternalAppToken
+  readonly micro: InternalAppMicro
+
+  readonly _name: string // 应用名
+  readonly _env: AppEnv // 应用环境变量
+  readonly _config: AppConfig // 应用配置
+
+  readonly _apis: AppApis // 应用api
+  readonly _pages: PageSchema[] // 本地pages
+  readonly _loaders: AppLoader[]
+  readonly _formatters: TextFormatters
 
   private _container?: Element | undefined
   private _vueApp?: VueApp<Element>
@@ -60,33 +73,35 @@ export class App implements Installable {
 
   private _pinia: Pinia
 
-  private _loaders: AppLoader[]
   private _widgets: Widget[] = []
   private _plugins: Plugin[] = []
-  private _formatters: TextFormatters
 
   // 应用错误
   private _error: AppError | undefined
 
   constructor(opts: AppCtorOptions) {
+    this.isDebug = opts.isDebug === true // 默认false
+    this.isMicro = opts.isMicro === true // 默认false
+
     if (__app_names.includes(opts.name)) {
       throw new Error(`应用名${opts.name}已存在！`)
     }
 
-    this.name = opts.name
-    this.isHost = opts.isHost
     this.emitter = new Emitter()
-    this.env = Object.freeze({ ...opts.env })
     this.ui = opts.ui
 
     this._container = queryEl(opts.container)
 
+    this._name = opts.name
+    this._env = Object.freeze({ ...opts.env })
+
     // 初始化应用配置
     const config = useAppConfigs(this, [opts.config, ...(opts.configs || [])])
-    this.config = config
-    this.apis = this._initApis()
+    this._config = config
 
-    this.pages = useAppPages(this, opts.pages)
+    this._apis = this._initApis()
+
+    this._pages = useAppPages(this, opts.pages)
 
     // 创建vueApp
     this._vueApp = createApp(opts.ui.root, { schema: config.schema })
@@ -94,7 +109,6 @@ export class App implements Installable {
 
     // 创建store
     this._pinia = createPinia()
-    this._pinia.use(() => ({ app: this })) // 设置全局上下文
     this.stores = defineAndUseAppStores(this)
     this._vueApp.use(this._pinia)
 
@@ -112,46 +126,86 @@ export class App implements Installable {
     // 自定义格式化
     this._formatters = Object.freeze(exts.formatters || {})
 
-    __app_names.push(this.name)
+    this.token = InternalAppToken.retrieveInstance(this)
+
+    this.auth = InternalAppAuth.retrieveInstance(this)
+
+    this.micro = InternalAppMicro.retrieveInstance(this)
+
+    __app_names.push(this._name)
   }
 
   // 初始化api
   private _initApis(): AppApis {
-    const baseCfg = this.config.api
+    const baseCfg = this._config.api
 
-    const initApi = (apiCfg: AppApiConfig) => {
-      const baseUrl = apiCfg.baseUrl || baseCfg.baseUrl
+    const apiCfgs = this._config.apis
 
-      const cfg = _.deepMerge(baseCfg, apiCfg)
-
-      const api = new HttpRequest(baseUrl, cfg) as any
-      api.request = cfg.request
-
-      // 合并应用方法
-      let baseMethods = _.isFunction(baseCfg.methods) ? baseCfg.methods!(api) : baseCfg.methods || {}
-      let apiMethods = _.isFunction(cfg.methods) ? cfg.methods!(api) : cfg.methods || {}
-
-      const allMethods = { ...apiMethods, ...baseMethods }
-
-      Object.keys(allMethods).forEach(name => {
-        api[name] = allMethods[name]
-      })
-
-      return api as AppApi
-    }
-
-    const apiCfgs = this.config.apis
-
-    const apis = Object.keys(apiCfgs).reduce((rtn, key) => {
-      rtn[`${key}Api`] = initApi(apiCfgs[key])
-      return rtn
-    }, {} as Record<string, AppApi>)
+    const apis = initalizeApis(apiCfgs, baseCfg)
 
     return apis as AppApis
   }
 
+  /** 是否独立的应用（非微应用或者微应用非调试状态） */
+  get isIndependent() {
+    return !this.isMicro || this.isDebug
+  }
+
+  /** 应用已加载 */
+  get loaded() {
+    return this.stores.appStore.loaded
+  }
+
+  /** 当前激活的元应用 */
+  get metaApp() {
+    return this.micro?.activeApp
+  }
+
+  /** 后去当前vue应用实例 */
+  get vueApp() {
+    return this._vueApp as VueApp
+  }
+
+  /** 获取当前路由 */
+  get currentRoute() {
+    return this.router.currentRoute
+  }
+
+  get error() {
+    return this._error
+  }
+
+  /** 获取当前应用名 */
+  get name() {
+    return this.metaApp ? this.metaApp.name : this._name
+  }
+
+  get env() {
+    return this.metaApp ? this.metaApp.env : this._env
+  }
+
+  get config() {
+    return this.metaApp ? this.metaApp.config : this._config
+  }
+
+  get apis() {
+    return this.metaApp ? this.metaApp.apis : this._apis
+  }
+
+  get pages() {
+    return this.metaApp ? this.metaApp.pages : this._pages
+  }
+
   get api() {
-    return this.apis.appApi
+    return this.metaApp?.api || this._apis.appApi
+  }
+
+  get request() {
+    return this.api.request
+  }
+
+  get loaders() {
+    return this.metaApp ? this.metaApp.loaders : this._loaders
   }
 
   get plugins() {
@@ -162,59 +216,74 @@ export class App implements Installable {
     return this._widgets
   }
 
-  get vueApp() {
-    return this._vueApp as VueApp
-  }
-
-  get pinia() {
-    return this._pinia
-  }
-
-  get error() {
-    return this._error
-  }
-
-  get request() {
-    return this.api?.request
-  }
-
-  /** 激活当前应用 */
-  active() {
-    if (this._pinia === getActivePinia()) return
-    setActivePinia(this._pinia)
-  }
-
   /**
    * 创建渲染器实例
    * @param options - 渲染选项
    */
   async start(options: AppStartOptions) {
-    const { appStore } = this.stores
-
-    // 安装ui
-    if (this.ui.install) await this.ui.install(this, options)
-
-    try {
-      const authLoader = this.useAuthLoader()
-      if (authLoader) {
-        await authLoader.checkAuth(this)
-      }
-    } catch (ex) {
-      this.setError(ex, '验证权限错误')
+    if (this.isMicro && !this.isDebug && !HostApp.loaded) {
+      this.setError(new Error('宿主应用未加载，无法启动微应用！'))
     }
 
-    // 加载app初始化数据
-    await appStore.load(options)
+    await installUI(this, options)
 
-    // 安装应用(组件、微件、插件)
-    await install(this, options)
+    if (this.ui.install) await this.ui.install(this, options)
 
-    // 执行app加载
-    const onLoad = this.config.app?.onLoad
-    if (onLoad) await Promise.resolve().then(() => onLoad(this, options))
+    // 非调试状态下的微应用不检查认证
+    if (!this.error) {
+      try {
+        await this.auth.checkStartAuth()
+      } catch (ex) {
+        this.setError(ex, '验证权限错误')
+      }
+    }
 
-    // 设置应用加载成功
-    appStore.setLoaded(true)
+    const { userStore, appStore } = this.stores
+
+    if (!this.error) {
+      try {
+        // 加载用户信息(独立应用才需要加载用户信息)
+        if (this.isIndependent) {
+          await userStore.load({ root: true })
+        }
+
+        // 加载app初始化数据
+        await appStore.load(options)
+      } catch (ex) {
+        this.setError(ex, '加载应用数据错误')
+      }
+    }
+
+    if (!this.error) {
+      try {
+        // 安装路由
+        await installRouter(this, options)
+      } catch (ex) {
+        this.setError(ex, '安装路由错误')
+      }
+    }
+
+    if (!this.error) {
+      try {
+        // 安装插件
+        await installPlugins(this, options)
+      } catch (ex) {
+        this.setError(ex, '安装插件错误')
+      }
+    }
+
+    if (!this.error) {
+      try {
+        // 执行app加载
+        const onLoad = this._config.app?.onLoad
+        if (onLoad) await Promise.resolve().then(() => onLoad(this, options))
+
+        // 设置应用加载成功
+        appStore.setLoaded(true)
+      } catch (ex) {
+        this.setError(ex, '调用加载方法失败')
+      }
+    }
 
     this.vueApp.use(this.router)
 
@@ -230,20 +299,13 @@ export class App implements Installable {
 
     this.vueApp.mount(this._container)
 
-    // 缓存错误
-    if (this.error) {
-      const pathName = this.error.code === ErrorCodes.APP_AUTH_ERROR ? '403' : '500'
+    await this.micro.start()
 
-      await this.router.replace({
-        name: pathName,
-        params: {
-          description: this.error.description,
-          message: this.error.message
-        }
-      })
+    // 检查应用错误
+    await this.checkError()
 
-      this.clearError()
-    }
+    // 第一次加载出现临时路径刷新问题
+    processAppInitialLocation(this)
 
     return this
   }
@@ -253,8 +315,10 @@ export class App implements Installable {
    * @returns
    */
   async stop() {
-    // 执行app加载
-    const onUnload = this.config.app?.onUnload
+    await this.micro.stop()
+
+    // 执行app卸载
+    const onUnload = this._config.app?.onUnload
     if (onUnload) await Promise.resolve().then(() => onUnload(this))
 
     this.stores.appStore.setLoaded(false)
@@ -265,10 +329,13 @@ export class App implements Installable {
     this._vueApp = undefined
   }
 
+  /**
+   * 卸载所有应用
+   */
   async destroy() {
     await this.stop()
 
-    const appIndex = __app_names.indexOf(this.name)
+    const appIndex = __app_names.indexOf(this._name)
     if (appIndex > -1) __app_names.splice(appIndex, 1)
   }
 
@@ -286,29 +353,21 @@ export class App implements Installable {
     return this
   }
 
-  /** 登出系统 */
-  async logout() {
-    const authLoader = this.useAuthLoader()
-    if (!authLoader) return
-
-    return await authLoader!.logout(this)
+  /** 应用Store */
+  applyStore(useStoreMethod: Function) {
+    return useStoreMethod(this._pinia)
   }
 
-  /**
-   * 检查权限
-   * @param codes
-   * @returns
-   */
-  checkPermission(codes: string | string[]) {
-    return this.apis.authApi.checkPermission!(codes)
-  }
+  /** 获取宿主应用 */
+  useHostApp(): App {
+    // 微应用默认获取HostApp AuthLoader
+    if (this.isMicro) {
+      if (HostApp.loaded) return HostApp.app as App
 
-  /** 获取上传token */
-  async getUploadToken(...args: any[]) {
-    if (!this.apis.fsApi.getUploadToken) throw new Error('fsApi为定义 getUploadToken')
+      if (!this.isDebug) throw new Error('宿主应用未加载')
+    }
 
-    const token = await this.apis.fsApi.getUploadToken(...args)
-    return token
+    return this
   }
 
   useWidgetSchema(schema: any, payload?: any) {
@@ -324,13 +383,15 @@ export class App implements Installable {
     return computed(() => this.useWidgetSchema(schema, payload))
   }
 
-  useWidgetEmitter(schema: any, handlerMap: Record<string, Function>) {
+  useWidgetEmitter(schema: any, handlerMap: Record<string, Handler>) {
     if (!handlerMap) return
+
+    const currentPageKey = this.currentRoute.value.meta?.pageKey as string
 
     Object.keys(handlerMap).forEach(key => {
       if (!isWidgetEventKey(key)) return
 
-      const evtTypes = schema[key] as any
+      const evtTypes = normalizeEventTypes(schema[key] as any, currentPageKey)
       const evtHandler = handlerMap[key] as any
 
       this.emitter.ons(evtTypes, evtHandler)
@@ -340,7 +401,7 @@ export class App implements Installable {
       Object.keys(handlerMap).forEach(key => {
         if (!isWidgetEventKey(key)) return
 
-        const evtTypes = schema[key] as any
+        const evtTypes = normalizeEventTypes(schema[key] as any, currentPageKey)
         const evtHandler = handlerMap[key] as any
 
         this.emitter.offs(evtTypes, evtHandler)
@@ -348,8 +409,31 @@ export class App implements Installable {
     })
   }
 
-  useRoute() {
-    return useRoute()
+  /** 触发事件 */
+  emits(eTypes: string[] | string, payload?: any) {
+    const currentPageKey = this.currentRoute.value.meta?.pageKey as string
+
+    const evtTypes = normalizeEventTypes(eTypes, currentPageKey)
+
+    this.emitter.emits(evtTypes, payload)
+  }
+
+  /** 监听事件 */
+  ons(eTypes: string[] | string, handler: Handler<unknown> | undefined) {
+    const currentPageKey = this.currentRoute.value.meta?.pageKey as string
+
+    const evtTypes = normalizeEventTypes(eTypes, currentPageKey)
+
+    this.emitter.ons(evtTypes, handler)
+  }
+
+  /** 解除监听事件 */
+  offs(eTypes: string[] | string, handler: Handler<unknown> | undefined) {
+    const currentPageKey = this.currentRoute.value.meta?.pageKey as string
+
+    const evtTypes = normalizeEventTypes(eTypes, currentPageKey)
+
+    this.emitter.offs(evtTypes, handler)
   }
 
   /** 获取loader */
@@ -358,12 +442,21 @@ export class App implements Installable {
 
     if (typeof name === 'object') return name
 
-    const _loader = this._loaders.find(it => it.type === type && it.name === name)
+    const _loader = this.loaders.find(it => it.type === type && it.name === name)
     return _loader as T | undefined
   }
 
   /** 获取auth loader, 默认获取当前配置的loader */
   useAuthLoader(name?: string): AppAuthLoader | undefined {
+    // 微应用默认获取HostApp AuthLoader
+    if (this.isMicro) {
+      if (HostApp.loaded) {
+        return HostApp.app?.useAuthLoader(name)
+      } else if (!this.isDebug) {
+        throw new Error('宿主应用未加载，获取AuthLoader失败')
+      }
+    }
+
     if (!name) name = this.useAppConfig('auth', {}).loader
     if (!name) return undefined
 
@@ -372,7 +465,7 @@ export class App implements Installable {
 
   /** 获取page loader, 默认获取当前配置的loader */
   usePageLoader(name?: string): AppPageLoader | undefined {
-    if (!name) name = this.useAppConfig('page', {}).loader
+    if (!name) name = this.useAppConfig('page.loader', 'local') // 默认local加载器
     if (!name) return undefined
 
     return this.useLoader<AppPageLoader>(AppLoaderType.PAGE, name)
@@ -412,7 +505,7 @@ export class App implements Installable {
 
   /** 获取当前实时上下文 */
   useContext(data: any = {}): PageContext {
-    const ctx = { ...this._context, apis: this.apis, api: this.api, data }
+    const ctx = { ...this.config?.app?.exContext, ...this._context, apis: this.apis, api: this.api, data }
     return ctx
   }
 
@@ -424,6 +517,31 @@ export class App implements Installable {
   useAppConfig(path?: string, defaultValue?: unknown) {
     const _path = path ? `.${path}` : ''
     return this.useConfig(`app${_path}`, defaultValue)
+  }
+
+  /** 解析api路径，判断获取url和ns */
+  parseApiUrl(url: string) {
+    if (!_.isString(url)) return url
+
+    let _ns: string | null = null
+    let _url = url
+
+    const _parts = url.split(':')
+    if (_parts[0] && this.useApi(_parts[0])) {
+      _ns = _parts[0]
+      if (_ns) _url = url.substring(_ns.length + 1)
+    }
+
+    return { ns: _ns, url: _url }
+  }
+
+  /**
+   * 根据命名空间获取api
+   * @param ns
+   * @returns
+   */
+  useApi(ns: string = 'app') {
+    return this.apis[`${ns}Api`]
   }
 
   /**
@@ -448,28 +566,38 @@ export class App implements Installable {
    * @deprecated 后续将直接使用app.env
    * 应用api
    */
-  useEnv<T = any>(envName?: string): T {
-    if (!envName) return this.env
-    return this.env[envName]
+  useEnv<T>(envName?: string): T {
+    const env = this.env
+
+    if (!envName) return env as any as T
+    return env[envName]
   }
 
   /** 获取制定页面配置 */
-  usePage(path: string) {
+  usePage(path: string): PageSchema | Nil {
     const pages = this.pages
 
     if (!pages?.length) return undefined
 
+    // 判断路径是否为meta应用路径
     const page = pages.find((it: any) => it?.path === path)
+
     return page
   }
 
-  /**
-   * @deprecated 后续将直接使用 app.api
-   * @param name
-   * @returns
-   */
-  useApi(name: string = 'app') {
-    return this.useConfig(`apis.${name}`)
+  /** 新增\更新\删除页面 */
+  setPage(path: string, page: AppPageDefinition | Nil): PageSchema | Nil {
+    if (_.isNil(page)) {
+      // 删除页面
+      const pageIndex = this.pages.findIndex(it => it.path === path)
+      this.pages.splice(pageIndex, 1)
+      return
+    } else {
+      const _pages = useAppPages(this, [page as any])
+      this.pages.push(_pages[0])
+
+      return _pages[0]
+    }
   }
 
   useAssets(path?: string, defaultValue?: unknown) {
@@ -477,17 +605,82 @@ export class App implements Installable {
     return this.useConfig(`assets${_path}`, defaultValue)
   }
 
-  /** 获取当前消息组件 */
-  useMessage() {
-    return this.ui.useMessage()
+  /** 获取组件 */
+  resolveComponent(name: string) {
+    if (!_.isString(name)) return name
+    if (this.metaApp) return this.metaApp.resolveComponent(name)
+    return resolveComponent(name)
+  }
+
+  /** 同时获取多个组件，（方便使用） */
+  resolveComponents(names: string[]) {
+    const records = names.reduce((acc, name) => {
+      const component = this.resolveComponent(name)
+      acc[name] = component
+      return acc
+    }, {})
+
+    return records as Record<string, VueComponent>
+  }
+
+  /** 获取组件 */
+  resolveWidget(name: string) {
+    if (this.metaApp) return this.metaApp.resolveWidget(name)
+
+    const wName = normalizeWidgetName(name)
+    return resolveComponent(wName)
   }
 
   setError(err: any, description?: string) {
     this._error = new AppError(err, description)
   }
 
+  /** 检查错误 */
+  async checkError() {
+    if (!this.error) return true
+
+    const pathName = this.error.code === ErrorCodes.APP_AUTH_ERROR ? '403' : '500'
+
+    await this.router.replace({
+      name: pathName,
+      params: {
+        description: this.error.description,
+        message: this.error.message
+      }
+    })
+
+    this.clearError()
+
+    return false
+  }
+
   clearError() {
     this._error = undefined
+  }
+
+  /** 设置应用数据 */
+  setAppData(path: string, data: any) {
+    return this.stores.appStore.setData({ path, data })
+  }
+
+  /** 获取应用数据 */
+  getAppData<T = any>(path?: string) {
+    return this.stores.appStore.getData<T>(path)
+  }
+
+  /** 设置用户数据 */
+  setUserData(path: string, data: any) {
+    return this.stores.userStore.setData({ path, data })
+  }
+
+  /** 获取用户数据 */
+  getUserData<T = any>(path?: string) {
+    return this.stores.userStore.getData<T>(path)
+  }
+
+  /** 设置页面数据 */
+  getPageData<T = any>(path?: string) {
+    return this.stores.pagesStore.getCurrentPageData<T>(path)
   }
 
   /** 设置页面数据 */
@@ -498,10 +691,6 @@ export class App implements Installable {
   /** 获取当前页面数据 */
   useCurentPage() {
     return this.stores.pagesStore.currentPage
-  }
-
-  async setAppData(path: string, data: any) {
-    await this.stores.appStore.setData({ path, data })
   }
 
   /** 应用vue插件 */
@@ -595,6 +784,10 @@ export class App implements Installable {
 
   // 格式化
   formatText(val: any, f: string | Function | Record<string, any>, options?: FormatTextOptions) {
+    if (this.metaApp) {
+      return this.metaApp.formatText(val, f, options)
+    }
+
     const opts = options || {}
     opts.formatters = { ...this._formatters, ...opts.formatters }
 
@@ -612,5 +805,50 @@ export class App implements Installable {
     const res = tpl.deepFilter(target, ctx)
 
     return res
+  }
+
+  useRoute() {
+    return useRoute()
+  }
+
+  /** 获取当前UI */
+  useGlobalUI() {
+    if (this.isMicro && HostApp.loaded) return HostApp.ui || this.ui
+    return this.ui
+  }
+
+  /** 获取当前或者HostAppProgress */
+  useProgress() {
+    const ui = this.useGlobalUI()
+    return ui?.useProgress()
+  }
+
+  /** 获取当前或者HostApp消息组件 */
+  useMessage() {
+    const ui = this.useGlobalUI()
+
+    return ui?.useMessage()
+  }
+
+  /**
+   * 检查权限
+   * @param codes
+   * @returns
+   */
+  checkPermission(codes: string | string[]) {
+    return this.auth.checkPermission(codes)
+  }
+
+  /** 登出系统 */
+  logout() {
+    return this.auth.logout()
+  }
+
+  /** 获取上传token */
+  async getUploadToken(...args: any[]) {
+    if (!this.apis.fsApi.getUploadToken) throw new Error('fsApi为定义 getUploadToken')
+
+    const token = await this.apis.fsApi.getUploadToken(...args)
+    return token
   }
 }

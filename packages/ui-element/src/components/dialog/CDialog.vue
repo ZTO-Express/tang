@@ -32,11 +32,12 @@
       <div class="dialog-footer">
         <slot name="footer">
           <template v-for="it in actionItems" :key="it.name">
-            <el-button v-if="it.name === 'close'" v-bind="it" class="q-mr-md" @click="close(it)">
+            <el-button v-if="it.name === 'close'" v-preventReclick v-bind="it" class="q-mr-md" @click="close(it)">
               {{ it.label || '取消' }}
             </el-button>
             <el-button
               v-else-if="it.name === 'submit' || it.actionType === 'submit'"
+              v-preventReclick
               v-bind="it"
               class="q-mr-md"
               :loading="loading"

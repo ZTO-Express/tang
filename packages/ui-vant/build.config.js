@@ -14,3 +14,15 @@ export const rollup = {
     }
   }
 }
+
+export const browser = {
+  external: ['vue', '@zto/zpage-runtime', '@zto/zpage'],
+  output: {
+    name: 'ZPageVantUI',
+    globals: {
+      vue: 'Vue',
+      '@zto/zpage-runtime': 'ZPageRuntime',
+      '@zto/zpage': 'ZPage'
+    }
+  }
+}

@@ -62,6 +62,9 @@ export function _useAppConfig(app: App, cfg?: any, type?: AppConfigType) {
   }
 
   if (_.isPlainObject(_cfg)) {
+    // 防止修改原始数据
+    _cfg = { ..._cfg }
+
     Object.keys(_cfg).forEach(key => {
       _cfg[key] = _useAppConfig(app, _cfg[key])
     })

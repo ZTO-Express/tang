@@ -18,7 +18,8 @@
         <app-nav />
       </div>
       <div class="app-main-con no-padding">
-        <app-content />
+        <app-content :class="{ hidden: isMicroRoute }" />
+        <app-micro-content :class="{ hidden: !isMicroRoute }" />
       </div>
     </div>
   </el-container>
@@ -31,13 +32,21 @@ import { Back } from '@element-plus/icons'
 import AppMenu from './app-menu.vue'
 import AppNav from './app-nav.vue'
 import AppContent from './app-content.vue'
-
-const asideCollapse = ref(false)
+import AppMicroContent from './app-micro-content.vue'
 
 const app = useCurrentAppInstance()
 
+const route = app.useRoute()
+
 const menuConfig = app.useAppConfig('menu', {})
 const frameConfig = app.useAppConfig('frame')
+
+const asideCollapse = ref<boolean>(false)
+
+/** 当前页面为微前端 */
+const isMicroRoute = computed(() => {
+  return route.path.startsWith('/m/') || !!route.meta?.micro
+})
 
 /** 是否显示框架 */
 const showFrame = computed(() => {
@@ -57,7 +66,7 @@ function handleAsideCollapse() {
 <style lang="scss" scoped>
 .app-aside {
   position: relative;
-  width: $app-sidebar-width;
+  width: var(--app-sidebar-width);
   overflow-x: hidden;
   background: rgb(14, 21, 36);
 
@@ -93,11 +102,11 @@ function handleAsideCollapse() {
   overflow: auto;
 
   .app-nav-con {
-    height: $app-nav-height;
+    height: var(--app-nav-height);
   }
 
   .app-main-con {
-    height: calc(100% - $app-nav-height - 20px);
+    height: calc(100% - var(--app-nav-height) - 20px);
   }
 }
 </style>

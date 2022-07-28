@@ -25,10 +25,8 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, dateUtil } from '@zto/zpage'
+import { ref, computed, watch, onMounted, dateUtil } from '@zto/zpage'
 import { Picker as VanPicker } from 'vant'
-
-const { ref, computed, watch, onMounted } = vue
 
 const emit = defineEmits(['change'])
 
@@ -66,7 +64,7 @@ const displayValue = computed(() => {
 
 watch(
   () => props.model[props.prop],
-  (cur) => {
+  cur => {
     if (cur) {
       if (!Array.isArray(cur)) innerValue.value = [cur]
     }

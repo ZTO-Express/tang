@@ -9,7 +9,7 @@
           @selected="handleFilesSelected"
         >
           <slot>
-            <el-button :type="buttonType" :disabled="disabled" :icon="buttonIcon || ''">
+            <el-button :type="buttonType" v-preventReclick :disabled="disabled" :icon="buttonIcon || ''">
               <span>{{ buttonText }}</span>
             </el-button>
           </slot>
@@ -18,7 +18,13 @@
       </template>
       <template v-else>
         <slot>
-          <el-button :type="buttonType" :disabled="disabled" :icon="buttonIcon || ''" @click="openUpload">
+          <el-button
+            :type="buttonType"
+            :disabled="disabled"
+            :icon="buttonIcon || ''"
+            v-preventReclick
+            @click="openUpload"
+          >
             <span>{{ buttonText }}</span>
           </el-button>
         </slot>

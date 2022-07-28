@@ -53,9 +53,8 @@ const { innerAttrs } = useFormItem(props)
 watch(
   () => props.model[props.prop],
   (cur, old) => {
-    const val = props.model[props.prop]
-
     if (cur && cur !== old) {
+      let val = dateUtil.parse(props.model[props.prop])
       props.model[props.prop] = dateUtil.format(val, props.valueFormat)
     }
   }
@@ -65,8 +64,8 @@ const innerDisabledDateFn = function (time: any) {
   if (props.disabledDate && props.disabledDate(time)) return true
   if (props.beforeToday && time >= Date.now()) return true
   if (props.afterToday && time <= Date.now()) return true
-  if (props.minDate && time < new Date(props.minDate).getTime()) return true
-  if (props.maxDate && time > new Date(props.maxDate).getTime()) return true
+  if (props.minDate && time < dateUtil.parse(props.minDate).getTime()) return true
+  if (props.maxDate && time > dateUtil.parse(props.maxDate).getTime()) return true
   return false
 }
 </script>

@@ -12,7 +12,7 @@ export class HostApp {
   private _app: App
 
   private constructor(options: AppCtorOptions) {
-    this._app = new App({ ...options, isHost: true })
+    this._app = new App({ ...options, isMicro: false })
   }
 
   static initialize(options: AppCtorOptions) {
@@ -37,6 +37,11 @@ export class HostApp {
 
   static get app() {
     return HostApp.__instance?._app
+  }
+
+  /** 宿主应用是否已加载 */
+  static get loaded() {
+    return !!HostApp.__instance?._app?.loaded
   }
 
   static get env() {
@@ -68,11 +73,10 @@ export class HostApp {
   }
 
   /**
-   * @deprecated 直接使用 HostApp.api
-   * @param name
+   * @param ns 命名空间
    * @returns
    */
-  static useApi(name?: string) {
-    return HostApp.app?.useApi(name)
+  static useApi(ns?: string) {
+    return HostApp.app?.useApi(ns)
   }
 }

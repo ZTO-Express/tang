@@ -1,11 +1,13 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { ROOT_ROUTE_NAME } from '../../consts'
+import { ROOT_ROUTE_NAME, ERROR_ROUTE_NAMES } from '../../consts'
 import { getPageKey, tpl, _ } from '../../utils'
-import { pruneCachedPage } from './util'
+import { pruneCachedPage, processAppInitialLocation } from './util'
 
 import type { Router } from 'vue-router'
 import type { AppRouterConfig, PageInfoData } from '../../typings'
 import type { App } from '../App'
+
+export { processAppInitialLocation }
 
 export function createAppRouter(app: App, config?: AppRouterConfig) {
   const _router: Router = config?.router
@@ -39,7 +41,7 @@ export function createAppRouter(app: App, config?: AppRouterConfig) {
         const tmplRoute = _router.getRouteByName(to.name)
         if (tmplRoute?.meta?.menu) {
           const tmplData = app.deepFilter(tmplRoute?.meta?.menu, to.data || {})
-          to = Object.assign({}, tmplData, to)
+          to = { ...tmplData, ...to }
         }
       }
 
@@ -79,7 +81,6 @@ export function createAppRouter(app: App, config?: AppRouterConfig) {
       // 若路由不存在则新增路由
       if (!toRoute) {
         to.submodule = to.submodule || appStore.navMenu?.submodule
-
         // 当前路由不存在，则新增临时路由
         await pagesStore.addTemp(to)
 
@@ -192,8 +193,8 @@ export function createAppRouter(app: App, config?: AppRouterConfig) {
   } else {
     _router.beforeEach(async (to, from, next) => {
       if (!from.name) {
-        if (to.name === '404') {
-          next({ name: ROOT_ROUTE_NAME, replace: true })
+        if (_.isString(to.name) && ERROR_ROUTE_NAMES.includes(to.name)) {
+          next()
           return
         }
 

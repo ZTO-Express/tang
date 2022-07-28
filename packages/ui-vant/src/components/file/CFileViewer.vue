@@ -13,14 +13,18 @@
         <iframe :src="files[0]" width="100%" height="100%"></iframe>
       </div>
     </van-popup>
-    <van-image-preview v-else :model-value="true" :images="files" :closeable="true" @close="handleClose">
-    </van-image-preview>
+    <van-image-preview
+      v-else
+      :model-value="true"
+      :images="files"
+      :closeable="true"
+      @close="handleClose"
+    ></van-image-preview>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { vue } from '@zto/zpage'
-const { ref } = vue
+import { ref } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{

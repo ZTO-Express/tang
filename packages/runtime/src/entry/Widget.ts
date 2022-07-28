@@ -1,4 +1,4 @@
-import { h, computed, resolveComponent, defineComponent } from 'vue'
+import { h, computed, defineComponent } from 'vue'
 
 import { _ } from '../utils'
 import { useCurrentAppInstance } from '../app'
@@ -11,10 +11,8 @@ export const Widget = defineComponent({
   name: 'Widget',
 
   props: {
-    schema: {
-      type: Object,
-      default: () => ({})
-    }
+    schema: { type: Object, default: () => ({}) },
+    error: { type: Object, default: () => ({}) }
   },
 
   setup(props: any) {
@@ -22,22 +20,10 @@ export const Widget = defineComponent({
 
     const schema = computed(() => props.schema?.value || props.schema)
 
-    // 获取widget组件
-    function resolveWidget(type: string) {
-      let wType = type
-      if (type && !type.startsWith('w-')) {
-        wType = `w-${type}`
-      }
-      const c = resolveComponent(wType)
-      return c
-    }
-
     // 渲染多个widgets
     function renderWidgets(ss: any[]): VNode | VNode[] {
       if (Array.isArray(ss)) {
-        const ws = ss.map(s => {
-          return renderWidget(s)
-        })
+        const ws = ss.map(s => renderWidget(s))
         return ws
       }
 
@@ -72,7 +58,7 @@ export const Widget = defineComponent({
         s = { type: 'html', html: s }
       }
 
-      const w = resolveWidget(s.type)
+      const w = app.resolveWidget(s.type)
 
       // 执行递归
       let bodyChild: any = null

@@ -4,7 +4,7 @@
       <div class="trigger-con">
         <c-file-trigger :accept="fileAccept" @file-selected="handleFileSelected">
           <slot name="trigger">
-            <el-button type="primary">选择文件</el-button>
+            <el-button type="primary" v-preventReclick>选择文件</el-button>
           </slot>
         </c-file-trigger>
         <div class="file-list-con text-center">
@@ -32,7 +32,7 @@
       <div class="footer-con">
         <slot name="footer">
           <div class="template-download">
-            <el-button type="text" @click="handleDownloadTemplate">下载导入模版</el-button>
+            <el-button type="text" v-preventReclick @click="handleDownloadTemplate">下载导入模版</el-button>
           </div>
         </slot>
       </div>
@@ -134,6 +134,10 @@ const innerExtraTip = computed(() => {
     _extraTip = { componentType: 'c-html', ..._tip }
   } else {
     _extraTip = { ..._tip }
+  }
+
+  if (_extraTip.componentType) {
+    _extraTip.componentType = app.resolveComponent(_extraTip.componentType)
   }
 
   return _extraTip

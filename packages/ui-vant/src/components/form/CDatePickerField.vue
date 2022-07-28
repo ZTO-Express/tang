@@ -25,12 +25,8 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { vue, dateUtil } from '@zto/zpage'
+import { ref, computed, watch, onMounted, dateUtil } from '@zto/zpage'
 import { DatetimePicker as VanDatetimePicker } from 'vant'
-
-const { ref, computed, watch, onMounted } = vue
-
-const emit = defineEmits(['change'])
 
 const props = withDefaults(
   defineProps<{
@@ -55,6 +51,8 @@ const props = withDefaults(
   }
 )
 
+const emit = defineEmits(['change'])
+
 const isShowPopup = ref<boolean>(false)
 
 const innerDateValue = ref<Date>(new Date())
@@ -71,7 +69,7 @@ const displayValue = computed(() => {
 
 watch(
   () => props.model[props.prop],
-  (cur) => {
+  cur => {
     if (cur) {
       innerDateValue.value = dateUtil.parse(cur, props.format)
     }

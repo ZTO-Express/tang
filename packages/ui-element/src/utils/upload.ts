@@ -2,7 +2,7 @@
 
 import { _ } from '@zto/zpage'
 
-import type { App, AppContextOptions } from '@zto/zpage'
+import type { AppContextOptions } from '@zto/zpage'
 
 export interface UploadStoreOptions {
   [prop: string]: any

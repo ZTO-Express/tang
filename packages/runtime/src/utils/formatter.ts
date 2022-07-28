@@ -1,8 +1,7 @@
 import { _ } from './util'
 import * as dateUtil from './date'
 
-import type { DateValue } from '@zto/zpage-core'
-import type { DataOptionItem } from '../typings'
+import type { DateValue, DataOptionItem } from '../typings'
 
 export interface MoneyFormatOptions {
   decimals?: number // 保留小数位数
@@ -34,8 +33,8 @@ export function yuanMoney(input: number, opts: MoneyFormatOptions = {}) {
     dec = opts.decimalSep || '.',
     s: string | string[] = '',
     toFixedFix = function (n: number, prec: number) {
-      const k = Math.pow(10, prec)
-      return '' + Math.ceil(n * k) / k
+      const num = parseFloat(String(n))
+      return (Math.round((num + Number.EPSILON) * Math.pow(10, prec)) / Math.pow(10, prec)).toFixed(prec)
     }
 
   s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.')

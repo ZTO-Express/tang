@@ -11,7 +11,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, tpl, useCurrentAppInstance } from '@zto/zpage'
+import { computed, ref, tpl, useCurrentAppInstance, onActivated, onMounted } from '@zto/zpage'
+
+import { UI_PAGE_EVENTS } from '../../consts'
 
 const props = defineProps<{
   schema: Record<string, any>
@@ -34,6 +36,16 @@ const pageMeta = computed(() => {
   }
 })
 
+onActivated(() => {
+  const ctx = app.useContext()
+  app.emits(UI_PAGE_EVENTS.ACTIVATED, ctx)
+})
+
+onMounted(() => {
+  const ctx = app.useContext()
+  app.emits(UI_PAGE_EVENTS.MOUNTED, ctx)
+})
+
 // ---- header相关 ----->
 
 const isToolbar = computed(() => {
@@ -50,7 +62,7 @@ const headerHeight = computed(() => {
 })
 
 const headerAttrs = computed(() => {
-  return { ...wSchema.header, noBack: wSchema.noBack === true }
+  return { tip: wSchema.tip, ...wSchema.header, noBack: wSchema.noBack === true }
 })
 
 // ---- tab相关 ----->

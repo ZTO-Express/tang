@@ -1,2 +1,3 @@
 import CAction from './CAction.vue'
-export { CAction }
+import CMoreAction from './CMoreAction.vue'
+export { CAction, CMoreAction }

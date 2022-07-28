@@ -7,6 +7,7 @@
           v-if="it.name === 'submit' || it.actionType === 'submit'"
           :loading="loading"
           type="primary"
+          v-preventReclick
           @click="handleSubmit(it)"
         >
           {{ it.label || '确定' }}
@@ -14,6 +15,7 @@
         <el-button
           v-else-if="it.name === 'cancel' || it.actionType === 'cancel'"
           type="plain"
+          v-preventReclick
           @click="handleCancel(it)"
         >
           {{ it.label || '取消' }}
@@ -43,6 +45,7 @@ const props = defineProps<{
   submitMethod?: Function
   beforeSubmit?: Function
   afterSubmit?: Function
+  column?: any
 }>()
 
 const emit = defineEmits(['submit', 'cancel'])
@@ -51,7 +54,7 @@ const app = useCurrentAppInstance()
 
 const formConfig = app.useComponentsConfig('form', {})
 
-const { Message } = app.useMessage()
+const { Message, MessageBox } = app.useMessage()
 const apiRequest = app.request
 
 const formRef = ref<any>()
@@ -150,10 +153,42 @@ function handleCancel(action: any) {
   emit('cancel', action)
 }
 
+// 编辑状态下，是否二次确认的判断
+const editorMessageBox = () => {
+  return new Promise((resolve, reject) => {
+    let message = props?.column?.editor?.message
+    if (typeof message === 'string') {
+      message = message
+    } else if (typeof message === 'function') {
+      message = message(props?.model)
+    } else {
+      resolve(true)
+      return false
+    }
+    if (message) {
+      MessageBox.confirm(message, {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          resolve(true)
+        })
+        .catch(() => {
+          reject()
+        })
+    } else {
+      resolve(true)
+    }
+  })
+}
+
 // 提交代码
 async function handleSubmit(action: any) {
   if (!formRef.value) {
-    await doSubmit(action)
+    editorMessageBox().then(async () => {
+      await doSubmit(action)
+    })
     return
   }
 
@@ -165,7 +200,9 @@ async function handleSubmit(action: any) {
     if (!valid) return
   }
 
-  await doSubmit(action)
+  editorMessageBox().then(async () => {
+    await doSubmit(action)
+  })
 }
 
 async function handleActionBeforeTrigger(action: any) {

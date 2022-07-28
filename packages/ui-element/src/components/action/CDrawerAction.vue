@@ -1,6 +1,6 @@
 <template>
   <div class="c-drawer-action">
-    <el-button v-bind="buttonAttrs" :disabled="disabled" @click="handleClick">
+    <el-button v-preventReclick v-bind="buttonAttrs" :disabled="disabled" @click="handleClick">
       {{ label }}
     </el-button>
 

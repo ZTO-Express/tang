@@ -46,21 +46,21 @@ const itemClass = computed(() => {
   height: 32px;
   padding: 6px 0 6px;
   line-height: 20px;
-  color: $secondary;
+  color: var(--secondary);
   border: none;
   display: inline-block;
   box-sizing: border-box;
 
   .icon-close {
     font-size: 16px;
-    color: $info;
+    color: var(--info);
     cursor: pointer;
     margin-left: 8px;
   }
 
   .subitem {
     padding: 0 16px;
-    border-left: 1px solid $border-color;
+    border-left: 1px solid var(--border-color);
   }
 
   &:first-child .subitem {
@@ -82,8 +82,8 @@ const itemClass = computed(() => {
   }
 
   &.active {
-    color: $primary;
-    background: $app-bg-color;
+    color: var(--primary);
+    background: var(--app-bg-color);
     border-radius: 4px 4px 0px 0px;
     opacity: 1;
 
@@ -96,7 +96,7 @@ const itemClass = computed(() => {
     }
 
     .icon-close {
-      color: $primary;
+      color: var(--primary);
     }
 
     &:before,

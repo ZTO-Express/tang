@@ -68,9 +68,9 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { _, isWidgetEventKey, reactive, ref, computed, onMounted, useCurrentAppInstance } from '@zto/zpage'
+import { _, isWidgetEventKey, reactive, ref, computed, useCurrentAppInstance } from '@zto/zpage'
 
-import { getFormItemRules } from '../../utils/form'
+import { getFormItemRules, calcDynamicAttrs } from '../../utils/form'
 
 import type { FormItemConfig } from '../../utils/form'
 import _Link from 'element-plus/lib/components/link'
@@ -120,8 +120,10 @@ const innerFormItems = computed<any>(() => {
   const items = formItems.map((item: any) => {
     let formItem = item
     if (typeof item === 'function') formItem = item(context)
-    if (typeof formItem.dynamicAttrs === 'function') {
-      const dynamicAttrs = formItem.dynamicAttrs(context)
+
+    if (formItem.dynamicAttrs) {
+      const dynamicAttrs = calcDynamicAttrs(formItem.dynamicAttrs, context)
+
       formItem = _.omit(formItem, ['dynamicAttrs'])
       formItem = _.deepMerge(formItem, dynamicAttrs)
     }
@@ -153,11 +155,18 @@ const innerFormItems = computed<any>(() => {
       if (!isWidgetEventKey(key)) it[key] = formItem[key]
     })
 
-    const componentType = formItem.componentType
+    const componentType = formItem.componentType ? app.resolveComponent(formItem.componentType) : null
     const componentAttrs = _.omit(it, ['type', 'relatedProps', 'label', 'componentType', 'span'])
+
+    let relatedProps = it.relatedProps
+
+    if (!relatedProps && (it.props || it.labelProps)) {
+      relatedProps = it.relatedProps || [...(it.props || []), ...(it.labelProps || [])]
+    }
 
     return {
       ...it,
+      relatedProps,
       componentAttrs,
       rules,
       realSpan,
@@ -193,19 +202,6 @@ const operationAlign = computed(() => {
 // 操作排列位置
 const operationSpan = computed(() => {
   return 24 - (fieldSpan.value % 24)
-})
-
-onMounted(() => {
-  const items = innerFormItems.value
-
-  // 设置默认值
-  if (items?.length) {
-    items.forEach((it: any) => {
-      if (_.isUndefined(props.model[it.prop]) && !_.isUndefined(it.default)) {
-        props.model[it.prop] = it.default
-      }
-    })
-  }
 })
 
 /**
@@ -282,12 +278,6 @@ defineExpose({
 .c-form-items {
   justify-items: stretch;
   // justify-content: space-between;
-
-  @for $i from 1 to 24 {
-    &.col-#{$i} {
-      grid-template-columns: repeat($i, math.div(100%, $i));
-    }
-  }
 
   .c-form-item {
     width: 100%;

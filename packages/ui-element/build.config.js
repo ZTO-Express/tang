@@ -17,12 +17,11 @@ export const rollup = {
 }
 
 export const browser = {
-  external: ['vue', '@zto/zpage-runtime', '@zto/zpage', 'element-plus'],
+  external: ['vue', '@zto/zpage', 'element-plus'],
   output: {
     name: 'ZPageElementUI',
     globals: {
       vue: 'Vue',
-      '@zto/zpage-runtime': 'ZPageRuntime',
       '@zto/zpage': 'ZPage',
       'element-plus': 'ElementPlus'
     }

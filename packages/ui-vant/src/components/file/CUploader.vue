@@ -19,21 +19,16 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { _, vue, useConfig, fileUtil } from '@zto/zpage'
+import { _, watch, reactive, computed, fileUtil, useCurrentAppInstance } from '@zto/zpage'
 import { Uploader } from 'vant'
 
 import { uploadUtil } from '../../utils'
-import { useMessage } from '../../composables'
-import { isSameFile, getFileThumbnail, getFileUrls, checkIsReadyForUpload, getUrlThumbnail } from './util'
+import { isSameFile, getFileThumbnail, checkIsReadyForUpload, getUrlThumbnail } from './util'
 import { UploadStatus, UploadStatusInfo } from './types'
 
 import type { GenericFunction, PromiseFunction } from '@zto/zpage'
 import type { UploadStoreOptions } from '../../utils/upload'
 import type { UploadData, UploadDataItems, UploadFileItem, UploadStoreGroup } from './types'
-
-const { watch, reactive, computed } = vue
-
-const { Message } = useMessage()
 
 const props = withDefaults(
   defineProps<{
@@ -83,7 +78,13 @@ const props = withDefaults(
 
 const emit = defineEmits(['update:modelValue', 'update:name', 'change', 'uploaded', 'completed', 'deleted', 'oversize'])
 
-const uploadConfig = useConfig('components.file.upload', {})
+const app = useCurrentAppInstance()
+
+const { fsApi } = app.apis
+
+const { Message } = app.useMessage()
+
+const uploadConfig = app.useComponentsConfig('file.upload', {})
 
 const uploadState = reactive<{
   items: UploadDataItems
@@ -136,7 +137,7 @@ const innerPreviewOptions = computed(() => {
 const fileListItems = computed(() => {
   const isImage = props.rescType === 'image'
 
-  const items = Object.keys(uploadState.items).map((key) => {
+  const items = Object.keys(uploadState.items).map(key => {
     const it = uploadState.items[key]
     const statusInfo = getUploadStatusInfo(it) as any
     return { key: it.key, url: it.thumbnail, status: statusInfo.status, message: statusInfo.message, isImage }
@@ -174,7 +175,7 @@ async function handleAfterRead(fileInfo: any) {
 /** 新增文件 */
 async function addFile(items: UploadDataItems, file: File) {
   let itemsArr = Object.values(items)
-  let exists = itemsArr.some((it) => isSameFile(it.file, file))
+  let exists = itemsArr.some(it => isSameFile(it.file, file))
 
   if (exists) {
     Message.fail('文件已存在。')
@@ -218,7 +219,7 @@ async function handleFileDelete(file: any) {
   const item = uploadState.items[itemKey]
 
   if (innerRemoteDelete.value && item.id) {
-    await fileUtil.deleteFile(item.id)
+    await fsApi.deleteFile!(item.id)
   }
 
   if (props.onDelete) {
@@ -240,6 +241,7 @@ function upload(item: UploadData) {
   // 上传管理器
   return uploadUtil
     .upload(item.file, {
+      app,
       onProgress: onUploadProgress(item),
       onUpload: onUploadStart(item),
       storePath: props.storePath,
@@ -317,7 +319,7 @@ async function onUploadCompleted(item: UploadData, result?: any) {
 function resetItem(item: UploadData) {
   if (!item?.key) return
 
-  item = Object.assign({}, item)
+  item = { ...item }
   uploadState.items[item.key] = item
 }
 
@@ -325,7 +327,7 @@ function resetItem(item: UploadData) {
 async function triggerChange() {
   const fileItems = uploadState.items || {}
 
-  const vals: any[] = Object.keys(fileItems).map((key) => parseFileValue(fileItems[key]))
+  const vals: any[] = Object.keys(fileItems).map(key => parseFileValue(fileItems[key]))
   const val = props.multiple ? vals : vals[0]
 
   emit('update:modelValue', val)
@@ -340,12 +342,12 @@ async function triggerChange() {
 async function parseUploadDataItems(fileItems: UploadFileItem[]): Promise<UploadDataItems> {
   let urls: string[] = []
   if (props.storeGroup === 'private' && props.srcType === 'id') {
-    const ids = fileItems.map((it) => it.id) as string[]
+    const ids = fileItems.map(it => it.id) as string[]
 
-    urls = await getFileUrls(ids)
+    urls = await fsApi.getFileUrls!(ids)
 
     const ops = urls.map((url, index) => {
-      return getUrlThumbnail(url).then((thumbnail) => {
+      return getUrlThumbnail(url).then(thumbnail => {
         fileItems[index].url = url
         fileItems[index].thumbnail = thumbnail
       })

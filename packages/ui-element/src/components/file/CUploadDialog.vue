@@ -40,19 +40,20 @@
               :multiple="uploadProps.multiple"
               @selected="handleFilesSelected"
             >
-              <el-button v-if="uploadProps.multiple">添加文件</el-button>
-              <el-button v-else>选择文件</el-button>
+              <el-button v-if="uploadProps.multiple" v-preventReclick>添加文件</el-button>
+              <el-button v-else v-preventReclick>选择文件</el-button>
             </c-file-trigger>
             <el-button
               v-if="isItemsReadyForUpload"
               class="q-ml-md"
               :loading="isUploading"
               type="primary"
+              v-preventReclick
               @click="handleUploadClick"
             >
               开始上传
             </el-button>
-            <el-button v-else class="q-ml-md" @click="handleCloseClick">关闭</el-button>
+            <el-button v-else class="q-ml-md" v-preventReclick @click="handleCloseClick">关闭</el-button>
           </div>
         </div>
       </div>
