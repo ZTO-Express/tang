@@ -201,7 +201,7 @@ export class App implements Installable {
   }
 
   get request() {
-    return this.api.request
+    return this.api?.request
   }
 
   get loaders() {

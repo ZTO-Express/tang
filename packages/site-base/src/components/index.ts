@@ -1,6 +1,5 @@
 import { getComponentsFromMap } from '../utils'
 
-import CAppHeaderExtra from './app/CAppHeaderExtra.vue'
 import CInfoSection from './section/CInfoSection.vue'
 
 import { CFormItemMultiInput, CFormItemMultiLabel } from './form'
@@ -10,7 +9,6 @@ import CMap from './map/CMap.vue'
 // import CChart from './chart/CChart.vue'
 
 const components = getComponentsFromMap({
-  CAppHeaderExtra,
   CInfoSection,
   CFormItemMultiInput,
   CFormItemMultiLabel,

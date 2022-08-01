@@ -329,6 +329,13 @@ function _mergeMenu(menus: NavMenuItemConfig[], exMenu: NavMenuItemConfig) {
 
 /** 菜单应用排序 */
 function _sortMenus(menus: NavMenuItem[]) {
+  // 设置默认排序号
+  let preOrder = 0
+  menus.forEach(it => {
+    if (!it.order) it.order = preOrder++
+    preOrder = it.order
+  })
+
   menus.sort((a, b) => {
     if (a.order > b.order) return 1
     else if (a.order < b.order) return -1

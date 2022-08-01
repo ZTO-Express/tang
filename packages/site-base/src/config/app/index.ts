@@ -2,15 +2,12 @@ import { defineAppConfig } from '@zto/zpage'
 
 import { HOST_APP_TITLE } from '../../consts'
 
-import header from './header'
-
 import type { App, AppAppConfig } from '@zto/zpage'
 
 export default defineAppConfig<AppAppConfig>((app: App) => {
   return {
     title: HOST_APP_TITLE,
     menu: { showNav: true, maxNavs: 15 },
-    header,
     auth: {
       loader: 'iam',
       token: {

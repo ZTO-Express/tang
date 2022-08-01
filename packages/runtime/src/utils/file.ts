@@ -174,32 +174,41 @@ export async function download(url: string, options?: any) {
     filetype = getFileMimeType(filename)
   }
 
-  const res = await axios.get(url, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    responseType: 'blob'
-  })
+  let href = url
 
-  // eslint-disable-next-line eqeqeq
-  if (res && res.status == 200) {
-    if (res.data && res.data.type) {
-      if (res.data.type === 'image/jpeg' && ext !== 'jpg' && ext !== 'jpeg') {
-        filename += '.jpeg'
+  const preload = options.preload !== false
+
+  // 默认preload不为false
+  if (preload) {
+    const res = await axios.get(url, {
+      headers: { 'Content-Type': 'application/json' },
+      responseType: 'blob'
+    })
+
+    // eslint-disable-next-line eqeqeq
+    if (res && res.status == 200) {
+      if (res.data && res.data.type) {
+        if (res.data.type === 'image/jpeg' && ext !== 'jpg' && ext !== 'jpeg') {
+          filename += '.jpeg'
+        }
+        filetype = res.data.type
       }
-      filetype = res.data.type
-    }
-    let blob = new Blob([res.data], { type: filetype })
 
-    let downloadElement = document.createElement('a')
-    let href = window.URL.createObjectURL(blob) // 创建下载的链接
-    downloadElement.href = href
-    downloadElement.download = decodeURIComponent(filename) // 下载后文件名
-    document.body.appendChild(downloadElement)
-    downloadElement.click() // 点击下载
-    document.body.removeChild(downloadElement) // 下载完成移除元素
+      const blob = new Blob([res.data], { type: filetype })
+      href = window.URL.createObjectURL(blob) // 创建下载的链接
+    }
+  }
+
+  const downloadElement = document.createElement('a')
+  downloadElement.href = href
+  downloadElement.download = decodeURIComponent(filename) // 下载后文件名
+  document.body.appendChild(downloadElement)
+  downloadElement.click() // 点击下载
+  document.body.removeChild(downloadElement) // 下载完成移除元素
+
+  // 有预加载则在下载完成后回收href
+  if (preload) {
     window.URL.revokeObjectURL(href) // 释放掉blob对象
-    return
   }
 }
 

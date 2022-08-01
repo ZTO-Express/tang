@@ -22,6 +22,11 @@ export default async (app: App, options: InstallableOptions): Promise<Router | u
 
   createAppRoutes(router, submodules, { baseRoute, menus })
 
+  // 设置默认导航菜单
+  if (!app.stores.appStore.navMenu?.submodule) {
+    app.stores.appStore.setNavMenu(null)
+  }
+
   // 设置所有默认页
   const routes = router.getRoutes()
   const defaultPages = routes.filter(it => it.meta?.default === true).map(it => it.meta)

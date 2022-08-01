@@ -58,7 +58,7 @@ export default defineConfig({
       },
       {
         find: '@',
-        replacement: resolve(__dirname, './src')
+        replacement: resolve(__dirname, './site/src')
       },
       {
         find: /~(.+)/,

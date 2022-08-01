@@ -12,7 +12,7 @@ export const LocalAuthLoader: AppAuthLoader = {
     const router = app.router
     const { authApi } = app.apis
 
-    if (authApi.checkAuth) {
+    if (authApi?.checkAuth) {
       await authApi.checkAuth(app.config)
     } else {
       // 从url获取code
@@ -29,6 +29,9 @@ export const LocalAuthLoader: AppAuthLoader = {
   // 获取用户信息
   async getUserInfo(app: App) {
     const { authApi } = app.apis
+
+    if (!authApi?.getUserInfo) return null
+
     // 先重设token
     await app.token.reset()
 
@@ -46,7 +49,7 @@ export const LocalAuthLoader: AppAuthLoader = {
   async logout(app: App) {
     const { authApi } = app.apis
 
-    if (authApi.logout) {
+    if (authApi?.logout) {
       authApi.logout()
     } else {
       await app.token.clearData()
