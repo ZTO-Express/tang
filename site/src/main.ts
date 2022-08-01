@@ -3,8 +3,9 @@ import { startSiteApp } from '@zto/zpage-site-base'
 import { APP_NAME } from './consts'
 import { envMap } from './env'
 
-import { config, menus } from './config'
+import { config, menus, extensions } from './config'
 
+import { pages } from './pages'
 import { components } from './components'
 import { widgets } from './widgets'
 
@@ -12,6 +13,7 @@ import { widgets } from './widgets'
 startSiteApp({
   name: APP_NAME,
   envMap,
+  pages,
   config: { ...config, menus },
-  extensions: { components, widgets }
+  extensions: { ...extensions, components, widgets }
 })

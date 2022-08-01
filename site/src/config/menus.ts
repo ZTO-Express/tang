@@ -9,13 +9,7 @@ export const menus: NavMenuItemConfig[] = [
       {
         name: 'site.docs.start',
         title: '开始',
-        children: [
-          {
-            name: 'site.docs.start.intro',
-            title: '介绍',
-            path: '/docs/start/intro'
-          }
-        ]
+        children: [{ name: 'site.docs.start.intro', title: '介绍', path: '/docs/start/intro' }]
       }
     ]
   },
@@ -24,21 +18,11 @@ export const menus: NavMenuItemConfig[] = [
     title: '组件',
     order: 20,
     children: [
-      {
-        name: 'site.cmpts.intro',
-        title: '介绍',
-        path: '/cmpts/intro'
-      },
+      { name: 'site.cmpts.intro', title: '介绍', path: '/cmpts/intro' },
       {
         name: 'site.cmpts.layout',
         title: '布局',
-        children: [
-          {
-            name: 'site.cmpts.layout.crud',
-            title: '介绍',
-            path: '/cmpts/layout/crud'
-          }
-        ]
+        children: [{ name: 'site.cmpts.layout.crud', title: '增删改查', path: '/cmpts/layout/crud' }]
       }
     ]
   },
@@ -51,16 +35,8 @@ export const menus: NavMenuItemConfig[] = [
         name: 'site.examples.page',
         title: '页面',
         children: [
-          {
-            name: 'site.examples.page.simple',
-            title: '简单页面',
-            path: '/examples/page/simple'
-          },
-          {
-            name: 'site.examples.page.form',
-            title: '表单页面',
-            path: '/examples/page/form'
-          }
+          { name: 'site.examples.page.simple', title: '简单页面', path: '/examples/page/simple' },
+          { name: 'site.examples.page.form', title: '表单页面', path: '/examples/page/form' }
         ]
       },
       {
