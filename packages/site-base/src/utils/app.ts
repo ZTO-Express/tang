@@ -65,6 +65,7 @@ export function getComponentsRecords(components: VueComponent[]) {
 export interface GetPagesFromGlobMapOptions {
   basePath?: string
   indexPostfix?: string
+  parse?: (config: any) => AppPageDefinition
 }
 
 /**
@@ -77,7 +78,6 @@ export function getPagesFromGlobMap(
   options: GetPagesFromGlobMapOptions = {}
 ): AppPageDefinition[] {
   options = { basePath: '../pages', indexPostfix: '/index.ts', ...options }
-
   const indexFile = `${options.basePath}${options.indexPostfix}`
 
   // 预处理导出页面
@@ -85,7 +85,9 @@ export function getPagesFromGlobMap(
     // index文件不导出
     if (key === indexFile) return undefined
 
-    const page = item.default || item.page
+    let _item: any = item
+
+    const page = _item.default || _item.page
     if (!page) return undefined
 
     if (!page.path) page.path = _getPagePathByPageKey(key, options as any)

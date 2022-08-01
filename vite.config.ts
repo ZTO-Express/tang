@@ -1,7 +1,10 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import createVuePlugin from '@vitejs/plugin-vue'
+
 import { createHtmlPlugin } from 'vite-plugin-html'
+import createMarkdownPlugin from 'vite-plugin-md'
+import { code, link, meta } from 'md-powerpack'
 
 import { dependencies as packageDependencies } from './site/package.json'
 
@@ -20,7 +23,15 @@ const HtmlInjectData = {
 export default defineConfig({
   root: __dirname,
   plugins: [
-    createVuePlugin({ include: [/\.vue$/] }),
+    createVuePlugin({ include: [/\.vue$/, /\.md$/] }),
+    createMarkdownPlugin({
+      markdownItOptions: {
+        html: true,
+        linkify: true,
+        typographer: true
+      }
+      // builders: [link(), meta(), code()]
+    }),
     createHtmlPlugin({
       minify: false,
       pages: [{ template: 'site/index.html', filename: 'index.html', injectOptions: { data: HtmlInjectData } }]

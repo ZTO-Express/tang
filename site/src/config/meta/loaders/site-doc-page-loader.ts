@@ -10,7 +10,32 @@ export const SiteDocPageLoader: AppPageLoader = {
   // 解析菜单数据
   async loadPage(app: App, path: string) {
     // 优先尝试从本地获取路径
-    let page = app.usePage(path)
+    const page: any = app.usePage(path)
+
+    //     const md = markdownit()
+
+    //     const result = md.render(`
+    // # markdown-it rulezz!
+
+    // | Tables        | Are           | Cool  |
+    // | ------------- |:-------------:| -----:|
+    // | col 3 is      | right-aligned | $1600 |
+    // | col 2 is      | centered      |   $12 |
+    // | zebra stripes | are neat      |    $1 |
+
+    // :tada: :100:
+
+    // ::: info
+    // This is an info box.
+    // :::
+
+    // \`\`\`js
+    // console.log('Hello, VitePress!')
+    // \`\`\`
+    //     `)
+
+    // if (page) page.body = result
+
     // data开头的路有需要从远程获取路径
     // if (!page && path.startsWith(APP_PAGE_PATH_PREFIX)) {
     //   const schemaUrl = pageUtil.getDataPageSchemaUrl(path)

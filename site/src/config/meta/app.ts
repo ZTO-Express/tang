@@ -1,4 +1,4 @@
-import { APP_TITLE } from '@/consts'
+import { APP_TITLE } from '../../consts'
 
 import type { AppAppConfig } from '@zto/zpage'
 
