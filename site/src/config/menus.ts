@@ -6,6 +6,7 @@ export const menus: NavMenuItemConfig[] = [
     title: '文档',
     order: 10,
     children: [
+      { name: 'site.docs.about', title: '关于', path: '/docs/about' },
       {
         name: 'site.docs.start',
         title: '开始',

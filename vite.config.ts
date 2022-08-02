@@ -4,14 +4,17 @@ import createVuePlugin from '@vitejs/plugin-vue'
 
 import { createHtmlPlugin } from 'vite-plugin-html'
 import createMarkdownPlugin from 'vite-plugin-md'
-import { code, link, meta } from 'md-powerpack'
+
+import markdownItAnchor from 'markdown-it-anchor'
+import { v4 as uuidv4 } from 'uuid'
+
+import markdownItPrism from 'markdown-it-prism'
 
 import { dependencies as packageDependencies } from './site/package.json'
+import { APP_NAME, APP_TITLE, APP_ZCAT_KEY, HOST_APP_PROD_HOSTS as APP_PROD_HOSTS } from './site/src/consts'
 
 // 独立的包（一般比较大，这里需要特殊处理）
 const independentVendors = ['xlsx', 'echarts']
-
-import { APP_NAME, APP_TITLE, APP_ZCAT_KEY, HOST_APP_PROD_HOSTS as APP_PROD_HOSTS } from './site/src/consts'
 
 const HtmlInjectData = {
   APP_NAME,
@@ -22,6 +25,7 @@ const HtmlInjectData = {
 
 export default defineConfig({
   root: __dirname,
+  publicDir: resolve(__dirname, 'site', 'public'),
   plugins: [
     createVuePlugin({ include: [/\.vue$/, /\.md$/] }),
     createMarkdownPlugin({
@@ -29,8 +33,13 @@ export default defineConfig({
         html: true,
         linkify: true,
         typographer: true
+      },
+      markdownItSetup(md) {
+        // add anchor links to your H[x] tags
+        md.use(markdownItAnchor, { slugify: s => uuidv4() })
+        // add code syntax highlighting with Prism
+        md.use(markdownItPrism)
       }
-      // builders: [link(), meta(), code()]
     }),
     createHtmlPlugin({
       minify: false,

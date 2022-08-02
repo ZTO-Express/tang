@@ -13,7 +13,7 @@ export function normalizeDocPagesMap(docPagesMap: GlobMap<any>): GlobMap<AppPage
     // 转换markdown页面
     if (key.endsWith(mdIndexPostfix)) {
       k = key.substring(0, key.length - mdIndexPostfix.length) + indexPostfix
-      p = { default: { type: 'doc-page', markdown: { cmpt: p.default } } }
+      p = { default: { type: 'doc-page', markdown: { cmpt: p.default, frontmatter: p.frontmatter } } }
     }
 
     map[k] = p
