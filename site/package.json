@@ -4,10 +4,6 @@
   "description": "ZPage 文档",
   "private": true,
   "main": "index.js",
-  "scripts": {
-    "dev": "vite --config=./vite.config.ts",
-    "build": "vite build"
-  },
   "repository": {
     "type": "git",
     "url": "git@git.ztosys.com:tuxi/tuxi-devs/zpage.git"

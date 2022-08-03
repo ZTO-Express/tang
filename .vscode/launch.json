@@ -5,6 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Doc Site",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "dev"],
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
       "name": "Launch ZPage Build via NPM",
       "type": "node",
       "request": "launch",

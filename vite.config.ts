@@ -3,12 +3,14 @@ import { defineConfig } from 'vite'
 import createVuePlugin from '@vitejs/plugin-vue'
 
 import { createHtmlPlugin } from 'vite-plugin-html'
+
 import createMarkdownPlugin from 'vite-plugin-md'
 
 import markdownItAnchor from 'markdown-it-anchor'
 import { v4 as uuidv4 } from 'uuid'
 
 import markdownItPrism from 'markdown-it-prism'
+import markdownItZPageDoc from './scripts/vite/plugins/markdown-it-zpage-doc'
 
 import { dependencies as packageDependencies } from './site/package.json'
 import { APP_NAME, APP_TITLE, APP_ZCAT_KEY, HOST_APP_PROD_HOSTS as APP_PROD_HOSTS } from './site/src/consts'
@@ -35,6 +37,9 @@ export default defineConfig({
         typographer: true
       },
       markdownItSetup(md) {
+        debugger
+        // 解析ZPage Code
+        md.use(markdownItZPageDoc)
         // add anchor links to your H[x] tags
         md.use(markdownItAnchor, { slugify: s => uuidv4() })
         // add code syntax highlighting with Prism

@@ -7,41 +7,34 @@ ZPage的目的就是将配置变成页面，结合后端Api生成企业应用 --
 
 ## 理念
 
-```vue doc-sample
+```vue
+--- doc-sample:sfc ---
 <template>
     <div>
-        <span
-        >I sit at my window this morning where the world like a passer-by stops
-        for a moment, nods to me and goes.</span
-        >
+        <span>I sit at my window this morning where the world like a passer-by stops
+        for a moment, nods to me and goes.</span>
         <el-divider />
-        <span
-        >There little thoughts are the rustle of leaves; they have their whisper
-        of joy in my mind.</span
-        >
+        <span>There little thoughts are the rustle of leaves; they have their whisper
+        of joy in my mind.</span>
     </div>
 </template>
 
 <script setup lang="ts">
 </script>
-
-<style lang="scss" scoped>
-</style>
 ```
 
-```zpage doc-sample-widget
-{
-    title: "xxxx"
+```json
+--- doc-sample:zpage-widget ---
+{ 
+    "type": "action", 
+    "label": "xxxx"
 }
 ```
 
 ## 框架
-- <img src="/assets/docs/zpage-framework-01.png" width="90%" />
+- <img src="/docs/zpage-framework-01.png" width="90%" />
 
 ## Feature Overview
-
-
-
 
 ## Feature Overview1
 

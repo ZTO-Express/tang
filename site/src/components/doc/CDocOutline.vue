@@ -32,12 +32,12 @@ let observer: MutationObserver | undefined
 // 只有开发环境监视文档内容变化
 if (app.env.name === 'dev') {
   observer = new MutationObserver(() => {
-    resolveHeaders()
+    refreshDoc()
   })
 }
 
 onMounted(() => {
-  resolveHeaders()
+  refreshDoc()
 
   observer?.observe(docBodyRef.value, { subtree: true, childList: true })
 })
@@ -55,8 +55,9 @@ function handleNavAnchor(h: DocHeader) {
   gotoAnchor(h.anchor)
 }
 
-function resolveHeaders() {
+function refreshDoc() {
   docHeaders.value = resolveDocHeaders(docBodyRef.value)
+  // 刷新内置组件
 }
 </script>
 

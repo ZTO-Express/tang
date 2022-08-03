@@ -1,9 +1,9 @@
 <template>
-  <c-action ref="actionRef" v-bind="$attrs" />
+  <c-action ref="actionRef" v-bind="actionAttrs" />
 </template>
 
 <script setup lang="ts">
-import { ref, useCurrentAppInstance } from '@zto/zpage'
+import { _, computed, ref, useCurrentAppInstance } from '@zto/zpage'
 
 // 属性
 const props = defineProps<{
@@ -20,6 +20,10 @@ app.useWidgetEmitter(wSchema, {
 })
 
 const actionRef = ref<any>()
+
+const actionAttrs = computed(() => {
+  return _.omit(wSchema, 'type')
+})
 
 // 执行数据加载
 async function doTrigger() {
