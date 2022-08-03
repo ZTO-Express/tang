@@ -51,3 +51,5 @@ pids
 # Optional eslint cache
 .eslintcache
 
+# Scannerwork
+.scannerwork

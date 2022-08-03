@@ -11,7 +11,7 @@ export interface MoneyFormatOptions {
 export function fenMoney(input: number, options: MoneyFormatOptions = {}) {
   if (_.isNil(input)) return options.emptyText || 'N/A'
 
-  const yuan = +(+input / 100).toFixed(2)
+  const yuan = +(+input / 100).toFixed(options.decimals || 2)
 
   return yuanMoney(yuan, options)
 }
@@ -30,8 +30,8 @@ export function yuanMoney(input: number, options: MoneyFormatOptions = {}) {
     dec = options.decimalSep || '.',
     s: string | string[] = '',
     toFixedFix = function (n: number, prec: number) {
-      const k = Math.pow(10, prec)
-      return '' + Math.ceil(n * k) / k
+      const num = parseFloat(String(n))
+      return (Math.round((num + Number.EPSILON) * Math.pow(10, prec)) / Math.pow(10, prec)).toFixed(prec)
     }
 
   s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.')
