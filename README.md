@@ -1,27 +1,42 @@
-# zpage
+<picture width="512" align="right">
+ <source media="(prefers-color-scheme: dark)" srcset="./assets/zpage-white.png">
+ <img src="./assets/zpage-black.png">
+</picture>
 
-Zpage 为前端低代码渲染库，基于 vue3，目前支持 element plus 和 vant 库
+A front-end development framework based on schema, which simplifies the development process and improves the development efficiency through configuration, supporting element plus and vant.
 
-## 安装
+## Install
 
-### pnpm 相关命令
+### pnpm commands
 
 ```bash
-
-# 发布应用
+# publish
 cd packages/runtime
-
-# 确保仓库在zto下
 nrm use zto
-
 pnpm publish
 ```
 
-### yarn workspace 相关命令
+### yarn workspace commands
 
 ```bash
-# 安装 peerDependencies
+# peerDependencies installation
 yarn add install-peers
 
 yarn workspace <workspace-name> <command>
 ```
+
+## Usage
+```bash
+zpage [OPTIONS] COMMAND [ARGS]...
+```
+
+## Projects using this library
+* [兔喜运营平台](https://kt.tuxi.com/) 服务于兔喜总部运营人员, 为门店生命周期全流程管理, 提供系统支持.
+
+## Related projects
+* [amis](https://github.com/baidu/amis) 前端低代码框架，通过 JSON 配置就能生成各种页面
+
+## About the name
+* We will change the name TANG to ZPAGE, to make this project more localization.
+
+have fun
