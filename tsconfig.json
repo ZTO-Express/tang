@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "esnext",
+    "target": "es2017",
     "declaration": true,
     "noImplicitAny": false,
     "removeComments": true,
@@ -8,7 +9,6 @@
     "esModuleInterop": true,
     "jsx": "preserve",
     "noLib": false,
-    "target": "es2017",
     "sourceMap": true,
     "lib": ["ESNext", "DOM"],
     "allowSyntheticDefaultImports": true,
@@ -18,5 +18,6 @@
     "strict": true,
     "skipLibCheck": true
   },
+  "include": ["typings"],
   "exclude": ["node_modules", "**/__tests__", "dist/**"]
 }

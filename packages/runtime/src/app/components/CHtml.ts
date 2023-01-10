@@ -4,7 +4,7 @@ import { useCurrentAppInstance } from '../composables'
 
 export default defineComponent({
   props: {
-    html: { type: [String, Object] },
+    html: { type: [String, Object, Function] },
     contextData: { type: Object }
   },
 

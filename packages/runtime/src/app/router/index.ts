@@ -81,6 +81,11 @@ export function createAppRouter(app: App, config?: AppRouterConfig) {
       // 若路由不存在则新增路由
       if (!toRoute) {
         to.submodule = to.submodule || appStore.navMenu?.submodule
+        // 如果title在url中不存在，则跳到首页
+        if (!to.title) {
+          return await _router.goHome()
+        }
+
         // 当前路由不存在，则新增临时路由
         await pagesStore.addTemp(to)
 
@@ -232,6 +237,20 @@ export function createAppRouter(app: App, config?: AppRouterConfig) {
         })
       }
 
+      // pageKey
+      const fromPageKey = getPageKey(from)
+      const toPageKey = getPageKey(to)
+      // console.log('from ===', from)
+      // console.log('to ===', to)
+
+      app.emits('trace', {
+        event_code: 'route',
+        event_data: {
+          from,
+          to,
+        }
+      })
+
       next()
     })
   }
@@ -242,7 +261,8 @@ export function createAppRouter(app: App, config?: AppRouterConfig) {
     _router.afterEach(async (to, from) => {
       const keeyAlive = app.useAppConfig('page.keeyAlive')
       const { pagesStore } = app.stores
-      await pagesStore.setCurrent((to.meta?.pageKey || to.name) as string)
+
+      await pagesStore.setCurrent((to.meta?.pageKey || to.name) as string, to.meta?.submodule as string)
 
       // 移除临时路由
       if (keeyAlive === false && from.name && from.meta?.isTemp) {

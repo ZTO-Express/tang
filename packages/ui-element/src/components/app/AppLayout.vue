@@ -13,11 +13,13 @@
 </template>
 
 <script setup lang="ts">
-import { _, computed, useCurrentAppInstance } from '@zto/zpage'
+import { _, ref, computed, useCurrentAppInstance, onMounted, onUnmounted } from '@zto/zpage'
 
 import AppHeader from './app-header.vue'
 import AppContent from './app-content.vue'
 import AppContainer from './app-container.vue'
+
+import Watermark from '../../utils/watermark'
 
 const app = useCurrentAppInstance()
 
@@ -34,6 +36,23 @@ const showFrame = computed(() => {
 /** 是否显示菜单 */
 const showNav = computed(() => {
   return showFrame.value && !!menuConfig.showNav
+})
+
+// 水印相关
+const { userStore } = app.stores
+const watermark = ref<any>(null)
+const watermarkContent = computed(() => {
+  const { nickname, deptName, positionName , mobile } = userStore.data.basic
+  return `${nickname}\n${deptName}\n${positionName}\n${mobile}`
+})
+onMounted(() => {
+  // 调用
+  watermark.value = new Watermark({
+    content: watermarkContent.value,
+  });
+})
+onUnmounted(() => {
+  watermark.value.unload()
 })
 </script>
 

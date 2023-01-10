@@ -14,9 +14,15 @@
       </div>
     </template>
     <el-row :gutter="24" :style="`margin: 0 0 0; height: ${bodyHeight};`">
-      <el-col ref="contentWrapperRef" :class="`dialog-body-con fh ${size}`" :span="24" :style="innerBodyStyle">
+      <el-col
+        ref="contentWrapperRef"
+        :class="`dialog-body-con fh ${size} ${overflowX ? 'overflow-x' : ''}`"
+        :span="24"
+        :style="innerBodyStyle"
+      >
         <slot />
-        <cmpt v-if="cmpt" ref="cmptRef" :config="cmpt" :context-data="dataModel" :on-submit="onCmptSubmit" />
+        <widget v-if="body" :schema="body" :context-data="dataModel" />
+        <cmpt v-else-if="cmpt" ref="cmptRef" :config="cmpt" :context-data="dataModel" :on-submit="onCmptSubmit" />
         <c-form
           v-else-if="dialogFormItems.length"
           ref="formRef"
@@ -79,15 +85,21 @@ const props = withDefaults(
     innerAttrs?: Record<string, any> // 内部元素属性
     labelWidth?: string | number // 表单label宽度
     itemSpan?: number // 表单span
+
+    formAttrs?: Record<string, any> // 表单属性
+    formItemsAttrs?: Record<string, any> // 表单项属性
     formItemSpan?: number // 表单span(遗弃)
     formItems?: Record<string, any> // 表单项
+
     appendToBody?: boolean
     noSubmit?: boolean // 没有提交按钮（只有关闭）
     noPadding?: boolean
     noFooter?: boolean
+    body?: any
     bodyStyle?: string
     bodyHeight?: string
     cmpt?: CmptConfig // 自定义组件类型
+    overflowX?: boolean // 是否显示横向滚动条
     beforeSubmit?: GenericFunction
     onSubmit?: GenericFunction
     onShow?: GenericFunction
@@ -97,7 +109,8 @@ const props = withDefaults(
     noSubmit: false,
     noPadding: false,
     noFooter: false,
-    bodyHeight: 'auto'
+    bodyHeight: 'auto',
+    overflowX: false
   }
 )
 
@@ -185,6 +198,7 @@ const dialogAttrs = computed(() => {
 const dialogFormAttrs = computed(() => {
   const formAttrs = {
     labelWidth: props.labelWidth,
+    ...props.formAttrs,
     ...props.innerAttrs?.form
   }
   return formAttrs
@@ -194,6 +208,7 @@ const dialogFormItemsAttrs = computed(() => {
   const formItemsAttrs = {
     showOperation: false,
     span: props.formItemSpan || props.itemSpan,
+    ...props.formItemsAttrs,
     ...props.innerAttrs?.formItems
   }
   return formItemsAttrs
@@ -206,14 +221,15 @@ onBeforeRouteUpdate(() => {
 
 /** 组件提交 */
 async function onCmptSubmit(options?: any) {
-  await doSubmit(options)
+  const flag = await doSubmit(options)
+  if (flag === false) return
 
-  if (options?.closeAfterSuccess !== false) close()
+  if (options?.closeAfterSuccess !== false) close({ ...options, triggerSuccess: true })
 }
 
-function handleActionAfterTrigger(options?: any) {
+function handleActionAfterTrigger(ctx: any, payload: any, options?: any) {
   if (options?.closeAfterSuccess !== false) {
-    close()
+    close({ ...options, triggerSuccess: true })
   }
 }
 
@@ -253,7 +269,9 @@ async function submit(options?: any) {
 
   //关闭后调用回调
   if (submitFlag) {
-    await doSubmit(options)
+    // 根据submit的返回值进行判断，默认返回的是undefined，如果定义了doAction，则需要明确返回false来控制close的是否触发
+    const flag = await doSubmit(options)
+    if (flag === false) return
 
     // 没传过callback 调用全局
     if (!__callbacks__ || !__callbacks__.length) {
@@ -270,7 +288,7 @@ async function submit(options?: any) {
       }
     }
 
-    if (options?.closeAfterSuccess !== false) close()
+    if (options?.closeAfterSuccess !== false) close({ ...options, triggerSuccess: true })
   }
 }
 
@@ -308,7 +326,7 @@ function close(options?: any) {
   // callback清除
   __callbacks__ && (__callbacks__.length = 0)
 
-  emit('close', { model: dataModel.value })
+  emit('close', { model: dataModel.value, options })
 }
 
 /** 提交表单 */
@@ -316,10 +334,12 @@ async function doSubmit(options?: any) {
   const extData = options?.extData && app.deepFilter(options?.extData, dataModel.value)
 
   let payload = { ...extData, ...dataModel.value }
-  if (props.beforeSubmit) {
+
+  const beforeSubmit = options?.beforeSubmit || props.beforeSubmit
+  if (beforeSubmit) {
     const context = app.useContext(payload)
-    let result = await Promise.resolve().then(() => props.beforeSubmit!(context, dataModel, options))
-    if (result === false) return
+    let result = await Promise.resolve().then(() => beforeSubmit!(context, dataModel, options))
+    if (result === false) return false
     if (result && _.isObject(result)) payload = result
   }
 
@@ -331,13 +351,14 @@ async function doSubmit(options?: any) {
       const flag = await Promise.resolve().then(() => {
         return innerCmpt.submit(payload, options)
       })
-      if (flag === false) return
+      if (flag === false) return false
     }
   }
 
-  if (props.onSubmit) {
+  const onSubmit = options?.onSubmit || props.onSubmit
+  if (onSubmit) {
     return await Promise.resolve().then(() => {
-      return props.onSubmit!(payload, options)
+      return onSubmit!(payload, options) // 如果父组件有传过来onSubmit，则返回执行结果，默认返回的是undefined，如果定义了doAction，则需要明确返回false来控制close的是否触发
     })
   }
 
@@ -363,6 +384,7 @@ defineExpose({
 
   .dialog-body-con {
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 12px;
 
     max-height: calc(95vh - 110px); // 防止出现外部滚动条
@@ -373,6 +395,10 @@ defineExpose({
 
     &.full {
       max-height: calc(95vh - 140px); // 防止出现外部滚动条
+    }
+
+    &.overflow-x {
+      overflow-x: auto;
     }
   }
 

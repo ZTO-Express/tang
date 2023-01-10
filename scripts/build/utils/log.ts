@@ -1,6 +1,8 @@
 import process from 'process'
 import chalk from 'chalk'
 
+export { chalk }
+
 export function cyan(str: string) {
   console.log(chalk.cyan(str))
 }

@@ -2,6 +2,13 @@ import { _ } from './util'
 import * as dateUtil from './date'
 
 import type { DateValue, DataOptionItem } from '../typings'
+import type { App } from '../app'
+
+/** 值格式化上下文 */
+export interface FormatterOptionsContext {
+  app?: App
+  [prop: string]: any
+}
 
 export interface MoneyFormatOptions {
   decimals?: number // 保留小数位数
@@ -56,10 +63,15 @@ export function yuanMoney(input: number, opts: MoneyFormatOptions = {}) {
 export function enumStr(
   input: number | string,
   opts: {
-    options?: DataOptionItem[] | Record<string | number, string>
+    context?: FormatterOptionsContext
+    options?: DataOptionItem[] | Record<string | number, string> | string
   } = {}
 ) {
-  const options = opts?.options
+  let options: any = opts?.options
+
+  if (_.isString(options) && opts.context?.app) {
+    options = opts.context?.app.getCommonOptions(options)
+  }
 
   if (!options) return input
 

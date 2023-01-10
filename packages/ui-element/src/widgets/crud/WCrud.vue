@@ -31,8 +31,11 @@
       <!-- 表格信息 -->
       <div class="w-crud__content">
         <div class="w-crud__content-body">
-          <div v-if="!noToolbar" class="w-crud__toolbar">
-            <div class="toolbar__line"></div>
+          <div v-if="!noToolbar" class="w-crud__toolbar" :style="toolbarStyle">
+            <div class="toolbar__line" />
+            <div v-if="sToolbar.title" class="toolbar__title">
+              <Content :content="sToolbar.title" :contextData="innerContextData" />
+            </div>
             <div class="toolbar__actions">
               <template v-for="(it, index) in sToolbar?.items || []" :key="`tool_${String(index)}`">
                 <el-button
@@ -62,7 +65,7 @@
                 <widget v-else-if="it.type" class="q-ml-md" :schema="it" />
               </template>
             </div>
-            <div class="toolbar__extra">
+            <div v-if="!noToolbarExtra" class="toolbar__extra">
               <slot name="tools">
                 <div class="u-flex">
                   <slot name="extra" />
@@ -100,6 +103,14 @@
                         {{ expandedSearch ? '隐藏筛选' : '展开筛选' }}
                         <i :class="expandedSearch ? 'el-icon-arrow-up' : 'el-icon-arrow-down'"></i>
                       </el-button>
+                      <ColumnsFilter
+                        v-if="columnsFilterable"
+                        :name="wSchema.name"
+                        :columns="innerColumns"
+                        :storable="!tableAttrs.dataColumns"
+                        :context-data="innerContextData"
+                        @change="handleColumnsFilterChange"
+                      />
                     </div>
                   </template>
                 </div>
@@ -108,7 +119,7 @@
           </div>
 
           <!-- 主体内容部分-->
-          <div v-loading="searchLoading" class="w-crud__body">
+          <div v-loading="searchLoading" class="w-crud__body" :style="{ height: bodyStyle.height }">
             <c-table
               ref="tableRef"
               class="w-crud__table"
@@ -118,19 +129,20 @@
               @fetch="handleTableFetch"
             >
               <template #operation="scope">
-                <template v-for="(it, index) in sTable?.operation?.items || []" :key="`operation_${String(index)}`">
+                <template
+                  v-for="(it, index) in sTable?.operation?.items || []"
+                  :key="`operation_${index}_${curSearchOptions?.pageIndex || 0}`"
+                >
                   <c-action v-if="it.action" v-bind="getOperationActionAttrs(it, scope)" class="q-ml-sm"></c-action>
                   <!-- 如果有items配置，走“更多操作”样式 -->
-                  <c-more-action v-if="it.items?.length && isShowCMoreAction" :label="it.label" v-bind="it">
-                    <div ref="cMoreActions">
-                      <c-action
-                        v-for="(_it, index) in it.items || []"
-                        :key="`operation_more_${String(index)}`"
-                        v-bind="getOperationActionAttrs(_it, scope)"
-                        class="q-ml-sm"
-                        style="display: block"
-                      ></c-action>
-                    </div>
+                  <c-more-action v-else-if="it.items?.length" :label="it.label" v-bind="it">
+                    <c-action
+                      v-for="(_it, key) in it.items || []"
+                      :key="`operation_more_${index}_${key}_${curSearchOptions?.pageIndex || 0}`"
+                      v-bind="getOperationActionAttrs(_it, scope)"
+                      class="q-ml-sm"
+                      style="display: block"
+                    ></c-action>
                   </c-more-action>
                   <cmpt
                     v-else-if="it.cmpt"
@@ -154,29 +166,45 @@
       </div>
     </div>
 
+    <!-- v-bind="dialogAttrs"写在下面 -->
     <c-dialog
       v-if="activeAction?.dialog && !dialogClose"
       ref="dialogRef"
-      v-bind="dialogAttrs"
       v-loading="dialogLoading"
       :on-submit="handleDialogSubmit"
       @close="handleDialogClose"
+      v-bind="dialogAttrs"
     ></c-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { _, tpl, computed, reactive, ref, onMounted, nextTick, useCurrentAppInstance } from '@zto/zpage'
+import {
+  _,
+  ref,
+  tpl,
+  computed,
+  reactive,
+  onMounted,
+  onBeforeUnmount,
+  nextTick,
+  useCurrentAppInstance,
+  PAGE_SEARCH_EVENT_KEY,
+  PAGE_SEARCH_DATA_KEY
+} from '@zto/zpage'
 
 import { appUtil } from '../../utils'
 import { UI_GLOBAL_EVENTS } from '../../consts'
 import { DEFAULT_ACTIONS } from './consts'
+
+import ColumnsFilter from './columns-filterer.vue'
 
 import type { PageContext } from '@zto/zpage'
 
 // 属性
 const props = defineProps<{
   schema: Record<string, any>
+  contextData?: Record<string, any>
 }>()
 
 const app = useCurrentAppInstance()
@@ -191,7 +219,7 @@ const { MessageBox, Message } = app.useMessage() // 请求
 const fsApi = app.apis.fsApi
 
 const crudConfig = app.useWidgetsConfig('crud', {})
-const tableConfig = app.useComponentsConfig('table.data', {})
+const tableConfig = app.useComponentsConfig('table', {})
 
 // 数据属性
 const dataProp = tableConfig?.data?.dataProp || 'data'
@@ -199,7 +227,7 @@ const dataProp = tableConfig?.data?.dataProp || 'data'
 const wSchema = app.useWidgetSchema(props.schema)
 
 // 注册微件事件监听
-app.useWidgetEmitter(wSchema, { searchOn: doSearch })
+app.useWidgetEmitter(wSchema, { searchOn: () => doSearch })
 
 // Tab切换时重新布局（防止tab错位）
 emitter.on(UI_GLOBAL_EVENTS.PAGE_TAB_CHANGE, () => {
@@ -245,14 +273,25 @@ const searchFormRef = ref<any>() // 查询框
 
 // 组件上下文数据
 const innerContextData = computed(() => {
+  const tableData = tableRef.value?.tableData || {}
+
   return {
-    searchResult: searchResult.value
+    contextData: props.contextData, // 上下文
+    searchResult: searchResult.value, // 查询结果
+    search: searchModel.value, // 查询表单数据
+    result: searchResult.value, // 查询结果
+    tableData: tableData, // 表格数据
+    rows: tableData.data, // 表格行数据
+    summary: tableData.summary // 表格汇总
   }
 })
 
 // ----- 生命周期相关 ----->
 onMounted(async () => {
   const context = app.useContext()
+
+  // 注册页面搜索处理
+  app.ons(PAGE_SEARCH_EVENT_KEY, pageSearchHandler)
 
   if (_.isFunction(sTable.columns)) {
     innerColumns.value = await Promise.resolve().then(() => {
@@ -265,6 +304,17 @@ onMounted(async () => {
     await doSearch()
   }
 })
+
+onBeforeUnmount(() => {
+  // 解除页面搜索处理
+  app.offs(PAGE_SEARCH_EVENT_KEY, pageSearchHandler)
+})
+
+async function pageSearchHandler(event: any) {
+  const { resetPager, refreshPager } = (event || {}) as any
+
+  await doSearch(resetPager, refreshPager)
+}
 
 // ----- 模块相关 ----->
 const sectionStyle = computed(() => ({
@@ -288,6 +338,7 @@ const searchFormAttrs = computed(() => {
     items: sSearch.items,
     api: sSearch.api || sActions.query?.api,
     labelWidth: sSearch.labelWidth,
+    noResetProps: sSearch.noResetProps,
     ...sSearch.innerAttrs?.form
   }
 })
@@ -334,6 +385,12 @@ function toggleExpandSearch() {
 
 const noToolbar = sToolbar.hidden === true
 
+// 关闭工具栏扩展
+const noToolbarExtra = computed(() => {
+  if (_.isBoolean(sToolbar.noExtra)) return sToolbar.noExtra
+  return crudConfig?.toolbar?.noExtra === true
+})
+
 // 获取工具栏动作属性
 function getToolbarActionAttrs(config: any) {
   const name = config.action
@@ -359,6 +416,14 @@ function getToolbarActionAttrs(config: any) {
 
 // ----- 表格相关 ----->
 
+/** 可见列 */
+const innerVisibleColumns = ref<any[]>([])
+
+const columnsFilterable = computed(() => {
+  if (_.isBoolean(sTable.columnsFilterable)) return sTable.columnsFilterable
+  return crudConfig.table?.columnsFilterable === true
+})
+
 // 行属性类型
 const columnPropTypes = computed(() => {
   const propTypes = innerColumns.value.reduce((acc: any, cur: any) => {
@@ -380,12 +445,14 @@ const tableAttrs = computed(() => {
     loadWithCondition: _.isBoolean(sTree.withCondition) ? sTree.withCondition : true
   }
 
+  const columns = columnsFilterable.value ? innerVisibleColumns.value : innerColumns.value
+
   return {
     border: sTable.border !== false,
     action: sActions.query,
     editable: sTable.editable,
     batchEditable: sTable.batchEditable,
-    columns: innerColumns.value,
+    columns,
     noOperation: _.isBoolean(sTable.noOperation) ? sTable.noOperation : !sTable.operation,
     operationWidth: sTable.operation?.width,
     showFixed: sTable.showFixed !== false,
@@ -395,6 +462,7 @@ const tableAttrs = computed(() => {
     showSummary: sTable.showSummary,
     summaryText: sTable.summaryText || sTable.sumText,
     noPager: sTable.noPager,
+    dataColumns: sTable.dataColumns,
     data: sActions.query?.data,
     loadMethod: tableLoadFn,
     export: { ...exportOptions },
@@ -406,6 +474,15 @@ const tableAttrs = computed(() => {
 const selectedRows = computed(() => {
   return tableRef.value?.selectedRows || []
 })
+
+/** 显示列发生变化 */
+function handleColumnsFilterChange(visibleColumns: any[]) {
+  innerVisibleColumns.value = visibleColumns || []
+
+  nextTick(() => {
+    doLayout(true)
+  })
+}
 
 /** 编辑内容提交触发 */
 function handleEditorSubmit() {
@@ -451,15 +528,6 @@ function getOperationActionAttrs(options: any, scope: any) {
   return actionAttrs
 }
 
-// 更多操作c-more-action
-const cMoreActions = ref<any>(null) // 更多操作的dom
-let isShowCMoreAction = ref(true) // 是否展示“更多操作”
-
-onMounted(() => {
-  // 根据dom下的子元素（会根据权限显隐各个action）判断是否展示“更多操作”
-  isShowCMoreAction.value = cMoreActions.value?.[0]?.children?.length > 0
-})
-
 /** 获取行编号（用于唯一标识一行） */
 function getRowCode(row: any) {
   return columnPropTypes.value.code ? row[columnPropTypes.value.code] : null
@@ -492,22 +560,47 @@ const dialogAttrs = computed(() => {
 })
 
 // 执行提交
-async function handleDialogSubmit(model: any) {
-  const actionCfg = activeAction.value
-  if (!actionCfg) return
+// 传给CDialog组件的onSubmit
+async function handleDialogSubmit(model: any, options: any) {
+  const actionCfg = { ...activeAction.value, ...options }
 
   const context = app.useContext(model)
 
   const extData = tpl.deepFilter(dialogAttrs.value?.extData, context)
   const payload = _.deepMerge({}, extData, model)
 
-  await doAction(actionCfg.api, payload, actionCfg)
+  return await doAction(actionCfg.api, payload, actionCfg) // 返回doAction的结果，默认是undefined，如果父组件定义了onAction可以定义返回false
 }
 
 // 执行关闭
-function handleDialogClose() {
+function handleDialogClose(args: any) {
   dialogClose.value = true
+
+  const options = args.options
+  if (options?.triggerSuccess && options?.reloadAfterSuccess === true) {
+    doSearch()
+  }
 }
+
+// ----- 布局相关 ----->
+
+const toolbarStyle = computed(() => {
+  return {
+    height: sToolbar.height,
+    ...sToolbar.style
+  }
+})
+
+// 表格布局样式，主要为了兼容toolbar高度
+const bodyStyle = computed(() => {
+  const _style: any = {}
+
+  if (sToolbar.height) {
+    _style.height = `calc(100% - ${sToolbar.height})`
+  }
+
+  return _style
+})
 
 // ----- 通用代码 ----->
 
@@ -518,7 +611,7 @@ async function triggerAction(actionCfg: any) {
 
   const context = app.useContext(actionCfg.contextData)
 
-  const actionData = buildActionData(actionCfg, context)
+  const actionData = await buildActionData(actionCfg, context)
 
   // 构建数据问题，则不执行接下来的代码
   if (!actionData) return
@@ -541,6 +634,11 @@ async function triggerAction(actionCfg: any) {
     nextTick(() => {
       dialogRef.value?.show(actionData)
     })
+  } else if (actionCfg.message === false) {
+    // message为false时
+    if (actionCfg.api) {
+      return doAction(actionCfg.api, actionData, actionCfg)
+    }
   } else {
     const messageCfg: any =
       tpl.filter(actionCfg.message, {
@@ -568,11 +666,18 @@ async function triggerAction(actionCfg: any) {
 }
 
 // 构建活动参数
-function buildActionData(actionCfg: any, context: PageContext) {
+async function buildActionData(actionCfg: any, context: PageContext) {
   let actionData: any = {}
 
   if (typeof actionCfg.payload === 'function') {
-    actionData = actionCfg.payload(context, { selection: selectedRows.value })
+    const searchParams = getSearchParams()
+    actionData = await Promise.resolve().then(() =>
+      actionCfg.payload(context, {
+        ...innerContextData.value,
+        selection: selectedRows.value,
+        searchParams
+      })
+    )
   } else if (Array.isArray(actionCfg.payload)) {
     const rowData = context.data.row || {}
     actionData = actionCfg.payload.reduce((obj: any, key: string) => {
@@ -630,18 +735,19 @@ function buildActionData(actionCfg: any, context: PageContext) {
 }
 
 // table重新布局
-function doLayout() {
-  tableRef.value?.doLayout()
+function doLayout(force = false) {
+  tableRef.value?.doLayout(force)
 }
 
 // 执行活动
 async function doAction(action: any, payload: any, options?: any) {
+  // 如果有onAction，则返回其结果flag，如果是false，不触发查询，给二次确认弹窗做铺垫
   if (options?.onAction) {
     const ctx = app.useContext(payload)
     const flag = await Promise.resolve().then(() => options.onAction!(ctx, options))
 
     if (flag !== false && options?.reload !== false) return doSearch()
-    return
+    return flag
   }
 
   if (!action) {
@@ -675,6 +781,7 @@ async function doSearch(resetPager = false, refreshPager = false) {
 
   if (resetPager === true) {
     tableRef.value.resetPager()
+    tableRef.value.clearSort()
   }
 
   const queryAction = sActions.query || {}
@@ -685,6 +792,7 @@ async function doSearch(resetPager = false, refreshPager = false) {
   }
 
   const pager = tableRef.value.pager
+  const sort = tableRef.value.getSort()
 
   let searchParams = getSearchParams()
 
@@ -702,11 +810,14 @@ async function doSearch(resetPager = false, refreshPager = false) {
     curSearchOptions.value = {
       pageIndex: pager.pageIndex,
       pageSize: pager.pageSize,
+      pageSort: sort,
       noPager: sTable.noPager,
       action: { ...queryAction, type: 'query' },
       params: searchParams
     }
   }
+
+  searchLoading.value = true
 
   await apiRequest(curSearchOptions.value)
     .then(async res => {
@@ -737,7 +848,12 @@ function getSearchParams() {
   const apiParams = app.deepFilter(queryAction?.apiParams, context)
   const extData = app.deepFilter(sSearch?.extData, context)
 
-  const searchParms = _.deepMerge(extData, apiParams, searchModel)
+  const pageSearchData = app.getPageData(PAGE_SEARCH_DATA_KEY)
+
+  let searchParms = _.deepMerge(pageSearchData, extData, apiParams, searchModel)
+
+  // 清理查询空格
+  searchParms = _.shallowTrim(searchParms)
 
   return searchParms
 }
@@ -896,6 +1012,7 @@ async function tableLoadFn(row: any, node: any, resolve: Function) {
     padding: 10px 0;
     display: flex;
     line-height: 28px;
+    box-sizing: border-box;
 
     & > .toolbar {
       &__line {

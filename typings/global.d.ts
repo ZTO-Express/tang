@@ -1,10 +1,7 @@
 /**
- * 自定义全局类型
+ * 通用方法
  */
-
-type FunctionPropertyNames<T> = {
-  [K in keyof T]: T[K] extends GenericFunction ? K : never
-}[keyof T]
+type GenericFunction<T = any> = (...args: any[]) => T
 
 // 动态导入模块
 interface ImportMeta {

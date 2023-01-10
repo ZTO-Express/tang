@@ -25,17 +25,15 @@ export async function generateTypesDefinitions(pkgDir: string, options: Partial<
     ...options.compilerOptions
   }
 
-  let projectOptions = {
-    skipAddingFilesFromTsConfig: true,
-    ...options
-  }
+  let projectOptions = { skipAddingFilesFromTsConfig: true, ...options }
 
   const buildTsConfig = await readBuildConfig(pkgDir, 'tsconfig')
 
   if (buildTsConfig) {
-    compilerOptions = Object.assign(compilerOptions, buildTsConfig.compilerOptions)
-    projectOptions = Object.assign(projectOptions, buildTsConfig)
+    compilerOptions = { ...compilerOptions, ...buildTsConfig.compilerOptions }
+    projectOptions = { ...projectOptions, ...buildTsConfig }
   }
+
   projectOptions.compilerOptions = compilerOptions
 
   const project = new Project(projectOptions)

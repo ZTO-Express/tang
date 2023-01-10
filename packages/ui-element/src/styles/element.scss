@@ -105,3 +105,17 @@ $--font-path: 'element-plus/packages/theme-chalk/src/fonts';
     overflow: auto;
   }
 }
+
+.light-disabled {
+  &.el-input.is-disabled .el-input__inner {
+    color: var(--light-disabled-color);
+  }
+
+  &.input {
+    color: var(--light-disabled-color);
+  }
+
+  input {
+    color: var(--light-disabled-color);
+  }
+}

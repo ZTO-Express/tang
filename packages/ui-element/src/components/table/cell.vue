@@ -51,7 +51,13 @@ const innerClass = computed(() => {
 
 /** icon属性 */
 const iconAttrs = computed(() => {
-  const iconCfg = tpl.deepFilter(props.config?.icon, cellContext.value)
+  let iconCfg: any = ''
+
+  if (_.isFunction(props.config?.icon)) {
+    iconCfg = props.config?.icon(cellContext.value)
+  } else {
+    iconCfg = tpl.deepFilter(props.config?.icon, cellContext.value)
+  }
 
   let _iconAttrs: any = {}
 

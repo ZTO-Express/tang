@@ -1,6 +1,14 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
-  <el-switch v-model="model[prop]" v-bind="innerAttrs" :disabled="disabled" />
+  <el-switch
+    v-model="model[prop]"
+    v-bind="innerAttrs"
+    :active-value="activeValue"
+    :inactive-value="inactiveValue"
+    :disabled="disabled"
+    :before-change="innerBeforeChangeMethod"
+    @change="handleSwitchChange"
+  />
 </template>
 
 <script lang="ts">
@@ -8,27 +16,44 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { computed } from '@zto/zpage'
-
 import { useFormItem } from '../util'
-
-import type { GenericFunction } from '@zto/zpage'
 
 const props = withDefaults(
   defineProps<{
     model: Record<string, any>
     prop: string
     disabled?: boolean
+    beforeChange?: Function
+    activeValue?: any
+    inactiveValue?: any
   }>(),
   {
-    disabled: false
+    disabled: false,
+    activeValue: true,
+    inactiveValue: false
   }
 )
 
+// beforeChangeMethod
+
 // 当值为['', null, undefined]，默认值调整为false
 if (['', null, undefined].includes(props.model[props.prop])) {
-  props.model[props.prop] = false
+  props.model[props.prop] = props.inactiveValue
 }
 
-const { innerAttrs } = useFormItem(props)
+const { app, innerAttrs, handleChange } = useFormItem(props, {
+  customeChangeEvent: true
+})
+
+const innerBeforeChangeMethod = () => {
+  if (props.beforeChange) {
+    const context = app.useContext(props.model)
+    return props.beforeChange(props.model, context)
+  }
+  return true
+}
+
+function handleSwitchChange(val: any) {
+  handleChange(val)
+}
 </script>

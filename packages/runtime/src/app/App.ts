@@ -3,7 +3,7 @@ import { createPinia, Pinia } from 'pinia'
 import { Router, useRoute } from 'vue-router'
 import { AppError, ErrorCodes, Nil } from '@zto/zpage-core'
 
-import { AppLoaderType, FlushAppContextType } from '../consts'
+import { AppLoaderType, FlushAppContextType, PAGE_SEARCH_EVENT_KEY } from '../consts'
 import { _, tpl, warn, queryEl, formatText, Emitter } from '../utils'
 import { getInnerLoaders, mergeLoaders } from './loaders'
 import { defineAndUseAppStores } from './store'
@@ -16,6 +16,7 @@ import { HostApp } from './HostApp'
 import { InternalAppAuth, InternalAppToken, InternalAppMicro } from './_internal'
 import { initalizeApis, normalizeWidgetName } from './_internal/util'
 
+import { storage } from '../utils'
 import * as runtime from '../ZPageRuntime'
 
 import type { Handler } from 'mitt'
@@ -37,10 +38,12 @@ import type {
   AppUI,
   AppContext,
   PageContext,
-  AppPageDefinition
+  AppPageDefinition,
+  DataOptionItem
 } from '../typings'
 
-import type { TextFormatters, FormatTextOptions } from '../typings'
+import type { TextFormatters, FormatTextOptions, DataOptionItems } from '../typings'
+import store from 'store2'
 
 /** 已创建的应用名 */
 const __app_names: string[] = []
@@ -70,6 +73,7 @@ export class App implements Installable {
   private _vueApp?: VueApp<Element>
 
   private _context: AppContext
+  private _exContext: Partial<PageContext>
 
   private _pinia: Pinia
 
@@ -94,6 +98,7 @@ export class App implements Installable {
 
     this._name = opts.name
     this._env = Object.freeze({ ...opts.env })
+    this._exContext = Object.freeze({ ...opts.exContext })
 
     // 初始化应用配置
     const config = useAppConfigs(this, [opts.config, ...(opts.configs || [])])
@@ -133,6 +138,7 @@ export class App implements Installable {
     this.micro = InternalAppMicro.retrieveInstance(this)
 
     __app_names.push(this._name)
+
   }
 
   // 初始化api
@@ -196,6 +202,10 @@ export class App implements Installable {
     return this.metaApp ? this.metaApp.pages : this._pages
   }
 
+  get exContext() {
+    return this.metaApp ? this.metaApp.exContext : this._exContext
+  }
+
   get api() {
     return this.metaApp?.api || this._apis.appApi
   }
@@ -214,6 +224,10 @@ export class App implements Installable {
 
   get widgets() {
     return this._widgets
+  }
+
+  get storage() {
+    return storage
   }
 
   /**
@@ -391,20 +405,20 @@ export class App implements Installable {
     Object.keys(handlerMap).forEach(key => {
       if (!isWidgetEventKey(key)) return
 
-      const evtTypes = normalizeEventTypes(schema[key] as any, currentPageKey)
-      const evtHandler = handlerMap[key] as any
+      const eventTypes = normalizeEventTypes(schema[key] as any, currentPageKey)
+      const eventHandler = handlerMap[key] as any
 
-      this.emitter.ons(evtTypes, evtHandler)
+      this.emitter.ons(eventTypes, eventHandler)
     })
 
     onUnmounted(() => {
       Object.keys(handlerMap).forEach(key => {
         if (!isWidgetEventKey(key)) return
 
-        const evtTypes = normalizeEventTypes(schema[key] as any, currentPageKey)
-        const evtHandler = handlerMap[key] as any
+        const eventTypes = normalizeEventTypes(schema[key] as any, currentPageKey)
+        const eventHandler = handlerMap[key] as any
 
-        this.emitter.offs(evtTypes, evtHandler)
+        this.emitter.offs(eventTypes, eventHandler)
       })
     })
   }
@@ -413,27 +427,35 @@ export class App implements Installable {
   emits(eTypes: string[] | string, payload?: any) {
     const currentPageKey = this.currentRoute.value.meta?.pageKey as string
 
-    const evtTypes = normalizeEventTypes(eTypes, currentPageKey)
+    const eventTypes = normalizeEventTypes(eTypes, currentPageKey)
 
-    this.emitter.emits(evtTypes, payload)
+    this.emitter.emits(eventTypes, payload)
+
+    return eventTypes
   }
 
   /** 监听事件 */
   ons(eTypes: string[] | string, handler: Handler<unknown> | undefined) {
     const currentPageKey = this.currentRoute.value.meta?.pageKey as string
 
-    const evtTypes = normalizeEventTypes(eTypes, currentPageKey)
+    const eventTypes = normalizeEventTypes(eTypes, currentPageKey)
 
-    this.emitter.ons(evtTypes, handler)
+    this.emitter.ons(eventTypes, handler)
+
+    return { eventTypes, handler }
   }
 
   /** 解除监听事件 */
   offs(eTypes: string[] | string, handler: Handler<unknown> | undefined) {
     const currentPageKey = this.currentRoute.value.meta?.pageKey as string
 
-    const evtTypes = normalizeEventTypes(eTypes, currentPageKey)
+    this.emitter.offs(eTypes, handler)
 
-    this.emitter.offs(evtTypes, handler)
+    // 容错
+    const eventTypes = normalizeEventTypes(eTypes, currentPageKey)
+    this.emitter.offs(eventTypes, handler)
+
+    return { eventTypes, handler }
   }
 
   /** 获取loader */
@@ -505,7 +527,7 @@ export class App implements Installable {
 
   /** 获取当前实时上下文 */
   useContext(data: any = {}): PageContext {
-    const ctx = { ...this.config?.app?.exContext, ...this._context, apis: this.apis, api: this.api, data }
+    const ctx = { ...this.exContext, ...this._context, apis: this.apis, api: this.api, data }
     return ctx
   }
 
@@ -633,6 +655,14 @@ export class App implements Installable {
 
   setError(err: any, description?: string) {
     this._error = new AppError(err, description)
+
+    try {
+      // 记录错误信息（便于调试）
+      console.log(this.error)
+      storage.local.set('LAST_APP_ERROR', this.error)
+    } catch (ex) {
+      console.log(ex)
+    }
   }
 
   /** 检查错误 */
@@ -686,6 +716,37 @@ export class App implements Installable {
   /** 设置页面数据 */
   async setPageData(path: string, data: any) {
     await this.stores.pagesStore.setCurrentPageData({ path, data })
+  }
+
+  /** 这只扩展上下文 */
+  setExContext(key: string, data: any) {
+    this.exContext[key] = data
+  }
+
+  /** 设置通用选项 */
+  setCommonOptions(data: DataOptionItems) {
+    let _options = this.exContext.options || {}
+    _options = { ..._options, ...data }
+
+    this.setExContext('options', _options)
+  }
+
+  /** 获取通用选项 */
+  getCommonOptions(...keys: string[]): DataOptionItem[] | DataOptionItems | undefined {
+    let _options = this.exContext.options || {}
+
+    // 长度为1直接返回
+    if (keys.length === 1) {
+      return _options[keys[0]]
+    }
+
+    // 返回对象
+    const _opts: DataOptionItems = {}
+    keys.forEach(key => {
+      _opts[key] = _options[keys[0]]
+    })
+
+    return _opts
   }
 
   /** 获取当前页面数据 */
@@ -850,5 +911,10 @@ export class App implements Installable {
 
     const token = await this.apis.fsApi.getUploadToken(...args)
     return token
+  }
+
+  /** 触发页面查询 */
+  triggerPageSearch(...args: any[]) {
+    this.emits(PAGE_SEARCH_EVENT_KEY, ...args)
   }
 }

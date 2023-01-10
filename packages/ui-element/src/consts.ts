@@ -1,3 +1,5 @@
+import { PAGE_SEARCH_EVENT_KEY } from '@zto/zpage'
+
 /** 全局事件 */
 export const UI_GLOBAL_EVENTS = Object.freeze({
   OPEN_DOWNLOADS: '$global_open_downloads',
@@ -7,7 +9,8 @@ export const UI_GLOBAL_EVENTS = Object.freeze({
 /** 页面事件 */
 export const UI_PAGE_EVENTS = Object.freeze({
   ACTIVATED: '$page_activated',
-  MOUNTED: '$page_mounted'
+  MOUNTED: '$page_mounted',
+  SEARCH: PAGE_SEARCH_EVENT_KEY
 })
 
 // 表格FormKey

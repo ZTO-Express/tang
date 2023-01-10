@@ -11,13 +11,14 @@ import { generateExternal, writeBundles } from '../utils/rollup'
 import { generateTypesDefinitions } from '../utils/dts'
 
 import { reporter } from '../plugins/size-reporter'
-import { buildConfigEntries } from '../build-info'
+import { buildInfoConfigEntries } from '../build-info'
 
-import type { BuildConfigEntries } from '../build-info'
 import type { OutputOptions, RollupOptions, RollupBuild } from 'rollup'
+import type { BuildInfoConfigEntries } from '../build-info'
+import type { BuildConfig } from '../types'
 
 /** 编译库 */
-export async function compileLib(buildConfig: any) {
+export async function compileLib(buildConfig: BuildConfig) {
   buildConfig.entryFileName = 'zpage' === buildConfig.packageName ? 'zpage' : `zpage-${buildConfig.packageName}`
 
   await _compile(buildConfig)
@@ -31,12 +32,10 @@ export async function compileLib(buildConfig: any) {
 }
 
 // 生成类型文件
-async function _generateDts(buildConfig: any) {
+async function _generateDts(buildConfig: BuildConfig) {
   if (buildConfig.genTypes === false) return
 
-  const pkgRoot = buildConfig.pkgRoot
-  const outTypesDir = buildConfig.outTypesDir
-  const inputTypesDir = buildConfig.inputTypesDir
+  const { pkgRoot, outTypesDir, inputTypesDir } = buildConfig
 
   // 生成类型文件
   await generateTypesDefinitions(pkgRoot, {
@@ -59,7 +58,7 @@ async function _generateDts(buildConfig: any) {
   }
 }
 
-async function _compile(buildConfig: any) {
+async function _compile(buildConfig: BuildConfig) {
   const pkgRoot = buildConfig.pkgRoot
   const buildRoollupConfig = buildConfig.rollup || {}
   const input = buildRoollupConfig.input || buildConfig.input
@@ -76,7 +75,7 @@ async function _compile(buildConfig: any) {
   }
 
   // 常用应用
-  const entries = buildConfigEntries.filter(it => !it[1]?.minify)
+  const entries = buildInfoConfigEntries.filter(it => !it[1]?.minify)
 
   console.log('entries --->', entries.length)
   if (entries?.length) {
@@ -92,7 +91,7 @@ async function _compile(buildConfig: any) {
   }
 
   // 压缩版应用
-  const minifyEntries = buildConfigEntries.filter(it => it[1]?.minify === true)
+  const minifyEntries = buildInfoConfigEntries.filter(it => it[1]?.minify === true)
   console.log('minifyEntries --->', minifyEntries.length)
   if (minifyEntries?.length) {
     const _rollupOptions = getRollupOptions(rollupConfig, {
@@ -106,7 +105,7 @@ async function _compile(buildConfig: any) {
 }
 
 /** 浏览器压缩包编译 */
-async function _compileBrowser(buildConfig: any, minify = false) {
+async function _compileBrowser(buildConfig: BuildConfig, minify = false) {
   const buildRoollupConfig = buildConfig.rollup || {}
   const input = buildRoollupConfig.input || buildConfig.input
 
@@ -177,7 +176,7 @@ function getRollupOptions(
   return rollupConfig
 }
 
-async function _writeBundles(bundle: RollupBuild, entries: BuildConfigEntries, buildConfig: any) {
+async function _writeBundles(bundle: RollupBuild, entries: BuildInfoConfigEntries, buildConfig: BuildConfig) {
   await writeBundles(
     bundle,
     entries.map(([module, config]): OutputOptions => {

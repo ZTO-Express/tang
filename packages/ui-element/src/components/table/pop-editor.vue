@@ -240,6 +240,6 @@ function submit() {
 <!-- 全局 el-popper样式调整 -->
 <style lang="scss">
 .el-popper {
-  max-width: 800px;
+  max-width: 1000px;
 }
 </style>

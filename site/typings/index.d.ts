@@ -1,1 +1,1 @@
-export * from './app.d'
+export * from './schema.d'

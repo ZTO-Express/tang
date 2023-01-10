@@ -8,6 +8,7 @@
     :filterable="filterable"
     :remote="remote"
     :placeholder="$attrs.placeholder || '请输入关键词'"
+    :filter-method="innerFilterMethod"
     :remote-method="execRemoteMethod"
     :loading="loading"
     :collapse-tags="collapseTags"
@@ -41,7 +42,7 @@
     </template>
     <template v-else>
       <el-option
-        v-for="(item, i) in fuzzyOptions"
+        v-for="(item, i) in visibleOptions"
         :key="getValueByPath(item, modelValueKey)"
         v-bind="item"
         :label="getOptionLabel(item)"
@@ -95,6 +96,7 @@ const props = withDefaults(
     labelProp?: string
     valueProp?: string
     tpl?: string | Record<string, any>
+    labelTpl?: string
     optionLabelPropFormatter?: (option: any) => void
     isOptionLabelPropTooltip?: boolean // 下拉选项的label是否需要tooltip（label内容太多可以开启）
 
@@ -110,6 +112,7 @@ const props = withDefaults(
     remoteMethod?: GenericFunction
     preventRemote?: boolean // 阻止远程请求
     beforeRemote?: (app: any, params: any) => boolean // 阻止远程请求
+    filterMethod?: GenericFunction // 过滤方法
 
     dataOptionsProp?: string
 
@@ -158,6 +161,7 @@ const innerValueProp = computed(() => props.valueProp || 'code')
 const remoteFuzzyOptions = ref<FuzzySelectOption[]>([])
 const fuzzyOptions = ref<FuzzySelectOption[]>([])
 const groupLabels = ref<any[]>([])
+const filterOptions = ref<FuzzySelectOption[]>([])
 
 const innerLabel: any = ref(props.modelLabel)
 const innerValue: any = ref(props.modelValue)
@@ -171,7 +175,15 @@ const isPrefix = computed(() => {
 })
 
 const htmlTpl = computed(() => {
-  return _.isObject(props.tpl) ? props.tpl : null
+  return _.isObject(props.tpl) || _.isFunction(props.tpl) ? props.tpl : null
+})
+
+const visibleOptions = computed(() => {
+  if (props.remote === false) {
+    return filterOptions.value
+  } else {
+    return fuzzyOptions.value
+  }
 })
 
 watch(
@@ -185,7 +197,7 @@ watch(
 
     // 自动清空当前值
     if (props.autoClearProp) {
-      setValueLabel('', '')
+      setValueLabel(undefined, undefined)
     }
   }
 )
@@ -231,6 +243,13 @@ watch(
   }
 )
 
+watch(
+  () => fuzzyOptions.value,
+  () => {
+    filterOptions.value = [...fuzzyOptions.value]
+  }
+)
+
 // 当不是远程搜索时候，只有在第一次 focus 时候获取数据，其它时候不加载数据 例如只有几个枚举
 const firstNoRemote = ref(true)
 
@@ -240,6 +259,12 @@ function getOptionLabel(option: FuzzySelectOption) {
   if (typeof props.optionLabelPropFormatter === 'function') {
     return props.optionLabelPropFormatter(option)
   }
+
+  // 如果有labelTpl，格式化
+  if (props.labelTpl) {
+    return tpl.filter(props.labelTpl, option)
+  }
+
   return option[innerLabelProp.value] || ''
 }
 
@@ -281,6 +306,9 @@ function handleFocusChange() {
     // 非远程搜索只请求一次
     execRemoteMethod()
     firstNoRemote.value = false
+  } else {
+    // 本地查询，关注时触发本地过滤
+    innerFilterMethod()
   }
 }
 
@@ -301,13 +329,12 @@ function handleSelectChange(value: string | Array<string>) {
 
   const option: any = props.multiple ? undefined : options[0]
 
-  emit('change', { value, label, option, options })
+  emit('change', value, { value, label, option, options })
 }
 
 // 设置value值
-function setValue(v: string | string[]) {
+function setValue(v: any | any[]) {
   if (!v && props.multiple) v = []
-
   innerValue.value = v
   emit('update:modelValue', v)
 }
@@ -321,7 +348,7 @@ function setLabel(v: string | string[]) {
 }
 
 /** 同时设置Modal和value模型值 */
-function setValueLabel(v: string | string[], label?: string | string[]) {
+function setValueLabel(v: any | any[], label?: string | string[]) {
   setValue(v)
 
   if (!_.isUndefined(label)) {
@@ -345,6 +372,25 @@ function doBeforeRemote(params: any) {
   })
 }
 
+function innerFilterMethod(keyword?: string) {
+  if (props.filterMethod) {
+    return props.filterMethod(keyword, fuzzyOptions)
+  }
+
+  let options: any[] = []
+
+  if (!keyword) {
+    options = [...fuzzyOptions.value]
+  } else {
+    options = fuzzyOptions.value.filter(it => {
+      const label = getOptionDisplay(it)
+      return label && label.indexOf(keyword) >= 0
+    })
+  }
+
+  filterOptions.value = options
+}
+
 async function execRemoteMethod(query?: string) {
   if (props.preventRemote) return
 
@@ -361,11 +407,7 @@ async function execRemoteMethod(query?: string) {
 
   if (innerRemoteMethod.value) {
     methodResponse = await innerRemoteMethod
-      .value(query || '', {
-        ...attrs,
-        ...props,
-        params
-      })
+      .value(query || '', { ...attrs, ...props, params })
       .finally(() => (loading.value = false))
   } else if (apiRequest && props.api) {
     const pageSize = props.pageSize || fuzzySelectConfig.pageSize || 40
@@ -373,9 +415,11 @@ async function execRemoteMethod(query?: string) {
     const queryAction: any = typeof props.api === 'string' ? { url: props.api } : props.api || {}
     queryAction.type = 'fuzzy-select'
 
+    const postData = _.shallowTrim({ [props.keywordProp]: query as string, ...params })
+
     methodResponse = await apiRequest({
       action: queryAction,
-      params: { [props.keywordProp]: query as string, ...params },
+      params: postData,
       pageIndex: 1,
       pageSize
     }).finally(() => (loading.value = false))

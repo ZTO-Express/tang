@@ -1,7 +1,9 @@
 import { compileUI } from './compile-ui'
 
+import type { BuildConfig } from '../types'
+
 /** 编译Base库 */
-export async function compileBase(buildConfig: any) {
+export async function compileBase(buildConfig: BuildConfig) {
   if (!buildConfig.entryFileName) {
     buildConfig.entryFileName = `zpage-${buildConfig.targetName}`
   }
@@ -9,11 +11,14 @@ export async function compileBase(buildConfig: any) {
   const compilerOptions = {
     baseUrl: buildConfig.pkgRoot,
     outDir: buildConfig.outTypesDir,
-    ...buildConfig.compilerOptions
+    ...buildConfig?.tsconfig?.compilerOptions
   }
 
   await compileUI({
     ...buildConfig,
-    compilerOptions
+    tsconfig: {
+      ...buildConfig?.tsconfig,
+      compilerOptions
+    }
   })
 }

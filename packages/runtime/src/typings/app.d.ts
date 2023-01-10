@@ -23,7 +23,14 @@ import type {
 } from '@zto/zpage-core'
 import type { FfbProcessor } from '@zto/zpage-ffb'
 
-import type { AppConfigDefinition, AppAppConfig, AppApiConfig, AppApisDefinition, AppPageDefinition } from './config'
+import type {
+  AppConfigDefinition,
+  AppAppConfig,
+  AppApiConfig,
+  AppApisDefinition,
+  AppPageDefinition,
+  AppExContext
+} from './config'
 import type { InstallableOptions, TextFormatters, ApiRequest, RuntimeUI, RuntimeExtensions } from './runtime'
 import type { AppDatas } from './store'
 import type { HttpRequest, HttpRequestConfig } from '../utils'
@@ -131,12 +138,14 @@ export interface AppStartOptions extends InstallableOptions {
   container?: Element | string
   env: AppEnv // 应用环境变量
   ui: AppUI
+  exContext?: AppExContext // 扩展上下文
   menus?: NavMenuItem[]
   pages?: AppPageDefinition[]
   config?: AppConfigOptions
   configs?: AppConfigOptions[]
   extensions?: AppExtensionOptions
   meta?: (app: App) => MetaAppMetadata // 用于调试元应用时单独启动元应用
+  initTrace?: (app: App, options: AppStartOptions) => void // 用于trace init
 }
 
 export interface PartialAppStartOptions extends Partial<AppStartOptions> {
@@ -161,6 +170,13 @@ export interface AppContext {
   datas: AppDatas
 }
 
+/** 应用扩展上下文 */
+export interface AppExContext {
+  options?: DataOptionItems
+
+  [prop: string]: any
+}
+
 export interface PageContext extends AppDatas {
   runtime: typeof runtime
   app: App
@@ -171,6 +187,10 @@ export interface PageContext extends AppDatas {
 
   route?: RouteLocationNormalizedLoaded
   data?: any
+
+  options?: DataOptionItems
+
+  [prop: string]: any
 }
 
 // 应用加载器

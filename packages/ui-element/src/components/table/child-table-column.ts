@@ -1,5 +1,18 @@
-import { _, h, tpl, renderHtml, renderCmpt, Cmpt, useSlots, defineComponent, useCurrentAppInstance } from '@zto/zpage'
+import {
+  _,
+  h,
+  tpl,
+  computed,
+  renderHtml,
+  renderCmpt,
+  Cmpt,
+  useSlots,
+  defineComponent,
+  useCurrentAppInstance
+} from '@zto/zpage'
 import { ElTableColumn, ElFormItem } from 'element-plus'
+
+import { calcFormItemAttrs } from '../form'
 
 import Cell from './cell.vue'
 import HeaderCell from './header-cell.vue'
@@ -12,6 +25,8 @@ import type { TableColumn } from './types'
 
 const ChildTableColumn = defineComponent({
   props: {
+    editorModel: { type: Object },
+    editorExFormRules: { type: Array },
     column: { type: Object, default: () => ({} as TableColumn) },
     editable: { type: Boolean, default: false },
     batchEditable: { type: Boolean, default: false },
@@ -85,7 +100,7 @@ const ChildTableColumn = defineComponent({
 
           /** 格式化字段 */
           if (config.formatter) {
-            innerText = config.formatter(scope.row, config, scope.row[prop], scope.$index, scope)
+            innerText = config.formatter(scope.row, config, scope.row[prop], context)
           }
 
           scope.row.__innerTexts[prop] = innerText
@@ -135,40 +150,61 @@ const ChildTableColumn = defineComponent({
 
           const tipSlot = getTableTip(config, context)
 
+          const editorProp = config.editorProp
           const rowEditable = !!scope.row.editable
 
           /** 编辑模式
            * editable 所有字段可编辑
            *  rowEditable 当前行可编辑 */
           if (config.editor && (props.editable || rowEditable)) {
-            const editor = config.editor
+            let editor = config.editor
+
+            if (_.isFunction(config.editor)) {
+              editor = config.editor(context, config)
+            }
 
             if (editor.popover) {
               return h(PopEditor as any, {
                 text: innerText,
                 column: config,
-                config: config.editor,
+                config: editor,
                 scope,
                 onSubmit: props.onEditorSubmit
               })
             } else {
-              const editAttrs = _.omit(editor, ['itemType', 'innerAttrs'])
-              const formItemAttrs = editor.innerAttrs?.formItem
+              const editAttrs = _.omit(editor, ['itemType', 'formItem', 'required', 'noPadding', 'rules', 'innerAttrs'])
               const Editor = app.resolveComponent(`c-form-item-${editor.itemType}`)
+
+              const formItemAttrs = {
+                prop: `data.${scope.$index}.${editorProp}`,
+                rules: editor.rules,
+                label: editor.label || config.label,
+                required: editor.required,
+                noPadding: editor.noPadding,
+                ...editor.formItem
+              }
+
+              const colFormItemAttrs = calcFormItemAttrs(formItemAttrs, context, {
+                model: props.editorModel,
+                exFormRules: props.editorExFormRules,
+                disabled: editor.disabled
+              })
 
               return h(
                 ElFormItem,
                 {
-                  prop: `list.${scope.$index}.${prop}`,
-                  rules: config.rules,
-                  style: editAttrs.noPadding ? 'margin: 0' : 'margin:15px 0',
-                  ...formItemAttrs
+                  class: {
+                    'table-column-form-item': true,
+                    'no-padding': formItemAttrs.noPadding,
+                    'show-label': formItemAttrs.showLabel
+                  },
+                  ...colFormItemAttrs
                 },
                 [
                   h(Editor, {
                     ...editAttrs,
                     model: scope.row,
-                    prop,
+                    prop: editorProp,
                     onSubmit: props.onBatchEditorSubmit
                   }),
                   tipSlot
@@ -259,10 +295,15 @@ const ChildTableColumn = defineComponent({
       return scopedSlots
     }
 
-    const columnProps = getColumnProps(props.column)
-    const childrenSlots = buildChildrenSlots(props.column)
+    const columnProps = computed(() => {
+      return getColumnProps(props.column)
+    })
 
-    return () => h(ElTableColumn, { ...columnProps }, childrenSlots)
+    const childrenSlots = computed(() => {
+      return buildChildrenSlots(props.column)
+    })
+
+    return () => h(ElTableColumn, { ...columnProps.value }, childrenSlots.value)
   }
 })
 

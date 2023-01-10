@@ -29,6 +29,7 @@ const props = withDefaults(
     readonly?: boolean
     valueFormat?: string
     beforeToday?: boolean
+    afterToday?: boolean
     beforeDate?: string | Date // 可选最大时间
     afterDate?: string | Date // 可选最小时间
     defaultFrom?: any // 默认开始时间 string | Date
@@ -45,7 +46,8 @@ const props = withDefaults(
     disabled: false,
     readonly: false,
     valueFormat: 'YYYY-MM-DD',
-    beforeToday: true,
+    beforeToday: false,
+    afterToday: false,
     defaultFrom: '',
     defaultTo: '',
     defaultRange: 1,
@@ -97,8 +99,20 @@ const innerDisabledDateFn = computed(() => {
     let _beforeTime = beforeTime
     let _afterTime = afterTime
 
-    if (props.beforeToday && _beforeTime) {
-      _beforeTime = _beforeTime < _now ? _beforeTime : _now
+    if (props.beforeToday) {
+      if (_beforeTime) {
+        _beforeTime = _beforeTime < _now ? _beforeTime : _now
+      } else {
+        _beforeTime = _now
+      }
+    }
+
+    if (props.afterToday) {
+      if (_afterTime) {
+        _afterTime = _afterTime > _now ? _afterTime : _now
+      } else {
+        _afterTime = _now
+      }
     }
 
     if (_beforeTime && time >= _beforeTime) return true
@@ -113,7 +127,7 @@ const innerDisabledDateFn = computed(() => {
 watch(
   () => props.from,
   () => {
-    setFrom(props.from)
+    setFrom(props.from, false)
   },
   { immediate: true }
 )
@@ -121,7 +135,7 @@ watch(
 watch(
   () => props.to,
   () => {
-    setTo(props.to)
+    setTo(props.to, false)
   },
   { immediate: true }
 )
@@ -177,7 +191,7 @@ function handleChange(val: any) {
 }
 
 // 设置开始时间
-function setFrom(from: Date | string) {
+function setFrom(from: Date | string, validate = true) {
   const fromDate = dateUtil.parse(from)
 
   if (!dateUtil.isValid(fromDate)) {
@@ -192,7 +206,7 @@ function setFrom(from: Date | string) {
     toDate = dateUtil.addDays(new Date(from), props.defaultRange)
   }
 
-  if (!validateRange([fromDate, toDate])) {
+  if (validate && !validateRange([fromDate, toDate])) {
     return
   }
 
@@ -200,7 +214,7 @@ function setFrom(from: Date | string) {
 }
 
 // 设置结束时间
-function setTo(to: Date | string) {
+function setTo(to: Date | string, validate = true) {
   const toDate = dateUtil.parse(to)
 
   if (!dateUtil.isValid(toDate)) {
@@ -215,7 +229,7 @@ function setTo(to: Date | string) {
     fromDate = dateUtil.addDays(new Date(toDate), props.defaultRange * -1 + 1)
   }
 
-  if (!validateRange([fromDate, toDate])) {
+  if (validate && !validateRange([fromDate, toDate])) {
     return
   }
 

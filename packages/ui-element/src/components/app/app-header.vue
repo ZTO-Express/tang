@@ -76,7 +76,10 @@ const activeTabName = ref(appStore.navMenu.submodule)
 
 // 菜单选中
 function handleTabClick() {
-  appStore.changeSubmodule({ name: activeTabName.value })
+  // 使用setTimeout防止菜单卡顿
+  setTimeout(() => {
+    appStore.changeSubmodule({ name: activeTabName.value })
+  }, 5)
 }
 </script>
 

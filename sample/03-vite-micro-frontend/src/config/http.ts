@@ -3,17 +3,17 @@ import ffb from './ffb'
 
 import type { HttpRequestConfig } from '@zto/zpage-ui-element'
 
-const { ZFfb } = ZPage
+const { Ffb } = ZPage
 const { ElementPlus } = ZPageElementUI
 
 const { ElMessageBox } = ElementPlus
 const MessageBox = ElMessageBox
 
-ZFfb.use(ffb)
+Ffb.use(ffb)
 
 function beforeRequest(config: any) {
   /** 对请求进行拦截调整 */
-  ZFfb.interceptFfbRequest(config)
+  Ffb.interceptFfbRequest(config)
 
   return config
 }
@@ -24,16 +24,16 @@ function requestError(error: any) {
 
 function afterResponse(response: any) {
   /** 对请求进行拦截调整 */
-  ZFfb.interceptFfbResponse(response)
+  Ffb.interceptFfbResponse(response)
 
   const cfg = response.config
   const res = response.data
 
   if (ENV.env === 'mock') res.status = true
   if (cfg.responseType === 'blob') return response
+
   // 忽略错误
-  // if (res.status) return res.result
-  return res.result
+  if (res.status) return res.result
 
   // token过期或不存在
   if (['401', '403'].includes(res.statusCode)) {

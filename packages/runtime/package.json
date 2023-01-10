@@ -1,6 +1,6 @@
 {
   "name": "@zto/zpage-runtime",
-  "version": "0.3.15",
+  "version": "0.3.25",
   "description": "@zto/zpage-runtime",
   "main": "index.js",
   "module": "dist/zpage-runtime.esm.js",

@@ -1,5 +1,6 @@
 import { register as registerBulitin, getFilters } from './tpl-builtin'
 import { register as registerLodash } from './tpl-lodash'
+// import { register as registerDefault } from './tpl-default'
 
 export interface Enginer {
   test: (tpl: string) => boolean
@@ -25,7 +26,7 @@ export function filter(tpl?: any, data: object = {}, ...rest: Array<any>): strin
   for (let i = 0, len = keys.length; i < len; i++) {
     const enginer = enginers[keys[i]]
     if (enginer.test(tpl)) {
-      return enginer.compile(tpl, data, ...rest)
+      tpl = enginer.compile(tpl, data, ...rest)
     } else if (enginer.removeEscapeToken) {
       tpl = enginer.removeEscapeToken(tpl)
     }
@@ -129,7 +130,8 @@ export function evalJS(js: string, data: object): any {
   }
 }
 
-;[registerBulitin, registerLodash].forEach(fn => {
+/** registerDefault 存在xss安全分险，现移除 */
+;[/*registerDefault, */ registerBulitin, registerLodash].forEach(fn => {
   const info = fn()
 
   registerTplEnginer(info.name, {

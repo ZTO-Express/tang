@@ -1,5 +1,5 @@
 import findWorkspacePackages from '@pnpm/find-workspace-packages'
-import { buildConfig } from '../build-info'
+import { buildInfoConfig } from '../build-info'
 import { ZPAGE_PREFIX } from './constants'
 import { pkgRoot, projRoot } from './paths'
 
@@ -27,7 +27,7 @@ export const getPackageDependencies = (pkgPath: string): string[] => {
 }
 
 export const pathRewriter = (module: Module) => {
-  const config = buildConfig[module]
+  const config = buildInfoConfig[module]
 
   return (id: string) => {
     id = id.replaceAll(`${ZPAGE_PREFIX}/`, `${config.bundle.path}/`)

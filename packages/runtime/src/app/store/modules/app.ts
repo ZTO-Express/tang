@@ -112,6 +112,16 @@ export function defineAppStore(app: App) {
         this.init({ submodules })
       },
 
+      // 设定指定模块的当前页面
+      setSubmoduleCurrent(submoduleName: string, pageKey: string) {
+        if (!submoduleName || !pageKey) return
+
+        const submodule = this.submodules.find(it => it.name === submoduleName)
+        if (!submodule) return
+
+        submodule.current = pageKey
+      },
+
       // 切换子模块
       async changeSubmodule(payload: any) {
         const router = app.router
@@ -130,11 +140,24 @@ export function defineAppStore(app: App) {
 
         if (payload.to) {
           await router.goto(payload.to)
-        } else if (submodule?.defaultMenu?.name) {
-          await router.goto({ name: submodule.defaultMenu?.name })
-        } else {
-          await router.goHome()
+          return
         }
+
+        if (submodule?.current) {
+          const to = router.getRouteByPageKey(submodule.current)
+
+          if (to) {
+            await router.goto(to)
+            return
+          }
+        }
+
+        if (submodule?.defaultMenu?.name) {
+          await router.goto({ name: submodule.defaultMenu?.name })
+          return
+        }
+
+        await router.goHome()
       }
     }
   })

@@ -1,3 +1,5 @@
+export const CRUD_COLUMNS_FILTER_DATA_KEY = '__crudColumnFilter'
+
 /** 默认活动 */
 export const DEFAULT_ACTIONS = {
   query: { label: '查询' },

@@ -80,8 +80,11 @@ function handleSelect(index: string, indexPath: string, item: any) {
     }
   }
 
-  // 不能用goto，否则可能导致切换menu后任然缓存页面
-  router.push({ name: index, query: meta?.query as any })
+  // 使用setTimeout防止菜单卡顿
+  setTimeout(() => {
+    // 不能用goto，否则可能导致切换menu后任然缓存页面
+    router.push({ name: index, query: meta?.query as any })
+  }, 5)
 }
 
 /**

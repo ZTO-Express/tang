@@ -13,7 +13,7 @@
         <el-button v-if="linkLabel" type="primary" size="small" v-preventReclick @click="handleLink">
           {{ linkLabel }}
         </el-button>
-        <el-button v-if="isLogged" size="small" v-preventReclick @click="handleLogout">{{ logoutLabel }}</el-button>
+        <el-button size="small" v-preventReclick @click="handleLogout">{{ logoutLabel }}</el-button>
       </div>
     </div>
   </div>

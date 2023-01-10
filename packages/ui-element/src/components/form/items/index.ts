@@ -4,6 +4,7 @@ import CFormItemCheckbox from './CFormItemCheckbox.vue'
 import CFormItemContent from './CFormItemContent.vue'
 import CFormItemDatePicker from './CFormItemDatePicker.vue'
 import CFormItemDateRangePicker from './CFormItemDateRangePicker.vue'
+import CFormItemDateTimePicker from './CFormItemDateTimePicker.vue'
 import CFormItemFileList from './CFormItemFileList.vue'
 import CFormItemFuzzySelect from './CFormItemFuzzySelect.vue'
 import CFormItemHtml from './CFormItemHtml.vue'
@@ -16,6 +17,7 @@ import CFormItemImport from './CFormItemImport.vue'
 import CFormItemText from './CFormItemText.vue'
 import CFormItemImage from './CFormItemImage.vue'
 import CFormItemVideo from './CFormItemVideo.vue'
+import CFormItemEditTable from './CFormItemEditTable.vue'
 
 export {
   CFormItemAction,
@@ -24,6 +26,7 @@ export {
   CFormItemContent,
   CFormItemDatePicker,
   CFormItemDateRangePicker,
+  CFormItemDateTimePicker,
   CFormItemFileList,
   CFormItemFuzzySelect,
   CFormItemHtml,
@@ -35,5 +38,6 @@ export {
   CFormItemImport,
   CFormItemText,
   CFormItemImage,
-  CFormItemVideo
+  CFormItemVideo,
+  CFormItemEditTable
 }

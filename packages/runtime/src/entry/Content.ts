@@ -1,4 +1,4 @@
-import { h, useAttrs, defineComponent } from 'vue'
+import { h, computed, useAttrs, defineComponent } from 'vue'
 import { renderCmpt, _ } from '../utils'
 import { useCurrentAppInstance } from '../app'
 
@@ -28,15 +28,15 @@ export const Content = defineComponent({
     const attrs = useAttrs()
     const app = useCurrentAppInstance()
 
-    const allAttrs = { ...attrs, ...props }
+    const allAttrs = computed(() => ({ ...attrs, ...props }))
 
     return () => {
-      if (props.ctype || props.cmpt) return _renderCmpt(app, allAttrs)
-      if (props.component) return _renderComponent(app, allAttrs)
-      if (!_.isNil(props.tpl)) return _renderTpl(app, allAttrs)
-      if (!_.isNil(props.html)) return _renderHtml(app, allAttrs)
-      if (props.type) return _renderComponent(app, allAttrs)
-      if (props.content) return _renderContent(app, allAttrs)
+      if (props.ctype || props.cmpt) return _renderCmpt(app, allAttrs.value)
+      if (props.component) return _renderComponent(app, allAttrs.value)
+      if (!_.isNil(props.tpl)) return _renderTpl(app, allAttrs.value)
+      if (!_.isNil(props.html)) return _renderHtml(app, allAttrs.value)
+      if (props.type) return _renderComponent(app, allAttrs.value)
+      if (props.content) return _renderContent(app, allAttrs.value)
       return h('span', {}, props.text || '--')
     }
   }

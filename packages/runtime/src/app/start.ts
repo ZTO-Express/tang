@@ -20,6 +20,13 @@ export async function startApp(options: AppStartOptions) {
 
   const app = createApp(options)
 
+  // 初始化 埋点
+  try {
+    if (options.initTrace) options.initTrace(app, options)
+  } catch (error) {
+    console.log(error)
+  }
+
   // 直接设置元应用入口（主要用于调试或单独启动元应用的情况）
   if (options.meta) window[options.name] = { meta: options.meta }
 

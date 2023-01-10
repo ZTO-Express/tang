@@ -1,6 +1,6 @@
 import { reactive } from 'vue'
 
-import { _ } from '../../../utils'
+import { _, warn } from '../../../utils'
 import { STORE_NAME } from '../../../consts'
 import { pruneCachedPage, createTmpRoute } from '../../router/util'
 import { defineStore, setData } from '../util'
@@ -24,9 +24,9 @@ export function definePagesStore(app: App) {
 
     state: () => {
       return {
-        current: '',
-        defaults: [],
-        visited: [],
+        current: '', // 当前页面
+        defaults: [], // 各子模块默认页面
+        visited: [], // 访问过的页面
         datas: {} // 页面数据
       }
     },
@@ -37,6 +37,7 @@ export function definePagesStore(app: App) {
         const pageData = state.datas[pageKey] || {}
         return { key: pageKey, data: pageData }
       },
+
       navPages: state => {
         const { appStore } = app.stores
 
@@ -52,8 +53,13 @@ export function definePagesStore(app: App) {
     },
 
     actions: {
-      setCurrent(pageKey: string) {
+      setCurrent(pageKey: string, submoduleName?: string) {
         this.current = pageKey
+
+        // 设置子模块当前页面
+        if (submoduleName) {
+          app.stores.appStore.setSubmoduleCurrent(submoduleName, pageKey)
+        }
       },
 
       // 设置默认页面
@@ -229,6 +235,10 @@ export function definePagesStore(app: App) {
         const { appStore } = app.stores
         const router = app.router
         if (!router) return
+
+        if (!menu.title) {
+          warn('title属性为空！创建临时菜单需要提供title属性。')
+        }
 
         let submodule = appStore.submodule
         if (menu.submodule) {
