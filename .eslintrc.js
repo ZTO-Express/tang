@@ -20,12 +20,7 @@ module.exports = defineConfig({
     jest: 'readonly'
   },
   plugins: ['@typescript-eslint', 'prettier', 'import'],
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:vue/vue3-recommended',
-    'prettier'
-  ],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'plugin:vue/vue3-recommended', 'prettier'],
   overrides: [
     {
       files: ['*.ts', '*.vue'],

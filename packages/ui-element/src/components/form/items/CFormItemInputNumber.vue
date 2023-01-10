@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
   <el-input-number
+    class="c-form-item-input-number"
     v-model="model[prop]"
     v-bind="innerAttrs"
     :controls-position="controlsPosition"
@@ -50,3 +51,9 @@ const innerMax = computed(() => {
   return props.max || inputNumberCfg.max
 })
 </script>
+
+<style lang="scss" scoped>
+.c-form-item-input-number {
+  width: 100%;
+}
+</style>

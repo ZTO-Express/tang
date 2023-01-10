@@ -218,6 +218,19 @@ export function deepTrim(obj: any): any {
   })
 }
 
+/** 浅trim，并支持循环引用 */
+export function shallowTrim(obj: any): any {
+  if (isString(obj)) return obj.trim()
+  if (!obj || !isObject(obj)) return obj
+
+  const trimed = Object.keys(obj).reduce((coll, key) => {
+    coll[key] = isString(obj[key]) ? obj[key].trim() : obj[key]
+    return coll
+  }, {})
+
+  return trimed
+}
+
 /** 默认深度合并对象判断 */
 export function isDeepMergeableObject(o: any): boolean {
   return Array.isArray(o) || isPlainObject(o)
@@ -358,13 +371,19 @@ export function entries<T>(obj: Record<string, T>): Array<[string, T]> {
  * @param seconds
  * @returns
  */
-export async function delay<T>(fn: GenericFunction, milliseconds = 1): Promise<T> {
+export async function delay<T>(fn: GenericFunction | number, milliseconds = 1): Promise<T> {
+  if (typeof fn === 'number') {
+    milliseconds = fn
+    // @ts-ignore
+    fn = undefined
+  }
+
   return await new Promise((resolve, reject) => {
     setTimeout(() => {
       Promise.resolve()
         .then(() => {
-          // eslint-disable-next-line no-useless-call
-          return fn.call(undefined)
+          if (typeof fn === 'function') return fn.call(undefined)
+          return
         })
         .then(result => {
           resolve(result as T)
@@ -374,4 +393,52 @@ export async function delay<T>(fn: GenericFunction, milliseconds = 1): Promise<T
         })
     }, milliseconds)
   })
+}
+
+// 根据key设置对象类型
+/** 参数1为要设置的数据; 参数3为唯一标识属性，或设置方法; 参数4为忽略的prop */
+export function setObjectsByKeys(targets: any[], items: any[], keyProp: string, setFn?: Function) {
+  if (!items || !items.length) return
+
+  // 获取data中所有有key的值
+  let itemKeys = items.filter(it => it && it[keyProp])
+  // 获取list中所有有key的行
+  let keyTargets = targets.filter(it => it && it[keyProp])
+
+  itemKeys.forEach((it: any) => {
+    if (!it[keyProp]) return
+
+    let targetItem = keyTargets.find(_it => it[keyProp] == _it[keyProp])
+
+    if (targetItem) {
+      if (setFn) {
+        setFn(targetItem, it)
+      } else {
+        writeObject(targetItem, it, true)
+      }
+    } else {
+      targets.push(it)
+    }
+  })
+}
+
+/**
+ * 将第二个的对象的值给第一个对象,
+ * isFull: 是否完整复制
+ */
+export function writeObject(writeObj, readObj, isFull?: boolean) {
+  Object.keys(writeObj).forEach((key: any) => {
+    if (readObj.hasOwnProperty(key)) {
+      writeObj[key] = readObj[key]
+    }
+  })
+  // 完整复制
+  if (isFull === true) {
+    Object.keys(readObj).forEach((key: any) => {
+      if (readObj.hasOwnProperty(key)) {
+        writeObj[key] = readObj[key]
+      }
+    })
+  }
+  return writeObj
 }

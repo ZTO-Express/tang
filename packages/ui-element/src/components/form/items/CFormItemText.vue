@@ -8,10 +8,10 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { tpl, useCurrentAppInstance, computed, _, formatText } from '@zto/zpage'
+import { computed, _, useCurrentAppInstance } from '@zto/zpage'
+import { useFormItem } from '../util'
 
 import type { GenericFunction } from '@zto/zpage'
-import { useFormItem } from '../util'
 
 const props = withDefaults(
   defineProps<{

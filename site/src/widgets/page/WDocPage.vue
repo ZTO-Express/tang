@@ -1,8 +1,8 @@
 <template>
   <c-page class="w-doc-page">
-    <div class="page__body">
+    <div class="doc-page__body">
       <c-doc-outline v-if="isMarkdownDoc">
-        <h1>{{ pageTitle }}</h1>
+        <!-- <h1>{{ pageTitle }}</h1> -->
         <component ref="mdComponentRef" :is="mdComponent" />
       </c-doc-outline>
       <widget v-else-if="bodySchema" :schema="bodySchema" />
@@ -53,8 +53,16 @@ const bodySchema = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+.w-doc-page {
+  background: white;
+
+  :deep(p) {
+    text-indent: 2rem;
+  }
+}
+
 h1 {
-  font-size: 1.8rem;
+  font-size: 2rem;
 }
 
 .page__body {

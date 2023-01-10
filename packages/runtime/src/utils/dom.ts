@@ -120,3 +120,11 @@ export function getScrollbarWidth() {
 
   return __scrollbarWidth
 }
+
+/** 文字转换为px */
+export function sizePx(size: number | string) {
+  if (!size) return ''
+  if (!String(size).endsWith('px')) {
+    return `${String(size)}px`
+  }
+}

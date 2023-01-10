@@ -2,54 +2,100 @@ import type { NavMenuItemConfig } from '@zto/zpage'
 
 export const menus: NavMenuItemConfig[] = [
   {
-    name: 'site.docs',
-    title: '文档',
-    order: 10,
+    title: '指南',
     children: [
-      { name: 'site.docs.about', title: '关于', path: '/docs/about' },
+      { title: '关于', path: '/guide/about' },
       {
-        name: 'site.docs.start',
         title: '开始',
-        children: [{ name: 'site.docs.start.intro', title: '介绍', path: '/docs/start/intro' }]
-      }
-    ]
-  },
-  {
-    name: 'site.cmpts',
-    title: '组件',
-    order: 20,
-    children: [
-      { name: 'site.cmpts.intro', title: '介绍', path: '/cmpts/intro' },
-      {
-        name: 'site.cmpts.layout',
-        title: '布局',
-        children: [{ name: 'site.cmpts.layout.crud', title: '增删改查', path: '/cmpts/layout/crud' }]
-      }
-    ]
-  },
-  {
-    name: 'site.examples',
-    title: '示例',
-    order: 30,
-    children: [
-      {
-        name: 'site.examples.page',
-        title: '页面',
         children: [
-          { name: 'site.examples.page.simple', title: '简单页面', path: '/examples/page/simple' },
-          { name: 'site.examples.page.form', title: '表单页面', path: '/examples/page/form' }
+          { title: '快速开始', path: '/guide/start/quick' },
+          { title: '开发规范', path: '/guide/start/criterion' }
         ]
       },
       {
-        name: 'site.examples.form',
+        title: '高级',
+        children: [{ title: '原理', path: '/guide/advance/internal' }]
+      }
+    ]
+  },
+  {
+    title: '微件',
+    children: [
+      { title: '介绍', path: '/widgets/intro' },
+      {
+        title: '页面',
+        children: [
+          { title: '普通页', path: '/widgets/page/normal' },
+          { title: 'Tab页', path: '/widgets/page/tab' },
+          { title: '欢迎页', path: '/widgets/page/welcome' },
+          { title: '空白页', path: '/widgets/page/blank' }
+        ]
+      },
+      {
+        title: '列表',
+        children: [{ title: '增删改查', path: '/widgets/list/crud' }]
+      }
+    ]
+  },
+  {
+    title: '组件',
+    children: [
+      { title: '介绍', path: '/cmpts/intro' },
+      {
+        title: '页面',
+        children: [{ title: '增删改查', path: '/cmpts/layout/crud' }]
+      },
+      {
+        title: '功能',
+        children: [
+          { title: 'Actions 行为按钮', path: '/cmpts/func/action' },
+          { title: 'Button 按钮', path: '/cmpts/func/button' },
+          { title: 'Checkbox 多选框', path: '/cmpts/func/checkbox' },
+          { title: 'Radio 单选框', path: '/cmpts/func/radio' },
+          { title: 'DateRangePicker 选择器', path: '/cmpts/func/dateRangePicker' },
+          { title: 'Dialog 对话框', path: '/cmpts/func/dialog' },
+          { title: 'Drawer 抽屉', path: '/cmpts/func/drawer' }
+        ]
+      },
+      {
+        title: '表单'
+      },
+      {
+        title: '表格'
+      },
+      {
+        title: '数据展示'
+      },
+      {
+        title: '其他'
+      }
+    ]
+  },
+  {
+    title: '示例',
+    children: [
+      {
+        title: '页面',
+        children: [
+          { title: '简单页面', path: '/examples/page/simple' },
+          { title: '表单页面', path: '/examples/page/form' }
+        ]
+      },
+      {
         title: '表单',
         children: []
       },
       {
-        name: 'site.examples.crud',
         title: '增删改查',
         children: []
       }
+    ]
+  },
+  {
+    title: '可视化编辑器',
+    children: [
+      { title: '基础', path: '/editor/basic' },
+      { title: '结构', path: '/editor/schema' }
     ]
   }
 ]

@@ -1,5 +1,7 @@
 <template>
   <el-row class="c-form-items" :gutter="$attrs.gutter || 10">
+    <div v-if="__showModelData">{{ model }}</div>
+
     <!-- 配置item -->
     <template v-for="(item, index) in innerFormItems" :key="'form-item' + index">
       <el-col
@@ -28,28 +30,56 @@
         >
           <template #label>
             <slot v-if="item.showLabelSlot" v-bind="item" :name="item.prop + 'Label'" />
-            <span v-else-if="item.label && item.labelWidth !== 0">{{ item.label + ':' }}</span>
+            <template v-else-if="item.label && item.labelWidth !== 0 && item.label !== false">
+              <span v-if="typeof item.label === 'string'">
+                <span v-if="item.labelTip">
+                  {{ item.label }}
+                  <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    :content="item.labelTip"
+                    placement="top-start"
+                  >
+                    <el-icon><QuestionFilled /></el-icon>
+                  </el-tooltip>
+                  :
+                </span>
+                <span v-else>{{ item.label + ':' }}</span>
+              </span>
+              <CFormItemCmpt
+                v-else-if="item.labelFormItem?.componentType"
+                :config="item.labelFormItem"
+                :model="model"
+                :clearable="clearable"
+                :item-width="itemWidth"
+              />
+              <span v-else>
+                <Content :content="item.label" />
+              </span>
+            </template>
+
             <span v-else></span>
           </template>
           <cmpt
             v-if="item.cmpt"
             :config="item.cmpt"
             :context-data="model"
-            :disabled="item.isDisabled"
+            :disabled="typeof item.isDisabled !== 'undefined' ? item.isDisabled : item.disabled"
             :style="{ width: item.width || itemWidth }"
           />
-          <component
-            :is="item.componentType"
+          <CFormItemCmpt
             v-if="!item.showSlot"
-            v-bind="item.componentAttrs"
+            :config="item"
             :model="model"
-            :disabled="item.isDisabled"
-            :clearable="typeof item.clearable !== 'undefined' ? item.clearable : clearable"
-            :style="{ width: item.width || itemWidth }"
+            :clearable="clearable"
+            :item-width="itemWidth"
           />
           <slot v-else v-bind="item" :name="item.prop" />
+
+          <div v-if="item.tip" class="text-tip">
+            <Content :content="item.tip" />
+          </div>
         </el-form-item>
-        <div v-if="item.tip" class="tip">{{ item.tip }}</div>
       </el-col>
     </template>
 
@@ -68,12 +98,14 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { _, isWidgetEventKey, reactive, ref, computed, useCurrentAppInstance } from '@zto/zpage'
-
-import { getFormItemRules, calcDynamicAttrs } from '../../utils/form'
+import { _, reactive, ref, computed, useCurrentAppInstance } from '@zto/zpage'
 
 import type { FormItemConfig } from '../../utils/form'
+
 import _Link from 'element-plus/lib/components/link'
+import { QuestionFilled } from '@element-plus/icons'
+import CFormItemCmpt from './CFormItemCmpt.vue'
+import { calcFormItemAttrs } from './util'
 
 const props = withDefaults(
   defineProps<{
@@ -84,6 +116,7 @@ const props = withDefaults(
     clearable?: boolean // 全部可删除
     span?: number // 表单项宽度
     showOperation?: boolean // 显示操作栏
+    __showModelData?: boolean // 显示模型数据，一般调试时使用
   }>(),
   {
     items: () => [],
@@ -118,63 +151,27 @@ const innerFormItems = computed<any>(() => {
   }
 
   const items = formItems.map((item: any) => {
-    let formItem = item
-    if (typeof item === 'function') formItem = item(context)
-
-    if (formItem.dynamicAttrs) {
-      const dynamicAttrs = calcDynamicAttrs(formItem.dynamicAttrs, context)
-
-      formItem = _.omit(formItem, ['dynamicAttrs'])
-      formItem = _.deepMerge(formItem, dynamicAttrs)
-    }
-
-    normalizeFormItem(formItem)
-
-    const isVisible = isVisibleItem(formItem)
-    const realSpan = isVisible ? formItem.span || itemSpan.value : 0
-    const isDisabled = isDisabledItem(formItem)
-    const isRequired = isRequiredItem(formItem)
-
-    const itemRules = typeof formItem.rules === 'function' ? formItem.rules(context) : formItem.rules
-
-    let rules =
-      getFormItemRules({
-        ...formItem,
-        rules: itemRules,
-        context: { data: props.model },
-        exFormRules
-      }) || []
-
-    if (!isRequired) {
-      rules = rules.filter((r: any) => r.ruleName !== 'required')
-    }
-
-    const it: any = {}
-    // 移除微件事件Key，防止重复计算事件
-    Object.keys(formItem).forEach(key => {
-      if (!isWidgetEventKey(key)) it[key] = formItem[key]
+    const formItemAttrs = calcFormItemAttrs(item, context, {
+      disabled: props.disabled,
+      model: props.model,
+      exFormRules,
+      itemSpan: itemSpan.value,
+      itemExpanded: itemExpanded
     })
 
-    const componentType = formItem.componentType ? app.resolveComponent(formItem.componentType) : null
-    const componentAttrs = _.omit(it, ['type', 'relatedProps', 'label', 'componentType', 'span'])
+    const labelFormItem = formItemAttrs.label?.formItem
 
-    let relatedProps = it.relatedProps
-
-    if (!relatedProps && (it.props || it.labelProps)) {
-      relatedProps = it.relatedProps || [...(it.props || []), ...(it.labelProps || [])]
+    if (labelFormItem) {
+      formItemAttrs.labelFormItem = calcFormItemAttrs(labelFormItem, context, {
+        disabled: props.disabled,
+        model: props.model,
+        exFormRules,
+        itemSpan: itemSpan.value,
+        itemExpanded: itemExpanded
+      })
     }
 
-    return {
-      ...it,
-      relatedProps,
-      componentAttrs,
-      rules,
-      realSpan,
-      componentType,
-      isDisabled,
-      isVisible,
-      isRequired
-    }
+    return formItemAttrs
   })
 
   // Warning: 这里可能会影响item的属性模板，暂时先去掉
@@ -203,59 +200,6 @@ const operationAlign = computed(() => {
 const operationSpan = computed(() => {
   return 24 - (fieldSpan.value % 24)
 })
-
-/**
- * 整理formItem属性
- * 内置组件 已注册过组件 传string类型即可
- * 支持扩展Component itemType传Component对象 - example -  foo: { label:"自定义组件", itemType : ElInput}
- * @param itemType
- */
-function normalizeFormItem(formItem: any) {
-  if (formItem.componentType) return formItem
-
-  let type = formItem.type
-
-  switch (formItem.type) {
-    case 'textarea':
-      type = 'input'
-      formItem.inputType = 'textarea'
-      break
-    case 'hidden':
-      type = 'input'
-      formItem.inputType = 'hidden'
-      break
-  }
-
-  if (typeof type === 'string') {
-    formItem.componentType = `c-form-item-${type}`
-  } else {
-    formItem.componentType = type
-  }
-
-  return formItem
-}
-
-/** 是否展示表单 */
-function isVisibleItem(item: FormItemConfig) {
-  if (!app.checkPermission(item.perm)) return false
-
-  if (item.hidden === true || item.span === 0 || item.type === 'hidden') return false
-
-  const result = app.calcOnExpression(item.visibleOn, props.model, itemExpanded[item.prop] !== false)
-  return result
-}
-
-/** 是否disabled */
-function isDisabledItem(item: FormItemConfig) {
-  const result = app.calcOnExpression(item.disabledOn, props.model, item.disabled === true)
-  return result
-}
-
-/** 是否required */
-function isRequiredItem(item: FormItemConfig) {
-  const result = app.calcOnExpression(item.requiredOn, props.model, item.required === true)
-  return result
-}
 
 /** 表单展示变化 */
 function toggleExpanded(isExpanded: boolean) {
@@ -291,5 +235,9 @@ defineExpose({
   &.invisible {
     visibility: hidden;
   }
+}
+
+.text-tip {
+  line-height: 18px;
 }
 </style>

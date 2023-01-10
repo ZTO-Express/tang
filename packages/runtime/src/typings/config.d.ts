@@ -14,6 +14,7 @@ import type {
   AppStartOptions,
   NavMenuItemConfig
 } from './app'
+import { DataOptionItem } from '../../dist/types'
 
 /** 应用配置 */
 export interface AppConfig extends RuntimeConfig {
@@ -83,7 +84,6 @@ export interface AppAppConfig {
   header?: AppAppHeaderConfig
   page?: AppAppPageConfig
   auth?: AppAppAuthConfig
-  exContext?: Record<string, any> // 扩展上下文
   onLoad?: (app: App, options: AppStartOptions) => Promise<void> | void
   onUnload?: (app: App) => Promise<void> | void
 }

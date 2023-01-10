@@ -5,6 +5,9 @@
       <template v-for="it in innerActions" :key="it.name">
         <el-button
           v-if="it.name === 'submit' || it.actionType === 'submit'"
+          v-bind="it"
+          v-show="it.isVisible"
+          :disabled="typeof it.isDisabled !== 'undefined' ? it.isDisabled : it.disabled"
           :loading="loading"
           type="primary"
           v-preventReclick
@@ -14,6 +17,9 @@
         </el-button>
         <el-button
           v-else-if="it.name === 'cancel' || it.actionType === 'cancel'"
+          v-bind="it"
+          v-show="it.isVisible"
+          :disabled="typeof it.isDisabled !== 'undefined' ? it.isDisabled : it.disabled"
           type="plain"
           v-preventReclick
           @click="handleCancel(it)"
@@ -37,11 +43,14 @@ import { _, computed, ref, provide, reactive, useCurrentAppInstance } from '@zto
 import { C_FORM_KEY } from '../../consts'
 
 import type { PromiseFunction, GenericFunction } from '@zto/zpage'
+import { appUtil } from '../../utils'
+import { calcFormActionAttrs } from './util'
 
 const props = defineProps<{
   labelWidth?: number | string
   actions?: any[]
   model?: Record<string, any>
+  noResetProps?: string[]
   submitMethod?: Function
   beforeSubmit?: Function
   afterSubmit?: Function
@@ -132,8 +141,25 @@ function clearValidate() {
   return formRef.value?.clearValidate()
 }
 
+/** 重置表单，支持保留某些属性不进行重置 */
 function resetFields() {
-  return formRef.value?.resetFields()
+  // 保留不进行重设的值
+  let reservedData: Record<string, any> | null = null
+
+  if (props.noResetProps?.length && props.model) {
+    reservedData = props.noResetProps.reduce((col: any, prop: string) => {
+      col[prop] = props.model![prop]
+      return col
+    }, {} as any)
+  }
+
+  formRef.value?.resetFields()
+
+  if (reservedData && props.model) {
+    Object.keys(reservedData).forEach(key => {
+      props.model![key] = reservedData![key]
+    })
+  }
 }
 
 // --------- 操作相关 ------>
@@ -141,8 +167,14 @@ function resetFields() {
 const loading = ref<boolean>(false)
 
 const innerActions = computed<any[]>(() => {
+  const context = app.useContext(props.model)
+
   const items = (props.actions || []).map((item: any) => {
-    return { ...item }
+    const formActionAttrs = calcFormActionAttrs(item, context, {
+      model: props.model
+    })
+
+    return { ...formActionAttrs }
   })
 
   return items
@@ -158,7 +190,7 @@ const editorMessageBox = () => {
   return new Promise((resolve, reject) => {
     let message = props?.column?.editor?.message
     if (typeof message === 'string') {
-      message = message
+      // message = message
     } else if (typeof message === 'function') {
       message = message(props?.model)
     } else {
@@ -218,23 +250,27 @@ async function handleActionAfterTrigger(action: any) {}
 
 /** 提交表单 */
 async function doSubmit(action?: any) {
-  let payload = app.deepFilter({ ...action.extData, ...dataModel.value }, dataModel.value)
+  let submitData = app.deepFilter({ ...action.extData, ...dataModel.value }, dataModel.value)
 
-  const context = app.useContext(payload)
+  const submitContext = app.useContext(submitData)
 
   if (props.beforeSubmit) {
     const submitFlag = await Promise.resolve().then(() => {
-      return props.beforeSubmit!(context, dataModel, action)
+      return props.beforeSubmit!(submitContext, dataModel, action)
     })
     if (!submitFlag) return
   }
 
+  if (action.payload) {
+    submitData = appUtil.getActionPayload(action.payload, submitContext)
+  }
+
   if (props.submitMethod) {
     await Promise.resolve().then(() => {
-      return props.submitMethod!(context, dataModel, action)
+      return props.submitMethod!(submitContext, submitData, action)
     })
 
-    emit('submit', action, context)
+    emit('submit', action, submitContext)
     return
   }
 
@@ -242,18 +278,18 @@ async function doSubmit(action?: any) {
 
   if (action.apiParams) {
     const apiParams = app.deepFilter(action.apiParams, dataModel.value)
-    payload = { ...payload, ...apiParams }
+    submitData = { ...submitData, ...apiParams }
   }
 
-  await apiRequest({ action: action.api, data: payload })
+  await apiRequest({ action: action.api, data: submitData })
 
   if (props.afterSubmit) {
     return await Promise.resolve().then(() => {
-      return props.afterSubmit && props.afterSubmit(context, action)
+      return props.afterSubmit && props.afterSubmit(submitContext, action, submitData)
     })
   }
 
-  emit('submit', action, context)
+  emit('submit', action, submitContext)
 
   Message.success(action?.successMessage || '提交成功！')
 }
@@ -261,7 +297,8 @@ async function doSubmit(action?: any) {
 // ----- provide方法 ----->
 const cForm = reactive({
   addValidatorItem,
-  removeValidatorItem
+  removeValidatorItem,
+  validateFields
 })
 
 provide(C_FORM_KEY, cForm)

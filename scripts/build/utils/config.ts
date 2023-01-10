@@ -1,8 +1,10 @@
 import path from 'path'
 import fse from 'fs-extra'
 
+import type { BuildConfig } from '../types'
+
 /** 读取构建配置 */
-export function readBuildConfig(pkgDir: string, section?: string, defalutValue: any = null) {
+export function readBuildConfig<T = any>(pkgDir: string, section?: string, defalutValue: any = null): T {
   const configFilePath = path.resolve(pkgDir, 'build.config.js')
 
   if (!fse.existsSync(configFilePath)) {

@@ -1,6 +1,6 @@
-import { _, tpl, formatText } from '@zto/zpage'
+import { _, tpl, formatText, FormatterOptionsContext } from '@zto/zpage'
 
-import type { App } from '@zto/zpage'
+import type { App, PageContext } from '@zto/zpage'
 import type { TableColumn } from './types'
 
 /** 扁平化所有子列
@@ -20,6 +20,37 @@ export function flattenChildren(columns: TableColumn[]) {
   }
 
   childFinder(columns)
+  return result
+}
+
+/**
+ * 根据columns合并两个列
+ * @param columnsA
+ * @param columnsB
+ */
+export function mergeColumns(target: (TableColumn | string)[], source: TableColumn[]) {
+  const result = target.map(it => {
+    let _it: any = it
+    if (_.isString(it)) _it = { prop: it }
+
+    if (!_it.prop) return _it
+
+    let sIt = source.find(s => s.prop === _it.prop)
+    const _sIt = _.omit(sIt, 'children')
+
+    _it = _.deepMerge(_sIt, _it)
+
+    if (sIt) {
+      if (!_it.children) {
+        _it.children = sIt.children || []
+      } else if (sIt.children) {
+        _it.children = mergeColumns(_it.children, sIt.children || [])
+      }
+    }
+
+    return _it
+  })
+
   return result
 }
 
@@ -54,8 +85,11 @@ export function getColCellStyleFn(app: App, cellStyle: any, columnStyles?: any[]
  * @param column 列
  */
 export function getColFormatter(column: TableColumn) {
-  let formatter: any = column.formatter || {}
+  let formatter: any = column.formatter
+  if (formatter === false) return formatter
   if (typeof formatter === 'function') return formatter
+
+  formatter = formatter || {}
 
   // @ts-ignore 这里formatter可能为对象
   const formatterType = formatter.type || 'default'
@@ -74,8 +108,8 @@ export function getColFormatter(column: TableColumn) {
 
 /** 默认表格行格式化函数 */
 export function getDefaultColFormatterFn(options?: any) {
-  return (row: any, col: any, cellValue: any) => {
-    const dataContext = { data: row, column: col, options }
+  return (row: any, col: any, cellValue: any, context: PageContext) => {
+    const dataContext = { app: context.app, data: row, column: col, options }
 
     const text = formatValue(cellValue, options, dataContext)
 
@@ -84,7 +118,7 @@ export function getDefaultColFormatterFn(options?: any) {
 }
 
 /** 格式化值 */
-export function formatValue(val: any, options?: any, dataContext?: any) {
+export function formatValue(val: any, options: any, dataContext: FormatterOptionsContext) {
   if (typeof options === 'string') options = { name: options }
 
   options = { prefix: '', postfix: '', ...options }

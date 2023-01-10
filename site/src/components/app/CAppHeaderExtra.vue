@@ -1,8 +1,8 @@
 <template>
   <div class="app-header-extra">
-    <!-- <div class="divider">
+    <div class="divider">
       <el-divider direction="vertical"></el-divider>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -15,6 +15,11 @@ const { MessageBox } = app.useMessage()
 
 const imageAssets = app.useAssets('images', {})
 </script>
+
+<style>
+/* Markdown代码高亮显示样式 */
+@import '../styles/prism.css';
+</style>
 
 <style lang="scss">
 @import '../styles/app.scss';

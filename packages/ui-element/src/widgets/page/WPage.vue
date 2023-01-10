@@ -62,7 +62,7 @@ const headerHeight = computed(() => {
 })
 
 const headerAttrs = computed(() => {
-  return { tip: wSchema.tip, ...wSchema.header, noBack: wSchema.noBack === true }
+  return { tip: wSchema.tip, title: wSchema.title, ...wSchema.header, noBack: wSchema.noBack === true }
 })
 
 // ---- tab相关 ----->

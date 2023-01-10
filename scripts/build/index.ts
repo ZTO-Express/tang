@@ -1,9 +1,12 @@
 import { resolve } from 'path'
-import { compile } from './compiler'
 import { readBuildConfig } from './utils/config'
 import * as log from './utils/log'
 import * as argv from './utils/argv'
 import { resolvePkgRoot } from './utils/paths'
+
+import { compile } from './compiler'
+
+import type { BuildConfig } from './types'
 
 build()
 
@@ -34,26 +37,31 @@ async function buildByTargetName(targetName: string) {
 
   // 准备配置文件
   const pkgRoot = resolvePkgRoot(targetName)
+
   const outDir = resolve(pkgRoot, 'dist')
+  const inputDir = resolve(pkgRoot, 'src')
+
   const outTypesDir = resolve(outDir, 'types')
 
-  const inputDir = resolve(pkgRoot, 'src')
   const inputTypesDir = resolve(inputDir, 'typings')
   const inputFile = resolve(inputDir, 'index.ts')
 
-  const buildConfig = await readBuildConfig(pkgRoot, '', {})
+  const _buildConfig = await readBuildConfig<Partial<BuildConfig>>(pkgRoot, '', {})
+
+  const buildConfig: BuildConfig = {
+    targetName,
+    pkgRoot,
+    input: inputFile,
+    inputDir,
+    inputTypesDir,
+    outDir,
+    outTypesDir,
+    ..._buildConfig,
+    packageName: targetName
+  }
 
   try {
-    await compile({
-      pkgRoot,
-      outDir,
-      outTypesDir,
-      inputDir,
-      inputTypesDir,
-      input: inputFile,
-      ...buildConfig,
-      packageName: targetName
-    })
+    await compile(buildConfig)
 
     log.green(`${targetName} 编译完成`)
   } catch (err: any) {

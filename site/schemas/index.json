@@ -1,0 +1,3415 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/ZPageDocSiteSchemas",
+  "definitions": {
+    "ZPageDocSiteSchemas": {
+      "type": "object",
+      "properties": {
+        "shared": {
+          "type": "object",
+          "properties": {
+            "utils": {
+              "type": "object",
+              "properties": {
+                "uiTextMap": {
+                  "$ref": "#/definitions/UITextMap",
+                  "name": "uiTextMap",
+                  "index": 0,
+                  "required": true
+                },
+                "uiItemTypeEnum": {
+                  "$ref": "#/definitions/UIItemTypeEnum",
+                  "name": "uiItemTypeEnum",
+                  "index": 1,
+                  "required": true
+                },
+                "uiDataTypeEnum": {
+                  "$ref": "#/definitions/UIDataTypeEnum",
+                  "name": "uiDataTypeEnum",
+                  "index": 2,
+                  "required": true
+                }
+              },
+              "required": [
+                "uiTextMap",
+                "uiItemTypeEnum",
+                "uiDataTypeEnum"
+              ],
+              "additionalProperties": false,
+              "name": "utils",
+              "index": 0
+            },
+            "actions": {
+              "$ref": "#/definitions/MixedUIActions",
+              "name": "actions",
+              "index": 1
+            }
+          },
+          "required": true,
+          "additionalProperties": false,
+          "label": "共享结构",
+          "name": "shared",
+          "index": 0
+        },
+        "widgets": {
+          "type": "object",
+          "properties": {
+            "crudPage": {
+              "$ref": "#/definitions/WCrudPageSchema",
+              "name": "crudPage",
+              "index": 0
+            }
+          },
+          "required": true,
+          "additionalProperties": false,
+          "label": "微件",
+          "name": "widgets",
+          "index": 1
+        },
+        "components": {
+          "type": "object",
+          "properties": {
+            "formItems": {
+              "$ref": "#/definitions/MixedUIFormItems",
+              "name": "formItems",
+              "index": 0
+            },
+            "actionItems": {
+              "$ref": "#/definitions/MixedUIActionItems",
+              "name": "actionItems",
+              "index": 1
+            }
+          },
+          "required": true,
+          "additionalProperties": false,
+          "label": "组件",
+          "name": "components",
+          "index": 2
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": false,
+          "label": "扩展schema",
+          "name": "extensions",
+          "index": 3,
+          "required": true
+        }
+      },
+      "required": [
+        "components",
+        "extensions",
+        "shared",
+        "widgets"
+      ],
+      "additionalProperties": false,
+      "label": "文本schema",
+      "name": "ZPageDocSiteSchemas",
+      "index": 0
+    },
+    "UITextMap": {
+      "type": "string",
+      "enum": [
+        "query",
+        "add",
+        "edit",
+        "enable",
+        "disable",
+        "detail",
+        "delete",
+        "download",
+        "import",
+        "export"
+      ],
+      "options": [
+        {
+          "value": "query",
+          "label": "查询",
+          "index": 0
+        },
+        {
+          "value": "add",
+          "label": "新增",
+          "index": 1
+        },
+        {
+          "value": "edit",
+          "label": "编辑",
+          "index": 2
+        },
+        {
+          "value": "enable",
+          "label": "启用",
+          "index": 3
+        },
+        {
+          "value": "disable",
+          "label": "禁用",
+          "index": 4
+        },
+        {
+          "value": "detail",
+          "label": "详情",
+          "index": 5
+        },
+        {
+          "value": "delete",
+          "label": "删除",
+          "index": 6
+        },
+        {
+          "value": "download",
+          "label": "下载",
+          "index": 7
+        },
+        {
+          "value": "import",
+          "label": "导入",
+          "index": 8
+        },
+        {
+          "value": "export",
+          "label": "导出",
+          "index": 9
+        }
+      ],
+      "label": "应用字符引述",
+      "name": "UITextMap",
+      "index": 1
+    },
+    "UIItemTypeEnum": {
+      "type": "string",
+      "enum": [
+        "formItems",
+        "formItem"
+      ],
+      "options": [
+        {
+          "value": "formItems",
+          "label": "表单项集合",
+          "index": 10
+        },
+        {
+          "value": "formItem",
+          "label": "表单项",
+          "index": 20
+        }
+      ],
+      "label": "ui项",
+      "name": "UIItemTypeEnum",
+      "index": 2
+    },
+    "UIDataTypeEnum": {
+      "type": [],
+      "enum": [],
+      "options": [],
+      "name": "UIDataTypeEnum",
+      "index": 3
+    },
+    "MixedUIActions": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/UIApiAction"
+        },
+        {
+          "$ref": "#/definitions/UIDialogAction"
+        },
+        {
+          "$ref": "#/definitions/UIEventAction"
+        },
+        {
+          "$ref": "#/definitions/UIExportAction"
+        },
+        {
+          "$ref": "#/definitions/UIImportAction"
+        },
+        {
+          "$ref": "#/definitions/UILinkAction"
+        },
+        {
+          "$ref": "#/definitions/UIDownloadAction"
+        },
+        {
+          "$ref": "#/definitions/UICmptAction"
+        },
+        {
+          "$ref": "#/definitions/UICustomAction"
+        }
+      ],
+      "label": "需要根据Action特点判断action类型",
+      "name": "MixedUIActions",
+      "index": 4
+    },
+    "UIApiAction": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "$ref": "#/definitions/ActionApi",
+          "priority": 2,
+          "ui": "api",
+          "label": "Api配置",
+          "description": "执行当前行为所需要执行的api请求",
+          "name": "api",
+          "index": 0,
+          "required": true
+        },
+        "extData": {
+          "type": "object",
+          "ui": "contextPayload",
+          "label": "Api附加参数",
+          "description": "此参数有最高优先级，将覆盖所有参数",
+          "name": "extData",
+          "index": 1,
+          "required": false
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "api"
+          ],
+          "options": [
+            {
+              "value": "api",
+              "label": "api",
+              "index": 0
+            }
+          ],
+          "label": "活动类型",
+          "name": "type",
+          "index": 2,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "priority": 1,
+          "label": "活动名称",
+          "description": "类似活动编码，用于唯一识别活动",
+          "name": "name",
+          "index": 3,
+          "required": false
+        },
+        "payload": {
+          "$ref": "#/definitions/PageContextPayload",
+          "priority": 3,
+          "ui": "contextPayload",
+          "label": "负载",
+          "description": "包括请求参数，弹框数据等",
+          "name": "payload",
+          "index": 4,
+          "required": false
+        },
+        "perm": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "ui": "perm",
+          "label": "权限设置",
+          "description": "根据约定如果是接口行为，默认自定义权限名与接口名称保持一致",
+          "name": "perm",
+          "index": 5,
+          "required": false,
+          "$mergedRef": "#/definitions/PermConfig"
+        },
+        "successMessage": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "ui": "booleanString",
+          "label": "成功提示",
+          "description": "操作成功后提示成功的消息，不设置将采用默认提示",
+          "name": "successMessage",
+          "index": 6,
+          "required": false
+        },
+        "trigger": {
+          "$ref": "#/definitions/ActionTriggerFunction",
+          "ui": "contextFunction",
+          "label": "活动触发方法",
+          "description": "此方法将替换活动自身的默认处理方法",
+          "name": "trigger",
+          "index": 7,
+          "required": false
+        },
+        "beforeTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发前调用方法",
+          "name": "beforeTrigger",
+          "index": 8,
+          "required": false
+        },
+        "afterTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发后调用方法",
+          "name": "afterTrigger",
+          "index": 9,
+          "required": false
+        }
+      },
+      "required": [
+        "api",
+        "type"
+      ],
+      "ui": "action",
+      "label": "Api请求",
+      "name": "UIApiAction",
+      "index": 5
+    },
+    "ActionApi": {
+      "$ref": "#/definitions/ApiRequestAction",
+      "label": "api请求",
+      "name": "ActionApi",
+      "index": 6
+    },
+    "ApiRequestAction": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "name": "type",
+          "index": 0
+        },
+        "api": {
+          "$ref": "#/definitions/ApiRequestActionApi",
+          "name": "api",
+          "index": 1
+        },
+        "url": {
+          "type": "string",
+          "name": "url",
+          "index": 2
+        },
+        "sourceType": {
+          "type": "string",
+          "name": "sourceType",
+          "index": 3
+        },
+        "mockData": {
+          "name": "mockData",
+          "index": 4
+        },
+        "uniqueApiParamProp": {
+          "type": "string",
+          "name": "uniqueApiParamProp",
+          "index": 5
+        }
+      },
+      "label": "Api请求活动",
+      "name": "ApiRequestAction",
+      "index": 7
+    },
+    "ApiRequestActionApi": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        }
+      ],
+      "name": "ApiRequestActionApi",
+      "index": 8
+    },
+    "PageContextPayload": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/PageContextFunction"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "object"
+        }
+      ],
+      "ui": "payload",
+      "label": "负载数据",
+      "description": "活动负载用于应用运行过程中从上下文中获取负载",
+      "name": "PageContextPayload",
+      "index": 9
+    },
+    "PageContextFunction": {
+      "type": "object",
+      "properties": {
+        "isFunction": {
+          "type": "boolean",
+          "const": true,
+          "name": "isFunction",
+          "index": 0
+        }
+      },
+      "name": "PageContextFunction",
+      "index": 10
+    },
+    "PermConfig": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ],
+      "ui": "perm",
+      "label": "权限设置",
+      "name": "PermConfig",
+      "index": 11
+    },
+    "ActionTriggerFunction": {
+      "type": "object",
+      "properties": {
+        "isFunction": {
+          "type": "boolean",
+          "const": true,
+          "name": "isFunction",
+          "index": 0
+        }
+      },
+      "label": "活动触发方法定义",
+      "name": "ActionTriggerFunction",
+      "index": 12
+    },
+    "ActionHookFunction": {
+      "type": "object",
+      "properties": {
+        "isFunction": {
+          "type": "boolean",
+          "const": true,
+          "name": "isFunction",
+          "index": 0
+        }
+      },
+      "label": "活动钩子函数定义",
+      "name": "ActionHookFunction",
+      "index": 13
+    },
+    "UIDialogAction": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "$ref": "#/definitions/ActionApi",
+          "priority": 2,
+          "ui": "api",
+          "label": "Api配置",
+          "description": "执行当前行为所需要执行的api请求",
+          "name": "api",
+          "index": 0,
+          "required": true
+        },
+        "extData": {
+          "type": "object",
+          "ui": "contextPayload",
+          "label": "Api附加参数",
+          "description": "此参数有最高优先级，将覆盖所有参数",
+          "name": "extData",
+          "index": 1,
+          "required": false
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "dialog"
+          ],
+          "options": [
+            {
+              "value": "dialog",
+              "label": "弹框",
+              "index": 0
+            }
+          ],
+          "label": "活动类型",
+          "name": "type",
+          "index": 2,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "priority": 1,
+          "label": "活动名称",
+          "description": "类似活动编码，用于唯一识别活动",
+          "name": "name",
+          "index": 3,
+          "required": false
+        },
+        "payload": {
+          "$ref": "#/definitions/PageContextPayload",
+          "priority": 3,
+          "ui": "contextPayload",
+          "label": "负载",
+          "description": "包括请求参数，弹框数据等",
+          "name": "payload",
+          "index": 4,
+          "required": false
+        },
+        "perm": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "ui": "perm",
+          "label": "权限设置",
+          "name": "perm",
+          "index": 5,
+          "description": "根据约定如果是接口行为，默认自定义权限名与接口名称保持一致",
+          "required": false,
+          "$mergedRef": "#/definitions/PermConfig"
+        },
+        "successMessage": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "ui": "booleanString",
+          "label": "成功提示",
+          "description": "操作成功后提示成功的消息，不设置将采用默认提示",
+          "name": "successMessage",
+          "index": 6,
+          "required": false
+        },
+        "trigger": {
+          "$ref": "#/definitions/ActionTriggerFunction",
+          "ui": "contextFunction",
+          "label": "活动触发方法",
+          "description": "此方法将替换活动自身的默认处理方法",
+          "name": "trigger",
+          "index": 7,
+          "required": false
+        },
+        "beforeTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发前调用方法",
+          "name": "beforeTrigger",
+          "index": 8,
+          "required": false
+        },
+        "afterTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发后调用方法",
+          "name": "afterTrigger",
+          "index": 9,
+          "required": false
+        },
+        "dialog": {
+          "$ref": "#/definitions/UIActionDialog",
+          "label": "弹窗",
+          "name": "dialog",
+          "index": 10,
+          "required": false
+        }
+      },
+      "required": [
+        "api",
+        "type"
+      ],
+      "ui": "action",
+      "label": "弹框",
+      "name": "UIDialogAction",
+      "index": 14
+    },
+    "UIActionDialog": {
+      "type": "object",
+      "additionalProperties": false,
+      "label": "活动对话框",
+      "name": "UIActionDialog",
+      "index": 15
+    },
+    "UIEventAction": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "event"
+          ],
+          "options": [
+            {
+              "value": "event",
+              "label": "事件",
+              "index": 0
+            }
+          ],
+          "label": "活动类型",
+          "name": "type",
+          "index": 0,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "priority": 1,
+          "label": "活动名称",
+          "description": "类似活动编码，用于唯一识别活动",
+          "name": "name",
+          "index": 1,
+          "required": false
+        },
+        "payload": {
+          "$ref": "#/definitions/PageContextPayload",
+          "priority": 3,
+          "ui": "contextPayload",
+          "label": "负载",
+          "description": "包括请求参数，弹框数据等",
+          "name": "payload",
+          "index": 2,
+          "required": false
+        },
+        "perm": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "ui": "perm",
+          "label": "权限设置",
+          "name": "perm",
+          "index": 3,
+          "description": "根据约定如果是接口行为，默认自定义权限名与接口名称保持一致",
+          "required": false,
+          "$mergedRef": "#/definitions/PermConfig"
+        },
+        "successMessage": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "ui": "booleanString",
+          "label": "成功提示",
+          "description": "操作成功后提示成功的消息，不设置将采用默认提示",
+          "name": "successMessage",
+          "index": 4,
+          "required": false
+        },
+        "trigger": {
+          "$ref": "#/definitions/ActionTriggerFunction",
+          "ui": "contextFunction",
+          "label": "活动触发方法",
+          "description": "此方法将替换活动自身的默认处理方法",
+          "name": "trigger",
+          "index": 5,
+          "required": false
+        },
+        "beforeTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发前调用方法",
+          "name": "beforeTrigger",
+          "index": 6,
+          "required": false
+        },
+        "afterTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发后调用方法",
+          "name": "afterTrigger",
+          "index": 7,
+          "required": false
+        },
+        "event": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/UIActionEvent"
+            }
+          ],
+          "name": "event",
+          "index": 8,
+          "required": false
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "ui": "action",
+      "label": "事件",
+      "name": "UIEventAction",
+      "index": 16
+    },
+    "UIActionEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "label": "活动事件",
+      "name": "UIActionEvent",
+      "index": 17
+    },
+    "UIExportAction": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "$ref": "#/definitions/ActionApi",
+          "priority": 2,
+          "ui": "api",
+          "label": "Api配置",
+          "description": "执行当前行为所需要执行的api请求",
+          "name": "api",
+          "index": 0,
+          "required": true
+        },
+        "extData": {
+          "type": "object",
+          "ui": "contextPayload",
+          "label": "Api附加参数",
+          "description": "此参数有最高优先级，将覆盖所有参数",
+          "name": "extData",
+          "index": 1,
+          "required": false
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "export"
+          ],
+          "options": [
+            {
+              "value": "export",
+              "label": "导出",
+              "index": 0
+            }
+          ],
+          "label": "活动类型",
+          "name": "type",
+          "index": 2,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "priority": 1,
+          "label": "活动名称",
+          "description": "类似活动编码，用于唯一识别活动",
+          "name": "name",
+          "index": 3,
+          "required": false
+        },
+        "payload": {
+          "$ref": "#/definitions/PageContextPayload",
+          "priority": 3,
+          "ui": "contextPayload",
+          "label": "负载",
+          "description": "包括请求参数，弹框数据等",
+          "name": "payload",
+          "index": 4,
+          "required": false
+        },
+        "perm": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "ui": "perm",
+          "label": "权限设置",
+          "name": "perm",
+          "index": 5,
+          "description": "根据约定如果是接口行为，默认自定义权限名与接口名称保持一致",
+          "required": false,
+          "$mergedRef": "#/definitions/PermConfig"
+        },
+        "successMessage": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "ui": "booleanString",
+          "label": "成功提示",
+          "description": "操作成功后提示成功的消息，不设置将采用默认提示",
+          "name": "successMessage",
+          "index": 6,
+          "required": false
+        },
+        "trigger": {
+          "$ref": "#/definitions/ActionTriggerFunction",
+          "ui": "contextFunction",
+          "label": "活动触发方法",
+          "description": "此方法将替换活动自身的默认处理方法",
+          "name": "trigger",
+          "index": 7,
+          "required": false
+        },
+        "beforeTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发前调用方法",
+          "name": "beforeTrigger",
+          "index": 8,
+          "required": false
+        },
+        "afterTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发后调用方法",
+          "name": "afterTrigger",
+          "index": 9,
+          "required": false
+        },
+        "exportType": {
+          "type": "string",
+          "label": "导出类型",
+          "name": "exportType",
+          "index": 10,
+          "required": false
+        },
+        "openDialogAfterSuccess": {
+          "type": "boolean",
+          "label": "完成后是否打开导出窗口",
+          "name": "openDialogAfterSuccess",
+          "index": 11,
+          "required": false
+        }
+      },
+      "required": [
+        "api",
+        "type"
+      ],
+      "ui": "action",
+      "label": "导出",
+      "name": "UIExportAction",
+      "index": 18
+    },
+    "UIImportAction": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "$ref": "#/definitions/ActionApi",
+          "priority": 2,
+          "ui": "api",
+          "label": "Api配置",
+          "description": "执行当前行为所需要执行的api请求",
+          "name": "api",
+          "index": 0,
+          "required": true
+        },
+        "extData": {
+          "type": "object",
+          "ui": "contextPayload",
+          "label": "Api附加参数",
+          "description": "此参数有最高优先级，将覆盖所有参数",
+          "name": "extData",
+          "index": 1,
+          "required": false
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "import"
+          ],
+          "options": [
+            {
+              "value": "import",
+              "label": "导入",
+              "index": 0
+            }
+          ],
+          "label": "活动类型",
+          "name": "type",
+          "index": 2,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "priority": 1,
+          "label": "活动名称",
+          "description": "类似活动编码，用于唯一识别活动",
+          "name": "name",
+          "index": 3,
+          "required": false
+        },
+        "payload": {
+          "$ref": "#/definitions/PageContextPayload",
+          "priority": 3,
+          "ui": "contextPayload",
+          "label": "负载",
+          "description": "包括请求参数，弹框数据等",
+          "name": "payload",
+          "index": 4,
+          "required": false
+        },
+        "perm": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "ui": "perm",
+          "label": "权限设置",
+          "name": "perm",
+          "index": 5,
+          "description": "根据约定如果是接口行为，默认自定义权限名与接口名称保持一致",
+          "required": false,
+          "$mergedRef": "#/definitions/PermConfig"
+        },
+        "successMessage": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "ui": "booleanString",
+          "label": "成功提示",
+          "description": "操作成功后提示成功的消息，不设置将采用默认提示",
+          "name": "successMessage",
+          "index": 6,
+          "required": false
+        },
+        "trigger": {
+          "$ref": "#/definitions/ActionTriggerFunction",
+          "ui": "contextFunction",
+          "label": "活动触发方法",
+          "description": "此方法将替换活动自身的默认处理方法",
+          "name": "trigger",
+          "index": 7,
+          "required": false
+        },
+        "beforeTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发前调用方法",
+          "name": "beforeTrigger",
+          "index": 8,
+          "required": false
+        },
+        "afterTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发后调用方法",
+          "name": "afterTrigger",
+          "index": 9,
+          "required": false
+        },
+        "template": {
+          "type": "string",
+          "label": "导入模版资源名",
+          "name": "template",
+          "index": 10,
+          "required": false
+        },
+        "maxCount": {
+          "type": "number",
+          "default": 1000,
+          "label": "最大导入数",
+          "name": "maxCount",
+          "index": 11,
+          "required": false
+        },
+        "extraTip": {
+          "type": "string",
+          "label": "额外提示",
+          "name": "extraTip",
+          "index": 12,
+          "required": false
+        }
+      },
+      "required": [
+        "api",
+        "type"
+      ],
+      "ui": "action",
+      "label": "导入",
+      "name": "UIImportAction",
+      "index": 19
+    },
+    "UILinkAction": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "link"
+          ],
+          "options": [
+            {
+              "value": "link",
+              "label": "跳转",
+              "index": 0
+            }
+          ],
+          "label": "活动类型",
+          "name": "type",
+          "index": 0,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "priority": 1,
+          "label": "活动名称",
+          "description": "类似活动编码，用于唯一识别活动",
+          "name": "name",
+          "index": 1,
+          "required": false
+        },
+        "payload": {
+          "$ref": "#/definitions/PageContextPayload",
+          "priority": 3,
+          "ui": "contextPayload",
+          "label": "负载",
+          "description": "包括请求参数，弹框数据等",
+          "name": "payload",
+          "index": 2,
+          "required": false
+        },
+        "perm": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "ui": "perm",
+          "label": "权限设置",
+          "name": "perm",
+          "index": 3,
+          "description": "根据约定如果是接口行为，默认自定义权限名与接口名称保持一致",
+          "required": false,
+          "$mergedRef": "#/definitions/PermConfig"
+        },
+        "successMessage": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "ui": "booleanString",
+          "label": "成功提示",
+          "description": "操作成功后提示成功的消息，不设置将采用默认提示",
+          "name": "successMessage",
+          "index": 4,
+          "required": false
+        },
+        "trigger": {
+          "$ref": "#/definitions/ActionTriggerFunction",
+          "ui": "contextFunction",
+          "label": "活动触发方法",
+          "description": "此方法将替换活动自身的默认处理方法",
+          "name": "trigger",
+          "index": 5,
+          "required": false
+        },
+        "beforeTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发前调用方法",
+          "name": "beforeTrigger",
+          "index": 6,
+          "required": false
+        },
+        "afterTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发后调用方法",
+          "name": "afterTrigger",
+          "index": 7,
+          "required": false
+        },
+        "link": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/AppPageLink"
+            }
+          ],
+          "label": "下载/跳转链接",
+          "description": "这里的link为跳转链接",
+          "name": "link",
+          "index": 8,
+          "required": false
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "ui": "action",
+      "label": "链接",
+      "name": "UILinkAction",
+      "index": 20
+    },
+    "AppPageLink": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "label": "链接标题，当打开新tab页后会作为tab页标题",
+          "name": "title",
+          "index": 0,
+          "required": false
+        },
+        "name": {
+          "type": "string",
+          "label": "跳转目标页面名称",
+          "name": "name",
+          "index": 1,
+          "required": false
+        },
+        "path": {
+          "type": "string",
+          "label": "跳转目标页面路径，如为临时页面，则用户生成临时页面key",
+          "name": "path",
+          "index": 2,
+          "required": false
+        },
+        "query": {
+          "type": "object",
+          "label": "跳转目标页面query",
+          "name": "query",
+          "index": 3,
+          "required": true
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "additionalProperties": false,
+      "label": "页面链接",
+      "name": "AppPageLink",
+      "index": 21
+    },
+    "UIDownloadAction": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "download"
+          ],
+          "options": [
+            {
+              "value": "download",
+              "label": "下载",
+              "index": 0
+            }
+          ],
+          "label": "活动类型",
+          "name": "type",
+          "index": 0,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "priority": 1,
+          "label": "活动名称",
+          "description": "类似活动编码，用于唯一识别活动",
+          "name": "name",
+          "index": 1,
+          "required": false
+        },
+        "payload": {
+          "$ref": "#/definitions/PageContextPayload",
+          "priority": 3,
+          "ui": "contextPayload",
+          "label": "负载",
+          "description": "包括请求参数，弹框数据等",
+          "name": "payload",
+          "index": 2,
+          "required": false
+        },
+        "perm": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "ui": "perm",
+          "label": "权限设置",
+          "name": "perm",
+          "index": 3,
+          "description": "根据约定如果是接口行为，默认自定义权限名与接口名称保持一致",
+          "required": false,
+          "$mergedRef": "#/definitions/PermConfig"
+        },
+        "successMessage": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "ui": "booleanString",
+          "label": "成功提示",
+          "description": "操作成功后提示成功的消息，不设置将采用默认提示",
+          "name": "successMessage",
+          "index": 4,
+          "required": false
+        },
+        "trigger": {
+          "$ref": "#/definitions/ActionTriggerFunction",
+          "ui": "contextFunction",
+          "label": "活动触发方法",
+          "description": "此方法将替换活动自身的默认处理方法",
+          "name": "trigger",
+          "index": 5,
+          "required": false
+        },
+        "beforeTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发前调用方法",
+          "name": "beforeTrigger",
+          "index": 6,
+          "required": false
+        },
+        "afterTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发后调用方法",
+          "name": "afterTrigger",
+          "index": 7,
+          "required": false
+        },
+        "url": {
+          "type": "string",
+          "label": "链接",
+          "name": "url",
+          "index": 8,
+          "required": false
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "ui": "action",
+      "label": "下载",
+      "name": "UIDownloadAction",
+      "index": 22
+    },
+    "UICmptAction": {
+      "type": "object",
+      "properties": {
+        "cmpt": {
+          "$ref": "#/definitions/CmptSchema",
+          "name": "cmpt",
+          "index": 0,
+          "required": false
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "cmpt"
+          ],
+          "options": [
+            {
+              "value": "cmpt",
+              "label": "组件",
+              "index": 0
+            }
+          ],
+          "label": "活动类型",
+          "name": "type",
+          "index": 1,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "priority": 1,
+          "label": "活动名称",
+          "description": "类似活动编码，用于唯一识别活动",
+          "name": "name",
+          "index": 2,
+          "required": false
+        },
+        "payload": {
+          "$ref": "#/definitions/PageContextPayload",
+          "priority": 3,
+          "ui": "contextPayload",
+          "label": "负载",
+          "description": "包括请求参数，弹框数据等",
+          "name": "payload",
+          "index": 3,
+          "required": false
+        },
+        "perm": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "ui": "perm",
+          "label": "权限设置",
+          "name": "perm",
+          "index": 4,
+          "description": "根据约定如果是接口行为，默认自定义权限名与接口名称保持一致",
+          "required": false,
+          "$mergedRef": "#/definitions/PermConfig"
+        },
+        "successMessage": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "ui": "booleanString",
+          "label": "成功提示",
+          "description": "操作成功后提示成功的消息，不设置将采用默认提示",
+          "name": "successMessage",
+          "index": 5,
+          "required": false
+        },
+        "trigger": {
+          "$ref": "#/definitions/ActionTriggerFunction",
+          "ui": "contextFunction",
+          "label": "活动触发方法",
+          "description": "此方法将替换活动自身的默认处理方法",
+          "name": "trigger",
+          "index": 6,
+          "required": false
+        },
+        "beforeTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发前调用方法",
+          "name": "beforeTrigger",
+          "index": 7,
+          "required": false
+        },
+        "afterTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发后调用方法",
+          "name": "afterTrigger",
+          "index": 8,
+          "required": false
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "ui": "action",
+      "label": "组件",
+      "name": "UICmptAction",
+      "index": 23
+    },
+    "CmptSchema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "label": "组件类型",
+          "name": "type",
+          "index": 0
+        },
+        "config": {
+          "$ref": "#/definitions/CmptConfigType",
+          "label": "组件配置",
+          "name": "config",
+          "index": 1
+        }
+      },
+      "additionalProperties": false,
+      "label": "Cmpt组件Schema",
+      "name": "CmptSchema",
+      "index": 24
+    },
+    "CmptConfigType": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/CmptConfig"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "isFunction": {
+              "type": "boolean",
+              "const": true
+            }
+          }
+        }
+      ],
+      "label": "Cmpt配置类型",
+      "name": "CmptConfigType",
+      "index": 25
+    },
+    "CmptConfig": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/CmptAttrs"
+        },
+        {
+          "$ref": "#/definitions/CmptAttrsMethod"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "name": "CmptConfig",
+      "index": 26
+    },
+    "CmptAttrs": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "name": "type",
+          "index": 0
+        },
+        "contextData": {
+          "name": "contextData",
+          "index": 1
+        }
+      },
+      "name": "CmptAttrs",
+      "index": 27
+    },
+    "CmptAttrsMethod": {
+      "type": "object",
+      "properties": {
+        "isFunction": {
+          "type": "boolean",
+          "const": true,
+          "name": "isFunction",
+          "index": 0
+        }
+      },
+      "name": "CmptAttrsMethod",
+      "index": 28
+    },
+    "UICustomAction": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "custom"
+          ],
+          "options": [
+            {
+              "value": "custom",
+              "label": "自定义",
+              "index": 0
+            }
+          ],
+          "label": "活动类型",
+          "name": "type",
+          "index": 0,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "priority": 1,
+          "label": "活动名称",
+          "description": "类似活动编码，用于唯一识别活动",
+          "name": "name",
+          "index": 1,
+          "required": false
+        },
+        "payload": {
+          "$ref": "#/definitions/PageContextPayload",
+          "priority": 3,
+          "ui": "contextPayload",
+          "label": "负载",
+          "description": "包括请求参数，弹框数据等",
+          "name": "payload",
+          "index": 2,
+          "required": false
+        },
+        "perm": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "ui": "perm",
+          "label": "权限设置",
+          "name": "perm",
+          "index": 3,
+          "description": "根据约定如果是接口行为，默认自定义权限名与接口名称保持一致",
+          "required": false,
+          "$mergedRef": "#/definitions/PermConfig"
+        },
+        "successMessage": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "ui": "booleanString",
+          "label": "成功提示",
+          "description": "操作成功后提示成功的消息，不设置将采用默认提示",
+          "name": "successMessage",
+          "index": 4,
+          "required": false
+        },
+        "trigger": {
+          "$ref": "#/definitions/ActionTriggerFunction",
+          "ui": "contextFunction",
+          "label": "活动触发方法",
+          "description": "此方法将替换活动自身的默认处理方法",
+          "name": "trigger",
+          "index": 5,
+          "required": false
+        },
+        "beforeTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发前调用方法",
+          "name": "beforeTrigger",
+          "index": 6,
+          "required": false
+        },
+        "afterTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发后调用方法",
+          "name": "afterTrigger",
+          "index": 7,
+          "required": false
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "ui": "action",
+      "label": "自定义",
+      "name": "UICustomAction",
+      "index": 29
+    },
+    "WCrudPageSchema": {
+      "type": "object",
+      "properties": {
+        "actions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/MixedUIActions"
+          },
+          "data": "set",
+          "ui": "actionSet",
+          "label": "活动",
+          "description": "键为活动名称, 值为活动定义",
+          "category": "default.actions",
+          "default": {
+            "query": {
+              "api": "query/api"
+            }
+          },
+          "name": "actions",
+          "index": 0,
+          "$mergedRef": "#/definitions/UIActionSet"
+        },
+        "header": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "label": "页面标题",
+              "name": "title",
+              "index": 0
+            },
+            "tip": {
+              "type": "string",
+              "section": "header",
+              "label": "页面提示",
+              "name": "tip",
+              "index": 1
+            },
+            "noBack": {
+              "type": "boolean",
+              "section": "header",
+              "label": "不支持返回",
+              "name": "noBack",
+              "index": 2
+            }
+          },
+          "additionalProperties": false,
+          "label": "头部",
+          "description": "页面头部相关配置",
+          "category": "default.advanced",
+          "data": "sub",
+          "name": "header",
+          "index": 1,
+          "$mergedRef": "#/definitions/WCrudPageHeaderSchema"
+        },
+        "search": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UIFormItem"
+              },
+              "ui": "formItems",
+              "label": "表单项",
+              "category": true,
+              "$mergedRef": "#/definitions/UIFormItems",
+              "name": "items",
+              "index": 0,
+              "required": true
+            },
+            "immediate": {
+              "type": "boolean",
+              "category": "advanced",
+              "default": false,
+              "label": "立即查询",
+              "description": "组件加载完成后，是否立即执行查询",
+              "name": "immediate",
+              "index": 1,
+              "required": false
+            }
+          },
+          "required": [
+            "items"
+          ],
+          "additionalProperties": false,
+          "label": "查询",
+          "category": true,
+          "data": "sub",
+          "name": "search",
+          "index": 2,
+          "$mergedRef": "#/definitions/WCrudSearchSchema"
+        },
+        "table": {
+          "type": "object",
+          "properties": {
+            "columns": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UITableColumn"
+              },
+              "ui": "tableColumns",
+              "label": "表格列",
+              "category": true,
+              "$mergedRef": "#/definitions/UITableColumns",
+              "name": "columns",
+              "index": 0
+            },
+            "operation": {
+              "type": "object",
+              "properties": {
+                "hidden": {
+                  "type": "boolean",
+                  "label": "是否隐藏",
+                  "name": "hidden",
+                  "index": 0
+                },
+                "width": {
+                  "type": "number",
+                  "label": "宽度",
+                  "name": "width",
+                  "index": 1
+                },
+                "items": {
+                  "$ref": "#/definitions/UIActionItems",
+                  "label": "操作项",
+                  "name": "items",
+                  "index": 2
+                }
+              },
+              "additionalProperties": false,
+              "category": true,
+              "label": "操作项",
+              "name": "operation",
+              "index": 1
+            }
+          },
+          "additionalProperties": false,
+          "label": "表格",
+          "category": true,
+          "data": "sub",
+          "name": "table",
+          "index": 3,
+          "$mergedRef": "#/definitions/WCrudTableSchema"
+        },
+        "toolbar": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UIActionItem"
+              },
+              "ui": "actionItems",
+              "label": "操作项",
+              "category": true,
+              "$mergedRef": "#/definitions/UIActionItems",
+              "name": "items",
+              "index": 0
+            },
+            "title": {
+              "type": "string",
+              "category": "advanced",
+              "label": "标题",
+              "name": "title",
+              "index": 1
+            }
+          },
+          "additionalProperties": false,
+          "label": "工具栏",
+          "category": true,
+          "data": "sub",
+          "name": "toolbar",
+          "index": 4,
+          "$mergedRef": "#/definitions/WCrudToolbarSchema"
+        }
+      },
+      "additionalProperties": {
+        "label": "扩展配置"
+      },
+      "schema": "widget",
+      "target": "WCrudPage",
+      "ui": "page",
+      "meta": ": {\ncategories: {\n\"default\": { label: '常规', index: 1 }\n\"default.actions\": { label: '集合', index: 1 }\n}\n}",
+      "label": "增删改查页面",
+      "description": "增删改查是目前应用开发中最常用的微件，其主要作用是对列表类型的数据进行查询、展示、操作等功能。\n该微件同时也包含部分页面自动布局功能，一般情况必须外部需要套一个容器，通常和Page页面配合使用。",
+      "name": "WCrudPageSchema",
+      "index": 30
+    },
+    "UIActionSet": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/MixedUIActions"
+      },
+      "data": "set",
+      "ui": "actionSet",
+      "label": "活动集合",
+      "description": "键为活动名称, 值为活动定义",
+      "name": "UIActionSet",
+      "index": 31
+    },
+    "WCrudPageHeaderSchema": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "label": "页面标题",
+          "name": "title",
+          "index": 0
+        },
+        "tip": {
+          "type": "string",
+          "section": "header",
+          "label": "页面提示",
+          "name": "tip",
+          "index": 1
+        },
+        "noBack": {
+          "type": "boolean",
+          "section": "header",
+          "label": "不支持返回",
+          "name": "noBack",
+          "index": 2
+        }
+      },
+      "additionalProperties": false,
+      "label": "页头",
+      "description": "页头描述信息",
+      "name": "WCrudPageHeaderSchema",
+      "index": 32
+    },
+    "WCrudSearchSchema": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UIFormItem"
+          },
+          "ui": "formItems",
+          "label": "表单项",
+          "category": true,
+          "$mergedRef": "#/definitions/UIFormItems",
+          "name": "items",
+          "index": 0,
+          "required": true
+        },
+        "immediate": {
+          "type": "boolean",
+          "category": "advanced",
+          "default": false,
+          "label": "立即查询",
+          "description": "组件加载完成后，是否立即执行查询",
+          "name": "immediate",
+          "index": 1,
+          "required": false
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "additionalProperties": false,
+      "label": "查询结构",
+      "name": "WCrudSearchSchema",
+      "index": 33
+    },
+    "UIFormItems": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/UIFormItem"
+      },
+      "ui": "formItems",
+      "label": "表单集合",
+      "name": "UIFormItems",
+      "index": 34
+    },
+    "UIFormItem": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "label": "标签",
+          "name": "label",
+          "index": 0,
+          "required": true
+        },
+        "prop": {
+          "type": "string",
+          "label": "属性",
+          "name": "prop",
+          "index": 1,
+          "required": false
+        },
+        "span": {
+          "type": "number",
+          "default": 6,
+          "label": "跨度",
+          "description": "表单项占一行(24)的跨度",
+          "name": "span",
+          "index": 2,
+          "required": false
+        },
+        "labelWidth": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "label": "标签宽度",
+          "name": "labelWidth",
+          "index": 3,
+          "required": false
+        },
+        "required": {
+          "type": "boolean",
+          "label": "是否必填",
+          "name": "required",
+          "index": 4,
+          "required": false
+        },
+        "clearable": {
+          "type": "boolean",
+          "default": true,
+          "label": "是否可清空",
+          "name": "clearable",
+          "index": 5,
+          "required": false
+        },
+        "readonly": {
+          "type": "boolean",
+          "default": false,
+          "label": "是否只读",
+          "name": "readonly",
+          "index": 6,
+          "required": false
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UIFormRule"
+          },
+          "ui": "formRules",
+          "label": "验证规则",
+          "name": "rules",
+          "index": 7,
+          "required": false
+        }
+      },
+      "required": [
+        "label"
+      ],
+      "additionalProperties": false,
+      "label": "表单项",
+      "name": "UIFormItem",
+      "index": 35
+    },
+    "UIFormRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "name": "UIFormRule",
+      "index": 36
+    },
+    "WCrudTableSchema": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UITableColumn"
+          },
+          "ui": "tableColumns",
+          "label": "表格列",
+          "category": true,
+          "$mergedRef": "#/definitions/UITableColumns",
+          "name": "columns",
+          "index": 0
+        },
+        "operation": {
+          "type": "object",
+          "properties": {
+            "hidden": {
+              "type": "boolean",
+              "label": "是否隐藏",
+              "name": "hidden",
+              "index": 0
+            },
+            "width": {
+              "type": "number",
+              "label": "宽度",
+              "name": "width",
+              "index": 1
+            },
+            "items": {
+              "$ref": "#/definitions/UIActionItems",
+              "label": "操作项",
+              "name": "items",
+              "index": 2
+            }
+          },
+          "additionalProperties": false,
+          "category": true,
+          "label": "操作项",
+          "name": "operation",
+          "index": 1
+        }
+      },
+      "additionalProperties": false,
+      "label": "表格结构",
+      "name": "WCrudTableSchema",
+      "index": 37
+    },
+    "UITableColumns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/UITableColumn"
+      },
+      "ui": "tableColumns",
+      "label": "表格列集合",
+      "name": "UITableColumns",
+      "index": 38
+    },
+    "UITableColumn": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "label": "列标签",
+          "name": "label",
+          "index": 0
+        },
+        "prop": {
+          "type": "string",
+          "label": "属性字段",
+          "name": "prop",
+          "index": 1
+        },
+        "width": {
+          "type": "number",
+          "label": "列宽度",
+          "name": "width",
+          "index": 2
+        },
+        "fixed": {
+          "type": "boolean",
+          "label": "是否固定",
+          "name": "fixed",
+          "index": 3
+        },
+        "align": {
+          "$ref": "#/definitions/AlignType",
+          "label": "对齐",
+          "name": "align",
+          "index": 4
+        },
+        "formatter": {
+          "$ref": "#/definitions/UIFormatterSchema",
+          "label": "格式化",
+          "name": "formatter",
+          "index": 5
+        },
+        "icon": {
+          "type": "string",
+          "ui": "icon",
+          "label": "图标",
+          "name": "icon",
+          "index": 6
+        },
+        "tip": {
+          "$ref": "#/definitions/TipObject",
+          "label": "列提示",
+          "name": "tip",
+          "index": 7
+        },
+        "header": {
+          "type": "object",
+          "properties": {
+            "tip": {
+              "$ref": "#/definitions/TipObject",
+              "ui": "tip",
+              "label": "提示",
+              "name": "tip",
+              "index": 0
+            },
+            "style": {
+              "$ref": "#/definitions/StyleObject",
+              "ui": "style",
+              "label": "样式",
+              "name": "style",
+              "index": 1
+            }
+          },
+          "additionalProperties": false,
+          "label": "列头",
+          "name": "header",
+          "index": 8
+        },
+        "summary": {
+          "type": "object",
+          "properties": {
+            "prop": {
+              "type": "string",
+              "label": "汇总列",
+              "description": "默认当前列名",
+              "name": "prop",
+              "index": 0
+            },
+            "formatter": {
+              "$ref": "#/definitions/UIFormatterSchema",
+              "label": "格式化配置",
+              "name": "formatter",
+              "index": 1
+            }
+          },
+          "additionalProperties": false,
+          "label": "汇总",
+          "name": "summary",
+          "index": 9
+        },
+        "children": {
+          "$ref": "#/definitions/UITableColumns",
+          "label": "子列",
+          "name": "children",
+          "index": 10
+        }
+      },
+      "additionalProperties": false,
+      "ui": "tableColumn",
+      "label": "表格列",
+      "name": "UITableColumn",
+      "index": 39
+    },
+    "AlignType": {
+      "type": "string",
+      "enum": [
+        "left",
+        "right",
+        "center"
+      ],
+      "options": [
+        {
+          "value": "left",
+          "label": "居左",
+          "index": 0
+        },
+        {
+          "value": "right",
+          "label": "居右",
+          "index": 1
+        },
+        {
+          "value": "center",
+          "label": "居中",
+          "index": 2
+        }
+      ],
+      "ui": "options",
+      "label": "对齐类型",
+      "name": "AlignType",
+      "index": 40
+    },
+    "UIFormatterSchema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "label": "格式化类型",
+          "name": "type",
+          "index": 0
+        },
+        "prefix": {
+          "type": "string",
+          "label": "前缀",
+          "name": "prefix",
+          "index": 1
+        },
+        "postfix": {
+          "type": "string",
+          "label": "后缀",
+          "name": "postfix",
+          "index": 2
+        },
+        "fn": {
+          "$ref": "#/definitions/FormatterFunction",
+          "label": "格式化方法",
+          "name": "fn",
+          "index": 3
+        }
+      },
+      "additionalProperties": false,
+      "ui": "formatter",
+      "label": "格式化结构",
+      "name": "UIFormatterSchema",
+      "index": 41
+    },
+    "FormatterFunction": {
+      "type": "object",
+      "properties": {
+        "isFunction": {
+          "type": "boolean",
+          "const": true,
+          "name": "isFunction",
+          "index": 0
+        }
+      },
+      "label": "格式化方法",
+      "name": "FormatterFunction",
+      "index": 42
+    },
+    "TipObject": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "ui": "template",
+          "label": "提示标题",
+          "name": "title",
+          "index": 0
+        },
+        "content": {
+          "type": "string",
+          "ui": "template",
+          "label": "提示内容",
+          "name": "content",
+          "index": 1
+        }
+      },
+      "additionalProperties": false,
+      "ui": "tip",
+      "label": "提示",
+      "name": "TipObject",
+      "index": 43
+    },
+    "StyleObject": {
+      "type": "object",
+      "properties": {
+        "background": {
+          "type": "string",
+          "label": "背景",
+          "name": "background",
+          "index": 0,
+          "required": true
+        },
+        "color": {
+          "type": "string",
+          "label": "颜色",
+          "name": "color",
+          "index": 1,
+          "required": true
+        }
+      },
+      "required": [
+        "background",
+        "color"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      },
+      "ui": "style",
+      "label": "样式",
+      "name": "StyleObject",
+      "index": 44
+    },
+    "UIActionItems": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/UIActionItem"
+      },
+      "ui": "actionItems",
+      "label": "活动项列表",
+      "name": "UIActionItems",
+      "index": 45
+    },
+    "UIActionItem": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "label": "活动名",
+          "name": "action",
+          "index": 0,
+          "required": true
+        },
+        "config": {
+          "$ref": "#/definitions/MixedUIActions",
+          "data": "partial",
+          "label": "活动配置",
+          "name": "config",
+          "index": 1,
+          "required": false
+        },
+        "children": {
+          "$ref": "#/definitions/UIActionItems",
+          "label": "子活动项",
+          "name": "children",
+          "index": 2,
+          "required": false
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "additionalProperties": false,
+      "ui": "actionItem",
+      "label": "活动项",
+      "name": "UIActionItem",
+      "index": 46
+    },
+    "WCrudToolbarSchema": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UIActionItem"
+          },
+          "ui": "actionItems",
+          "label": "操作项",
+          "category": true,
+          "$mergedRef": "#/definitions/UIActionItems",
+          "name": "items",
+          "index": 0
+        },
+        "title": {
+          "type": "string",
+          "category": "advanced",
+          "label": "标题",
+          "name": "title",
+          "index": 1
+        }
+      },
+      "additionalProperties": false,
+      "label": "工具栏结构",
+      "name": "WCrudToolbarSchema",
+      "index": 47
+    },
+    "MixedUIFormItems": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/UIInputFormItem"
+        },
+        {
+          "$ref": "#/definitions/UIInputNumberFormItem"
+        },
+        {
+          "$ref": "#/definitions/UIDatePickerFormItem"
+        },
+        {
+          "$ref": "#/definitions/UIDateRangePickerFormItem"
+        },
+        {
+          "$ref": "#/definitions/UISelectFormItem"
+        },
+        {
+          "$ref": "#/definitions/UISwitchFormItem"
+        },
+        {
+          "$ref": "#/definitions/UIPlaceholderFormItem"
+        }
+      ],
+      "name": "MixedUIFormItems",
+      "index": 48
+    },
+    "UIInputFormItem": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "label": "标签",
+          "name": "label",
+          "index": 0,
+          "required": true
+        },
+        "prop": {
+          "type": "string",
+          "label": "属性",
+          "name": "prop",
+          "index": 1,
+          "required": false
+        },
+        "span": {
+          "type": "number",
+          "default": 6,
+          "label": "跨度",
+          "description": "表单项占一行(24)的跨度",
+          "name": "span",
+          "index": 2,
+          "required": false
+        },
+        "labelWidth": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "label": "标签宽度",
+          "name": "labelWidth",
+          "index": 3,
+          "required": false
+        },
+        "required": {
+          "type": "boolean",
+          "label": "是否必填",
+          "name": "required",
+          "index": 4,
+          "required": false
+        },
+        "clearable": {
+          "type": "boolean",
+          "default": true,
+          "label": "是否可清空",
+          "name": "clearable",
+          "index": 5,
+          "required": false
+        },
+        "readonly": {
+          "type": "boolean",
+          "default": false,
+          "label": "是否只读",
+          "name": "readonly",
+          "index": 6,
+          "required": false
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UIFormRule"
+          },
+          "ui": "formRules",
+          "label": "验证规则",
+          "name": "rules",
+          "index": 7,
+          "required": false
+        },
+        "inputType": {
+          "type": "string",
+          "default": "text",
+          "options": [
+            {
+              "value": "text",
+              "label": "单行文本框"
+            },
+            {
+              "value": "textarea",
+              "label": "多行文本框"
+            }
+          ],
+          "label": "输入类型",
+          "name": "inputType",
+          "index": 8,
+          "required": false
+        },
+        "maxlength": {
+          "type": "number",
+          "label": "最大长度",
+          "description": "默认text: 100，textarea: 300, 可在应用配置中进行配置",
+          "name": "maxlength",
+          "index": 9,
+          "required": false
+        },
+        "showWordLimit": {
+          "type": "boolean",
+          "label": "是否显示文字限制",
+          "name": "showWordLimit",
+          "index": 10,
+          "required": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "label"
+      ],
+      "ui": "formItem",
+      "label": "文本输入",
+      "name": "UIInputFormItem",
+      "index": 49
+    },
+    "UIInputNumberFormItem": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "label": "标签",
+          "name": "label",
+          "index": 0,
+          "required": true
+        },
+        "prop": {
+          "type": "string",
+          "label": "属性",
+          "name": "prop",
+          "index": 1,
+          "required": false
+        },
+        "span": {
+          "type": "number",
+          "default": 6,
+          "label": "跨度",
+          "description": "表单项占一行(24)的跨度",
+          "name": "span",
+          "index": 2,
+          "required": false
+        },
+        "labelWidth": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "label": "标签宽度",
+          "name": "labelWidth",
+          "index": 3,
+          "required": false
+        },
+        "required": {
+          "type": "boolean",
+          "label": "是否必填",
+          "name": "required",
+          "index": 4,
+          "required": false
+        },
+        "clearable": {
+          "type": "boolean",
+          "default": true,
+          "label": "是否可清空",
+          "name": "clearable",
+          "index": 5,
+          "required": false
+        },
+        "readonly": {
+          "type": "boolean",
+          "default": false,
+          "label": "是否只读",
+          "name": "readonly",
+          "index": 6,
+          "required": false
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UIFormRule"
+          },
+          "ui": "formRules",
+          "label": "验证规则",
+          "name": "rules",
+          "index": 7,
+          "required": false
+        },
+        "min": {
+          "type": "number",
+          "label": "最小值",
+          "name": "min",
+          "index": 8,
+          "required": false
+        },
+        "max": {
+          "type": "number",
+          "label": "最大值",
+          "name": "max",
+          "index": 9,
+          "required": false
+        },
+        "controlsPosition": {
+          "type": "string",
+          "default": "right",
+          "options": [
+            {
+              "value": "right",
+              "label": "右侧"
+            },
+            {
+              "value": "left",
+              "label": "左侧"
+            },
+            {
+              "value": "both",
+              "label": "两侧"
+            }
+          ],
+          "label": "控制按钮位置",
+          "name": "controlsPosition",
+          "index": 10,
+          "required": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "label"
+      ],
+      "ui": "formItem",
+      "label": "数字输入",
+      "name": "UIInputNumberFormItem",
+      "index": 50
+    },
+    "UIDatePickerFormItem": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "label": "标签",
+          "name": "label",
+          "index": 0,
+          "required": true
+        },
+        "prop": {
+          "type": "string",
+          "label": "属性",
+          "name": "prop",
+          "index": 1,
+          "required": false
+        },
+        "span": {
+          "type": "number",
+          "default": 6,
+          "label": "跨度",
+          "description": "表单项占一行(24)的跨度",
+          "name": "span",
+          "index": 2,
+          "required": false
+        },
+        "labelWidth": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "label": "标签宽度",
+          "name": "labelWidth",
+          "index": 3,
+          "required": false
+        },
+        "required": {
+          "type": "boolean",
+          "label": "是否必填",
+          "name": "required",
+          "index": 4,
+          "required": false
+        },
+        "clearable": {
+          "type": "boolean",
+          "default": true,
+          "label": "是否可清空",
+          "name": "clearable",
+          "index": 5,
+          "required": false
+        },
+        "readonly": {
+          "type": "boolean",
+          "default": false,
+          "label": "是否只读",
+          "name": "readonly",
+          "index": 6,
+          "required": false
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UIFormRule"
+          },
+          "ui": "formRules",
+          "label": "验证规则",
+          "name": "rules",
+          "index": 7,
+          "required": false
+        },
+        "pickerType": {
+          "type": "string",
+          "default": "date",
+          "options": [
+            {
+              "value": "date",
+              "label": "日期"
+            },
+            {
+              "value": "month",
+              "label": "月"
+            },
+            {
+              "value": "year",
+              "label": "年"
+            },
+            {
+              "value": "dates",
+              "label": "多个时间"
+            },
+            {
+              "value": "datetime",
+              "label": "日期时间"
+            },
+            {
+              "value": "week",
+              "label": "周"
+            }
+          ],
+          "label": "显示类型",
+          "name": "pickerType",
+          "index": 8,
+          "required": false
+        },
+        "valueFormat": {
+          "type": "string",
+          "default": "YYYY-MM-DD HH:mm:ss",
+          "label": "日期值格式",
+          "name": "valueFormat",
+          "index": 9,
+          "required": false
+        },
+        "beforeToday": {
+          "type": "boolean",
+          "default": true,
+          "label": "今日之前",
+          "description": "限制只能选择今天之前的日期",
+          "name": "beforeToday",
+          "index": 10,
+          "required": false
+        },
+        "afterToday": {
+          "type": "boolean",
+          "default": false,
+          "label": "今日之前",
+          "description": "限制只能选择今天之后的日期",
+          "name": "afterToday",
+          "index": 11,
+          "required": false
+        },
+        "minDate": {
+          "type": "string",
+          "ui": "date",
+          "label": "最小日期",
+          "description": "可以选择的最小日期",
+          "name": "minDate",
+          "index": 12,
+          "required": false
+        },
+        "maxDate": {
+          "type": "string",
+          "ui": "date",
+          "label": "最大日期",
+          "description": "可以选择的最大日期",
+          "name": "maxDate",
+          "index": 13,
+          "required": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "label"
+      ],
+      "ui": "formItem",
+      "label": "日期选择",
+      "name": "UIDatePickerFormItem",
+      "index": 51
+    },
+    "UIDateRangePickerFormItem": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "label": "标签",
+          "name": "label",
+          "index": 0,
+          "required": true
+        },
+        "prop": {
+          "type": "string",
+          "label": "属性",
+          "name": "prop",
+          "index": 1,
+          "required": false
+        },
+        "span": {
+          "type": "number",
+          "default": 6,
+          "label": "跨度",
+          "description": "表单项占一行(24)的跨度",
+          "name": "span",
+          "index": 2,
+          "required": false
+        },
+        "labelWidth": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "label": "标签宽度",
+          "name": "labelWidth",
+          "index": 3,
+          "required": false
+        },
+        "required": {
+          "type": "boolean",
+          "label": "是否必填",
+          "name": "required",
+          "index": 4,
+          "required": false
+        },
+        "clearable": {
+          "type": "boolean",
+          "default": true,
+          "label": "是否可清空",
+          "name": "clearable",
+          "index": 5,
+          "required": false
+        },
+        "readonly": {
+          "type": "boolean",
+          "default": false,
+          "label": "是否只读",
+          "name": "readonly",
+          "index": 6,
+          "required": false
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UIFormRule"
+          },
+          "ui": "formRules",
+          "label": "验证规则",
+          "name": "rules",
+          "index": 7,
+          "required": false
+        },
+        "toProp": {
+          "type": "string",
+          "index": 3,
+          "label": "结束日期属性",
+          "name": "toProp",
+          "required": true
+        },
+        "pickerType": {
+          "type": "string",
+          "default": "date",
+          "options": [
+            {
+              "value": "date",
+              "label": "日期"
+            },
+            {
+              "value": "month",
+              "label": "月"
+            },
+            {
+              "value": "year",
+              "label": "年"
+            },
+            {
+              "value": "dates",
+              "label": "多个时间"
+            },
+            {
+              "value": "datetime",
+              "label": "日期时间"
+            },
+            {
+              "value": "week",
+              "label": "周"
+            }
+          ],
+          "label": "显示类型",
+          "name": "pickerType",
+          "index": 9,
+          "required": false
+        },
+        "valueFormat": {
+          "type": "string",
+          "default": "YYYY-MM-DD",
+          "label": "日期值格式",
+          "name": "valueFormat",
+          "index": 10,
+          "required": false
+        },
+        "beforeToday": {
+          "type": "boolean",
+          "default": true,
+          "label": "今日之前",
+          "description": "限制只能选择今天之前的日期",
+          "name": "beforeToday",
+          "index": 11,
+          "required": false
+        },
+        "afterToday": {
+          "type": "boolean",
+          "default": false,
+          "label": "今日之前",
+          "description": "限制只能选择今天之后的日期",
+          "name": "afterToday",
+          "index": 12,
+          "required": false
+        },
+        "beforeDate": {
+          "type": "string",
+          "ui": "date",
+          "label": "最大时间",
+          "description": "可选最大时间",
+          "name": "beforeDate",
+          "index": 13,
+          "required": false
+        },
+        "afterDate": {
+          "type": "string",
+          "ui": "date",
+          "label": "最小时间",
+          "description": "可选最小时间",
+          "name": "afterDate",
+          "index": 14,
+          "required": false
+        },
+        "defaultFrom": {
+          "type": "string",
+          "ui": "date",
+          "label": "默认开始时间",
+          "name": "defaultFrom",
+          "index": 15,
+          "required": false
+        },
+        "defaultTo": {
+          "type": "string",
+          "ui": "date",
+          "label": "默认结束时间",
+          "name": "defaultTo",
+          "index": 16,
+          "required": false
+        },
+        "defaultRange": {
+          "type": "number",
+          "default": 1,
+          "label": "默认时间范围(天)",
+          "name": "defaultRange",
+          "index": 17,
+          "required": false
+        },
+        "maxRange": {
+          "type": "number",
+          "label": "默认最大时间范围(天)，0为无限制",
+          "name": "maxRange",
+          "index": 18,
+          "required": false
+        },
+        "unlinkPanels": {
+          "type": "boolean",
+          "default": false,
+          "label": "取消日期联动",
+          "description": "在范围选择器里取消两个日期面板之间的联动",
+          "name": "unlinkPanels",
+          "index": 19,
+          "required": false
+        },
+        "appendTime": {
+          "type": "boolean",
+          "label": "是否附加时间",
+          "description": "选择后是否为日期附加时间段",
+          "name": "appendTime",
+          "index": 20,
+          "required": false
+        }
+      },
+      "required": [
+        "label",
+        "toProp"
+      ],
+      "additionalProperties": false,
+      "ui": "formItem",
+      "label": "日期范围",
+      "name": "UIDateRangePickerFormItem",
+      "index": 52
+    },
+    "UISelectFormItem": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "label": "标签",
+          "name": "label",
+          "index": 0,
+          "required": true
+        },
+        "prop": {
+          "type": "string",
+          "label": "属性",
+          "name": "prop",
+          "index": 1,
+          "required": false
+        },
+        "span": {
+          "type": "number",
+          "default": 6,
+          "label": "跨度",
+          "description": "表单项占一行(24)的跨度",
+          "name": "span",
+          "index": 2,
+          "required": false
+        },
+        "labelWidth": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "label": "标签宽度",
+          "name": "labelWidth",
+          "index": 3,
+          "required": false
+        },
+        "required": {
+          "type": "boolean",
+          "label": "是否必填",
+          "name": "required",
+          "index": 4,
+          "required": false
+        },
+        "clearable": {
+          "type": "boolean",
+          "default": true,
+          "label": "是否可清空",
+          "name": "clearable",
+          "index": 5,
+          "required": false
+        },
+        "readonly": {
+          "type": "boolean",
+          "default": false,
+          "label": "是否只读",
+          "name": "readonly",
+          "index": 6,
+          "required": false
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UIFormRule"
+          },
+          "ui": "formRules",
+          "label": "验证规则",
+          "name": "rules",
+          "index": 7,
+          "required": false
+        },
+        "options": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {}
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "data": "options",
+          "label": "选项",
+          "name": "options",
+          "index": 8,
+          "required": false
+        },
+        "optionLabelProp": {
+          "type": "string",
+          "default": "label",
+          "label": "标签属性",
+          "description": "选项标签对应的可选项属性",
+          "name": "optionLabelProp",
+          "index": 9,
+          "required": false
+        },
+        "optionValueProp": {
+          "type": "string",
+          "default": "value",
+          "label": "值属性",
+          "description": "选项标值对应的可选项属性",
+          "name": "optionValueProp",
+          "index": 10,
+          "required": false
+        },
+        "collapseTags": {
+          "type": "boolean",
+          "default": true,
+          "label": "折叠选项（多选时）",
+          "description": "多选时是否将选中值按文字的形式展示",
+          "name": "collapseTags",
+          "index": 11,
+          "required": false
+        },
+        "multiple": {
+          "type": "boolean",
+          "label": "支持多选",
+          "name": "multiple",
+          "index": 12,
+          "required": false
+        },
+        "groupName": {
+          "type": "string",
+          "label": "分组属性",
+          "description": "如果设置将根据此属性进行分组",
+          "name": "groupName",
+          "index": 13,
+          "required": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "label"
+      ],
+      "ui": "formItem",
+      "label": "选择器",
+      "name": "UISelectFormItem",
+      "index": 53
+    },
+    "UISwitchFormItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "label": "标签",
+          "name": "label",
+          "index": 0,
+          "required": true
+        },
+        "prop": {
+          "type": "string",
+          "label": "属性",
+          "name": "prop",
+          "index": 1,
+          "required": false
+        },
+        "span": {
+          "type": "number",
+          "default": 6,
+          "label": "跨度",
+          "description": "表单项占一行(24)的跨度",
+          "name": "span",
+          "index": 2,
+          "required": false
+        },
+        "labelWidth": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "label": "标签宽度",
+          "name": "labelWidth",
+          "index": 3,
+          "required": false
+        },
+        "required": {
+          "type": "boolean",
+          "label": "是否必填",
+          "name": "required",
+          "index": 4,
+          "required": false
+        },
+        "clearable": {
+          "type": "boolean",
+          "default": true,
+          "label": "是否可清空",
+          "name": "clearable",
+          "index": 5,
+          "required": false
+        },
+        "readonly": {
+          "type": "boolean",
+          "default": false,
+          "label": "是否只读",
+          "name": "readonly",
+          "index": 6,
+          "required": false
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UIFormRule"
+          },
+          "ui": "formRules",
+          "label": "验证规则",
+          "name": "rules",
+          "index": 7,
+          "required": false
+        }
+      },
+      "required": [
+        "label"
+      ],
+      "ui": "formItem",
+      "label": "开关",
+      "name": "UISwitchFormItem",
+      "index": 54
+    },
+    "UIPlaceholderFormItem": {
+      "type": "object",
+      "properties": {
+        "span": {
+          "type": "number",
+          "default": 6,
+          "label": "跨度",
+          "description": "表单项占一行(24)的跨度",
+          "name": "span",
+          "index": 0
+        }
+      },
+      "additionalProperties": false,
+      "ui": "formItem",
+      "default": {
+        "invisible": true
+      },
+      "label": "占位",
+      "description": "由于Zpage表单是自动布局，在特殊情况下会导致布局错位，可通过添加占位在对齐表单项",
+      "name": "UIPlaceholderFormItem",
+      "index": 55
+    },
+    "MixedUIActionItems": {
+      "$ref": "#/definitions/UIApiActionItem",
+      "name": "MixedUIActionItems",
+      "index": 56
+    },
+    "UIApiActionItem": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "$ref": "#/definitions/ActionApi",
+          "priority": 2,
+          "ui": "api",
+          "label": "Api配置",
+          "description": "执行当前行为所需要执行的api请求",
+          "name": "api",
+          "index": 0,
+          "required": true
+        },
+        "extData": {
+          "type": "object",
+          "ui": "contextPayload",
+          "label": "Api附加参数",
+          "description": "此参数有最高优先级，将覆盖所有参数",
+          "name": "extData",
+          "index": 1,
+          "required": false
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "api"
+          ],
+          "options": [
+            {
+              "value": "api",
+              "label": "api",
+              "index": 0
+            }
+          ],
+          "label": "活动类型",
+          "name": "type",
+          "index": 2,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "priority": 1,
+          "label": "活动名称",
+          "description": "类似活动编码，用于唯一识别活动",
+          "name": "name",
+          "index": 3,
+          "required": false
+        },
+        "payload": {
+          "$ref": "#/definitions/PageContextPayload",
+          "priority": 3,
+          "ui": "contextPayload",
+          "label": "负载",
+          "description": "包括请求参数，弹框数据等",
+          "name": "payload",
+          "index": 4,
+          "required": false
+        },
+        "perm": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "ui": "perm",
+          "label": "权限设置",
+          "name": "perm",
+          "index": 5,
+          "description": "根据约定如果是接口行为，默认自定义权限名与接口名称保持一致",
+          "required": false,
+          "$mergedRef": "#/definitions/PermConfig"
+        },
+        "successMessage": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "ui": "booleanString",
+          "label": "成功提示",
+          "description": "操作成功后提示成功的消息，不设置将采用默认提示",
+          "name": "successMessage",
+          "index": 6,
+          "required": false
+        },
+        "trigger": {
+          "$ref": "#/definitions/ActionTriggerFunction",
+          "ui": "contextFunction",
+          "label": "活动触发方法",
+          "description": "此方法将替换活动自身的默认处理方法",
+          "name": "trigger",
+          "index": 7,
+          "required": false
+        },
+        "beforeTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发前调用方法",
+          "name": "beforeTrigger",
+          "index": 8,
+          "required": false
+        },
+        "afterTrigger": {
+          "$ref": "#/definitions/ActionHookFunction",
+          "ui": "contextFunction",
+          "label": "触发后调用方法",
+          "name": "afterTrigger",
+          "index": 9,
+          "required": false
+        },
+        "action": {
+          "type": "string",
+          "label": "活动名",
+          "name": "action",
+          "index": 10,
+          "required": true
+        },
+        "config": {
+          "$ref": "#/definitions/MixedUIActions",
+          "data": "partial",
+          "label": "活动配置",
+          "name": "config",
+          "index": 11,
+          "required": false
+        },
+        "children": {
+          "$ref": "#/definitions/UIActionItems",
+          "label": "子活动项",
+          "name": "children",
+          "index": 12,
+          "required": false
+        }
+      },
+      "required": [
+        "action",
+        "api",
+        "type"
+      ],
+      "ui": "actionItem",
+      "label": "Api请求",
+      "name": "UIApiActionItem",
+      "index": 57
+    }
+  }
+}

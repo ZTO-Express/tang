@@ -86,7 +86,7 @@ export const Cmpt = defineComponent({
       return type
     }
 
-    // 渲染多个widgets
+    // 渲染多个cmpt
     function renderCmpts(cfgs: any | any[]): VNode | VNode[] {
       if (Array.isArray(cfgs)) {
         const cs = cfgs.map(cfg => renderCmpt(cfg))
@@ -96,7 +96,7 @@ export const Cmpt = defineComponent({
       return renderCmpt(cfgs)
     }
 
-    // 渲染widget
+    // 渲染cmpt
     function renderCmpt(cfg: any): VNode {
       if (isAppUseMethod(cfg)) {
         cfg = _useAppConfig(app, cfg)

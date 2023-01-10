@@ -6,6 +6,7 @@
       v-model:to="model[toProp]"
       v-bind="innerAttrs"
       :disabled="disabled"
+      @change="handleChange"
     />
     <el-form-item :prop="toProp"></el-form-item>
   </div>
@@ -16,9 +17,11 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { ref } from '@zto/zpage'
-
+import { ref, inject } from '@zto/zpage'
+import { C_FORM_KEY } from '../../../consts'
 import { useFormItem } from '../util'
+
+const cForm = inject<any>(C_FORM_KEY)
 
 const props = withDefaults(
   defineProps<{
@@ -33,4 +36,11 @@ const props = withDefaults(
 )
 
 const { innerAttrs } = useFormItem(props)
+
+// 值发生变化后，调用form的校验，解决值发生变化后没校验的问题
+function handleChange(){
+  if (cForm){
+    cForm.validateFields([props.prop, props.toProp])
+  }
+}
 </script>

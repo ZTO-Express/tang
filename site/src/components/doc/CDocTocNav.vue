@@ -44,6 +44,9 @@ function isHeaderVisible(h: DocHeader) {
 $levelSpace: 15px;
 
 ul.nav-items {
+  padding-inline-start: 20px;
+  border-left: 1px solid var(--border-color);
+
   & > li {
     cursor: pointer;
     padding: 3px 0;
@@ -52,11 +55,11 @@ ul.nav-items {
     .divider {
       position: absolute;
       top: 5px;
-      left: -10px;
+      left: -21px;
       background: var(--active);
       border-radius: 2px;
       width: 3px;
-      height: 12px;
+      height: 15px;
     }
 
     &.active {

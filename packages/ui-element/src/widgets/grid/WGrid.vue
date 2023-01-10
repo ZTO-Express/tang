@@ -17,7 +17,7 @@
         <el-col
           v-for="(it, index) in gridCols"
           :key="index"
-          v-bind="innerAttrs.col"
+          v-bind="{ ...innerAttrs.col, ...it.colAttrs }"
           :span="it.colSpan || innerAttrs.col?.span"
         >
           <widget :schema="it"></widget>

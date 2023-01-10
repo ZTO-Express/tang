@@ -6,10 +6,15 @@ export interface TableColumn {
   showHeader?: boolean
   showSlot?: boolean
   children?: TableColumn[]
-  rules: Array<any>
-  editor: any
+  rules?: Array<any>
+  editor?: any
 
   [prop: string]: any
+}
+
+// 可编辑表格列
+export interface TableEditableColumn extends TableColumn {
+  editorProp?: string
 }
 
 export interface TablePager {
@@ -23,6 +28,7 @@ export interface TableData {
   data: any[]
   total: number
   summary: Record<string, any>
+  columns?: any[]
 }
 
 export type TableAdapter = (

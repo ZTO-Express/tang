@@ -84,6 +84,7 @@ export interface AppActions {
   getData<T = any>(path?: string): T | undefined
   init(payload: { appId?: string; default?: string; submodules?: Submodule[] }): void
   load(options?: Record<string, any>): Promise<void>
+  setSubmoduleCurrent(submoduleName: string, pageKey: string): void
   changeSubmodule(payload: any): Promise<void>
 }
 
@@ -143,7 +144,7 @@ export interface PagesGetters extends _GettersTree<PagesState> {
 }
 
 export interface PagesActions {
-  setCurrent(pageKey: string): void
+  setCurrent(pageKey: string, submoduleName?: string): void
   setDefaults(pages: PageInfo[]): void
   addVisited(page: PageInfo): void
   addCurrentVisited(payload: { route?: any; redirect?: boolean }): Promise<void>

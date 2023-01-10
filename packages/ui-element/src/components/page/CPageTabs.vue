@@ -6,7 +6,13 @@
     :tab-position="tabPosition"
     @tab-click="handleTabClick"
   >
-    <el-tab-pane v-for="item in newTabItems" :key="item.value" :label="item.label" :name="item.value">
+    <el-tab-pane
+      v-for="item in newTabItems"
+      class="page-tab-pane"
+      :key="item.value"
+      :label="item.label"
+      :name="item.value"
+    >
       <slot v-if="showPane" v-bind="item" />
     </el-tab-pane>
   </el-tabs>
@@ -77,6 +83,10 @@ function handleTabClick(tab: any) {
       height: 100%;
     }
   }
+}
+
+.page-tab-pane {
+  overflow-y: auto;
 }
 
 :deep(.el-tabs__nav-wrap) {

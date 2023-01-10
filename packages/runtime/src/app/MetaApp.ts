@@ -17,7 +17,7 @@ import type {
   FormatTextOptions,
   MetaAppInstallFunction,
   VueComponent,
-  PageContext
+  AppExContext
 } from '../typings'
 
 /**
@@ -31,6 +31,7 @@ export class MetaApp {
   readonly env: AppEnv
 
   readonly config: AppConfig
+  readonly exContext: AppExContext
 
   readonly apis: AppApis
   readonly pages: PageSchema[]
@@ -58,6 +59,7 @@ export class MetaApp {
     const envMap = opts.envMap || {}
     const env = _.deepMerge(mainApp._env, envMap[mainApp._env.name]?.ENV)
     this.env = Object.freeze(env)
+    this.exContext = Object.freeze({ ...opts.exContext })
 
     // 初始化应用配置
     const config = useAppConfigs(mainApp, [opts.config])

@@ -12,13 +12,21 @@ export const Widget = defineComponent({
 
   props: {
     schema: { type: Object, default: () => ({}) },
+    contextData: { type: Object, default: () => ({}) },
     error: { type: Object, default: () => ({}) }
   },
 
   setup(props: any) {
     const app = useCurrentAppInstance()
 
-    const schema = computed(() => props.schema?.value || props.schema)
+    const schema = computed(() => {
+      let s = props.schema?.value || props.schema
+      if (_.isFunction(s)) {
+        const sContext = app.useContext(props.contextData)
+        s = s(sContext)
+      }
+      return s
+    })
 
     // 渲染多个widgets
     function renderWidgets(ss: any[]): VNode | VNode[] {
@@ -77,7 +85,7 @@ export const Widget = defineComponent({
 
       return h(
         w,
-        { schema: s },
+        { schema: s, contextData: props.contextData },
         {
           default: () => bodyChild,
           ...children

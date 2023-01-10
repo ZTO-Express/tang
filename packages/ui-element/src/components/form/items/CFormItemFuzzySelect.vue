@@ -14,6 +14,7 @@
         :multiple="multiple"
         :disabled="disabled"
         return-label
+        @change="handleChange"
         @update:label="handleUpdateLabelProps"
       />
     </el-tooltip>
@@ -52,11 +53,11 @@ const props = withDefaults(
   }
 )
 
-const app = useCurrentAppInstance()
 const fieldRef = ref<any>()
 
-const { innerAttrs, allAttrs } = useFormItem(props, {
-  clearModelEmptyPropOnChange: true
+const { app, innerAttrs, allAttrs, handleChange } = useFormItem(props, {
+  clearModelEmptyPropOnChange: true,
+  customeChangeEvent: true
 })
 
 // 注册微件事件监听

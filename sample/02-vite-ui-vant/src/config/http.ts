@@ -1,18 +1,18 @@
 import { Toast } from 'vant'
-import { uuid, getAccessToken, useAppRouter, ZFfb } from '@zto/zpage'
+import { uuid, getAccessToken, useAppRouter, Ffb } from '@zto/zpage'
 
 import ffb from '../config/ffb'
 import { ENV } from './env'
 
 import type { HttpRequestConfig } from '@zto/zpage'
 
-ZFfb.use(ffb)
+Ffb.use(ffb)
 
 function beforeRequest(config: any) {
   const router = useAppRouter()
 
   /** 对请求进行拦截调整 */
-  ZFfb.interceptFfbRequest(config)
+  Ffb.interceptFfbRequest(config)
 
   config.headers['x-zop-ns'] = 'tuxi-cdc'
   config.headers['x-request-id'] = uuid()
@@ -37,7 +37,7 @@ function requestError(error: any) {
 
 async function afterResponse(response: any) {
   /** 对请求进行拦截调整 */
-  ZFfb.interceptFfbResponse(response)
+  Ffb.interceptFfbResponse(response)
 
   const cfg = response.config
   const res = response.data

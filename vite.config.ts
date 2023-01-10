@@ -1,6 +1,8 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
+
 import createVuePlugin from '@vitejs/plugin-vue'
+import VueTypeImports from 'vite-plugin-vue-type-imports'
 
 import { createHtmlPlugin } from 'vite-plugin-html'
 
@@ -10,7 +12,7 @@ import markdownItAnchor from 'markdown-it-anchor'
 import { v4 as uuidv4 } from 'uuid'
 
 import markdownItPrism from 'markdown-it-prism'
-import markdownItZPageDoc from './scripts/vite/plugins/markdown-it-zpage-doc'
+import { markdownItZPageDoc } from './scripts/doc'
 
 import { dependencies as packageDependencies } from './site/package.json'
 import { APP_NAME, APP_TITLE, APP_ZCAT_KEY, HOST_APP_PROD_HOSTS as APP_PROD_HOSTS } from './site/src/consts'
@@ -30,6 +32,7 @@ export default defineConfig({
   publicDir: resolve(__dirname, 'site', 'public'),
   plugins: [
     createVuePlugin({ include: [/\.vue$/, /\.md$/] }),
+    VueTypeImports(),
     createMarkdownPlugin({
       markdownItOptions: {
         html: true,
@@ -37,7 +40,6 @@ export default defineConfig({
         typographer: true
       },
       markdownItSetup(md) {
-        debugger
         // 解析ZPage Code
         md.use(markdownItZPageDoc)
         // add anchor links to your H[x] tags
@@ -72,10 +74,6 @@ export default defineConfig({
       {
         find: '@zto/zpage-runtime',
         replacement: resolve(__dirname, './packages/runtime/src')
-      },
-      {
-        find: '@zto/zpage-ffb',
-        replacement: resolve(__dirname, './packages/ffb/src')
       },
       {
         find: '@zto/zpage',

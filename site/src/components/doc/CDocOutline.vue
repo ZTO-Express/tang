@@ -67,7 +67,9 @@ function refreshDoc() {
 
   & > .doc-body {
     flex: 1;
-    padding: 0 10px;
+    padding: 10px 30px;
+    font-size: 14px;
+    line-height: 2rem;
   }
 
   & > .doc-nav {
@@ -84,6 +86,23 @@ function refreshDoc() {
   .doc-wrapper {
     & > .doc-nav {
       display: none;
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+.doc-body {
+  table {
+    width: 100%;
+    th,
+    td {
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.6em 1em;
+      text-align: left;
+      // max-width: 250px;
+      white-space: pre-wrap;
+      width: 25%;
     }
   }
 }

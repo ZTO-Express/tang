@@ -16,7 +16,7 @@
           :key="'select' + index"
           :label="item[optionLabelProp || 'label']"
           :value="item[optionValueProp || 'value']"
-          :disbaled="item.disabled"
+          :disabled="item.disabled"
         />
       </el-option-group>
     </template>
@@ -26,7 +26,7 @@
         :key="'select' + index"
         :label="item[optionLabelProp || 'label']"
         :value="item[optionValueProp || 'value']"
-        :disbaled="item.disabled"
+        :disabled="item.disabled"
       />
     </template>
   </el-select>
@@ -57,6 +57,7 @@ const props = withDefaults(
     optionValueProp?: string
     collapseTags?: boolean
     filterable?: boolean
+    optionsFilter?: GenericFunction
     noWriteback?: boolean
     multiple?: boolean
   }>(),
@@ -86,7 +87,7 @@ const selectOptions = computed(() => {
   if (typeof props.options === 'function') {
     options = props.options(context)
   } else if (typeof props.options === 'string') {
-    options = tpl.evalJS(props.options, context) || []
+    options = app.getCommonOptions(props.options) || []
   }
 
   return (options || []) as any[]

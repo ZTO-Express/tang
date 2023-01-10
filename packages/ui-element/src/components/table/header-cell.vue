@@ -20,5 +20,6 @@ const props = withDefaults(
 
 <style lang="scss" scoped>
 .c-table-header-cell {
+  display: inline-block;
 }
 </style>

@@ -88,7 +88,7 @@ const cdcApi = useApi('cdc')
 
 // 属性
 const props = defineProps<{
-  schema: GenericObject
+  schema: any
 }>()
 
 const wSchema = await useWidgetSchema(props.schema)

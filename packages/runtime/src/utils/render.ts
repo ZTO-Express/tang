@@ -6,6 +6,10 @@ import type { VNode } from 'vue'
 
 /** 渲染html */
 export function renderHtml(options: any, dataContext: any = {}): VNode | string | undefined {
+  if (typeof options === 'function') {
+    options = options(dataContext)
+  }
+  
   if (options && typeof options === 'string') {
     const innerHTML = tpl.filter(options, dataContext)
     return h('span', { innerHTML })
