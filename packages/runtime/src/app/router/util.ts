@@ -332,8 +332,12 @@ function _sortMenus(menus: NavMenuItem[]) {
   // 设置默认排序号
   let preOrder = 0
   menus.forEach(it => {
-    if (!it.order) it.order = preOrder++
-    preOrder = it.order
+    if (!it.order) {
+      preOrder++
+      it.order = preOrder
+    } else {
+      preOrder = it.order
+    }
   })
 
   menus.sort((a, b) => {

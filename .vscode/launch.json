@@ -5,6 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Build Doc Site",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "build"],
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
       "name": "Launch Doc Site",
       "type": "node",
       "request": "launch",

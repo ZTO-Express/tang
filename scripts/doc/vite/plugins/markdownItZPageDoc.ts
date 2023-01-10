@@ -4,6 +4,7 @@ import $ from 'gogocode'
 import type { RenderRule } from 'markdown-it/lib/renderer'
 
 export const DocSampleTag = 'doc-sample'
+export const DocSchemaTag = 'doc-schema'
 
 /** 解析文档 */
 export default function doc(md: MarkdownIt, options: any) {
@@ -25,26 +26,33 @@ function applyCodeTransform(md: MarkdownIt, options: any, existingRule: RenderRu
 
       let scriptCode = trimContent
 
-      const docSamplePrefix = `--- ${DocSampleTag}:`
+      for (const tag of [DocSampleTag, DocSchemaTag]) {
+        const docTagPrefix = `--- ${tag}:`
+        const commitDocTagPrefix = `// --- ${tag}:`
 
-      if (trimContent.startsWith(docSamplePrefix)) {
-        // 用于代码转换
+        let tagPrefix = ''
 
-        // const $code = $(trimContent)
-        // $code.replace()
+        if (trimContent.startsWith(docTagPrefix)) {
+          tagPrefix = docTagPrefix
+        } else if (trimContent.startsWith(commitDocTagPrefix)) {
+          tagPrefix = commitDocTagPrefix
+        }
+
+        // 未命中直接返回
+        if (!tagPrefix) continue
 
         const firstLine = trimContent.substring(0, trimContent.indexOf('\n'))
 
-        scriptCode = trimContent.substring(trimContent.indexOf('\n')).trim()
+        scriptCode = trimContent.substring(firstLine.length).trim()
 
-        const docMetaStr = firstLine.substring(docSamplePrefix.length, trimContent.lastIndexOf('---')).trim()
+        const docMetaStr = firstLine.substring(tagPrefix.length, trimContent.lastIndexOf('---')).trim()
 
-        let prismCode = existingRule(tokens, idx, renderOptions, env, self)
+        // let prismCode = existingRule(tokens, idx, renderOptions, env, self)
+        // prismCode = prismCode.replace(new RegExp(`--- ${DocSampleTag}(.*?)---(.*?)\n`), '')
 
-        // 清除前缀
-        prismCode = prismCode.replace(new RegExp(`--- ${DocSampleTag}(.*?)---(.*?)\n`), '')
+        const encodedScriptCode = encodeURIComponent(scriptCode)
 
-        return `<c-doc-code code='${scriptCode}' prismCode='${prismCode}' lang='${lang}' meta='${docMetaStr}' />`
+        return `<c-${tag} code='${encodedScriptCode}' lang='${lang}' meta='${docMetaStr}' />`
       }
 
       const existingResult = existingRule(tokens, idx, renderOptions, env, self)

@@ -45,7 +45,7 @@ export default defineConfig({
         // add anchor links to your H[x] tags
         md.use(markdownItAnchor, { slugify: s => uuidv4() })
         // add code syntax highlighting with Prism
-        md.use(markdownItPrism)
+        // md.use(markdownItPrism)
       }
     }),
     createHtmlPlugin({

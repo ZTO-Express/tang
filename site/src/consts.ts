@@ -1,4 +1,4 @@
-export const APP_TITLE = 'ZPage - Web低代码前端框架'
+export const APP_TITLE = 'ZPage - 低代码前端框架'
 export const APP_NAME = 'zpageDocs' // 宿主应用名称
 export const APP_ZCAT_KEY = 'zpage_docs' // ZCAT名称
 

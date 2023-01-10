@@ -8,7 +8,7 @@
           v-bind="$attrs"
           v-loading="tableLoading"
           class="fw"
-          :height="$attrs.height || '100%'"
+          :height="autoHeight ? undefined : $attrs.height || '100%'"
           :border="typeof $attrs.border !== 'undefined' ? $attrs.border : false"
           :show-summary="showSummary"
           :summary-method="innerSummaryMethod"
@@ -174,6 +174,7 @@ const props = withDefaults(
 
     cellStyle?: any // 单元格样式
     headerCellStyle?: any // 头部单元格样式
+    autoHeight?: boolean // 自动高度
 
     batchEditable?: boolean // 是否可批量编辑
     editable?: boolean // 是否可编辑

@@ -28,7 +28,8 @@ export async function startSiteApp(options: SiteAppStartOptions) {
   if (options.beforeStart) options.beforeStart(startOptions, options)
 
   // 启动应用
-  await ZPage.startApp(startOptions)
+  const app = await ZPage.startApp(startOptions)
+  return app
 }
 
 /** 获取应用配置 */

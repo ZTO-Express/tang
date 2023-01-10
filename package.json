@@ -38,6 +38,7 @@
     "sha1": "^1.1.1",
     "store2": "^2.12.0",
     "vue-router": "^4.0.12",
+    "vue3-highlightjs": "^1.0.5",
     "vuedraggable": "^4.1.0",
     "xlsx": "^0.17.1"
   },
