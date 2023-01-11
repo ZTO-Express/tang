@@ -39,7 +39,7 @@ export const menus: NavMenuItemConfig[] = [
         children: [
           { name: 'widgets.basic.tpl', title: '模版', path: '/widgets/basic/tpl' },
           { name: 'widgets.basic.html', title: 'Html', path: '/widgets/basic/html' },
-          { name: 'widgets.basic.action', title: '活动', path: '/widgets/basic/action' }
+          { name: 'widgets.basic.action', title: '行为按钮', path: '/widgets/basic/action' }
         ]
       },
       {
