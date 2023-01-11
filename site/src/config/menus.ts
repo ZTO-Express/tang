@@ -27,14 +27,47 @@ export const menus: NavMenuItemConfig[] = [
     children: [
       { name: 'widgets.intro', title: '介绍', path: '/widgets/intro' },
       {
+        name: 'widgets.basic',
+        title: '基础',
+        children: [
+          { name: 'widgets.basic.tpl', title: '模版', path: '/widgets/basic/tpl' },
+          { name: 'widgets.basic.html', title: 'Html', path: '/widgets/basic/html' },
+          { name: 'widgets.basic.action', title: '活动', path: '/widgets/basic/action' }
+        ]
+      },
+      {
         name: 'widgets.page',
         title: '页面',
-        order: 20,
         children: [
           { name: 'widgets.page.normal', title: '普通页', path: '/widgets/page/normal' },
           { name: 'widgets.page.tab', title: 'Tab页', path: '/widgets/page/tab' },
           { name: 'widgets.page.welcome', title: '欢迎页', path: '/widgets/page/welcome' },
           { name: 'widgets.page.blank', title: '空白页', path: '/widgets/page/blank' }
+        ]
+      },
+      {
+        name: 'widgets.form',
+        title: '表单',
+        children: [
+          { name: 'widgets.form.form', title: '表单', path: '/widgets/form/form' },
+          { name: 'widgets.form.input', title: '输入框', path: '/widgets/form/input' },
+          { name: 'widgets.form.inputNumber', title: '数字输入框', path: '/widgets/form/inputNumber' },
+          { name: 'widgets.form.select', title: '选择框', path: '/widgets/form/select' },
+          { name: 'widgets.form.switch', title: '开关', path: '/widgets/form/switch' },
+          { name: 'widgets.form.fuzzySelect', title: '模糊选择', path: '/widgets/form/fuzzySelect' },
+          { name: 'widgets.form.datepicker', title: '日期选择', path: '/widgets/form/checkbox' },
+          { name: 'widgets.form.dateRangePicker', title: '日期范围选择', path: '/widgets/form/dateRangePicker' },
+          { name: 'widgets.form.dateTimePicker', title: '日期时间选择', path: '/widgets/form/dateTimePicker' },
+          { name: 'widgets.form.import', title: '导入', path: '/widgets/form/import' },
+          { name: 'widgets.form.checkbox', title: '单/多选框', path: '/widgets/form/checkbox' },
+          { name: 'widgets.form.fileList', title: '文件列表', path: '/widgets/form/fileList' },
+          { name: 'widgets.form.html', title: 'Html', path: '/widgets/form/html' },
+          { name: 'widgets.form.text', title: '文本', path: '/widgets/form/text' },
+          { name: 'widgets.form.upload', title: '上传', path: '/widgets/form/upload' },
+          { name: 'widgets.form.image', title: '图片', path: '/widgets/form/image' },
+          { name: 'widgets.form.video', title: '视频', path: '/widgets/form/video' },
+          { name: 'widgets.form.action', title: '活动按钮', path: '/widgets/form/action' },
+          { name: 'widgets.form.editTable', title: '编辑表格', path: '/widgets/form/editTable' }
         ]
       },
       {

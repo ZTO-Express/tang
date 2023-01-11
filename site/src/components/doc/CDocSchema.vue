@@ -68,10 +68,12 @@ function parseDefinitionSchema(json: any) {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .c-doc-schema {
-  :v-deep(.c-table__body > .el-form) {
-    height: auto !important;
+  .c-table-cell {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: initial;
   }
 }
 </style>
