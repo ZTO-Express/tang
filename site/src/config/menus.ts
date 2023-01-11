@@ -5,7 +5,14 @@ export const menus: NavMenuItemConfig[] = [
     name: 'guide',
     title: '指南',
     children: [
-      { name: 'guide.about', title: '关于', path: '/guide/about' },
+      {
+        name: 'guide.intro',
+        title: '介绍',
+        children: [
+          { name: 'guide.intro.about', title: '关于', path: '/guide/intro/about' },
+          { name: 'guide.intro.concept', title: '概念', path: '/guide/intro/concept' }
+        ]
+      },
       {
         name: 'guide.start',
         title: '开始',

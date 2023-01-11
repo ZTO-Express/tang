@@ -55,7 +55,7 @@ function parseDefinitionSchema(json: any) {
       data: json.properties || [],
       columns: [
         { label: '名称', prop: 'name', width: '200', expandColumn: true },
-        { label: '说明', prop: 'desc', minWidth: '200', align: 'left' },
+        { label: '说明', prop: 'desc', minWidth: '200', align: 'left', class: 'text-wrap' },
         { label: '类型', prop: 'type', width: '100' },
         { label: '可选值', prop: 'enum', width: '100' },
         { label: '默认值', prop: 'default', width: '100' }
@@ -70,7 +70,7 @@ function parseDefinitionSchema(json: any) {
 
 <style lang="scss">
 .c-doc-schema {
-  .c-table-cell {
+  .c-table-cell.text-wrap {
     white-space: normal;
     overflow: visible;
     text-overflow: initial;
