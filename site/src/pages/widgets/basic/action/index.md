@@ -2,7 +2,7 @@
 
 ## 基本用法
 
-### 字符串写法
+### 请求确认
 
 ```json
 // --- doc-sample:zpage-widget ---
@@ -22,7 +22,152 @@
     "var1": "xxxx"
   },
   "message": "是否执行",
-  "label": "执行"
+  "label": "请求确认"
+}
+```
+
+### 弹框
+
+```json
+// --- doc-sample:zpage-widget ---
+{
+  "type": "action",
+  "api": "api.testApi",
+  "apiParams": {
+    "p1": "x",
+    "p2": "${route.name}",
+    "v1": "${data.var1}"
+  },
+  "extData": {
+    "ex1": "ex1"
+  },
+  "payload": {},
+  "contextData": {
+    "var1": "xxxx"
+  },
+  "dialog": {
+    "width": 900,
+    "labelWidth": 130,
+    "formItems": [
+      {
+        "label": "公司全称",
+        "type": "input",
+        "prop": "companyName",
+        "required": true,
+        "minlength": 2,
+        "maxlength": 30
+      },
+      { "label": "服务商PM姓名", "type": "input", "prop": "pmName", "required": true, "minlength": 2, "maxlength": 15 },
+      {
+        "label": "服务商PM联系电话",
+        "type": "input",
+        "prop": "pmPhone",
+        "required": true,
+        "maxlength": 11,
+        "rules": [{ "ruleName": "mobile" }]
+      },
+      {
+        "label": "大区",
+        "type": "input",
+        "prop": "largeDeptName",
+        "required": true,
+        "disabled": true,
+        "placeholder": "请提供服务商所在大区"
+      },
+      {
+        "label": "省区",
+        "type": "input",
+        "prop": "provinceDeptName",
+        "required": true,
+        "disabled": true,
+        "placeholder": "请提供服务商所在省区"
+      },
+      {
+        "label": "城市部",
+        "type": "input",
+        "prop": "cityDeptName",
+        "required": true,
+        "disabled": true,
+        "placeholder": "请提供服务商所在城市部"
+      },
+      {
+        "label": "保证金金额(元)",
+        "type": "input-number",
+        "prop": "securityDepositMoney",
+        "min": 0,
+        "max": 9999999,
+        "precision": 2
+      },
+      {
+        "label": "服务商背景",
+        "type": "fuzzy-select",
+        "prop": "serviceProviderBackground",
+        "labelProp": "serviceProviderBackgroundName",
+        "api": "kdcs.getServiceProviderBackground",
+        "triggerFocus": true,
+        "remote": false
+      }
+    ]
+  },
+  "message": "是否执行",
+  "label": "弹框"
+}
+```
+
+### 上传
+
+一般配合表单使用。详细属性参考 CFileUpload 组件
+
+```json
+// --- doc-sample:zpage-widget ---
+{
+  "type": "action",
+  "upload": { "accept": "image/*" },
+  "label": "上传图片"
+}
+```
+
+### 下载
+
+点击下载将触发下载插件调用以 link 为参数的下载操作。
+
+```json
+// --- doc-sample:zpage-widget ---
+{
+  "type": "action",
+  "actionType": "download",
+  "link": "fileUrl.jpg",
+  "label": "下载文件"
+}
+```
+
+### 导入
+
+```json
+// --- doc-sample:zpage-widget ---
+{
+  "type": "action",
+  "import": {
+    "template": "import_template_fileName",
+    "extraTip": { "html": "导入说明" }
+  },
+  "api": "api.testApi",
+  "label": "导入"
+}
+```
+
+### 导出
+
+目前暂不支持单独使用，需配合 Crud 组件使用。
+
+```json
+// --- doc-sample:zpage-widget ---
+{
+  "type": "action",
+  "export": {
+    "type": "getDecorateCertificationList"
+  },
+  "label": "导出"
 }
 ```
 

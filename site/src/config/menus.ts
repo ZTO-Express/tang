@@ -48,8 +48,7 @@ export const menus: NavMenuItemConfig[] = [
         children: [
           { name: 'widgets.page.normal', title: '普通页', path: '/widgets/page/normal' },
           { name: 'widgets.page.tab', title: 'Tab页', path: '/widgets/page/tab' },
-          { name: 'widgets.page.welcome', title: '欢迎页', path: '/widgets/page/welcome' },
-          { name: 'widgets.page.blank', title: '空白页', path: '/widgets/page/blank' }
+          { name: 'widgets.page.welcome', title: '欢迎页', path: '/widgets/page/welcome' }
         ]
       },
       {
