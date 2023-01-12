@@ -1,4 +1,4 @@
-常用的导入控件。对应组件 CFormItemImport。
+最常用的表单导入控件。对应组件 CFormItemImport。
 
 ## 用法
 

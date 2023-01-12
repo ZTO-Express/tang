@@ -1,4 +1,4 @@
-最常用的文件列表控件。对应组件 CFormItemFileList。
+最常用的表单文件列表控件。对应组件 CFormItemFileList。
 
 ## 用法
 

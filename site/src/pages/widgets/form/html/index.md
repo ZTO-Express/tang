@@ -1,4 +1,4 @@
-Html控件。对应组件 CFormItemHtml。
+最常用的表单Html控件。对应组件 CFormItemHtml。
 
 ## 用法
 

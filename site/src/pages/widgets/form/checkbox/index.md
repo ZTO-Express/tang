@@ -1,4 +1,4 @@
-最常用的单/多选框控件。对应组件 CFormItemCheckbox。
+最常用的表单单/多选框控件。对应组件 CFormItemCheckbox。
 
 ## 用法
 
