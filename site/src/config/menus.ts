@@ -55,7 +55,7 @@ export const menus: NavMenuItemConfig[] = [
           { name: 'widgets.form.select', title: '选择框', path: '/widgets/form/select' },
           { name: 'widgets.form.switch', title: '开关', path: '/widgets/form/switch' },
           { name: 'widgets.form.fuzzySelect', title: '模糊选择', path: '/widgets/form/fuzzySelect' },
-          { name: 'widgets.form.datepicker', title: '日期选择', path: '/widgets/form/checkbox' },
+          { name: 'widgets.form.datepicker', title: '日期选择', path: '/widgets/form/datePicker' },
           { name: 'widgets.form.dateRangePicker', title: '日期范围选择', path: '/widgets/form/dateRangePicker' },
           { name: 'widgets.form.dateTimePicker', title: '日期时间选择', path: '/widgets/form/dateTimePicker' },
           { name: 'widgets.form.import', title: '导入', path: '/widgets/form/import' },

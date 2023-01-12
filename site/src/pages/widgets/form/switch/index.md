@@ -1,4 +1,4 @@
-最常用的表单输入控件。对应组件 CFormItemInput。
+表示两种相互对立的状态间的切换，多用于触发「开/关」。对应组件 CFormItemSwitch。
 
 ## 用法
 
@@ -10,8 +10,8 @@
   "type": "form",
   "actions": { "submit": { "api": "api.submitData" } },
   "formItems": [
-    { "label": "输入1", "type": "input", "prop": "input1", "required": true, "placeholder": "请填写版本号" },
-    { "label": "输入2", "type": "input", "prop": "input2" }
+    { "label": "开关1", "type": "switch", "prop": "switch1", "activeValue": 1, "inactiveValue": 0 },
+    { "label": "开关2", "type": "switch", "prop": "switch2", "disabled": true }
   ]
 }
 ```
@@ -36,25 +36,24 @@
       "default": "",
       "required": true
     },
-
     {
-      "name": "inputType",
-      "desc": "设置input类型",
-      "type": "string",
-      "default": "text",
+      "name": "activeValue",
+      "desc": "switch 状态为 on 时的值	",
+      "type": "boolean / string / number",
+      "default": "true",
       "required": false
     },
     {
-      "name": "maxlength",
-      "desc": "最大输入长度",
-      "type": "number",
-      "default": "",
+      "name": "inactiveValue",
+      "desc": "switch的状态为 off 时的值",
+      "type": "boolean / string / number",
+      "default": "false",
       "required": false
     },
     {
-      "name": "showWordLimit",
-      "desc": "是否显示统计字数",
-      "type": "boolean",
+      "name": "beforeChange",
+      "desc": "switch 状态改变前的钩子， 返回 false 或者返回 Promise 且被 reject 则停止切换",
+      "type": "function",
       "default": "",
       "required": false
     },
