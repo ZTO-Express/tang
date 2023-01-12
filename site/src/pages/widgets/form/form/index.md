@@ -43,6 +43,8 @@
 
 ## Schema
 
+其他属性参考<a href="https://element-plus.gitee.io/zh-CN/component/form.html" target="_blank">Element Pluse Form 属性</a>
+
 ```json
 // --- doc-schema:definition ---
 {
