@@ -1,4 +1,4 @@
-最常用的表单输入控件。对应组件 CFormItemInput。
+仅允许输入标准的数字值，可定义范围。对应组件 CFormItemInputNumber。
 
 ## 用法
 
@@ -10,15 +10,15 @@
   "type": "form",
   "actions": { "submit": { "api": "api.submitData" } },
   "formItems": [
-    { "label": "输入1", "type": "input", "prop": "input1", "required": true, "placeholder": "请填写版本号" },
-    { "label": "输入2", "type": "input", "prop": "input2" }
+    { "label": "输入1", "type": "inputNumber", "prop": "input1", "controlsPosition": "left", "required": true },
+    { "label": "输入2", "type": "inputNumber", "prop": "input2", "min": 1, "max": 10 }
   ]
 }
 ```
 
 ## Schema
 
-其他属性参考<a href="https://element-plus.gitee.io/zh-CN/component/input.html" target="_blank">Element Pluse Input 属性</a>
+其他属性参考<a href="https://element-plus.gitee.io/zh-CN/component/input-number.html" target="_blank">Element Pluse InputNumber 属性</a>
 
 ```json
 // --- doc-schema:definition ---
@@ -38,32 +38,35 @@
       "default": "",
       "required": true
     },
-
     {
-      "name": "inputType",
-      "desc": "设置input类型",
+      "name": "controlsPosition",
+      "desc": "控制按钮位置",
       "type": "string",
-      "default": "text",
+      "enum": "left/right",
+      "default": "right",
       "required": false
     },
     {
-      "name": "maxlength",
-      "desc": "最大输入长度",
+      "name": "min",
+      "desc": "设置计数器允许的最小值",
       "type": "number",
-      "default": "",
+      "enum": "",
+      "default": "0",
       "required": false
     },
     {
-      "name": "showWordLimit",
-      "desc": "是否显示统计字数",
-      "type": "boolean",
+      "name": "max",
+      "desc": "设置计数器允许的最大值",
+      "type": "number",
+      "enum": "",
       "default": "",
       "required": false
     },
     {
       "name": "disabled",
-      "desc": "是否禁用",
+      "desc": "是否禁用状态",
       "type": "boolean",
+      "enum": "",
       "default": "false",
       "required": false
     }

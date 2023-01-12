@@ -11,7 +11,8 @@ export default defineComponent({
   setup(props: any) {
     return () => {
       const tplProps = _.omit(props.schema, ['type'])
-      return h(CTpl, { ...tplProps })
+
+      return h(CTpl, { ...tplProps, ctxData: tplProps.contextData })
     }
   }
 })

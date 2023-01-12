@@ -72,6 +72,10 @@ export default defineConfig({
         replacement: resolve(__dirname, './packages/core/src')
       },
       {
+        find: '@zto/zpage-ffb',
+        replacement: resolve(__dirname, './packages/ffb/src')
+      },
+      {
         find: '@zto/zpage-runtime',
         replacement: resolve(__dirname, './packages/runtime/src')
       },
