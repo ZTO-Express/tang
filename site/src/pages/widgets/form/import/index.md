@@ -7,72 +7,79 @@
 ```json
 // --- doc-sample:zpage-widget ---
 {
-  "type": "action",
-  "label": "导入",
-  "actionType": "import",
-  "import": {
-    "title": "导入",
-    "api": "kdcs.advanceBatchImport",
-    "template": "operate_store_advanceFund",
-    "maxCount": 1000,
-    "extraTip": {
-      "html": {
-        "tag": "div",
-        "children": [
-          {
-            "tag": "h5",
-            "children": [
-                "导入说明："
-            ]
-          },
-          {
-            "tag": "ul",
-            "props": {
-              "class": "li-decimal text-small"
-            },
+  "type": "form",
+  "actions": { "submit": { "api": "api.submitData" } },
+  "formItems": [
+    {
+      "type": "action",
+      "label": "导入",
+      "actionType": "import",
+      "name": "导入",
+      "import": {
+        "title": "导入",
+        "api": "kdcs.advanceBatchImport",
+        "template": "operate_store_advanceFund",
+        "maxCount": 1000,
+        "extraTip": {
+          "html": {
+            "tag": "div",
             "children": [
               {
-                "tag": "li",
+                "tag": "h5",
                 "children": [
-                    "门店编号必填；"
+                    "导入说明："
                 ]
               },
               {
-                "tag": "li",
+                "tag": "ul",
+                "props": {
+                  "class": "li-decimal text-small"
+                },
                 "children": [
-                    "门店编号必须为系统已存在的门店；"
-                ]
-              },
-              {
-                "tag": "li",
-                "children": [
-                    "已标记的门店不可重复导入；"
-                ]
-              },
-              {
-                "tag": "li",
-                "children": [
-                    "已装修认证通过的门店不可导入；"
-                ]
-              },
-              {
-                "tag": "li",
-                "children": [
-                    "门店认证未通过的门店不支持导入；"
-                ]
-              },
-              {
-                "tag": "li",
-                "children": [
-                    "数据填写完成后请删除导入说明再导入"
+                  {
+                    "tag": "li",
+                    "children": [
+                        "门店编号必填；"
+                    ]
+                  },
+                  {
+                    "tag": "li",
+                    "children": [
+                        "门店编号必须为系统已存在的门店；"
+                    ]
+                  },
+                  {
+                    "tag": "li",
+                    "children": [
+                        "已标记的门店不可重复导入；"
+                    ]
+                  },
+                  {
+                    "tag": "li",
+                    "children": [
+                        "已装修认证通过的门店不可导入；"
+                    ]
+                  },
+                  {
+                    "tag": "li",
+                    "children": [
+                        "门店认证未通过的门店不支持导入；"
+                    ]
+                  },
+                  {
+                    "tag": "li",
+                    "children": [
+                        "数据填写完成后请删除导入说明再导入"
+                    ]
+                  }
                 ]
               }
             ]
           }
-        ]
+        }
       }
     }
-  }
+  ]
 }
 ```
 
@@ -92,7 +99,7 @@
     },
     {
       "name": "label",
-      "desc": "按钮名称",
+      "desc": "标签",
       "type": "string",
       "enum": "",
       "default": "",
@@ -103,6 +110,14 @@
       "desc": "按钮类型",
       "type": "string",
       "enum": "import",
+      "default": "",
+      "required": false,
+    },
+    {
+      "name": "name",
+      "desc": "按钮名称",
+      "type": "string",
+      "enum": "",
       "default": "",
       "required": false,
     },

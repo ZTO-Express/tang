@@ -175,7 +175,7 @@
     },
     {
       "name": "label",
-      "desc": "按钮名称",
+      "desc": "标签",
       "type": "string",
       "enum": "",
       "default": "",
@@ -187,6 +187,14 @@
       "type": "string",
       "enum": "primary/text/import/dialog/form/download/link/event",
       "default": "primary",
+      "required": false,
+    },
+    {
+      "name": "name",
+      "desc": "按钮名称",
+      "type": "string",
+      "enum": "",
+      "default": "",
       "required": false,
     },
     {
