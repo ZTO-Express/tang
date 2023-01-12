@@ -32,6 +32,8 @@
 
 ## Schema
 
+其他属性参考<a href="https://element-plus.gitee.io/zh-CN/component/date-picker.html" target="_blank">Element Pluse DatePicker 属性</a>
+
 ```json
 // --- doc-schema:definition ---
 {
