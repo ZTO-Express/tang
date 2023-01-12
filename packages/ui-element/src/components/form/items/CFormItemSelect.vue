@@ -97,7 +97,8 @@ watch(
   () => selectOptions.value,
   () => {
     resolveGroupLabels()
-  },{
+  },
+  {
     immediate: true
   }
 )

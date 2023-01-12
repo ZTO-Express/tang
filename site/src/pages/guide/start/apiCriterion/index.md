@@ -7,13 +7,13 @@
 3. 不要相信前端的传参，后端只接收自己想要的值，同时进行规则验证
 4. 相同的前端展示方式，相同的接口格式
 
-## 1. 路径
+## Api 路径规范
 
 接口路径要符合通用命名规则，接口交互统一用 POST，接口入参和出参统一采用实体（DTO），接口字段定义 3 要素：是否必须，字段说明，类型
 
-示例：实际使用过程中把<base>替换成自己的模块名称
+示例：实际使用过程中把&lt;base&gt;替换成自己的模块名称
 
-前端文档生成说明：http://w.ztosys.com/107098842
+前端文档生成说明：<a href="http://w.ztosys.com/107098842" target="_blank">http://w.ztosys.com/107098842</a>
 
 **RPC 路径**
 | 路径 | 说明 | 入参 | 出参 |
@@ -45,11 +45,13 @@
 
 **讨论：**
 
-1. 添加和修改是否应该合并，在什么情况下合并
+1. <font color="red">添加和修改是否应该合并，在什么情况下合并</font>
 
-## 2. 请求/返回值
+## Api 请求/返回值规范
 
-所有返回值按照中通通过返回值中的 result 规范，如下示例，<result>部分：
+所有返回值按照中通通过返回值中的 result 规范，如下示例，&lt;result&gt;部分：
+
+{ message: '成功', status: true, statusCode: 200, result: <font color="red">&lt;result&gt;</font> }
 
 <el-table :data="tableData" style="width: 100%">
   <el-table-column prop="name" label="规范" width="180">
@@ -118,7 +120,7 @@ const tableData = [
   desc: `<pre>入参：keyword
 出参：{
     data: [{id，code，name}]
-} 
+}
 id, code, 可视情况使用id或code或同时使用。`,
   remark: '考虑到安全性和可维护性，一般不建议应用返回id，尽量用code唯一标识记录'
 },
@@ -143,7 +145,7 @@ id, code, 可视情况使用id或code或同时使用。`,
 
 {
   name: '查询条件 - 多项',
-  desc: `<pre>	
+  desc: `<pre>
 查询条件一个字段包含多项，用数组表示，
 示例：
 {
@@ -153,7 +155,7 @@ id, code, 可视情况使用id或code或同时使用。`,
 },
 {
   name: '查询返回 - 枚举',
-  desc: `<pre>	
+  desc: `<pre>
 需要同时返回枚举值和显示值，显示值以 Name作为后缀
 {
     data: [
@@ -205,7 +207,7 @@ operate/storeQuitAudit/xxxxx.pdf`
 },
 {
   name: '数据导入',
-  desc: `<pre>	
+  desc: `<pre>
 {
    data: [{...item}]
 }`,
@@ -214,7 +216,7 @@ operate/storeQuitAudit/xxxxx.pdf`
 ]
 </script>
 
-## 3. 部分命名规范
+## 部分命名规范约定
 
 命名规范为前端对返回接口命名建议，不作为后端命名约束，但仍建议前后端就一些通用的命名达成一致
 
