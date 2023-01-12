@@ -98,7 +98,7 @@ export class App implements Installable {
 
     this._name = opts.name
     this._env = Object.freeze({ ...opts.env })
-    this._exContext = Object.freeze({ ...opts.exContext })
+    this._exContext = { ...opts.exContext }
 
     // 初始化应用配置
     const config = useAppConfigs(this, [opts.config, ...(opts.configs || [])])
@@ -138,7 +138,6 @@ export class App implements Installable {
     this.micro = InternalAppMicro.retrieveInstance(this)
 
     __app_names.push(this._name)
-
   }
 
   // 初始化api
