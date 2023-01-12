@@ -54,7 +54,13 @@ function parseDefinitionSchema(json: any) {
       border: true,
       data: json.properties || [],
       columns: [
-        { label: '名称', prop: 'name', width: '200', expandColumn: true },
+        {
+          label: '名称',
+          prop: 'name',
+          width: '200',
+          formatter: (data: any) => data.nameText || data.name,
+          expandColumn: true
+        },
         { label: '说明', prop: 'desc', minWidth: '200', align: 'left', class: 'text-wrap' },
         { label: '类型', prop: 'type', width: '100' },
         { label: '可选值', prop: 'enum', width: '100' },
