@@ -18,7 +18,8 @@ export const menus: NavMenuItemConfig[] = [
         title: '开始',
         children: [
           { name: 'guide.start.quick', title: '快速开始', path: '/guide/start/quick' },
-          { name: 'guide.start.criterion', title: '开发规范', path: '/guide/start/criterion' }
+          { name: 'guide.start.projectStructure', title: '项目结构', path: '/guide/start/projectStructure' },
+          { name: 'guide.start.apiCriterion', title: '接口规范', path: '/guide/start/apiCriterion' }
         ]
       },
       {

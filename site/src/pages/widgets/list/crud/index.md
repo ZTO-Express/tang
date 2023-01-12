@@ -1,6 +1,6 @@
 <!-- <CWidgetSchemaViewer name="WCrud" type="desc" /> -->
 
-增删改查微件目前基本上是中后台管理使用最频繁的微件，对应 ui-element 下面 WCrud 组件。
+增删改查微件目前基本上是中后台管理使用最频繁的微件，对应 ui-element 下面 WCrud 组件。其主要作用是对列表类型的数据进行查询、展示、操作等功能。该微件同时也包含部分页面自动布局功能，一般情况必须外部需要套一个容器，通常和 Page 页面配合使用。
 
 ## 基本用法
 
@@ -95,7 +95,69 @@
 {
   "properties": [
     {
-      "name": "default",
+      "name": "actions",
+      "desc": "数据结构为map，对象的key未活动项名称，值为活动项配置信息。详细活动项配置可参考基础微件WAction。",
+      "type": "map",
+      "enum": "",
+      "default": "",
+      "children": [
+        {
+          "name": "query",
+          "desc": "加载表单数据请求api。",
+          "type": "object",
+          "children": [
+            {
+              "name": "api",
+              "desc": "",
+              "type": "string|object",
+              "children": [
+                {
+                  "name": "url",
+                  "desc": "api请求路径。可以写成ns:path, ns为命名空间用于识别特定api",
+                  "type": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "export",
+          "desc": "一般作为导出全部",
+          "type": "object",
+          "children": [
+            {
+              "name": "exportType",
+              "desc": "导出类型",
+              "type": "object",
+              "default": "",
+              "required": true
+            }
+          ]
+        },
+        {
+          "name": "...",
+          "desc": "其他活动项",
+          "type": "object",
+          "default": ""
+        }
+      ]
+    },
+    {
+      "name": "search",
+      "desc": "默认显示的tab的标签值。若未设置或未找到指定的默认项，将默认显示第一个tab页。",
+      "type": "string",
+      "default": "",
+      "required": false
+    },
+    {
+      "name": "toolbar",
+      "desc": "默认显示的tab的标签值。若未设置或未找到指定的默认项，将默认显示第一个tab页。",
+      "type": "string",
+      "default": "",
+      "required": false
+    },
+    {
+      "name": "table",
       "desc": "默认显示的tab的标签值。若未设置或未找到指定的默认项，将默认显示第一个tab页。",
       "type": "string",
       "default": "",
