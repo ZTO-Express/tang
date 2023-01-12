@@ -11,7 +11,7 @@ export default defineComponent({
   setup(props: any) {
     return () => {
       const htmlProps = _.omit(props.schema, ['type'])
-      return h(CHtml, { ...htmlProps })
+      return h(CHtml, { ...htmlProps, ctxData: htmlProps.contextData })
     }
   }
 })

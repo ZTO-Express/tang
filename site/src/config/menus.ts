@@ -5,13 +5,21 @@ export const menus: NavMenuItemConfig[] = [
     name: 'guide',
     title: '指南',
     children: [
-      { name: 'guide.about', title: '关于', path: '/guide/about' },
+      {
+        name: 'guide.intro',
+        title: '介绍',
+        children: [
+          { name: 'guide.intro.about', title: '关于', path: '/guide/intro/about' },
+          { name: 'guide.intro.concept', title: '概念', path: '/guide/intro/concept' }
+        ]
+      },
       {
         name: 'guide.start',
         title: '开始',
         children: [
           { name: 'guide.start.quick', title: '快速开始', path: '/guide/start/quick' },
-          { name: 'guide.start.criterion', title: '开发规范', path: '/guide/start/criterion' }
+          { name: 'guide.start.projectStructure', title: '项目结构', path: '/guide/start/projectStructure' },
+          { name: 'guide.start.apiCriterion', title: '接口规范', path: '/guide/start/apiCriterion' }
         ]
       },
       {
@@ -32,7 +40,7 @@ export const menus: NavMenuItemConfig[] = [
         children: [
           { name: 'widgets.basic.tpl', title: '模版', path: '/widgets/basic/tpl' },
           { name: 'widgets.basic.html', title: 'Html', path: '/widgets/basic/html' },
-          { name: 'widgets.basic.action', title: '活动', path: '/widgets/basic/action' }
+          { name: 'widgets.basic.action', title: '行为按钮', path: '/widgets/basic/action' }
         ]
       },
       {
@@ -41,8 +49,7 @@ export const menus: NavMenuItemConfig[] = [
         children: [
           { name: 'widgets.page.normal', title: '普通页', path: '/widgets/page/normal' },
           { name: 'widgets.page.tab', title: 'Tab页', path: '/widgets/page/tab' },
-          { name: 'widgets.page.welcome', title: '欢迎页', path: '/widgets/page/welcome' },
-          { name: 'widgets.page.blank', title: '空白页', path: '/widgets/page/blank' }
+          { name: 'widgets.page.welcome', title: '欢迎页', path: '/widgets/page/welcome' }
         ]
       },
       {
