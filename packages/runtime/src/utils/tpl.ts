@@ -1,6 +1,6 @@
 import { register as registerBulitin, getFilters } from './tpl-builtin'
 import { register as registerLodash } from './tpl-lodash'
-// import { register as registerDefault } from './tpl-default'
+import { register as registerDefault } from './tpl-default'
 
 export interface Enginer {
   test: (tpl: string) => boolean
@@ -131,7 +131,7 @@ export function evalJS(js: string, data: object): any {
 }
 
 /** registerDefault 存在xss安全分险，现移除 */
-;[/*registerDefault, */ registerBulitin, registerLodash].forEach(fn => {
+;[registerDefault, registerBulitin, registerLodash].forEach(fn => {
   const info = fn()
 
   registerTplEnginer(info.name, {
