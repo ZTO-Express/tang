@@ -1,5 +1,6 @@
 
 import type { Enginer } from './tpl'
+import { filters, registerFilter } from './tpl-builtin'
 
 export function filterXSS(str: string) {
   return str
@@ -41,12 +42,25 @@ function filterObj(obj: any) {
 function compile(str: string, { data }) {
   data = filterObj(data)
   return str.replace(/\$\{\{(.*?)\}\}/g, (a, b) => {
-    const fn = new Function('data', 'return ' + b);
+    let rs = null
+    const bs = b.split(/(?<=[^|])\|(?=[^|])/)
+    
     try {
-      return fn.call('', data || {})
+      const fn = new Function('data', 'return ' + bs.shift().trim());
+      rs =  fn.call('', data || {})
     } catch (error) {
-      return null
     }
+
+    try {
+      rs = bs.reduce((pv, filter) => {
+        const fs = filter.split(":")
+        const fn = filters[fs.shift().trim()]
+        return fn ? fn.apply('', [pv, ...fs]): pv
+      }, rs)
+    } catch (error) {
+    }
+
+    return rs
   })
 }
 
