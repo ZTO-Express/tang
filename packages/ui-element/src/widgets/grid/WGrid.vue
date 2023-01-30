@@ -1,5 +1,5 @@
 <template>
-  <div class="w-grid">
+  <div class="w-grid" v-bind="innerAttrs.grid">
     <template v-if="isRowGrid">
       <el-row
         v-for="(it, index) in gridRows"
