@@ -89,6 +89,7 @@ const props = withDefaults(
     apiParams?: Record<string, any>
     valueProp?: string
     optionsDataProp?: string
+    onOptionsLoad?: GenericFunction
 
     singleCheck?: boolean // 单个值（针对 checkType为check，只有一个值）
     uncheckValue?: string | number
@@ -207,6 +208,11 @@ async function fetchOptions() {
     } else {
       innerValue.value = vals || []
     }
+  }
+
+  if (props.onOptionsLoad) {
+    const context = app.useContext(optionsData)
+    await props.onOptionsLoad(context)
   }
 }
 

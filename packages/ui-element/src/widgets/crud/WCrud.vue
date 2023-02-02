@@ -227,7 +227,9 @@ const dataProp = tableConfig?.data?.dataProp || 'data'
 const wSchema = app.useWidgetSchema(props.schema)
 
 // 注册微件事件监听
-app.useWidgetEmitter(wSchema, { searchOn: () => doSearch })
+app.useWidgetEmitter(wSchema, {
+  searchOn: () => doSearch()
+})
 
 // Tab切换时重新布局（防止tab错位）
 emitter.on(UI_GLOBAL_EVENTS.PAGE_TAB_CHANGE, () => {

@@ -42,14 +42,14 @@ const showNav = computed(() => {
 const { userStore } = app.stores
 const watermark = ref<any>(null)
 const watermarkContent = computed(() => {
-  const { nickname, deptName, positionName , mobile } = userStore.data.basic || {}
+  const { nickname, deptName, positionName, mobile } = userStore.data.basic || {}
   return `${nickname}\n${deptName}\n${positionName}\n${mobile}`
 })
 onMounted(() => {
   // 调用
   watermark.value = new Watermark({
-    content: watermarkContent.value,
-  });
+    content: watermarkContent.value
+  })
 })
 onUnmounted(() => {
   watermark.value.unload()

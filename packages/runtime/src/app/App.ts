@@ -1,9 +1,9 @@
-import { createApp, onUnmounted, watch, computed, resolveComponent } from 'vue'
+import { reactive, createApp, onUnmounted, watch, computed, resolveComponent } from 'vue'
 import { createPinia, Pinia } from 'pinia'
 import { Router, useRoute } from 'vue-router'
 import { AppError, ErrorCodes, Nil } from '@zto/zpage-core'
 
-import { AppLoaderType, FlushAppContextType, PAGE_SEARCH_EVENT_KEY } from '../consts'
+import { AppLoaderType, FlushAppContextType, PAGE_SEARCH_DATA_KEY, PAGE_SEARCH_EVENT_KEY } from '../consts'
 import { _, tpl, warn, queryEl, formatText, Emitter } from '../utils'
 import { getInnerLoaders, mergeLoaders } from './loaders'
 import { defineAndUseAppStores } from './store'
@@ -43,7 +43,6 @@ import type {
 } from '../typings'
 
 import type { TextFormatters, FormatTextOptions, DataOptionItems } from '../typings'
-import store from 'store2'
 
 /** 已创建的应用名 */
 const __app_names: string[] = []
@@ -397,14 +396,19 @@ export class App implements Installable {
   }
 
   useWidgetEmitter(schema: any, handlerMap: Record<string, Handler>) {
-    if (!handlerMap) return
+    this.useEventListeners(schema, handlerMap)
+  }
+
+  useEventListeners(listeners: any, handlerMap: Record<string, Handler>) {
+    if (!listeners || !handlerMap) return
 
     const currentPageKey = this.currentRoute.value.meta?.pageKey as string
 
     Object.keys(handlerMap).forEach(key => {
       if (!isWidgetEventKey(key)) return
+      if (!listeners[key]) return
 
-      const eventTypes = normalizeEventTypes(schema[key] as any, currentPageKey)
+      const eventTypes = normalizeEventTypes(listeners[key] as any, currentPageKey)
       const eventHandler = handlerMap[key] as any
 
       this.emitter.ons(eventTypes, eventHandler)
@@ -413,8 +417,9 @@ export class App implements Installable {
     onUnmounted(() => {
       Object.keys(handlerMap).forEach(key => {
         if (!isWidgetEventKey(key)) return
+        if (!listeners[key]) return
 
-        const eventTypes = normalizeEventTypes(schema[key] as any, currentPageKey)
+        const eventTypes = normalizeEventTypes(listeners[key] as any, currentPageKey)
         const eventHandler = handlerMap[key] as any
 
         this.emitter.offs(eventTypes, eventHandler)
@@ -713,8 +718,34 @@ export class App implements Installable {
   }
 
   /** 设置页面数据 */
-  async setPageData(path: string, data: any) {
-    await this.stores.pagesStore.setCurrentPageData({ path, data })
+  setPageData(path: string, data: any) {
+    this.stores.pagesStore.setCurrentPageData({ path, data })
+  }
+
+  /** 设置页面查询数据 */
+  getPageSearchData() {
+    let searchData = this.getPageData(PAGE_SEARCH_DATA_KEY)
+    if (!searchData) {
+      searchData = reactive({})
+      this.setPageData(PAGE_SEARCH_DATA_KEY, searchData)
+    }
+    return searchData
+  }
+
+  /** 设置页面查询数据 */
+  setPageSearchData(key: string, data: any) {
+    const searchData = this.getPageSearchData()
+    searchData[key] = data
+    return searchData
+  }
+
+  /** 设置页面查询数据 */
+  mergePageSearchData(data: Record<string, any>) {
+    const searchData = this.getPageSearchData()
+    Object.entries(data).forEach(([key, value]) => {
+      searchData[key] = value
+    })
+    return searchData
   }
 
   /** 这只扩展上下文 */

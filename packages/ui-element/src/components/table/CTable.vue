@@ -184,6 +184,8 @@ const props = withDefaults(
     dataColumns?: boolean // 从数据中获取列信息
     dataColumnsProp?: string // 数据列属性
 
+    listeners?: Record<string, string[]> // 时间监听配置
+
     export?: Record<string, any> // 导出配置
   }>(),
   {
@@ -527,12 +529,21 @@ function getSort() {
 
 // ---- 数据相关 ------->
 
+// 注册微件事件监听
+app.useEventListeners(props.listeners, {
+  fetchOn: (e: any) => {
+    doFetch(e?.resetPager, { apiParams: e?.data })
+  }
+})
+
 const dataCfg = app.useComponentsConfig('table.data', {})
 
 /** 请求数据 */
-async function doFetch(isResetPager: boolean) {
+async function doFetch(isResetPager: boolean = false, options?: any) {
   if (tableLoading.value) return
   if (isResetPager) resetPager()
+
+  options = { ...options }
 
   const payload = {
     attrs,
@@ -544,7 +555,7 @@ async function doFetch(isResetPager: boolean) {
     },
     pageIndex: pager.pageIndex,
     pageSize: pager.pageSize,
-    params: props.apiParams,
+    params: { ...props.apiParams, ...options.apiParams },
     noPager: props.noPager,
     pageSort: sortedColumns.value
   }
