@@ -19,6 +19,7 @@
           highlight-current-row
           :cell-style="innerCellStyle"
           :header-cell-style="innerHeaderCellStyle"
+          :span-method="innerSpanMethod"
           @selection-change="handleSelectionChange"
           @sort-change="handleSortChange"
         >
@@ -128,13 +129,10 @@ import * as tableUtil from './util'
 import ChildTableColumn from './child-table-column'
 import Pagination from './pagination.vue'
 
-import type { SummaryMethodParams, TableColumn, TablePager, TableData, TableEditableColumn } from './types'
+import type { SummaryMethodParams, TableColumn, TablePager, TableData } from './types'
 import type { ExportColumn } from '../../utils/xlsx'
 
-import type { GenericFunction, ApiRequestAction } from '@zto/zpage'
-
-// 请求规则
-const RequiredRule = Object.freeze({ required: true, message: '请输入' })
+import type { GenericFunction, ApiRequestAction, AppEventListeners } from '@zto/zpage'
 
 // 属性
 const props = withDefaults(
@@ -146,6 +144,7 @@ const props = withDefaults(
     dataListProp?: string // 列表数据属性
     dataTotalProp?: string // 总数属性
     dataSummaryProp?: string // 汇总属性
+    onDataLoad?: GenericFunction // 数据加载
 
     columns?: Array<any> // 列设置
     showExpand?: boolean // 展开列是否展示
@@ -184,7 +183,10 @@ const props = withDefaults(
     dataColumns?: boolean // 从数据中获取列信息
     dataColumnsProp?: string // 数据列属性
 
-    listeners?: Record<string, string[]> // 时间监听配置
+    rowspanProp?: string // 是否合并对应属性（合并单元格）
+    spanMethod?: Function // 合并方法
+
+    listeners?: AppEventListeners // 时间监听配置
 
     export?: Record<string, any> // 导出配置
   }>(),
@@ -245,6 +247,13 @@ const innerSummaryMethod = computed(() => {
 
 const innerLoadMethod = computed(() => {
   return props.loadMethod || tableLoadFn
+})
+
+const innerSpanMethod = computed(() => {
+  if (props.spanMethod) return props.spanMethod
+  if (props.rowspanProp) return rowspanFn
+
+  return undefined
 })
 
 const columnItems = computed<TableColumn[]>(() => {
@@ -531,8 +540,12 @@ function getSort() {
 
 // 注册微件事件监听
 app.useEventListeners(props.listeners, {
-  fetchOn: (e: any) => {
-    doFetch(e?.resetPager, { apiParams: e?.data })
+  fetchOn: async (e: any) => {
+    await doFetch(e?.resetPager, { apiParams: e?.params })
+  },
+
+  setDataOn: async (e: any) => {
+    setData(e.data)
   }
 })
 
@@ -603,7 +616,11 @@ async function setData(data: any) {
     tableData.data = []
   }
 
-  await nextTick(() => {
+  if (props.rowspanProp) {
+    list = parseRowspanData(list, props.rowspanProp)
+  }
+
+  await nextTick(async () => {
     tableData.data = list || []
     tableData.total = total > 0 ? total : pager.pageIndex === 1 ? 0 : tableData.total
     tableData.columns = data[columnsProp] || []
@@ -614,11 +631,54 @@ async function setData(data: any) {
 
       nextTick((tableRef as any).doLayout)
     }
+
+    if (props.onDataLoad) {
+      const context = app.useContext(tableData)
+      await props.onDataLoad(context)
+    }
   })
 }
 
+// 返回表格数据
 function getData() {
   return tableData.data
+}
+
+const rowspanColumns = computed(() => {
+  const _cols = columnItems.value.filter(it => it.rowspan === true)
+  return _cols
+})
+
+// 解析行数据
+function parseRowspanData(data: any[], prop: string) {
+  if (!data?.length || !prop) return data
+
+  const parsed: any[] = []
+
+  data.forEach((it: any, idx: number) => {
+    it = { ...it }
+    const items = it[prop] || [{}]
+    delete it.items
+
+    const rowspan = items.length || 0
+    items.forEach((_it: any, _idx: number) => {
+      parsed.push({
+        __rowspan: _idx === 0 ? rowspan : 0,
+        __rowspanIndex: idx + 1,
+        ...it,
+        ..._it
+      })
+    })
+  })
+
+  return parsed
+}
+
+// 内部行单元格合并方法
+function rowspanFn({ row, column }: any) {
+  const spanColProps = rowspanColumns.value.filter(it => it.rowspan === true).map(it => it.prop)
+  if (spanColProps.includes(column.property)) return [row.__rowspan, 1]
+  return [1, 1]
 }
 
 // ---- 表格编辑相关 ------->

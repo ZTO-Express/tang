@@ -450,13 +450,15 @@ const tableAttrs = computed(() => {
   const columns = columnsFilterable.value ? innerVisibleColumns.value : innerColumns.value
 
   return {
-    border: sTable.border !== false,
     action: sActions.query,
+    data: sActions.query?.data,
+
     editable: sTable.editable,
     batchEditable: sTable.batchEditable,
     columns,
     noOperation: _.isBoolean(sTable.noOperation) ? sTable.noOperation : !sTable.operation,
     operationWidth: sTable.operation?.width,
+    operationPosition: sTable.operation?.position,
     showFixed: sTable.showFixed !== false,
     showCheckbox: sTable.showCheckbox,
     noIndex: _.isBoolean(sTable.noIndex) ? sTable.noIndex : sTable.showCheckbox,
@@ -465,8 +467,13 @@ const tableAttrs = computed(() => {
     summaryText: sTable.summaryText || sTable.sumText,
     noPager: sTable.noPager,
     dataColumns: sTable.dataColumns,
-    data: sActions.query?.data,
+    border: sTable.border !== false,
+
     loadMethod: tableLoadFn,
+    onDataLoad: sTable.onDataLoad,
+    spanMethod: sTable.spanMethod,
+    rowspanProp: sTable.rowspanProp,
+
     export: { ...exportOptions },
     ...treeOptions,
     ...sTable.innerAttrs

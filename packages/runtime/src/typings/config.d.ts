@@ -1,7 +1,7 @@
-import type { AxiosRequestConfig } from 'axios'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 
-import type { PartialPageSchema } from '@zto/zpage-core'
+import type { AppSchema, PartialPageSchema } from '@zto/zpage-core'
+import type { FfbProcessor } from '@zto/zpage-ffb'
 import type { HttpRequest, HttpRequestConfig } from '../utils'
 import type { App } from '../app/App'
 import type { ApiRequest, RuntimeConfig } from './runtime'
@@ -14,7 +14,6 @@ import type {
   AppStartOptions,
   NavMenuItemConfig
 } from './app'
-import { DataOptionItem } from '../../dist/types'
 
 /** 应用配置 */
 export interface AppConfig extends RuntimeConfig {

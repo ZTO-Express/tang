@@ -1,5 +1,5 @@
 <template>
-  <div class="w-grid" v-bind="innerAttrs.grid">
+  <div class="w-grid" v-bind="innerAttrs.grid" :style="gridStyle">
     <template v-if="isRowGrid">
       <el-row
         v-for="(it, index) in gridRows"
@@ -32,7 +32,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { useCurrentAppInstance } from '@zto/zpage'
+import { computed, sizePx, useCurrentAppInstance } from '@zto/zpage'
 
 // 属性
 const props = defineProps<{
@@ -43,15 +43,24 @@ const app = useCurrentAppInstance()
 
 const wSchema = app.useWidgetSchema(props.schema)
 
-const gridRows = wSchema.rows || []
-const gridCols = wSchema.cols || []
-const innerAttrs = wSchema.innerAttrs || {}
+const gridRows = computed(() => wSchema.rows || [])
+const gridCols = computed(() => wSchema.cols || [])
+const innerAttrs = computed(() => wSchema.innerAttrs || {})
 
-const isRowGrid = !!gridRows?.length
+const isRowGrid = computed(() => !!gridRows.value?.length)
+
+const gridStyle = computed(() => {
+  return {
+    ...innerAttrs.value.grid?.style,
+    ...wSchema.style,
+    padding: sizePx(wSchema.padding)
+  }
+})
 </script>
 
 <style lang="scss" scoped>
 .w-grid {
   overflow-x: hidden;
+  background: var(--section-color);
 }
 </style>

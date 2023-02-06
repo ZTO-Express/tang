@@ -33,7 +33,9 @@ import type {
   AppAuthLoader,
   AppConfigDefinition,
   PageInfo,
-  PageInfoData
+  PageInfoData,
+  AppEventListener,
+  AppEventListeners
 } from './typings'
 
 import type { DataOptionItem, DataOptionItems } from './typings'
@@ -73,9 +75,9 @@ export * as vue from 'vue'
 export * as pinia from 'pinia'
 export * as vueRouter from 'vue-router'
 
-export * from './typings/config.d'
-export * from './typings/runtime.d'
-export * from './typings/app.d'
+// export * from './typings/config.d'
+// export * from './typings/runtime.d'
+// export * from './typings/app.d'
 
 export type { Ref, PropType } from 'vue'
 
@@ -99,8 +101,11 @@ export type {
   AppPageLoader,
   AppAuthLoader,
   PageInfo,
-  PageInfoData
+  PageInfoData,
+  AppEventListener,
+  AppEventListeners
 }
+
 export type { DataOptionItem, DataOptionItems }
 export type { PageSchema, PartialPageSchema, AppSchema, PartialAppSchema, Widget, Loader }
 export type { CmptAttrs, CmptAttrsMethod, CmptConfig }

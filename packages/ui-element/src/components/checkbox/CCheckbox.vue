@@ -83,13 +83,14 @@ const props = withDefaults(
     optionLabelProp?: string
     optionDisabledProp?: string
     disabled?: boolean
-    onChange?: GenericFunction
 
     api?: ApiRequestAction
     apiParams?: Record<string, any>
     valueProp?: string
     optionsDataProp?: string
-    onOptionsLoad?: GenericFunction
+
+    onChange?: GenericFunction
+    onDataLoad?: GenericFunction
 
     singleCheck?: boolean // 单个值（针对 checkType为check，只有一个值）
     uncheckValue?: string | number
@@ -187,10 +188,12 @@ async function fetchOptions() {
   if (props.api) {
     const params = app.deepFilter(props.apiParams)
 
-    optionsData = await appApi.request({
+    const res = await appApi.request({
       action: props.api,
       params: { ...params }
     })
+
+    optionsData = Array.isArray(res) ? res : res.data || []
   }
   if (optionsData && props.optionsDataProp) {
     innerOptions.value = optionsData[props.optionsDataProp]
@@ -210,9 +213,9 @@ async function fetchOptions() {
     }
   }
 
-  if (props.onOptionsLoad) {
+  if (props.onDataLoad) {
     const context = app.useContext(optionsData)
-    await props.onOptionsLoad(context)
+    await props.onDataLoad(context)
   }
 }
 

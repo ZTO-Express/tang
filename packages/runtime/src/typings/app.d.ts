@@ -9,29 +9,17 @@ import type {
   RouteLocationNormalized,
   RouteLocationNormalizedLoaded
 } from 'vue-router'
-import type {
-  Nil,
-  Widget,
-  Plugin,
-  Schema,
-  AppSchema,
-  PageSchema,
-  PartialPageSchema,
-  PromiseFunction,
-  PromiseObject,
-  Loader
-} from '@zto/zpage-core'
-import type { FfbProcessor } from '@zto/zpage-ffb'
+import type { Nil, Widget, Plugin, Schema, PageSchema, PromiseFunction, Loader } from '@zto/zpage-core'
 
+import type { AppConfigDefinition, AppAppConfig, AppApiConfig, AppApisDefinition, AppPageDefinition } from './config'
 import type {
-  AppConfigDefinition,
-  AppAppConfig,
-  AppApiConfig,
-  AppApisDefinition,
-  AppPageDefinition,
-  AppExContext
-} from './config'
-import type { InstallableOptions, TextFormatters, ApiRequest, RuntimeUI, RuntimeExtensions } from './runtime'
+  InstallableOptions,
+  TextFormatters,
+  ApiRequest,
+  RuntimeUI,
+  RuntimeExtensions,
+  DataOptionItems
+} from './runtime'
 import type { AppDatas } from './store'
 import type { HttpRequest, HttpRequestConfig } from '../utils'
 
@@ -149,7 +137,7 @@ export interface AppStartOptions extends InstallableOptions {
 }
 
 export interface PartialAppStartOptions extends Partial<AppStartOptions> {
-  options?: Partial<AppOptions>
+  options?: Partial<AppStartOptions>
 }
 
 /** 应用构造函数选项 */
@@ -163,7 +151,7 @@ export interface AppContextOptions {
 
 /** 默认应用上下文 */
 export interface AppContext {
-  runtime: typeof runtime
+  runtime: any
   app: App
 
   route?: RouteLocationNormalizedLoaded
@@ -178,7 +166,7 @@ export interface AppExContext {
 }
 
 export interface PageContext extends AppDatas {
-  runtime: typeof runtime
+  runtime: any
   app: App
   apis: AppApis
   api: AppApi
@@ -204,7 +192,7 @@ export interface AppAuthLoader extends AppLoader {
   type: AppLoaderType.AUTH
 
   // 检查应用认证
-  checkAuth: (app: App, ...args: any[]) => PromiseObject
+  checkAuth: (app: App, ...args: any[]) => Promise<any>
 
   // 获取用户信息
   getUserInfo: (app: App, ...args: any[]) => Promise<any>
@@ -300,4 +288,15 @@ export interface MetaAppOptions
 /** 为应用配置 */
 export interface MetaAppCtorOptions extends MetaAppOptions {
   name: string
+}
+
+export interface AppEventListenerSchema {
+  events: string // 监听的事件
+  onEventData?: (e: any) => any | boolean // 接收事件后可对事件参数进行处理
+}
+
+export type AppEventListener = string | string[] | AppEventListenerSchema
+
+export interface AppEventListeners {
+  [prop: string]: AppEventListener
 }

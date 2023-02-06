@@ -1,15 +1,5 @@
-import type {
-  Widget,
-  Schema,
-  Loader,
-  Plugin,
-  PromiseFunction,
-  PromiseObject,
-  AppSchema,
-  PageSchema
-} from '@zto/zpage-core'
+import type { Widget, Loader, Plugin, PromiseFunction, AppSchema, PageSchema } from '@zto/zpage-core'
 import type { VueApp, VueComponent } from './vue'
-import type { TextFormatters } from './config'
 
 /** option选项相关配置 */
 export interface DataOptionItem {

@@ -38,7 +38,7 @@ export interface AppDatas {
 }
 
 export interface AppData {
-  appId: string
+  appId?: string
   [prop: string]: any
 }
 

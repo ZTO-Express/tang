@@ -39,7 +39,9 @@ import type {
   AppContext,
   PageContext,
   AppPageDefinition,
-  DataOptionItem
+  DataOptionItem,
+  AppEventListener,
+  AppEventListeners
 } from '../typings'
 
 import type { TextFormatters, FormatTextOptions, DataOptionItems } from '../typings'
@@ -399,19 +401,34 @@ export class App implements Installable {
     this.useEventListeners(schema, handlerMap)
   }
 
-  useEventListeners(listeners: any, handlerMap: Record<string, Handler>) {
+  useEventListeners(listeners: AppEventListeners | undefined, handlerMap: Record<string, Handler>) {
     if (!listeners || !handlerMap) return
 
     const currentPageKey = this.currentRoute.value.meta?.pageKey as string
 
     Object.keys(handlerMap).forEach(key => {
       if (!isWidgetEventKey(key)) return
-      if (!listeners[key]) return
 
-      const eventTypes = normalizeEventTypes(listeners[key] as any, currentPageKey)
+      const listener = listeners[key] as any
       const eventHandler = handlerMap[key] as any
 
-      this.emitter.ons(eventTypes, eventHandler)
+      if (!listener || !eventHandler) return
+
+      const eventTypes = normalizeEventTypes(listener, currentPageKey)
+
+      if (_.isFunction(listener.onEventData) && !eventHandler.__event_data_wrapped) {
+        const wrappedHandler = async (e: any) => {
+          const _e = await listener.onEventData(e)
+          if (_e === false) return
+
+          await eventHandler(_e)
+        }
+        ;(wrappedHandler as any).__event_data_wrapped = true
+
+        handlerMap[key] = wrappedHandler
+      }
+
+      this.emitter.ons(eventTypes, handlerMap[key])
     })
 
     onUnmounted(() => {
@@ -419,7 +436,7 @@ export class App implements Installable {
         if (!isWidgetEventKey(key)) return
         if (!listeners[key]) return
 
-        const eventTypes = normalizeEventTypes(listeners[key] as any, currentPageKey)
+        const eventTypes = normalizeEventTypes(listeners[key], currentPageKey)
         const eventHandler = handlerMap[key] as any
 
         this.emitter.offs(eventTypes, eventHandler)
@@ -439,7 +456,7 @@ export class App implements Installable {
   }
 
   /** 监听事件 */
-  ons(eTypes: string[] | string, handler: Handler<unknown> | undefined) {
+  ons(eTypes: AppEventListener, handler: Handler<unknown> | undefined) {
     const currentPageKey = this.currentRoute.value.meta?.pageKey as string
 
     const eventTypes = normalizeEventTypes(eTypes, currentPageKey)

@@ -1,3 +1,6 @@
+import _ from 'lodash'
+import { AppEventListener } from '../../typings'
+
 /**
  * Widget
  * @param section
@@ -23,13 +26,23 @@ export function isPageEventType(type: string) {
 }
 
 /** 页面事件 */
-export function normalizeEventTypes(types: string[] | string, currentPageKey: string) {
-  if (!Array.isArray(types)) types = [types]
+export function normalizeEventTypes(types: AppEventListener | undefined, currentPageKey: string) {
+  if (!types) return []
 
-  const _types = types.map(t => {
+  let eventTypes: string[] = []
+
+  if (_.isString(types)) {
+    eventTypes = [types]
+  } else if (Array.isArray(types)) {
+    eventTypes = [...types]
+  } else if (Array.isArray(types.events)) {
+    eventTypes = [...types.events]
+  }
+
+  eventTypes = eventTypes.map(t => {
     if (isPageEventType(t)) return `${t}__${currentPageKey}`
     return t
   })
 
-  return _types
+  return eventTypes
 }
