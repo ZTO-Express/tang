@@ -2,7 +2,7 @@ export const genTypes = false
 export const genSchemas = false
 
 export const rollup = {
-  internal: ['@element-plus/icons', '@element-plus/tokens', 'element-plus'],
+  internal: ['@element-plus/icons', 'element-plus'],
   plugins: {
     vue: {
       preprocessOptions: {
