@@ -125,10 +125,12 @@ export function formatValue(val: any, options: any, dataContext: FormatterOption
 
   if (_.isEmpty(val)) return options.emptyText || '--'
 
+  const { app } = dataContext || {}
+
   let valText = String(val)
 
   if (options.name) {
-    valText = formatText(val, options.name, { context: dataContext, ...options })
+    valText = app.formatText(val, options.name, { context: dataContext, ...options })
   }
 
   const prefix = options.prefix || ''
