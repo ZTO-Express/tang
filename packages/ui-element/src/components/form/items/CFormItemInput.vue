@@ -16,7 +16,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { _, computed, useCurrentAppInstance } from '@zto/zpage'
+import { _, watch, unref, computed, useCurrentAppInstance } from '@docage/docage'
 
 import { useFormItem } from '../util'
 
@@ -59,4 +59,16 @@ const innerShowWordLimit = computed(() => {
 
   return false
 })
+
+watch(
+  () => props.model[props.prop],
+  (cur, old) => {
+    if (_.isPlainObjectOrArray(cur)) {
+      props.model[props.prop] = JSON.stringify(cur, null, 2)
+    }
+  },
+  {
+    immediate: true
+  }
+)
 </script>

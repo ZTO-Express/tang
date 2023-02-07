@@ -29,12 +29,10 @@ const props = withDefaults(
   }>(),
   {
     disabled: false,
-    activeValue: true,
-    inactiveValue: false
+    activeValue: 1,
+    inactiveValue: 0
   }
 )
-
-// beforeChangeMethod
 
 // 当值为['', null, undefined]，默认值调整为false
 if (['', null, undefined].includes(props.model[props.prop])) {

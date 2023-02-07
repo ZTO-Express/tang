@@ -98,7 +98,7 @@ export function date(input: DateValue, opts?: { formatType: string; emptyText: s
   return dateUtil.format(input, formatType)
 }
 
-/**  */
+/** 是否格式化  */
 export function yesNo(input: number | boolean, opts: { options?: string[] } = {}) {
   const options = opts?.options || []
 
@@ -109,4 +109,19 @@ export function yesNo(input: number | boolean, opts: { options?: string[] } = {}
   } else {
     return options[1] || '否'
   }
+}
+
+/** 启用停用 */
+export function enableStr(input: any, options?: string[]) {
+  options = options || ['启用', '停用']
+
+  return yesNo(input, {options})
+}
+
+/** 对象字符串化 */
+export function stringify(input: string) {
+  if (_.isPlainObjectOrArray(input)) {
+    return JSON.stringify(input, null, 2)
+  }
+  return input
 }

@@ -95,3 +95,9 @@ export const isPlainObject = (o: any): boolean => {
   // Most likely a plain Object
   return true
 }
+
+// 目标是否普通对象或数组
+export const isPlainObjectOrArray = (o: any): boolean => {
+  if (!Array.isArray(o)) return isPlainObject(o)
+  return o.every(it => isPlainObject(it))
+}
