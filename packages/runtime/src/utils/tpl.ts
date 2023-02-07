@@ -22,15 +22,17 @@ export function filter(tpl?: any, data: object = {}, ...rest: Array<any>): strin
     return ''
   }
 
-  const keys = Object.keys(enginers)
-  for (let i = 0, len = keys.length; i < len; i++) {
-    const enginer = enginers[keys[i]]
-    if (enginer.test(tpl)) {
-      tpl = enginer.compile(tpl, data, ...rest)
-    } else if (enginer.removeEscapeToken) {
-      tpl = enginer.removeEscapeToken(tpl)
+  try {
+    const keys = Object.keys(enginers)
+    for (let i = 0, len = keys.length; i < len; i++) {
+      const enginer = enginers[keys[i]]
+      if (enginer.test(tpl)) {
+        tpl = enginer.compile(tpl, data, ...rest)
+      } else if (enginer.removeEscapeToken) {
+        tpl = enginer.removeEscapeToken(tpl)
+      }
     }
-  }
+  } catch (err) {}
 
   return tpl
 }
