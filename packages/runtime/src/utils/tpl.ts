@@ -18,9 +18,10 @@ export function registerTplEnginer(name: string, enginer: Enginer) {
 
 // 处理
 export function filter(tpl?: any, data: object = {}, ...rest: Array<any>): string {
-  if (!tpl || typeof tpl !== 'string') {
-    return ''
-  }
+  if (!tpl || typeof tpl !== 'string') return ''
+
+  // “$$$”为特殊字符，可能会导致解析死锁，这里将$$$替换为___$___
+  tpl = tpl.replace(/\$\$\$/g, '___###___')
 
   try {
     const keys = Object.keys(enginers)
@@ -33,6 +34,9 @@ export function filter(tpl?: any, data: object = {}, ...rest: Array<any>): strin
       }
     }
   } catch (err) {}
+
+  // 替换$$$字符
+  tpl = tpl.replace(/___###___/g, '$$$$$')
 
   return tpl
 }
