@@ -638,6 +638,8 @@ async function triggerAction(actionCfg: any) {
     await router.goto(link)
   } else if (actionCfg.event) {
     emitter.emits(actionCfg.event, actionData)
+  } else if (actionCfg.trigger) {
+    actionCfg.trigger(actionData, context)
   } else if (actionCfg.dialog) {
     dialogClose.value = false
     nextTick(() => {

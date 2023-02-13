@@ -903,6 +903,7 @@ export class App implements Installable {
   }
 
   filter(target: any, data: any = {}) {
+    if (_.isEmpty(target)) return target
     const ctx = this.useContext(data)
     return tpl.filter(target, ctx)
   }

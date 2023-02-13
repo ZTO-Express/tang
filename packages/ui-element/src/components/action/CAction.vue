@@ -217,7 +217,7 @@ function handleClick() {
     event_code: 'action',
     event_data: {
       buttonType,
-      buttonLabel,
+      buttonLabel
     }
   })
   trigger()
@@ -235,7 +235,7 @@ async function trigger() {
   const flag = await doBeforeTrigger()
   if (flag === false) return
 
-  if (props.trigger) return props.trigger(allAttrs.value)
+  if (props.trigger) return props.trigger(allAttrs.value, actionContext.value)
 
   const actionType = props.actionType
 
