@@ -225,11 +225,13 @@ const tableConfig = app.useComponentsConfig('table', {})
 const dataProp = tableConfig?.data?.dataProp || 'data'
 
 const wSchema = app.useWidgetSchema(props.schema)
+wSchema.toolbar = _.deepMerge(crudConfig.toolbar, wSchema.toolbar)
+wSchema.search = _.deepMerge(crudConfig.search, wSchema.search)
+wSchema.table = _.deepMerge(crudConfig.table, wSchema.table)
+wSchema.tree = _.deepMerge(crudConfig.tree, wSchema.tree)
 
 // 注册微件事件监听
-app.useWidgetEmitter(wSchema, {
-  searchOn: () => doSearch()
-})
+app.useWidgetEmitter(wSchema, { searchOn: doSearch as any })
 
 // Tab切换时重新布局（防止tab错位）
 emitter.on(UI_GLOBAL_EVENTS.PAGE_TAB_CHANGE, () => {
@@ -255,6 +257,11 @@ const sTable = app.useWidgetSchema(wSchema.table || {})
 
 // 树形相关schema
 const sTree = app.useWidgetSchema(sTable.tree || {})
+
+// 是否树形表格
+const isTreeTable = computed(() => {
+  return !!tableAttrs.value?.rowKey
+})
 
 const innerColumns = ref<any[]>([])
 innerColumns.value = Array.isArray(sTable.columns) ? sTable.columns : []
@@ -589,7 +596,11 @@ function handleDialogClose(args: any) {
   dialogClose.value = true
 
   const options = args.options
-  if (options?.triggerSuccess && options?.reloadAfterSuccess === true) {
+
+  if (options?.triggerSuccess && options?.reloadAfterSuccess !== false) {
+    // 树形节点默认不刷新
+    if (isTreeTable.value) return
+
     doSearch()
   }
 }
@@ -758,12 +769,14 @@ async function doAction(action: any, payload: any, options?: any) {
     const ctx = app.useContext(payload)
     const flag = await Promise.resolve().then(() => options.onAction!(ctx, options))
 
-    if (flag !== false && options?.reload !== false) return doSearch()
+    if (flag !== false && options?.reload !== false) return doReload()
     return flag
   }
 
   if (!action) {
-    if (options?.reload !== false) return doSearch()
+    if (options?.reload !== false) {
+      return doReload()
+    }
     return
   }
 
@@ -778,7 +791,7 @@ async function doAction(action: any, payload: any, options?: any) {
         Message.success(options?.successMessage || `${options.label || '操作'}成功！`)
       }
 
-      if (options?.reload !== false) return doSearch()
+      if (options?.reload !== false) return doReload()
     })
     .finally(() => {
       dialogLoading.value = false
@@ -786,6 +799,25 @@ async function doAction(action: any, payload: any, options?: any) {
 }
 
 const curSearchOptions = ref<any>()
+
+// 重新加载
+async function doReload() {
+  // 非表格列表直接刷新
+  if (!isTreeTable.value) {
+    await doSearch()
+    return
+  }
+
+  // 表格列表根据当前操作类型进行刷新
+  const action = activeAction.value
+  const rowData = action?.contextData?.row
+
+  const refreshed = await refreshTreeNode(rowData, { action })
+
+  if (refreshed !== true) {
+    await doSearch()
+  }
+}
 
 // 执行查询
 async function doSearch(resetPager = false, refreshPager = false) {
@@ -948,6 +980,7 @@ async function doToggleExpand() {
 }
 
 async function tableLoadFn(row: any, node: any, resolve: Function) {
+  // 树形相关数据
   let parentProp = tableAttrs.value.parentProp
   let rowKey = tableAttrs.value.rowKey
 
@@ -982,6 +1015,15 @@ async function tableLoadFn(row: any, node: any, resolve: Function) {
     .finally(() => {
       searchLoading.value = false
     })
+}
+
+/**
+ * 刷新节点
+ */
+async function refreshTreeNode(modal: any, options: any) {
+  if (!tableRef.value || !modal) return
+
+  return await tableRef.value.refreshTreeNode(modal, options)
 }
 </script>
 

@@ -16,6 +16,7 @@ import type {
 import type { RouteRecordRaw } from 'vue-router'
 import type { VueApp, VueComponent } from './typings'
 import type { ApiRequestAction, ApiRequestConfig, ApiQueryRequestConfig, ApiRequest, ApiQueryRequest } from './typings'
+import type { AppAppApiConfig, AppAppConfig, AppComponentsConfig, AppWidgetsConfig, AppMicroConfig } from './typings'
 
 import type {
   RendererOptions,
@@ -32,9 +33,9 @@ import type {
   AppPageLoader,
   AppAuthLoader,
   AppConfigDefinition,
-  PageContext,
   PageInfo,
   PageInfoData,
+  PageContext,
   AppEventListener,
   AppEventListeners
 } from './typings'
@@ -86,6 +87,7 @@ export type { GenericFunction, GenericObject, PromiseFunction, DateValue }
 export type { RouteRecordRaw }
 export type { VueApp, VueComponent }
 export type { ApiRequestAction, ApiRequestConfig, ApiQueryRequestConfig, ApiRequest, ApiQueryRequest }
+export type { AppAppApiConfig, AppAppConfig, AppComponentsConfig, AppWidgetsConfig, AppMicroConfig }
 export type {
   RendererOptions,
   AppStartOptions,
@@ -101,9 +103,9 @@ export type {
   AppLoader,
   AppPageLoader,
   AppAuthLoader,
-  PageContext,
   PageInfo,
   PageInfoData,
+  PageContext,
   AppEventListener,
   AppEventListeners
 }
@@ -111,6 +113,8 @@ export type {
 export type { DataOptionItem, DataOptionItems }
 export type { PageSchema, PartialPageSchema, AppSchema, PartialAppSchema, Widget, Loader }
 export type { CmptAttrs, CmptAttrsMethod, CmptConfig }
+
+export { AppAuthError } from '@zto/zpage-core'
 
 export * from './consts'
 export * from './utils'
