@@ -457,7 +457,27 @@ const tableAttrs = computed(() => {
     loadWithCondition: _.isBoolean(sTree.withCondition) ? sTree.withCondition : true
   }
 
-  const columns = columnsFilterable.value ? innerVisibleColumns.value : innerColumns.value
+  const visibleColumns = columnsFilterable.value ? innerVisibleColumns.value : innerColumns.value
+
+  const columns = (visibleColumns || []).map(it => {
+    const _col = { ...it }
+
+    let _action = _col.action
+    if (_.isString(_action)) {
+      _action = { action: _col.action }
+    }
+
+    if (_action) {
+      let _label = _action.label
+      _col.action = ({ data }: any) => {
+        const _actionAttrs = getOperationActionAttrs(_action, data)
+        _actionAttrs.label = _label // 移除默认label
+        return _actionAttrs
+      }
+    }
+
+    return _col
+  })
 
   return {
     action: sActions.query,

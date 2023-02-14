@@ -115,15 +115,24 @@ const ChildTableColumn = defineComponent({
           }
 
           if (config.action) {
+            let actionConfig: any = {}
+
+            if (_.isFunction(config.action)) {
+              actionConfig = config.action(context, config)
+            } else {
+              actionConfig = { ...config.action }
+            }
+
             // 单元格内的action
             return h(
               CAction,
               {
-                ...config.action,
+                buttonType: 'text',
+                ...actionConfig,
                 contextData: scope,
                 textEllipsis: true
               },
-              innerText
+              actionConfig.label || innerText
             )
           }
 
