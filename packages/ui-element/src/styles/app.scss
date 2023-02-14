@@ -123,6 +123,12 @@ hr.separator {
   color: #999;
 }
 
+.label-required::before {
+  content: '*';
+  color: var(--negative);
+  margin-right: 4px;
+}
+
 ul {
   &.li-decimal {
     li {

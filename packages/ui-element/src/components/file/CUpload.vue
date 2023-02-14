@@ -1,15 +1,15 @@
 <template>
   <div class="c-upload">
     <c-file-upload
-      v-bind="uploadAttrs"
-      :multiple="multiple"
-      :count-limit="innerCountLimit"
       :size-limit="sizeLimit"
       :accept="accept"
       :close-when-completed="closeWhenCompleted"
       :auto-upload="autoUpload"
       :open-file="openFile"
       :tip="tip"
+      v-bind="uploadAttrs"
+      :multiple="multiple"
+      :count-limit="innerCountLimit"
       :disabled="isDisabled"
       @completed="handleUploadCompleted"
     ></c-file-upload>

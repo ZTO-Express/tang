@@ -172,12 +172,17 @@ const formDialogAttrs = computed(() => {
 })
 
 const innerDialogAttrs = computed(() => {
+  let dialogConfig = props.dialog || {}
+  if (_.isFunction(dialogConfig)) {
+    dialogConfig = dialogConfig(actionContext.value)
+  }
+
   return {
     title: actionLabel.value,
     onSubmit: dialogSubmitMethod,
     contextData: props.contextData,
     bodyHeight: attrs.height,
-    ...props.dialog,
+    ...dialogConfig,
     ...props.innerAttrs?.dialog
   }
 })

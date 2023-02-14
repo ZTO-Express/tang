@@ -1,3 +1,4 @@
 import WSection from './WSection.vue'
+import WDivider from './WDivider.vue'
 
-export { WSection }
+export { WDivider, WSection }

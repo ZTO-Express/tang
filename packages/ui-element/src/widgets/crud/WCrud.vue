@@ -357,7 +357,10 @@ const searchItemsAttrs = computed(() => {
 
 // 执行查询
 async function handleSearch() {
-  const valid = await searchFormRef.value.validate()
+  let valid = true
+  if (sSearch.validate) {
+    valid = await searchFormRef.value.validate()
+  }
   if (valid) await doSearch(true)
 }
 
@@ -638,8 +641,6 @@ async function triggerAction(actionCfg: any) {
     await router.goto(link)
   } else if (actionCfg.event) {
     emitter.emits(actionCfg.event, actionData)
-  } else if (actionCfg.trigger) {
-    actionCfg.trigger(actionData, context)
   } else if (actionCfg.dialog) {
     dialogClose.value = false
     nextTick(() => {
@@ -814,6 +815,8 @@ async function doSearch(resetPager = false, refreshPager = false) {
       sSearch.beforeSearch({ ...context, pager, resetPager, refreshPager, searchParams, queryAction })
     )
 
+    if (beforeSearchRes === false) return
+
     if (!_.isUndefined(beforeSearchRes)) searchParams = beforeSearchRes
   }
 
@@ -836,6 +839,8 @@ async function doSearch(resetPager = false, refreshPager = false) {
         const afterSearchRes = await Promise.resolve().then(() =>
           sSearch.afterSearch({ ...context, pager, resetPager, searchParams, queryAction }, res)
         )
+
+        if (afterSearchRes === false) return
 
         if (!_.isUndefined(afterSearchRes)) res = afterSearchRes
       }

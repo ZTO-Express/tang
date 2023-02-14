@@ -6,6 +6,7 @@
     <template v-for="(item, index) in innerFormItems" :key="'form-item' + index">
       <el-col
         v-show="item.isVisible"
+        v-bind="item.colAttrs"
         class="form-item__con"
         :class="{ invisible: item.invisible }"
         :span="item.realSpan"
@@ -34,12 +35,7 @@
               <span v-if="typeof item.label === 'string'">
                 <span v-if="item.labelTip">
                   {{ item.label }}
-                  <el-tooltip
-                    class="box-item"
-                    effect="dark"
-                    :content="item.labelTip"
-                    placement="top-start"
-                  >
+                  <el-tooltip class="box-item" effect="dark" :content="item.labelTip" placement="top-start">
                     <el-icon><QuestionFilled /></el-icon>
                   </el-tooltip>
                   :
