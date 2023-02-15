@@ -73,8 +73,15 @@ export function getColCellStyleFn(app: App, cellStyle: any, columnStyles?: any[]
     let funcStyle: any = {}
     if (_.isFunction(cellStyle)) funcStyle = cellStyle(scope)
 
-    const colStyle = columnStyles?.find(it => it.prop && it.prop === scope.column?.property)
-    const style = app.deepFilter({ ...baseCellStyle, ...funcStyle, ...colStyle?.style }, scope)
+    let colStyle = columnStyles?.find(it => it.prop && it.prop === scope.column?.property)
+
+    let _cellStyle = colStyle?.style
+
+    if (_.isFunction(_cellStyle)) {
+      _cellStyle = _cellStyle(scope)
+    }
+
+    const style = app.deepFilter({ ...baseCellStyle, ...funcStyle, ..._cellStyle }, scope)
 
     return style
   }
