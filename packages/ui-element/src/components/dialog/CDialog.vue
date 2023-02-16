@@ -63,6 +63,7 @@
         </slot>
       </div>
     </template>
+    <CDialog v-for="(d, key) in innerDialogs" :key="key" v-bind="d" :ref="el => setItemRef(el, key)" />
   </el-dialog>
 </template>
 
@@ -71,9 +72,11 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { _, computed, ref, useAttrs, tpl, noop, onBeforeRouteUpdate, useCurrentAppInstance } from '@zto/zpage'
+import { _, computed, ref, useAttrs, noop, onBeforeRouteUpdate, useCurrentAppInstance, reactive } from '@zto/zpage'
 
 import type { CmptConfig, GenericFunction } from '@zto/zpage'
+import { reject } from 'lodash'
+import { Module } from 'module'
 
 const props = withDefaults(
   defineProps<{
@@ -103,6 +106,8 @@ const props = withDefaults(
     beforeSubmit?: GenericFunction
     onSubmit?: GenericFunction
     onShow?: GenericFunction
+
+    innerDialogs?: Record<string, any> // 内部弹框
   }>(),
   {
     appendToBody: true,
@@ -221,10 +226,10 @@ onBeforeRouteUpdate(() => {
 
 /** 组件提交 */
 async function onCmptSubmit(options?: any) {
-  const flag = await doSubmit(options)
-  if (flag === false) return
+  const submitResult = await doSubmit(options)
+  if (submitResult === false) return
 
-  if (options?.closeAfterSuccess !== false) close({ ...options, triggerSuccess: true })
+  if (options?.closeAfterSuccess !== false) close({ ...options, triggerSuccess: true }, submitResult)
 }
 
 function handleActionAfterTrigger(ctx: any, payload: any, options?: any) {
@@ -237,7 +242,6 @@ function handleActionAfterTrigger(ctx: any, payload: any, options?: any) {
 async function submit(options?: any) {
   if (!formRef.value) {
     await doSubmit(options)
-
     return
   }
 
@@ -270,18 +274,15 @@ async function submit(options?: any) {
   //关闭后调用回调
   if (submitFlag) {
     // 根据submit的返回值进行判断，默认返回的是undefined，如果定义了doAction，则需要明确返回false来控制close的是否触发
-    const flag = await doSubmit(options)
-    if (flag === false) return
+    const submitResult = await doSubmit(options)
+    if (submitResult === false) return
 
-    // 没传过callback 调用全局
-    if (!__callbacks__ || !__callbacks__.length) {
-      emit('submitted', dataModel.value, attrs, form, app)
-    }
+    emit('submitted', dataModel.value, attrs, form, app)
 
-    while (__callbacks__ && __callbacks__.length) {
+    while (__callbacks__?.length) {
       const callbackFn = __callbacks__.shift()
       try {
-        await (callbackFn || noop).call(null, dataModel)
+        await (callbackFn || noop).call(null, submitResult, dataModel.value)
       } catch (err: any) {
         __callbacks__.push(callbackFn || noop)
         throw new Error(err)
@@ -297,6 +298,7 @@ async function submit(options?: any) {
  */
 async function show(payload: any, callback?: GenericFunction) {
   dataModel.value = _.deepClone(payload || {})
+
   if (callback) {
     ;(__callbacks__ || (__callbacks__ = [])).push(callback)
   }
@@ -317,7 +319,7 @@ async function show(payload: any, callback?: GenericFunction) {
 /**
  * 关闭
  */
-function close(options?: any) {
+function close(options?: any, submitResult?: any) {
   // 关闭状态不处理
   if (!isShowDialog.value) return
 
@@ -326,7 +328,7 @@ function close(options?: any) {
   // callback清除
   __callbacks__ && (__callbacks__.length = 0)
 
-  emit('close', { model: dataModel.value, options })
+  emit('close', { options, model: dataModel.value, result: submitResult })
 }
 
 /** 提交表单 */
@@ -336,9 +338,10 @@ async function doSubmit(options?: any) {
   let payload = { ...extData, ...dataModel.value }
 
   const beforeSubmit = options?.beforeSubmit || props.beforeSubmit
+
   if (beforeSubmit) {
     const context = app.useContext(payload)
-    let result = await Promise.resolve().then(() => beforeSubmit!(context, dataModel, options))
+    let result = await Promise.resolve().then(() => beforeSubmit!(context, dataModel, options, { ...componentExposed }))
     if (result === false) return false
     if (result && _.isObject(result)) payload = result
   }
@@ -364,15 +367,59 @@ async function doSubmit(options?: any) {
 
   if (!options?.api) return
 
-  await apiRequest({ action: options.api, data: payload })
+  const requestResult = await apiRequest({ action: options.api, data: payload })
+
   Message.success(options?.successMessage || '执行成功！')
+
+  return requestResult
 }
 
-defineExpose({
-  show,
-  close,
-  dataModel
+// ----------- 二次弹窗 ----------->
+
+const innerDialogs = computed(() => {
+  if (!props.innerDialogs || !_.isObject(props.innerDialogs)) return {}
+
+  const _dialog: Record<string, any> = {}
+
+  const context = app.useContext(dataModel.value)
+
+  Object.entries(props.innerDialogs).forEach(([k, d]) => {
+    let _attrs = d
+    if (typeof d === 'function') _attrs = d(context, d)
+
+    _dialog[k] = { ..._attrs }
+  })
+
+  return { ..._dialog }
 })
+
+const innerDialogRefs: Record<string, any> = reactive({})
+
+/** 显示内部弹窗 */
+function showInnerDialog(name: string, payload: any) {
+  const _innerDialogRef = innerDialogRefs[name]
+  return new Promise((resolve, reject) => {
+    if (!_innerDialogRef) reject('获取内部弹框错误')
+
+    _innerDialogRef.show(payload, (submitResult: any, innerModel: any) => {
+      resolve({
+        dataModel: dataModel.value,
+        innerModel,
+        submitResult
+      })
+    })
+  })
+}
+
+const setItemRef = (el: any, key: any) => {
+  if (!el || !key) return
+  innerDialogRefs[key] = el
+}
+
+/** 内部导出 */
+const componentExposed = Object.freeze({ show, close, dataModel, showInnerDialog })
+
+defineExpose({ ...componentExposed })
 </script>
 
 <style lang="scss">
