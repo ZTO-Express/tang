@@ -1,6 +1,7 @@
 <template>
   <!-- eslint-disable vue/no-mutating-props -->
   <el-input
+    class="c-form-item-input"
     v-model="model[prop]"
     v-bind="innerAttrs"
     :placeholder="innerAttrs.placeholder || '请输入'"
@@ -16,7 +17,7 @@ export default { inheritAttrs: false }
 </script>
 
 <script setup lang="ts">
-import { _, watch, computed, useCurrentAppInstance } from '@zto/zpage'
+import { _, watch, unref, computed, useCurrentAppInstance } from '@zto/zpage'
 
 import { useFormItem } from '../util'
 
@@ -72,3 +73,10 @@ watch(
   }
 )
 </script>
+
+<style lang="scss" scoped>
+.c-form-item-input {
+  :deep(input) {
+  }
+}
+</style>

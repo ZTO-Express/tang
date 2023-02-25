@@ -20,7 +20,6 @@ $app-progress-color: #c5cae9;
 $app-header-height: 48px;
 $app-nav-height: 36px;
 $app-sidebar-width: 180px;
-$app-page-height: calc(100vh - $app-header-height);
 $app-page-min-width: 900px;
 
 @mixin content-header() {

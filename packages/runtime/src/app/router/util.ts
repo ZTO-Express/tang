@@ -50,6 +50,11 @@ export function createAppRoutes(router: Router, submodules: Submodule[], options
   })
 }
 
+/** 重新加载模块路由 */
+export function reloadModuleRoutes(router: Router, submodule: Submodule, baseRoute = '') {
+  _createSubRoute(router, submodule, submodule, baseRoute)
+}
+
 /** 清理缓存 */
 export function pruneCachedPage(router: Router, page: any) {
   const key = page?.key
@@ -182,8 +187,14 @@ export async function processAppInitialLocation(app: App) {
 
   if (!pathInfo?.path) return // 路径不存在则不作处理
 
+  // 是否符合独立模块前缀
+  await app.micro.checkActionSingleModuleAppByPath(pathInfo, true)
+
   const existsRoute = app.router.getRouteByMenuPath(pathInfo.path)
-  if (existsRoute) return // route已存在则不作处理
+  if (existsRoute) {
+    app.router.goto(existsRoute)
+    return
+  }
 
   const existsPage = app.pages.find(it => it.path === pathInfo.path)
   if (!existsPage) return // 页面不存在则不作处理

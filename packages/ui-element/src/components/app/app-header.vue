@@ -1,8 +1,8 @@
 <template>
   <div class="app-header fw">
     <div class="header-logo" @click="handleLogoClick">
-      <img :src="appLogo" />
-      <!-- <div class="title">{{ title }}</div> -->
+      <img v-if="appLogo" :src="appLogo" />
+      <div v-if="appTitle" class="title">{{ appTitle }}</div>
     </div>
     <div class="header-body">
       <div class="header-menu">
@@ -44,7 +44,8 @@ const appConfig = app.useAppConfig('', {})
 
 const imageAssets = app.useAssets('images', {})
 
-const appLogo = imageAssets?.logo
+const appLogo = appConfig.logo !== false ? appConfig.logo || imageAssets?.logo : null
+const appTitle = appConfig.title
 const headerExtraComponent = appConfig.header?.extra?.component
 
 const displaySubmodules = appConfig.menu?.displayedSubmodules
@@ -98,7 +99,7 @@ $app-header-inner-height: calc(var(--app-header-height) - $app-header-padding * 
 .header-logo {
   padding: $app-header-padding;
   padding-left: 20px;
-  padding-right: 100px;
+  padding-right: 50px;
   cursor: pointer;
 
   & > img {

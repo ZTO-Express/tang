@@ -104,7 +104,8 @@
                         <i :class="expandedSearch ? 'el-icon-arrow-up' : 'el-icon-arrow-down'"></i>
                       </el-button>
                       <ColumnsFilter
-                        v-if="columnsFilterable"
+                        v-if="isColumnFilter"
+                        ref="columnsFiltererRef"
                         :name="wSchema.name"
                         :columns="innerColumns"
                         :storable="!tableAttrs.dataColumns"
@@ -225,38 +226,32 @@ const tableConfig = app.useComponentsConfig('table', {})
 const dataProp = tableConfig?.data?.dataProp || 'data'
 
 const wSchema = app.useWidgetSchema(props.schema)
-wSchema.toolbar = _.deepMerge(crudConfig.toolbar, wSchema.toolbar)
-wSchema.search = _.deepMerge(crudConfig.search, wSchema.search)
-wSchema.table = _.deepMerge(crudConfig.table, wSchema.table)
-wSchema.tree = _.deepMerge(crudConfig.tree, wSchema.tree)
 
 // 注册微件事件监听
 app.useWidgetEmitter(wSchema, { searchOn: doSearch as any })
 
 // Tab切换时重新布局（防止tab错位）
 emitter.on(UI_GLOBAL_EVENTS.PAGE_TAB_CHANGE, () => {
-  nextTick(() => {
-    doLayout()
-  })
+  doLayout()
 })
 
 // 活动 schema
-const sSection = app.useWidgetSchema(wSchema.section || {})
+const sActions = app.useWidgetSchema(wSchema.actions || {}, props.contextData, { config: crudConfig.actions })
 
 // 活动 schema
-const sActions = app.useWidgetSchema(wSchema.actions || {})
+const sSection = app.useWidgetSchema(wSchema.section || {}, props.contextData, { config: crudConfig.section })
 
 // 查询 schema
-const sSearch = app.useWidgetSchema(wSchema.search || {})
+const sSearch = app.useWidgetSchema(wSchema.search || {}, props.contextData, { config: crudConfig.search })
 
 // 工具栏 schema
-const sToolbar = app.useWidgetSchema(wSchema.toolbar || {})
+const sToolbar = app.useWidgetSchema(wSchema.toolbar || {}, props.contextData, { config: crudConfig.toolbar })
 
 // 表格 schema
-const sTable = app.useWidgetSchema(wSchema.table || {})
+const sTable = app.useWidgetSchema(wSchema.table || {}, props.contextData, { config: crudConfig.table })
 
 // 树形相关schema
-const sTree = app.useWidgetSchema(sTable.tree || {})
+const sTree = app.useWidgetSchema(sTable.tree || {}, props.contextData, { config: crudConfig.tree })
 
 // 是否树形表格
 const isTreeTable = computed(() => {
@@ -264,6 +259,7 @@ const isTreeTable = computed(() => {
 })
 
 const innerColumns = ref<any[]>([])
+
 innerColumns.value = Array.isArray(sTable.columns) ? sTable.columns : []
 
 // 查询数据模型
@@ -279,6 +275,7 @@ const activeAction = ref<any>({})
 const tableRef = ref<any>() // 表格组件
 const dialogRef = ref<any>() // 弹出框
 const searchFormRef = ref<any>() // 查询框
+const columnsFiltererRef = ref<any>() // 列过滤
 
 // 组件上下文数据
 const innerContextData = computed(() => {
@@ -431,9 +428,9 @@ function getToolbarActionAttrs(config: any) {
 /** 可见列 */
 const innerVisibleColumns = ref<any[]>([])
 
-const columnsFilterable = computed(() => {
-  if (_.isBoolean(sTable.columnsFilterable)) return sTable.columnsFilterable
-  return crudConfig.table?.columnsFilterable === true
+const isColumnFilter = computed(() => {
+  if (_.isBoolean(sTable.columnFilter)) return sTable.columnFilter
+  return crudConfig.table?.columnFilter === true
 })
 
 // 行属性类型
@@ -457,7 +454,7 @@ const tableAttrs = computed(() => {
     loadWithCondition: _.isBoolean(sTree.withCondition) ? sTree.withCondition : true
   }
 
-  const visibleColumns = columnsFilterable.value ? innerVisibleColumns.value : innerColumns.value
+  const visibleColumns = isColumnFilter.value ? innerVisibleColumns.value : innerColumns.value
 
   const columns = (visibleColumns || []).map(it => {
     const _col = { ...it }
@@ -469,7 +466,7 @@ const tableAttrs = computed(() => {
 
     if (_action) {
       let _label = _action.label
-      _col.action = ({ data }: any) => {
+      _col.action = ({ data }: PageContext) => {
         const _actionAttrs = getOperationActionAttrs(_action, data)
         _actionAttrs.label = _label // 移除默认label
         return _actionAttrs
@@ -518,9 +515,7 @@ const selectedRows = computed(() => {
 function handleColumnsFilterChange(visibleColumns: any[]) {
   innerVisibleColumns.value = visibleColumns || []
 
-  nextTick(() => {
-    doLayout(true)
-  })
+  doLayout(true)
 }
 
 /** 编辑内容提交触发 */
@@ -778,8 +773,13 @@ async function buildActionData(actionCfg: any, context: PageContext) {
 }
 
 // table重新布局
-function doLayout(force = false) {
-  tableRef.value?.doLayout(force)
+async function doLayout(force = false) {
+  await nextTick(async () => {
+    await tableRef.value?.doLayout(force)
+
+    // 强制重写布局则进行重新加载
+    if (force) await doReload()
+  })
 }
 
 // 执行活动
@@ -943,18 +943,35 @@ async function doAsyncExport(api?: string, options?: any, context?: any) {
   const queryAction = sActions.query || {}
   let searchParams = getSearchParams()
 
+  /** 列过滤数据 */
+  let columnFilterData: string[] = []
+  if (columnsFiltererRef.value) {
+    columnFilterData = columnsFiltererRef.value.getColumnFilterData()
+  }
+
+  /** 导出上下文数据 */
+  const exportContext = app.useContext({
+    searchParams,
+    columnFilter: columnFilterData,
+    actionOptions: options,
+    actionData: context?.data
+  })
+
   if (options?.beforeExport) {
-    const flag = await Promise.resolve().then(() => options?.beforeExport(context, { ...options, searchParams }))
+    const flag = await Promise.resolve().then(() => options?.beforeExport(exportContext, options))
     if (flag === false) return
   }
 
-  // 获取导出参数
+  /**
+   * 获取导出参数
+   * @deprecated 直接使用apiParams
+   */
   const getExportParamsMethod = exportConfig.getExportParams || options.getExportParams
 
-  let reqParams: any = {}
+  let exportApiParams: any = {}
 
   if (getExportParamsMethod) {
-    reqParams = getExportParamsMethod(options, context)
+    exportApiParams = getExportParamsMethod(options, context)
   } else {
     if (options?.exSearchParams) {
       searchParams = { ...searchParams, ...options?.exSearchParams }
@@ -966,12 +983,16 @@ async function doAsyncExport(api?: string, options?: any, context?: any) {
     const searchTypeProp = options.searchTypeProp || exportConfig.searchTypeProp || 'exportType'
     const searchType = options.exportType || options.type
 
-    reqParams = { [searchTypeProp]: searchType, [searchParamProp]: searchParams, ...options.apiParams }
+    if (_.isFunction(options.apiParams)) {
+      exportApiParams = options.apiParams(exportContext)
+    } else {
+      exportApiParams = { [searchTypeProp]: searchType, [searchParamProp]: searchParams, ...options.apiParams }
+    }
   }
 
   await apiRequest({
     action: { ...queryAction, api, type: 'export' },
-    params: reqParams
+    params: exportApiParams
   })
 
   if (options?.openDownloads !== false) {
@@ -1114,6 +1135,10 @@ async function refreshTreeNode(modal: any, options: any) {
         height: 100%;
       }
     }
+  }
+
+  :deep(.el-table__body-wrapper) {
+    height: 100%;
   }
 }
 </style>

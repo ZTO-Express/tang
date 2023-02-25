@@ -39,7 +39,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { tpl, computed, ref, watch, useCurrentAppInstance } from '@zto/zpage'
+import { computed, ref, watch, useCurrentAppInstance } from '@zto/zpage'
+import filter from 'lodash-es/filter'
 
 import { useFormItem } from '../util'
 
@@ -57,7 +58,8 @@ const props = withDefaults(
     optionValueProp?: string
     collapseTags?: boolean
     filterable?: boolean
-    optionsFilter?: GenericFunction
+    optionsFilter?: GenericFunction | Object
+    defaultFirst?: boolean
     noWriteback?: boolean
     multiple?: boolean
   }>(),
@@ -83,11 +85,15 @@ const groupLabels = ref<any[]>([])
 const selectGroupName = computed(() => props.groupName)
 
 const selectOptions = computed(() => {
-  let options = props.options || []
+  let options: any = props.options || []
   if (typeof props.options === 'function') {
     options = props.options(context)
   } else if (typeof props.options === 'string') {
     options = app.getCommonOptions(props.options) || []
+  }
+
+  if (props.optionsFilter) {
+    options = filter(options, props.optionsFilter)
   }
 
   return (options || []) as any[]

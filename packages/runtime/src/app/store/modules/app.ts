@@ -112,6 +112,22 @@ export function defineAppStore(app: App) {
         this.init({ submodules })
       },
 
+      // 重新加载模块
+      async reloadModule(name: string, options: Record<string, any>) {
+        if (!name || !options) return
+
+        const submodule = this.allSubmodules.find(it => it.name === name)
+        if (!submodule) return
+
+        if (options.children) {
+          submodule.children = options.children
+        }
+
+        if (options.singleModule) {
+          submodule.singleModule = options.singleModule
+        }
+      },
+
       // 设定指定模块的当前页面
       setSubmoduleCurrent(submoduleName: string, pageKey: string) {
         if (!submoduleName || !pageKey) return
@@ -131,6 +147,9 @@ export function defineAppStore(app: App) {
 
         // 若子模块与当前子模块相同，则不作任何操作
         if (payload.name === navMenu.submodule) return
+
+        // 检查并激活应用
+        await app.micro.checkActiveSingleModuleApp(payload.name, true)
 
         this.setNavMenu(payload)
 

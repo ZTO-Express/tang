@@ -50,7 +50,7 @@ export const LocalAuthLoader: AppAuthLoader = {
     const { authApi } = app.apis
 
     if (authApi?.logout) {
-      authApi.logout()
+      await authApi.logout()
     } else {
       await app.token.clearData()
     }

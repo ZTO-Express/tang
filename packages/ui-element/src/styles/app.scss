@@ -257,3 +257,67 @@ ul {
     }
   }
 }
+
+.app-header-extra {
+  display: flex;
+  height: var(--app-header-height);
+  padding-right: 20px;
+
+  & > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .button-link {
+    position: relative;
+    color: white;
+    font-weight: normal;
+    cursor: pointer;
+    margin-right: 10px;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &.icon {
+      padding-left: 15px;
+    }
+
+    & > .icon {
+      position: absolute;
+      left: 0;
+    }
+  }
+
+  .link-item {
+    display: inline-block;
+    &.plain {
+      cursor: default;
+    }
+  }
+
+  .dropdown-con {
+    margin-left: 10px;
+  }
+
+  .dropdown-link {
+    cursor: pointer;
+    color: white;
+    position: relative;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &__icon {
+      position: absolute;
+      margin-left: 5px;
+      margin-top: -2px;
+    }
+  }
+
+  .link-item + .link-item {
+    margin-left: 30px;
+  }
+}

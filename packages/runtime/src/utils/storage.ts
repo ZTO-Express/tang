@@ -1,3 +1,5 @@
-import _storage from 'store2'
+import store2 from 'store2'
 
-export const storage = _storage
+import { StorageType } from '../typings/storage'
+
+export const storage: StorageType = store2

@@ -61,6 +61,30 @@ export class InternalAppMicro extends AppInterior<InternalAppMicro> {
     await Promise.all(stops)
   }
 
+  /** 检查并并根据激活独立模块应用，一般用在应用户刷新时 */
+  async checkActionSingleModuleAppByPath(pathInfo: any, forceLoad = false) {
+    const appCfg = this._config.apps?.find(it => {
+      if (it.singleModule !== true) return false
+
+      const flag = checkActiveRule(it.activeRule, this.app, pathInfo)
+      return flag
+    })
+
+    if (!appCfg) return
+
+    const app = await this._doActiveApp(appCfg, forceLoad)
+    return app
+  }
+
+  /** 检查并激活独立模块应用 */
+  async checkActiveSingleModuleApp(moduleName: string, forceLoad = false) {
+    const appCfg = this._config.apps?.find(it => it.name === moduleName && it.singleModule === true)
+    if (!appCfg) return
+
+    const app = await this._doActiveApp(appCfg, forceLoad)
+    return app
+  }
+
   /**
    * 检查并激活应用
    * @param forceLoad 如果没有加载则强制加载
@@ -72,6 +96,13 @@ export class InternalAppMicro extends AppInterior<InternalAppMicro> {
       this._activeApp = undefined
       return
     }
+
+    const app = await this._doActiveApp(appCfg, forceLoad)
+    return app
+  }
+
+  private async _doActiveApp(appCfg: MicroAppConfig | null, forceLoad = false) {
+    if (!appCfg) return
 
     if (!appCfg.name) throw new Error('当前应用配置错误，缺少name属性')
 
@@ -110,7 +141,7 @@ export class InternalAppMicro extends AppInterior<InternalAppMicro> {
 
     const metaApp = new MetaApp(this.app, appOptions)
 
-    await metaApp.start()
+    await metaApp.start(cfg)
 
     this._apps.push(metaApp)
 

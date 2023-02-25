@@ -31,7 +31,6 @@ onUpdated(() => {
 })
 </script>
 
-
 <style lang="scss" scoped>
 .c-more-action {
   display: inline-block;

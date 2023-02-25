@@ -16,12 +16,12 @@ export function useAppConfigs(app: App, cfgs: AppConfigDefinition[]): AppConfig 
 
 /** 应用页面配置 */
 export function useAppPages(app: App, pages?: AppPageDefinition[]): PageSchema[] {
-  const schemas = (pages || []).map(it => {
+  const _schemas = (pages || []).map(it => {
     const s = _useAppPage(app, it)
     return s
   })
 
-  return schemas
+  return _schemas
 }
 
 /** 检查当前配置是否应用方法 */

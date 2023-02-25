@@ -9,7 +9,7 @@
     <div class="c-error-page__footer">
       <div class="c-error-page__title">{{ errorInfo.description }}</div>
       <div class="c-error-page__tip">{{ errorInfo.message }}</div>
-      <div class="c-error-page__action">
+      <div v-if="isTopWindow" class="c-error-page__action">
         <el-button v-if="linkLabel" type="primary" size="small" v-preventReclick @click="handleLink">
           {{ linkLabel }}
         </el-button>
@@ -39,6 +39,8 @@ const props = withDefaults(
   }
 )
 
+const isTopWindow = window.top === window
+
 const DefaultErrorInfos: Record<string, any> = {
   '403': {
     description: '权限不足',
@@ -56,7 +58,7 @@ const DefaultErrorInfos: Record<string, any> = {
 
 const emit = defineEmits(['link', 'logout'])
 
-const defaultErrorPic = 'https://fscdn.zto.com/fs21/M01/F6/77/CgRRhGGLgYWAXrUCAAA4nWZTAXY302.png'
+const defaultErrorPic = '/images/error.jpg'
 
 const app = useCurrentAppInstance()
 

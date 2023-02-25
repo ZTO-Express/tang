@@ -2,9 +2,9 @@ import { resolveComponent } from 'vue'
 import { App } from './App'
 import { useAppConfigs, useAppPages } from './config/use-config'
 
-import { _, formatText, resolveVueAsset } from '../utils'
+import { _, formatText, resolveVueAsset, flattenTree } from '../utils'
 import { mergeLoaders } from './loaders'
-import { initalizeApis, normalizeWidgetName } from './_internal/util'
+import { initalizeApis, camelizeSchemaName, normalizeWidgetName } from './_internal/util'
 
 import type { PageSchema, Widget } from '@zto/zpage-core'
 import type {
@@ -17,8 +17,14 @@ import type {
   FormatTextOptions,
   MetaAppInstallFunction,
   VueComponent,
-  AppExContext
+  AppExContext,
+  AppWidgetSchema,
+  AppAuthLoader,
+  MicroAppConfig
 } from '../typings'
+import { AppLoaderType } from '../consts'
+
+import { reloadModuleRoutes } from './router/util'
 
 /**
  * 元应用为嵌入在主应用中的应用
@@ -40,6 +46,7 @@ export class MetaApp {
 
   readonly components: Record<string, VueComponent>
   readonly widgets: Record<string, Widget>
+  readonly schemas: Record<string, AppWidgetSchema>
 
   private _install?: MetaAppInstallFunction
   private _onLoad?: Function
@@ -89,7 +96,12 @@ export class MetaApp {
     this.widgets = (exts.widgets || []).reduce((acc, cur) => {
       acc[cur.name] = cur
       return acc
-    }, {})
+    }, {} as Record<string, Widget>)
+
+    this.schemas = (exts.schemas || []).reduce((acc, cur) => {
+      acc[cur.name] = cur
+      return acc
+    }, {} as Record<string, AppWidgetSchema>)
 
     mainApp.micro.checkActiveApp()
   }
@@ -107,6 +119,14 @@ export class MetaApp {
 
   get api() {
     return this.apis.appApi
+  }
+
+  /** 获取组件 */
+  resolveSchema(name: string) {
+    if (!_.isString(name)) return name
+
+    let sName = camelizeSchemaName(name)
+    return this.schemas[sName] || this.mainApp.schemas[name]
   }
 
   /** 获取组件 */
@@ -129,8 +149,13 @@ export class MetaApp {
   /**
    * 启用应用
    */
-  async start() {
+  async start(cfg: MicroAppConfig) {
     const mainApp = this.mainApp
+
+    // 如果是单独配置应用，则初始化当前模块菜单
+    if (cfg.singleModule === true) {
+      await this._loadSingleModule(cfg.name)
+    }
 
     // 安装元应用
     if (this._install) await this._install(mainApp)
@@ -143,6 +168,75 @@ export class MetaApp {
   /** 暂停元应用 */
   async stop() {
     if (this._onUnload) await Promise.resolve().then(() => this._onUnload!(this.mainApp))
+  }
+
+  /** 加载单独模块 */
+  private async _loadSingleModule(moduleName: string) {
+    const { appStore, userStore } = this.mainApp.stores
+
+    const targetModule = appStore.submodules.find(it => it.name === moduleName)
+    if (!targetModule) return
+
+    // 清理原菜单并重建
+    const authLoader = this.useAuthLoader()
+    if (!authLoader) return
+
+    // 元应用动态加载菜单
+    if (authLoader.getMetaUserData) {
+      const userData = await authLoader.getMetaUserData(this)
+      let { menus, permissions } = userData || {}
+
+      /** TODO: 后续可以通过数据隔离的方式更安全的管理第三方应用 */
+
+      /** 为菜单名加前缀，防止命名冲突 */
+      const allMenus = flattenTree(menus || [])
+      allMenus.forEach(it => {
+        it.name = `${moduleName}__${it.name}`
+      })
+
+      if (!targetModule.children?.length) {
+        await appStore.reloadModule(moduleName, {
+          singleModule: true,
+          children: menus
+        })
+
+        const baseRoute = this.mainApp.useConfig('router.base', '')
+        await reloadModuleRoutes(this.mainApp.router, targetModule, baseRoute)
+      }
+
+      /** 为权限加前缀，防止命名冲突 */
+      permissions = (permissions || []).map(p => `${moduleName}__${p}`)
+
+      await userStore.patchPermissions(permissions || [])
+    }
+  }
+
+  /** 获取auth loader, 默认获取当前配置的loader */
+  useAuthLoader(name?: string): AppAuthLoader | undefined {
+    if (!name) name = this.useAppConfig('auth', {}).loader
+    if (!name) return undefined
+
+    return this.useLoader<AppAuthLoader>(AppLoaderType.AUTH, name)
+  }
+
+  /** 获取loader */
+  useLoader<T extends AppLoader>(type: AppLoaderType, name: string): T | undefined {
+    if (!type || !name) return undefined
+
+    if (typeof name === 'object') return name
+
+    const _loader = this.loaders.find(it => it.type === type && it.name === name)
+    return _loader as T | undefined
+  }
+
+  useAppConfig(path?: string, defaultValue?: unknown) {
+    const _path = path ? `.${path}` : ''
+    return this.useConfig(`app${_path}`, defaultValue)
+  }
+
+  useConfig(path: string, defaultValue?: unknown) {
+    const cfg = _.get(this.config, path, defaultValue)
+    return cfg
   }
 
   // 格式化

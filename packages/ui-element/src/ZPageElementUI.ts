@@ -9,6 +9,7 @@ export const root = AppRoot as unknown as VueComponent
 export const theme = AppTheme
 export const router = AppRouter
 
+export * from './consts'
 export * from './composables'
 export * from './utils'
 export * from './components/form/util'

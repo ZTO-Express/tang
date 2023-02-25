@@ -1,14 +1,7 @@
 import { _ } from './util'
 import * as dateUtil from './date'
 
-import type { DateValue, DataOptionItem } from '../typings'
-import type { App } from '../app'
-
-/** 值格式化上下文 */
-export interface FormatterOptionsContext {
-  app?: App
-  [prop: string]: any
-}
+import type { DateValue, DataOptionItem, FormatterOptionsContext } from '../typings'
 
 export interface MoneyFormatOptions {
   decimals?: number // 保留小数位数
@@ -112,10 +105,9 @@ export function yesNo(input: number | boolean, opts: { options?: string[] } = {}
 }
 
 /** 启用停用 */
-export function enableStr(input: any, options?: string[]) {
-  options = options || ['启用', '停用']
-
-  return yesNo(input, {options})
+export function enableStr(input: any, opts: { options?: string[] } = {}) {
+  opts = { options: ['启用', '停用'], ...opts }
+  return yesNo(input, opts)
 }
 
 /** 对象字符串化 */

@@ -132,7 +132,7 @@ const ChildTableColumn = defineComponent({
                 contextData: scope,
                 textEllipsis: true
               },
-              actionConfig.label || innerText
+              actionConfig?.label || innerText
             )
           }
 

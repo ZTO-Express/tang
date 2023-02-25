@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { ROOT_ROUTE_NAME, ERROR_ROUTE_NAMES } from '../../consts'
-import { getPageKey, tpl, _ } from '../../utils'
+import { ROOT_ROUTE_NAME, ERROR_ROUTE_NAMES, LOGIN_ROUTE_NAME } from '../../consts'
+import { getPageKey, _ } from '../../utils'
 import { pruneCachedPage, processAppInitialLocation } from './util'
 
 import type { Router } from 'vue-router'
@@ -25,6 +25,13 @@ export function createAppRouter(app: App, config?: AppRouterConfig) {
   if (!_router.goHome) {
     _router.goHome = async () => {
       return await _router.push({ name: ROOT_ROUTE_NAME })
+    }
+  }
+
+  /** 跳转至登录页 */
+  if (!_router.goLogin) {
+    _router.goLogin = async () => {
+      return await _router.push({ name: LOGIN_ROUTE_NAME })
     }
   }
 
@@ -196,27 +203,28 @@ export function createAppRouter(app: App, config?: AppRouterConfig) {
   if (config?.beforeEach) {
     _router.beforeEach(config?.beforeEach)
   } else {
-    _router.beforeEach(async (to, from, next) => {
+    _router.beforeEach(async (to: any, from, next) => {
+      if (to.name === LOGIN_ROUTE_NAME) {
+        return next()
+      }
+
       if (!from.name) {
-        if (_.isString(to.name) && ERROR_ROUTE_NAMES.includes(to.name)) {
-          next()
-          return
+        if (_.isString(to.name) && [...ERROR_ROUTE_NAMES].includes(to.name)) {
+          return next()
         }
 
         if (to.meta?.isTemp) {
           if (to.meta?.parentName) {
-            next({ name: to.meta.parentName as string, replace: true })
+            return next({ name: to.meta.parentName as string, replace: true })
           } else {
-            next({ name: ROOT_ROUTE_NAME, replace: true })
+            return next({ name: ROOT_ROUTE_NAME, replace: true })
           }
-          return
         } else if (!to.meta?.redirectQuery) {
           // vue router的match只关注path，这里通过path和query进行匹配
           const menuPath = location.hash.substring(1)
           const route = _router.getRouteByMenuPath(menuPath)
           if (route?.name && route.name !== to.name) {
-            next({ name: route.name, query: to.query, replace: true })
-            return
+            return next({ name: route.name, query: to.query, replace: true })
           }
         }
       }
@@ -225,8 +233,7 @@ export function createAppRouter(app: App, config?: AppRouterConfig) {
         const query = Object.assign({}, to.query, to.meta?.redirectQuery)
 
         if (!_.deepEqual(query, to.query)) {
-          next({ name: to.name as string, query, replace: true })
-          return
+          return next({ name: to.name as string, query, replace: true })
         }
       }
 
@@ -237,21 +244,7 @@ export function createAppRouter(app: App, config?: AppRouterConfig) {
         })
       }
 
-      // pageKey
-      const fromPageKey = getPageKey(from)
-      const toPageKey = getPageKey(to)
-      // console.log('from ===', from)
-      // console.log('to ===', to)
-
-      app.emits('trace', {
-        event_code: 'route',
-        event_data: {
-          from,
-          to,
-        }
-      })
-
-      next()
+      return next()
     })
   }
 

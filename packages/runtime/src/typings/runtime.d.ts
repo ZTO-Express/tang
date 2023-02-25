@@ -1,5 +1,6 @@
 import type { Widget, Loader, Plugin, PromiseFunction, AppSchema, PageSchema } from '@zto/zpage-core'
 import type { VueApp, VueComponent } from './vue'
+import type { TextFormatters } from './config'
 
 /** option选项相关配置 */
 export interface DataOptionItem {
@@ -17,6 +18,12 @@ export type TextFormatters = Record<string, TextFormatter>
 // 格式化选项
 export interface FormatTextOptions {
   formatters?: TextFormatters
+  [prop: string]: any
+}
+
+/** 值格式化上下文 */
+export interface FormatterOptionsContext {
+  app?: App
   [prop: string]: any
 }
 

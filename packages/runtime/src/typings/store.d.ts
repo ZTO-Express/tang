@@ -84,6 +84,7 @@ export interface AppActions {
   getData<T = any>(path?: string): T | undefined
   init(payload: { appId?: string; default?: string; submodules?: Submodule[] }): void
   load(options?: Record<string, any>): Promise<void>
+  reloadModule(name: string, options?: Record<string, any>): Promise<void>
   setSubmoduleCurrent(submoduleName: string, pageKey: string): void
   changeSubmodule(payload: any): Promise<void>
 }
@@ -107,6 +108,7 @@ export interface UserGetters extends _GettersTree<UserState> {}
 
 export interface UserActions {
   set(payload: Record<string, any>): void
+  patchPermissions(permissions: string[]): void
   setData(payload: SetDataOptions): void
   getData<T = any>(path?: string): T | undefined
   load(payload: Record<string, any>): Promise<void>

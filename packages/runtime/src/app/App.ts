@@ -1,7 +1,7 @@
 import { reactive, createApp, onUnmounted, watch, computed, resolveComponent } from 'vue'
 import { createPinia, Pinia } from 'pinia'
 import { Router, useRoute } from 'vue-router'
-import { AppError, ErrorCodes, Nil } from '@zto/zpage-core'
+import { AppAuthError, AppError, ErrorCodes, Nil } from '@zto/zpage-core'
 
 import { AppLoaderType, FlushAppContextType, PAGE_SEARCH_DATA_KEY, PAGE_SEARCH_EVENT_KEY } from '../consts'
 import { _, tpl, warn, queryEl, formatText, Emitter } from '../utils'
@@ -14,7 +14,7 @@ import { useAppConfigs, useAppPages } from './config/use-config'
 import { HostApp } from './HostApp'
 
 import { InternalAppAuth, InternalAppToken, InternalAppMicro } from './_internal'
-import { initalizeApis, normalizeWidgetName } from './_internal/util'
+import { camelizeSchemaName, initalizeApis, normalizeWidgetName } from './_internal/util'
 
 import { storage } from '../utils'
 import * as runtime from '../ZPageRuntime'
@@ -41,10 +41,15 @@ import type {
   AppPageDefinition,
   DataOptionItem,
   AppEventListener,
-  AppEventListeners
+  AppEventListeners,
+  AppWidgetSchema
 } from '../typings'
 
 import type { TextFormatters, FormatTextOptions, DataOptionItems } from '../typings'
+
+export interface UseWidgetSchemaOptions {
+  config?: any
+}
 
 /** 已创建的应用名 */
 const __app_names: string[] = []
@@ -69,6 +74,7 @@ export class App implements Installable {
   readonly _pages: PageSchema[] // 本地pages
   readonly _loaders: AppLoader[]
   readonly _formatters: TextFormatters
+  readonly _schemas: Record<string, AppWidgetSchema>
 
   private _container?: Element | undefined
   private _vueApp?: VueApp<Element>
@@ -128,6 +134,9 @@ export class App implements Installable {
 
     // 创建加载器
     this._loaders = mergeLoaders(getInnerLoaders(), exts.loaders)
+
+    // 自定义格式化
+    this._schemas = Object.freeze(exts.schemas || {})
 
     // 自定义格式化
     this._formatters = Object.freeze(exts.formatters || {})
@@ -226,6 +235,10 @@ export class App implements Installable {
     return this._widgets
   }
 
+  get schemas() {
+    return this._schemas
+  }
+
   get storage() {
     return storage
   }
@@ -236,7 +249,7 @@ export class App implements Installable {
    */
   async start(options: AppStartOptions) {
     if (this.isMicro && !this.isDebug && !HostApp.loaded) {
-      this.setError(new Error('宿主应用未加载，无法启动微应用！'))
+      this.setError('宿主应用未加载，无法启动微应用！')
     }
 
     await installUI(this, options)
@@ -248,7 +261,11 @@ export class App implements Installable {
       try {
         await this.auth.checkStartAuth()
       } catch (ex) {
-        this.setError(ex, '验证权限错误')
+        if (AppError.isZPageError(ex)) {
+          this.setError(ex)
+        } else {
+          this.setError(new AppAuthError(ex, '验证权限错误'))
+        }
       }
     }
 
@@ -264,7 +281,11 @@ export class App implements Installable {
         // 加载app初始化数据
         await appStore.load(options)
       } catch (ex) {
-        this.setError(ex, '加载应用数据错误')
+        if (AppError.isZPageError(ex)) {
+          this.setError(ex)
+        } else {
+          this.setError(ex, '加载应用数据错误')
+        }
       }
     }
 
@@ -316,10 +337,12 @@ export class App implements Installable {
     await this.micro.start()
 
     // 检查应用错误
-    await this.checkError()
+    const checkFlag = await this.checkError()
 
-    // 第一次加载出现临时路径刷新问题
-    processAppInitialLocation(this)
+    if (checkFlag) {
+      // 第一次加载出现临时路径刷新问题
+      processAppInitialLocation(this)
+    }
 
     return this
   }
@@ -384,13 +407,14 @@ export class App implements Installable {
     return this
   }
 
-  useWidgetSchema(schema: any, payload?: any) {
+  useWidgetSchema(schema: any, contextData?: any, options: UseWidgetSchemaOptions = {}) {
     if (typeof schema === 'function') {
-      const ctx = this.useContext(payload)
-      return schema.call(null, ctx)
+      const ctx = this.useContext(contextData)
+      schema = schema.call(null, ctx)
     }
 
-    return schema
+    const _schema = _.deepMerge(options.config, schema)
+    return _schema
   }
 
   useComputedWidgetSchema(schema: any, payload?: any) {
@@ -648,6 +672,15 @@ export class App implements Installable {
     return this.useConfig(`assets${_path}`, defaultValue)
   }
 
+  /** 获取通用schema */
+  resolveSchema(name: string) {
+    if (!_.isString(name)) return name
+    if (this.metaApp) return this.metaApp.resolveSchema(name)
+
+    const sName = camelizeSchemaName(name)
+    return this.schemas[sName]
+  }
+
   /** 获取组件 */
   resolveComponent(name: string) {
     if (!_.isString(name)) return name
@@ -661,9 +694,9 @@ export class App implements Installable {
       const component = this.resolveComponent(name)
       acc[name] = component
       return acc
-    }, {})
+    }, {} as Record<string, VueComponent>)
 
-    return records as Record<string, VueComponent>
+    return records
   }
 
   /** 获取组件 */
@@ -675,7 +708,13 @@ export class App implements Installable {
   }
 
   setError(err: any, description?: string) {
-    this._error = new AppError(err, description)
+    if (!err) return
+
+    if (AppError.isZPageError(err)) {
+      this._error = err
+    } else {
+      this._error = new AppError(err, description)
+    }
 
     try {
       // 记录错误信息（便于调试）
@@ -690,15 +729,19 @@ export class App implements Installable {
   async checkError() {
     if (!this.error) return true
 
-    const pathName = this.error.code === ErrorCodes.APP_AUTH_ERROR ? '403' : '500'
+    const isAuthError = this.error.code === ErrorCodes.APP_AUTH_ERROR
 
-    await this.router.replace({
-      name: pathName,
-      params: {
-        description: this.error.description,
-        message: this.error.message
-      }
-    })
+    if (isAuthError && !this.stores.userStore.logged) {
+      await this.router.goLogin()
+    } else {
+      await this.router.replace({
+        name: isAuthError ? '403' : '500',
+        params: {
+          description: this.error.description,
+          message: this.error.message
+        }
+      })
+    }
 
     this.clearError()
 
@@ -812,7 +855,7 @@ export class App implements Installable {
     return this
   }
 
-  /** 应用zpage 插件 */
+  /** 应用ZPage 插件 */
   async apply(plugins: Plugin | Plugin[], ...options: any[]) {
     const existsNames = this.plugins.map(p => p.name)
 
@@ -903,7 +946,6 @@ export class App implements Installable {
   }
 
   filter(target: any, data: any = {}) {
-    if (_.isEmpty(target)) return target
     const ctx = this.useContext(data)
     return tpl.filter(target, ctx)
   }
@@ -949,8 +991,10 @@ export class App implements Installable {
   }
 
   /** 登出系统 */
-  logout() {
-    return this.auth.logout()
+  async logout(redirect = false) {
+    await this.auth.logout()
+
+    if (redirect) await this.router.goLogin()
   }
 
   /** 获取上传token */

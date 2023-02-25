@@ -17,6 +17,7 @@ declare module 'vue-router' {
   interface Router {
     __cachedNodes: Record<string, VNode> // 已缓存节点
     goHome: () => Promise<void | NavigationFailure>
+    goLogin: () => Promise<void | NavigationFailure>
     goBack: () => Promise<void | NavigationFailure>
     goto: (to: any) => Promise<void | NavigationFailure>
     close: (pageKey?: string) => Promise<void>

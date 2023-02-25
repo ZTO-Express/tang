@@ -141,7 +141,7 @@ function _getParentMenuNames(menu: NavMenuItem, allMenus: NavMenuItem[], cached:
   font-size: 14px;
 
   &.is-active {
-    background: url(https://uedcdn.zto.com/static/working/menu-bg.png) left top no-repeat;
+    background: url(/images/menu-bg.png) left top no-repeat;
 
     .img-icon {
       opacity: 1;

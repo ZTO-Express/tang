@@ -1,3 +1,27 @@
+/** 参考vue cacheStringFunction */
+const cacheStringFunction = <T extends (str: string) => string>(fn: T): T => {
+  const cache: Record<string, string> = Object.create(null)
+  return ((str: string) => {
+    const hit = cache[str]
+    return hit || (cache[str] = fn(str))
+  }) as T
+}
+
+const camelizeRE = /-(\w)/g
+/**
+ * @private
+ */
+export const camelize = cacheStringFunction((str: string): string => {
+  return str.replace(camelizeRE, (_, c) => (c ? c.toUpperCase() : ''))
+})
+
+/**
+ * 首字母大写
+ * @param str
+ * @returns
+ */
+export const capitalize = cacheStringFunction((str: string) => str.charAt(0).toUpperCase() + str.slice(1))
+
 /**
  * 以指定字符串填从字符串指定长度
  * @param v
@@ -20,15 +44,6 @@ export function pad(v: string, length = 2, char = '0'): string {
 export function truncate(v: string, length: number, postfix = '...'): string {
   const val = String(v)
   return val.length < length ? val : val.substring(0, length) + postfix
-}
-
-/**
- * 首字母大写
- * @param str
- * @returns
- */
-export function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 /**

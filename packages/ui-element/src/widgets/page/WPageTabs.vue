@@ -1,7 +1,7 @@
 <template>
   <c-page-tabs v-model="tabName" class="w-page-tabs" show-pane :tab-items="tabItems" @change="handleChange">
     <template #default="item">
-      <widget :schema="item.body" />
+      <widget :schema="item.body" :context-data="contextData" />
     </template>
   </c-page-tabs>
 </template>
@@ -12,6 +12,7 @@ import { UI_GLOBAL_EVENTS } from '../../consts'
 
 const props = defineProps<{
   schema: Record<string, any>
+  contextData?: Record<string, any>
 }>()
 
 const app = useCurrentAppInstance()
@@ -19,9 +20,11 @@ const app = useCurrentAppInstance()
 const emitter = app.emitter
 const wSchema = app.useWidgetSchema(props.schema)
 const cTabItems = app.useWidgetSchema(wSchema.items)
+const route = app.useRoute()
 
 // ---- tab相关 ----->
-const defaultTabName = app.filter(wSchema.default)
+// 如果route携带参数defaultTabName，则默认选中此tab页，否则取设置的默认
+const defaultTabName = (route.query['defaultTabName'] as string) || app.filter(wSchema.default)
 
 const tabName = ref<string>(defaultTabName)
 

@@ -123,6 +123,8 @@ export class InternalAppToken extends AppInterior<InternalAppToken> {
 
     const tokenData = this.getLocalData()
     if (tokenData) this.saveData(tokenData)
+
+    return tokenData
   }
 
   /**
@@ -157,7 +159,10 @@ export class InternalAppToken extends AppInterior<InternalAppToken> {
    * @returns
    */
   getData(): TokenData | Nil {
-    return storage.page.get(TOKEN_DATA_STORAGE_KEY)
+    let tokenData = storage.page.get(TOKEN_DATA_STORAGE_KEY)
+    if (!tokenData) tokenData = this.reset()
+
+    return tokenData
   }
 
   /**
@@ -167,6 +172,12 @@ export class InternalAppToken extends AppInterior<InternalAppToken> {
   getAccessToken(): string | Nil {
     const tokenData = this.getData()
     return tokenData?.accessToken
+  }
+
+  setAccessToken(token: string): void {
+    if (!token) return
+
+    this.saveData({ accessToken: token })
   }
 
   /**

@@ -176,7 +176,6 @@ const innerDialogAttrs = computed(() => {
   if (_.isFunction(dialogConfig)) {
     dialogConfig = dialogConfig(actionContext.value)
   }
-
   return {
     title: actionLabel.value,
     onSubmit: dialogSubmitMethod,

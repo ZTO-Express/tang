@@ -24,6 +24,11 @@ export class ZPageError extends Error {
     return errorBody?.message || errorBody?.text || errorBody?.description || defaultText
   }
 
+  // 是否ZPage错误
+  static isZPageError(error: any) {
+    return error instanceof ZPageError
+  }
+
   static createBody(objectOrError: object | string, message?: string, code?: string) {
     if (!objectOrError) {
       return { code, message }

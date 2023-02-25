@@ -38,8 +38,8 @@ const props = withDefaults(
 const { innerAttrs } = useFormItem(props)
 
 // 值发生变化后，调用form的校验，解决值发生变化后没校验的问题
-function handleChange(){
-  if (cForm){
+function handleChange() {
+  if (cForm) {
     cForm.validateFields([props.prop, props.toProp])
   }
 }

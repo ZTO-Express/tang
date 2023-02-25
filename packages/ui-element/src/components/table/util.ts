@@ -1,6 +1,6 @@
-import { _, tpl, formatText, FormatterOptionsContext } from '@zto/zpage'
+import { _, tpl } from '@zto/zpage'
 
-import type { App, PageContext } from '@zto/zpage'
+import type { App, PageContext, FormatterOptionsContext } from '@zto/zpage'
 import type { TableColumn } from './types'
 
 /** 扁平化所有子列
@@ -127,7 +127,6 @@ export function getDefaultColFormatterFn(options?: any) {
 /** 格式化值 */
 export function formatValue(val: any, options: any, dataContext: FormatterOptionsContext) {
   if (typeof options === 'string') options = { name: options }
-
   options = { prefix: '', postfix: '', ...options }
 
   if (_.isEmpty(val)) return options.emptyText || '--'
@@ -136,7 +135,7 @@ export function formatValue(val: any, options: any, dataContext: FormatterOption
 
   let valText = String(val)
 
-  if (options.name) {
+  if (options.name && app) {
     valText = app.formatText(val, options.name, { context: dataContext, ...options })
   }
 

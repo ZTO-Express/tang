@@ -60,12 +60,13 @@ export interface AppAppAuthConfig {
 }
 
 // 微应用激活规则
-export type MicroAppActiveRule = string | ((route: RouteLocationNormalizedLoaded, app: App) => boolean) // 激活规则
+export type MicroAppActiveRule = string | ((route: RouteLocationNormalizedLoaded | string, app: App) => boolean) // 激活规则
 
 /** 单个微应用配置 */
 export interface MicroAppConfig {
   name: string
   activeRule: MicroAppActiveRule
+  singleModule?: boolean // 独立模块名（独立菜单）
   type?: 'meta' | 'qiankun' // 元数据模式，乾坤模式(默认meta模式)
   entry?: string // 元数据模式下的入口
   container?: string // 乾坤模式下的容器
@@ -130,7 +131,7 @@ export interface AppAssetImportTemplateConfig {
 }
 
 export interface AppAssetsConfig {
-  import_templates: Record<string, AppAssetImportTemplateConfig>
+  import_templates?: Record<string, AppAssetImportTemplateConfig>
   [prop: string]: any
 }
 

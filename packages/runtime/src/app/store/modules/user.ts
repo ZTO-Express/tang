@@ -41,10 +41,16 @@ export function defineUserStore(app: App) {
 
           roles: payload.roles,
           menus: payload.menus,
-          permissions: payload.permissions
-        })
+          permissions: payload.permissions,
 
-        this.setData(payload.data)
+          data: payload.data || {}
+        })
+      },
+
+      // 附加权限
+      patchPermissions(permissions: string[]) {
+        if (!permissions?.length) return
+        this.permissions = [...new Set([...this.permissions, ...permissions])]
       },
 
       // 设置user 数据

@@ -1,5 +1,6 @@
 import type { AppLoaderType } from '../consts'
 import type { App } from '../app/App'
+import type { MetaApp } from '../app/MetaApp'
 import type { VueComponent } from './vue'
 import type {
   Router,
@@ -47,6 +48,9 @@ export interface AppSchema extends Schema {
 
 export type PartialAppSchema = Omit<AppSchema, 'type'>
 
+//** 微件schema */
+export type AppWidgetSchema = Schema | ((ctx: PageContext) => Schema)
+
 /** 菜单选项 */
 export interface INavMenuItem<T> {
   name: string
@@ -73,6 +77,7 @@ export interface NavMenuItemConfig extends Partial<INavMenuItem<NavMenuItemConfi
 /** 应用子模块相关信息 */
 export interface Submodule extends NavMenuItem {
   isSubmodule: boolean
+  singleModule: boolean
   defaultMenu?: NavMenuItemConfig
 }
 
@@ -98,6 +103,7 @@ export interface AppUI extends RuntimeUI {
 
 export interface AppExtensions extends RuntimeExtensions {
   loaders?: AppLoader[]
+  schemas?: Schema[]
   widgets?: Widget[]
   components?: VueComponent[]
   formatters?: TextFormatters
@@ -187,6 +193,13 @@ export interface AppLoader extends Loader {
   name: string
 }
 
+export interface MetaUserData {
+  deptCode?: string
+  realName?: string
+  menus?: NavMenuItem[]
+  permissions?: string[]
+}
+
 // 权限加载器
 export interface AppAuthLoader extends AppLoader {
   type: AppLoaderType.AUTH
@@ -199,6 +212,9 @@ export interface AppAuthLoader extends AppLoader {
 
   // 解析获取的菜单数据
   getMenuData: (app: App, ...args: any[]) => Promise<NavMenuItem[]>
+
+  // 解析获取的菜单数据
+  getMetaUserData?: (app: MetaApp, ...args: any[]) => Promise<MetaUserData>
 
   // 登出
   logout: (app: App, ...args: any[]) => Promise<void>
@@ -281,6 +297,7 @@ export interface MetaAppOptions
   extends Partial<
     Omit<AppStartOptions, 'ui' | 'name' | 'env' | 'isDebug' | 'isMicro' | 'container' | 'configs' | 'menus'>
   > {
+  env?: AppEnv
   envMap?: AppEnvMap
   install?: MetaAppInstallFunction
 }

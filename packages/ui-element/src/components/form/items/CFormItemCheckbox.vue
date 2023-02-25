@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
-  <c-checkbox ref="fieldRef" v-model="model[prop]" v-bind="innerAttrs" :disabled="disabled" />
+  <c-checkbox ref="fieldRef" v-model="model[prop]" v-bind="innerAttrs" :context-data="model" :disabled="disabled" />
   <!-- 下面代码，防止初始化时报错 -->
   <div style="display: none">{{ model[prop] }}</div>
 </template>

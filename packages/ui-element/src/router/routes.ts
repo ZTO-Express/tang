@@ -2,6 +2,7 @@ import { ROOT_ROUTE_NAME } from '@zto/zpage'
 
 import AppLayout from '../components/app/AppLayout.vue'
 import CErrorPage from '../components/page/CErrorPage.vue'
+import CLoginPage from '../components/page/CLoginPage.vue'
 
 import type { RouteRecordRaw } from '@zto/zpage'
 
@@ -12,6 +13,11 @@ export const routes: RouteRecordRaw[] = [
     component: AppLayout,
     redirect: '/welcome',
     children: []
+  },
+  {
+    name: 'login',
+    path: '/login', // 无权限页面
+    component: CLoginPage
   },
   {
     name: '403',

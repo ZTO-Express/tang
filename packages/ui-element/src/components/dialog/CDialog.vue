@@ -6,11 +6,21 @@
     :model-value="dialogVisible"
     :close-on-click-modal="false"
     :append-to-body="appendToBody"
+    :fullscreen="innerFullscreen"
     @close="close"
   >
     <template #title>
       <div class="dialog-title">
         <slot name="title">{{ title }}</slot>
+        <div class="dialog-title-actions">
+          <el-button
+            v-if="fullscreenable"
+            class="action-button"
+            type="button"
+            :icon="`el-icon-${innerFullscreen ? 'crop' : 'full-screen'}`"
+            @click="handleToggleFullscreen"
+          ></el-button>
+        </div>
       </div>
     </template>
     <el-row :gutter="24" :style="`margin: 0 0 0; height: ${bodyHeight};`">
@@ -75,8 +85,6 @@ export default { inheritAttrs: false }
 import { _, computed, ref, useAttrs, noop, onBeforeRouteUpdate, useCurrentAppInstance, reactive } from '@zto/zpage'
 
 import type { CmptConfig, GenericFunction } from '@zto/zpage'
-import { reject } from 'lodash'
-import { Module } from 'module'
 
 const props = withDefaults(
   defineProps<{
@@ -107,9 +115,13 @@ const props = withDefaults(
     onSubmit?: GenericFunction
     onShow?: GenericFunction
 
+    fullscreen?: boolean
+    fullscreenable?: boolean
+
     innerDialogs?: Record<string, any> // 内部弹框
   }>(),
   {
+    fullscreenable: false,
     appendToBody: true,
     noSubmit: false,
     noPadding: false,
@@ -139,6 +151,7 @@ const apiRequest = app.request
 
 const contentWrapperRef = ref()
 const isShowDialog = ref(false)
+
 const formRef = ref<any>()
 
 let __callbacks__: GenericFunction[] = []
@@ -236,6 +249,17 @@ function handleActionAfterTrigger(ctx: any, payload: any, options?: any) {
   if (options?.closeAfterSuccess !== false) {
     close({ ...options, triggerSuccess: true })
   }
+}
+
+const isFullscreen = ref(props.fullscreen)
+
+const innerFullscreen = computed(() => {
+  if (props.fullscreenable) return isFullscreen.value
+  return props.fullscreen
+})
+
+function handleToggleFullscreen() {
+  isFullscreen.value = !isFullscreen.value
 }
 
 // 提交
@@ -425,12 +449,29 @@ defineExpose({ ...componentExposed })
 <style lang="scss">
 .c-dialog {
   .dialog-title {
+    position: relative;
     font-size: 14px;
     font-weight: bold;
+    display: flex;
+  }
+
+  .dialog-title-actions {
+    position: absolute;
+    right: 0;
+    top: -5px;
+
+    & > .action-button {
+      border: 0;
+      outline: 0;
+      cursor: pointer;
+      background: 0 0;
+      font-weight: bold;
+      margin-right: 10px;
+      font-weight: bold;
+    }
   }
 
   .dialog-body-con {
-    overflow-y: auto;
     overflow-x: hidden;
     padding: 12px;
 
@@ -462,5 +503,9 @@ defineExpose({ ...componentExposed })
 
 .el-select-dropdown__item {
   height: auto;
+}
+
+.el-dialog__body {
+  overflow-y: auto;
 }
 </style>

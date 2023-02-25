@@ -13,6 +13,7 @@
     :loading="loading"
     :collapse-tags="collapseTags"
     :value-key="modelValueKey"
+    :allow-create="allowCreate"
     @change="handleSelectChange"
     @focus="handleFocusChange"
   >
@@ -104,6 +105,7 @@ const props = withDefaults(
     returnLabel?: boolean
     triggerFocus?: boolean // 是否简单
     collapseTags?: boolean
+    allowCreate?: boolean // 是否允许创建
 
     api?: ApiRequestAction | string
     apiParams?: Record<string, any>

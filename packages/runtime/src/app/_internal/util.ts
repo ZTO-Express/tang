@@ -1,16 +1,20 @@
-import { HttpRequest, _ } from '../../utils'
+import { HttpRequest, strings, _ } from '../../utils'
 
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import type { AppApi, AppApiConfig, MicroAppActiveRule } from '../../typings'
 import type { App } from '../App'
 
 /** 检查指定route是否符合激活规则 */
-export function checkActiveRule(activeRule: MicroAppActiveRule, app: App, route?: RouteLocationNormalizedLoaded) {
+export function checkActiveRule(
+  activeRule: MicroAppActiveRule,
+  app: App,
+  routeOrPath?: RouteLocationNormalizedLoaded | string
+) {
   if (!activeRule) return false
 
-  if (!route) route = app.router.currentRoute.value
+  if (!routeOrPath) routeOrPath = app.router.currentRoute.value
 
-  const routePath = route?.path // 当前路径
+  const routePath = _.isString(routeOrPath) ? routeOrPath : routeOrPath?.path // 当前路径
   if (!routePath) return false
 
   if (_.isString(activeRule)) {
@@ -19,7 +23,7 @@ export function checkActiveRule(activeRule: MicroAppActiveRule, app: App, route?
 
     return _activeRuleReg.test(routePath)
   } else if (_.isFunction(activeRule)) {
-    return activeRule(route, app)
+    return activeRule(routeOrPath, app)
   }
 
   return false
@@ -65,9 +69,26 @@ export function createApi(apiCfg: AppApiConfig, baseCfg: AppApiConfig) {
   return api as AppApi
 }
 
+export function camelizeSchemaName(name: string) {
+  if (!name) return name
+
+  if (name.startsWith('S')) return name
+
+  const sName = normalizeSchemaName(name)
+  return strings.camelize(sName)
+}
+
 /** 规范化Widget名称 */
 export function normalizeWidgetName(name: string) {
   let wName = name
   if (name && !name.startsWith('w-')) wName = `w-${name}`
   return wName
+}
+
+/** 规范化通用名称 */
+export function normalizeSchemaName(name: string) {
+  let sName = name
+  if (name && !name.startsWith('s-')) sName = `s-${name}`
+
+  return sName
 }

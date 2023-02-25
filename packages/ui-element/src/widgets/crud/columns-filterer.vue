@@ -1,17 +1,25 @@
 <template>
-  <el-popover popper-class="column-filterer" placement="bottom-end" :width="180" trigger="click">
+  <el-popover popper-class="column-filterer" placement="bottom-end" :width="180" trigger="click" @hide="handleHide">
     <template #reference>
-      <el-button type="text" class="q-ml-md">
-        列筛选
-        <i class="el-icon-setting"></i>
-      </el-button>
+      <el-badge
+        class="filter-badge"
+        type="warning"
+        :value="filteredColumnProps.length"
+        :hidden="!filteredColumnProps.length"
+      >
+        <el-button type="text" class="q-ml-md">
+          列筛选
+          <i class="el-icon-setting"></i>
+        </el-button>
+      </el-badge>
     </template>
     <div class="filterer-header">
       <el-button type="text" class="q-ml-md" @click="handleReset">重置</el-button>
+      <el-button type="text" class="q-ml-md" @click="handleConfirm">确定</el-button>
     </div>
     <div class="filterer-body">
       <el-checkbox-group class="filterer-checkbox-group" v-model="checks">
-        <el-checkbox v-for="item in columns" class="filterer-checkbox" :key="item.prop" :label="item.prop">
+        <el-checkbox v-for="item in allLeafColumns" class="filterer-checkbox" :key="item.prop" :label="item.prop">
           {{ item.label }}
         </el-checkbox>
       </el-checkbox-group>
@@ -50,54 +58,84 @@ const checks = ref<string[]>([])
 const currentRoute = app.currentRoute.value
 const currentFilterKey = getFilterKey()
 
+const allLeafColumns = computed(() => {
+  const _leafColumns = retrieveLeafColumns(props.columns)
+  return _leafColumns
+})
+
 /** 所有列 */
 const allColumnProps = computed(() => {
-  return props.columns.map(it => it.prop).filter(p => !!p)
+  // 获取所有叶子列（考虑多级表头）
+  const _leafColumnProps = allLeafColumns.value.map(it => it.prop).filter(p => !!p)
+  return _leafColumnProps
+})
+
+/** 已保存的隐藏列属性 */
+const filteredColumnProps = computed(() => {
+  const filteredColumnProps = allColumnProps.value.filter(it => !checks.value.includes(it))
+  return filteredColumnProps || []
 })
 
 /** 可见列 */
 const visibleColumns = computed(() => {
-  const columns = props.columns.filter(it => !it.prop || checks.value.includes(it.prop))
-  return columns
+  const _vColumns = retrieveVisibleColumns(props.columns, filteredColumnProps.value)
+  return _vColumns
 })
-
-watch(
-  () => visibleColumns.value,
-  (cur, old) => {
-    if (cur !== old) {
-      emit('change', visibleColumns.value)
-    }
-  }
-)
 
 onMounted(() => {
   tryInitFilterData()
+
+  active()
 })
 
-onBeforeUnmount(() => {
-  if (!props.filterable) return
-
-  saveFilterData()
-})
+onBeforeUnmount(() => {})
 
 /** 重置 */
 function handleReset() {
   reset()
 }
 
+/** 配置生效 */
+function handleConfirm() {
+  active()
+}
+
+/** 弹框隐藏时触发 */
+function handleHide() {
+  tryInitFilterData()
+}
+
+/** 重置选项 */
+function reset() {
+  checks.value = [...allColumnProps.value]
+}
+
+/** 配置生效 */
+function active() {
+  emit('change', visibleColumns.value)
+  saveFilterData()
+}
+
 /** 尝试初始化过滤事件 */
 function tryInitFilterData() {
-  const filterData = getFilterData()
-
   let visibleProps = [...allColumnProps.value]
 
   // 记录移除的属性
-  const removedProps = filterData.cruds[currentFilterKey] || []
-  if (removedProps.length) {
-    visibleProps = visibleProps.filter(it => !removedProps.includes(it))
+  const filteredProps = getCurrentFilterProps()
+
+  if (filteredProps.length) {
+    visibleProps = visibleProps.filter(it => !filteredProps.includes(it))
   }
 
   checks.value = visibleProps
+}
+
+/** 获取当前过滤的过滤器属性 */
+function getCurrentFilterProps() {
+  const filterData = getFilterData()
+
+  const filteredProps = filterData.cruds[currentFilterKey] || []
+  return filteredProps || []
 }
 
 /** 获取filterData */
@@ -121,16 +159,18 @@ function getFilterData() {
 }
 
 /** 设置持久化 */
-function saveFilterData() {
+function saveFilterData(filteredProps?: string[]) {
   const filterData = getFilterData()
 
   // 如果checks包含所有的属性则直接删除（注意！存储的是移除的key）
-  const removedProps = allColumnProps.value.filter(it => !checks.value.includes(it))
+  if (!filteredProps) {
+    filteredProps = allColumnProps.value.filter(it => !checks.value.includes(it))
+  }
 
-  if (!removedProps.length) {
+  if (!filteredProps.length) {
     delete filterData.cruds[currentFilterKey]
   } else {
-    filterData.cruds[currentFilterKey] = [...removedProps]
+    filterData.cruds[currentFilterKey] = [...filteredProps]
   }
 
   app.setAppData(CRUD_COLUMNS_FILTER_DATA_KEY, filterData)
@@ -149,20 +189,73 @@ function getFilterKey() {
   return routeKey
 }
 
-/** 重置选项 */
-function reset() {
-  checks.value = []
+/** 计算可见列 */
+function retrieveVisibleColumns(columns: any[], filteredColumnProps: string[] = []) {
+  if (!columns?.length || !filteredColumnProps?.length) return columns
 
-  for (let c of props.columns) {
-    checks.value.push(c.prop)
+  let visibleColumns: any[] = []
+
+  columns.forEach(it => {
+    // 不应当修改原列
+    const _col = { ...it }
+
+    if (it.children?.length) {
+      const _children = retrieveVisibleColumns(it.children, filteredColumnProps)
+
+      if (_children.length) {
+        _col.children = _children
+        visibleColumns.push(_col)
+      }
+    } else if (!filteredColumnProps.includes(it.prop)) {
+      visibleColumns.push(_col)
+    }
+  })
+
+  return visibleColumns
+}
+
+/** 计算所有子列 */
+function retrieveLeafColumns(columns: any[], leafColumns: any[] = []) {
+  if (!columns?.length) return leafColumns
+
+  columns.forEach(it => {
+    if (!it.children?.length) leafColumns.push(it)
+
+    retrieveLeafColumns(it.children, leafColumns)
+  })
+
+  return leafColumns
+}
+
+/** 获取列过滤信息 */
+function getColumnFilterData() {
+  const filterData = getFilterData()
+  const filteredProps = getCurrentFilterProps()
+
+  return {
+    filteredProps,
+    columns: props.columns,
+    visibleColumns: visibleColumns,
+    filterData
   }
 }
 
 defineExpose({
   reset,
-  visibleColumns
+  visibleColumns,
+  getColumnFilterData
 })
 </script>
+
+<style lang="scss" scoped>
+.filter-badge {
+  :deep(.el-badge__content) {
+    transform: scale(0.8);
+    right: -10px;
+    top: -5px;
+  }
+}
+</style>
 
 <style lang="scss">
 .el-popover.column-filterer {

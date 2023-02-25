@@ -1,8 +1,8 @@
 <template>
   <c-page class="page-index">
     <c-page-section class="title-section flex-center">
-      <img v-if="welcomePic" :src="welcomePic" />
-      <h1 v-else class="title">{{ title }}</h1>
+      <img v-if="picture" :src="picture" />
+      <h1 v-if="title" class="title">{{ title }}</h1>
     </c-page-section>
   </c-page>
 </template>
@@ -10,15 +10,27 @@
 <script setup lang="ts">
 import { computed, useCurrentAppInstance } from '@zto/zpage'
 
+const props = defineProps<{
+  schema: Record<string, any>
+}>()
+
 const app = useCurrentAppInstance()
 
-const config = app.useAppConfig()
+const wSchema = app.useWidgetSchema(props.schema)
+
+const appConfig = app.useAppConfig()
 const imageAssets = app.useAssets('images', {})
 
-const title = config.title
+const title = computed(() => {
+  if (wSchema.title === false) return null
 
-const welcomePic = computed(() => {
-  return imageAssets.welcome || imageAssets.logo
+  return wSchema.title || appConfig.title
+})
+
+const picture = computed(() => {
+  if (wSchema.picture === false) return null
+
+  return wSchema.picture || imageAssets.welcome || imageAssets.logo
 })
 </script>
 

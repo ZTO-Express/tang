@@ -8,7 +8,7 @@
         :gutter="innerAttrs.row?.gutter || 10"
       >
         <el-col :span="24" v-bind="innerAttrs.col">
-          <widget :schema="it"></widget>
+          <widget :schema="it" :context-data="contextData"></widget>
         </el-col>
       </el-row>
     </template>
@@ -20,7 +20,7 @@
           v-bind="{ ...innerAttrs.col, ...it.colAttrs }"
           :span="it.colSpan || innerAttrs.col?.span"
         >
-          <widget :schema="it"></widget>
+          <widget :schema="it" :context-data="contextData"></widget>
         </el-col>
       </el-row>
     </template>
@@ -37,6 +37,7 @@ import { computed, sizePx, useCurrentAppInstance } from '@zto/zpage'
 // 属性
 const props = defineProps<{
   schema: Record<string, any>
+  contextData?: Record<string, any>
 }>()
 
 const app = useCurrentAppInstance()

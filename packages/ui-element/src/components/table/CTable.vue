@@ -58,9 +58,9 @@
           </el-table-column>
 
           <!-- 展开列-->
-          <el-table-column v-if="showExpand" type="expand" :fixed="showFixed">
+          <el-table-column v-if="props.expand" type="expand" :fixed="showFixed">
             <template #default="scope">
-              <slot v-bind="scope" name="expand" />
+              <widget :schema="props.expand" :context-data="scope" />
             </template>
           </el-table-column>
 
@@ -147,7 +147,6 @@ const props = withDefaults(
     onDataLoad?: GenericFunction // 数据加载
 
     columns?: Array<any> // 列设置
-    showExpand?: boolean // 展开列是否展示
     noPager?: boolean // 是否隐藏分页
     showFixed?: boolean | string // 全选列 展开列 操作列 固定
     totalRows?: number // 总行数
@@ -187,6 +186,8 @@ const props = withDefaults(
     spanMethod?: Function // 合并方法
 
     listeners?: AppEventListeners // 时间监听配置
+
+    expand?: any
 
     export?: Record<string, any> // 导出配置
   }>(),
@@ -243,10 +244,6 @@ const isTreeTable = computed(() => {
 
 const innerSummaryMethod = computed(() => {
   return props.summaryMethod || tableSummaryFn
-})
-
-const innerLoadMethod = computed(() => {
-  return props.loadMethod || tableLoadFn
 })
 
 const innerSpanMethod = computed(() => {
@@ -486,20 +483,36 @@ function normalizeColumns(columns: TableColumn[], pid?: string) {
 }
 
 /** 重新layout */
-function doLayout(force = false) {
-  if (force) {
-    isShowTable.value = false
-    nextTick(() => (isShowTable.value = true))
-  } else {
-    // 多级表头筛选有问题，暂时这样解决
-    if (columnItems.value.find(column => column.children && column.children.length)) {
+async function doLayout(force = false) {
+  await new Promise(resolve => {
+    if (force) {
       isShowTable.value = false
-      nextTick(() => (isShowTable.value = true))
+      setTimeout(() => {
+        isShowTable.value = true
+        resolve(true)
+      }, 10)
+
       return
     }
 
-    tableRef.value.doLayout()
-  }
+    // 多级表头筛选有问题，暂时这样解决
+    if (columnItems.value.find(column => column.children && column.children.length)) {
+      isShowTable.value = false
+      nextTick(() => {
+        isShowTable.value = true
+        resolve(true)
+      })
+      return
+    }
+
+    nextTick(() => {
+      tableRef.value.doLayout()
+
+      nextTick(() => {
+        resolve(true)
+      })
+    })
+  })
 }
 
 // ---- 分页相关 ------->
@@ -852,6 +865,8 @@ function exportData(options?: any) {
   }
 }
 
+// ---- 树形表格处理 ------->
+
 // 树形菜单展开所有（不包括懒加载项）
 function expandAll(expanded: boolean = true) {
   const data = tableData.data || []
@@ -868,6 +883,84 @@ function expandRows(rows: any[], expanded: boolean = true, recursive: boolean = 
       if (recursive) expandRows(it.children, expanded, recursive)
     }
   })
+}
+
+const treeResolveMap = ref(new Map())
+
+async function innerLoadMethod(row: any, node: any, resolve: Function) {
+  const rowKey = props.rowKey
+  if (rowKey) {
+    // 用于刷新树形节点
+    treeResolveMap.value.set(row[rowKey], { row, node, resolve })
+  }
+
+  const loadMethod = props.loadMethod || tableLoadFn
+  await loadMethod(row, node, resolve)
+}
+
+/**
+ * 刷新节点
+ */
+async function refreshTreeNode(model: any, options?: any) {
+  options = { ...options }
+
+  const rowKey = props.rowKey
+  const parentProp = props.parentProp
+
+  if (!rowKey || !parentProp || !model || !tableRef.value) return
+
+  const rowId = model[rowKey]
+  const parentId = model[parentProp]
+
+  const tableRefStore = tableRef.value.store
+  const lazyTreeNodeMap = tableRefStore.states.lazyTreeNodeMap
+
+  if (!parentId || !lazyTreeNodeMap.value) return
+
+  let actionType: string = ''
+
+  if (options.action) {
+    actionType = options.action.actionType || options.action.name
+
+    // 删除当前节点
+    // if (actionType === 'delete') {
+    //   lazyTreeNodeMap.value = _.omit(lazyTreeNodeMap.value, rowId)
+    // }
+  }
+
+  const treeResolve = treeResolveMap.value.get(parentId)
+  if (!treeResolve) return
+
+  const { row, node, resolve } = treeResolve
+
+  lazyTreeNodeMap.value[parentId] = []
+
+  if (row) await innerLoadMethod(row, node, resolve)
+
+  const pNode = findTreeResolveMapNode(parentId)
+
+  if (pNode && ['add', 'delete'].includes(actionType)) {
+    await refreshTreeNode(pNode)
+  }
+
+  return true
+}
+
+/** 找到延迟加载映射节点 */
+function findTreeResolveMapNode(rowId: string) {
+  const tableRefStore = tableRef.value.store
+  const lazyTreeNodeMap = tableRefStore.states.lazyTreeNodeMap
+
+  let node: any = null
+
+  for (let [key, nodes] of Object.entries(lazyTreeNodeMap.value)) {
+    if (!Array.isArray(nodes)) continue
+
+    node = nodes.find(it => it.id === rowId)
+    if (node) break
+  }
+
+  return node
 }
 
 /** 导出组件方法 */
@@ -895,7 +988,8 @@ defineExpose({
   removeRows,
   removeSelectedRows,
   setRowsDatasByKey,
-  setRowsDefaults
+  setRowsDefaults,
+  refreshTreeNode
 })
 </script>
 

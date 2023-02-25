@@ -10,6 +10,8 @@ export const DEFAULT_PAGE_PATH = `/${DEFAULT_PAGE_NAME}` // 默认页名
 export const ROOT_ROUTE_NAME = 'root' // 根路由名称
 export const ROOT_MENU_PREFIX = 'root:' // 根路由名称
 
+export const LOGIN_ROUTE_NAME = 'login' // 根路由名称
+
 export const PAGE_SEARCH_DATA_KEY = '__searchData' // 页面查询数据key
 export const PAGE_SEARCH_EVENT_KEY = '$page_search' // 页面查询事件
 export const PAGE_SEARCHED_EVENT_KEY = '$page_searched' // 页面已查询事件

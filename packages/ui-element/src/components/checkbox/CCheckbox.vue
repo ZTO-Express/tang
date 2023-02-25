@@ -84,6 +84,8 @@ const props = withDefaults(
     optionDisabledProp?: string
     disabled?: boolean
 
+    contextData?: any
+
     api?: ApiRequestAction
     apiParams?: Record<string, any>
     valueProp?: string
@@ -183,7 +185,15 @@ function handleChange(val: any) {
 
 // 获取options数据
 async function fetchOptions() {
+  const context = app.useContext(props.contextData)
+
   let optionsData: any = props.options || []
+
+  if (typeof props.options === 'function') {
+    optionsData = props.options(context)
+  } else if (typeof props.options === 'string') {
+    optionsData = app.getCommonOptions(props.options) || []
+  }
 
   if (props.api) {
     const params = app.deepFilter(props.apiParams)
@@ -214,8 +224,8 @@ async function fetchOptions() {
   }
 
   if (props.onDataLoad) {
-    const context = app.useContext(optionsData)
-    await props.onDataLoad(context)
+    const dataLoadContext = app.useContext(optionsData)
+    await props.onDataLoad(dataLoadContext)
   }
 }
 

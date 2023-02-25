@@ -7,6 +7,7 @@ export * from './config'
 export * from './store'
 export * from './router'
 export * from './App'
+export * from './MetaApp'
 export * from './HostApp'
 
 export * from './start'

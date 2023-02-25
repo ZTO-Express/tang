@@ -38,7 +38,9 @@ export interface HttpRequestConfig {
 
   interceptors?: {
     beforeRequest?: (config: AxiosRequestConfig) => Promise<any> | GenericFunction
+    exBeforeRequest?: (config: AxiosRequestConfig) => Promise<any> | GenericFunction
     requestError?: (error: any, config?: HttpRequestConfig) => Promise<any> | GenericFunction
+    exAfterResponse?: (config: AxiosRequestConfig) => Promise<any> | GenericFunction
     afterResponse?: (response: AxiosResponse, config?: HttpRequestConfig) => Promise<any> | GenericFunction
     responseError?: (error: any, config?: HttpRequestConfig) => Promise<any> | GenericFunction
     afterFetchResponse?: (response: AxiosResponse, config?: HttpRequestConfig) => Promise<any> | GenericFunction
@@ -94,7 +96,7 @@ export class HttpRequest {
   private getInnerConfig() {
     const config = {
       baseURL: this._baseUrl,
-      withCredentials: true,
+      withCredentials: false,
       method: 'POST',
       timeout: 60000,
       ...this._config?.inner,
@@ -119,6 +121,13 @@ export class HttpRequest {
           if (cfg) _config = cfg
         }
 
+        // 第三方扩展截断
+        const exBeforeRequest = this._config?.interceptors?.exBeforeRequest
+        if (exBeforeRequest) {
+          cfg = await Promise.resolve().then(() => exBeforeRequest(cfg))
+          if (cfg) _config = cfg
+        }
+
         return _config
       },
       error => {
@@ -138,12 +147,21 @@ export class HttpRequest {
         let resp = await Promise.resolve().then(() => this._ffb.interceptFfbResponse(response))
         if (resp) _response = resp
 
+        const exAfterResponse = this._config?.interceptors?.exAfterResponse
+        if (exAfterResponse) {
+          resp = await Promise.resolve().then(() => exAfterResponse(resp))
+          if (resp) _response = resp
+        }
+
         const afterResponse = this._config?.interceptors?.afterResponse
-        if (afterResponse) resp = await Promise.resolve().then(() => afterResponse(resp))
-        if (resp) _response = resp
+        if (afterResponse) {
+          resp = await Promise.resolve().then(() => afterResponse(resp))
+          if (resp) _response = resp
+        }
 
         return _response
       },
+
       error => {
         if (url) this.destroy(url)
 
